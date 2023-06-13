@@ -77,7 +77,7 @@ public class DefaultDsonDocWriter extends AbstractDsonDocWriter {
         Context context = getContext();
         if (context.contextType == DsonContextType.OBJECT ||
                 context.contextType == DsonContextType.HEADER) {
-            output.writeString(context.name);
+            output.writeString(context.curName);
         }
     }
     // endregion

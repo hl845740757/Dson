@@ -48,6 +48,12 @@ public class DsonBinary extends DsonValue {
         this.data = Objects.requireNonNull(data);
     }
 
+    /** 默认采取拷贝的方式，保证安全性 */
+    public DsonBinary(DsonBinary src) {
+        this.type = src.type;
+        this.data = src.data.clone();
+    }
+
     public static void checksSubType(int type) {
         Preconditions.checkBetween(type, 0, 255);
     }

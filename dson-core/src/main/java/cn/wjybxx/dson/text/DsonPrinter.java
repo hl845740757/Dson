@@ -25,9 +25,6 @@ import java.util.Objects;
 
 /**
  * 该接口与{@link DsonScanner}对应
- * 总指导：
- * 1. token字符尽量不换行，eg：'{'、'['、'@'
- * 2. token字符和内容的空格缩进尽量在行尾
  *
  * @author wjybxx
  * date - 2023/6/5
@@ -142,6 +139,7 @@ public final class DsonPrinter implements AutoCloseable {
 
     public void flush() {
         try {
+            StringBuilder builder = this.builder;
             if (builder.length() > 0) {
                 // 显式转cBuffer，避免toString的额外开销
                 char[] cBuffer = new char[builder.length()];

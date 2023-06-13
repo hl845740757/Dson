@@ -84,7 +84,7 @@ public abstract class AbstractDsonDocWriter implements DsonDocWriter {
         if (context.state != DsonWriterState.NAME) {
             throw invalidState(List.of(DsonWriterState.NAME), context.state);
         }
-        context.name = name;
+        context.curName = name;
         context.state = DsonWriterState.VALUE;
         doWriteName(name);
     }
@@ -352,7 +352,7 @@ public abstract class AbstractDsonDocWriter implements DsonDocWriter {
         public Context parent;
         public DsonContextType contextType;
         public DsonWriterState state = DsonWriterState.INITIAL;
-        public String name;
+        public String curName;
 
         public Context() {
         }
@@ -371,7 +371,7 @@ public abstract class AbstractDsonDocWriter implements DsonDocWriter {
             parent = null;
             contextType = null;
             state = DsonWriterState.INITIAL;
-            name = null;
+            curName = null;
         }
 
         /** 方便查看赋值的调用 */
@@ -382,6 +382,7 @@ public abstract class AbstractDsonDocWriter implements DsonDocWriter {
         public Context getParent() {
             return parent;
         }
+
     }
 
 }

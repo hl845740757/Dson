@@ -85,7 +85,7 @@ public abstract class AbstractDsonBinWriter implements DsonBinWriter {
         if (context.state != DsonWriterState.NAME) {
             throw invalidState(List.of(DsonWriterState.NAME), context.state);
         }
-        context.name = name;
+        context.curName = name;
         context.state = DsonWriterState.VALUE;
         doWriteName(name);
     }
@@ -353,7 +353,7 @@ public abstract class AbstractDsonBinWriter implements DsonBinWriter {
         public Context parent;
         public DsonContextType contextType;
         public DsonWriterState state = DsonWriterState.INITIAL;
-        public int name;
+        public int curName;
 
         public Context() {
         }
@@ -372,7 +372,7 @@ public abstract class AbstractDsonBinWriter implements DsonBinWriter {
             parent = null;
             contextType = null;
             state = DsonWriterState.INITIAL;
-            name = 0;
+            curName = 0;
         }
 
         /** 方便查看赋值的调用 */

@@ -77,7 +77,7 @@ public class DefaultDsonBinWriter extends AbstractDsonBinWriter {
         Context context = getContext();
         if (context.contextType == DsonContextType.OBJECT ||
                 context.contextType == DsonContextType.HEADER) {
-            output.writeUint32(context.name);
+            output.writeUint32(context.curName);
         }
     }
     // endregion

@@ -26,6 +26,10 @@ import java.io.Writer;
 import java.util.Objects;
 
 /**
+ * 总指导：
+ * 1. token字符尽量不换行，eg：'{'、'['、'@'
+ * 2. token字符和内容的空格缩进尽量在行尾
+ *
  * @author wjybxx
  * date - 2023/4/21
  */
@@ -84,7 +88,7 @@ public class DsonTextWriter extends AbstractDsonDocWriter {
         }
         if (context.contextType == DsonContextType.OBJECT ||
                 context.contextType == DsonContextType.HEADER) {
-            printStringNonSS(printer, context.name);
+            printStringNonSS(printer, context.curName);
             printer.print(": ");
         }
 

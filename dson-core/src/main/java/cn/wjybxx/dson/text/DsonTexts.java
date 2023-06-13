@@ -49,14 +49,15 @@ public class DsonTexts {
 
     /** 长文本，字符串不需要加引号，不对内容进行转义，可直接换行 */
     public static final String LABEL_TEXT = "ss";
+    public static final String LABEL_STRING_VALUE = "sv";
     public static final String LABEL_ARRAY = "[";
     public static final String LABEL_OBJECT = "{";
 
-    public static final Set<String> LABEL_SET = Set.of(
+    private static final Set<String> LABEL_SET = Set.of(
             LABEL_INT32, LABEL_INT64, LABEL_FLOAT, LABEL_DOUBLE,
             LABEL_BOOL, LABEL_NULL, LABEL_BINARY,
             LABEL_EXTINT32, LABEL_EXTINT64, LABEL_EXTSTRING, LABEL_REFERENCE,
-            LABEL_TEXT, LABEL_ARRAY, LABEL_OBJECT);
+            LABEL_TEXT, LABEL_STRING_VALUE, LABEL_ARRAY, LABEL_OBJECT);
 
     // 行首标签
     public static final String LHEAD_COMMENT = "#";
@@ -163,20 +164,20 @@ public class DsonTexts {
     }
 
     public static int parseInt(String str) {
-        if (str.startsWith("0x")) {
+        if (str.startsWith("0x") || str.startsWith("0X")) {
             return Integer.parseInt(str, 2, str.length(), 16);
         }
-        if (str.startsWith("-0x")) {
+        if (str.startsWith("-0x") || str.startsWith("-0X")) {
             return Integer.parseInt(str, 3, str.length(), 16);
         }
         return Integer.parseInt(str);
     }
 
     public static long parseLong(String str) {
-        if (str.startsWith("0x")) {
+        if (str.startsWith("0x") || str.startsWith("0X")) {
             return Long.parseLong(str, 2, str.length(), 16);
         }
-        if (str.startsWith("-0x")) {
+        if (str.startsWith("-0x") || str.startsWith("-0X")) {
             return Long.parseLong(str, 3, str.length(), 16);
         }
         return Long.parseLong(str);

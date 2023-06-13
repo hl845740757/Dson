@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * 抽象实现，提供基于Dson语法的字符串解析目标
+ * 抽象实现，提供基于Dson语法的字符串解析模板
  *
  * @author wjybxx
  * date - 2023/6/3

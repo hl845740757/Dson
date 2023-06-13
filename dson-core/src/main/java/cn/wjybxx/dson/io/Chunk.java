@@ -68,6 +68,13 @@ public final class Chunk {
         }
         this.used = used;
     }
+
+    public byte[] payload() {
+        byte[] r = new byte[length];
+        System.arraycopy(buffer, offset, r, 0, length);
+        return r;
+    }
+
     //
 
     public byte[] getBuffer() {

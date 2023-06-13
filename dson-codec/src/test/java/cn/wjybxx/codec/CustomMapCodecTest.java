@@ -16,8 +16,6 @@
 
 package cn.wjybxx.codec;
 
-import cn.wjybxx.dson.AutoTypeArgs;
-import cn.wjybxx.dson.ClassImpl;
 import cn.wjybxx.dson.DsonType;
 import cn.wjybxx.codec.binary.BinaryObjectReader;
 import cn.wjybxx.codec.binary.BinaryObjectWriter;

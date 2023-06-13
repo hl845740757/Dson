@@ -22,8 +22,6 @@ import cn.wjybxx.codec.binary.BinaryObjectReader;
 import cn.wjybxx.codec.binary.BinaryObjectWriter;
 import cn.wjybxx.codec.binary.BinaryPojoCodecImpl;
 import cn.wjybxx.codec.binary.DefaultBinaryConverter;
-import cn.wjybxx.dson.codec.ClassId;
-import cn.wjybxx.dson.codec.ConvertOptions;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
