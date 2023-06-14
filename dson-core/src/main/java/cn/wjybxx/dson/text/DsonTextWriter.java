@@ -93,7 +93,7 @@ public class DsonTextWriter extends AbstractDsonDocWriter {
         }
 
         if (dsonType == DsonType.HEADER) {
-            context.headerWrited = true;
+            context.headerCount++;
         } else {
             context.count++;
         }
@@ -414,7 +414,7 @@ public class DsonTextWriter extends AbstractDsonDocWriter {
         if (context.style == ObjectStyle.INDENT) {
             printer.retract();
             // 打印了内容的情况下才换行结束
-            if (context.headerWrited || context.count > 0) {
+            if (context.headerCount > 0 || context.count > 0) {
                 printer.println();
                 printer.printLhead(LheadType.APPEND_LINE);
                 printer.printIndent();
@@ -464,8 +464,8 @@ public class DsonTextWriter extends AbstractDsonDocWriter {
     private static class Context extends AbstractDsonDocWriter.Context {
 
         ObjectStyle style = ObjectStyle.INDENT;
-        boolean headerWrited = false;
-        int count;
+        int headerCount = 0;
+        int count = 0;
 
         public Context() {
         }
@@ -477,7 +477,7 @@ public class DsonTextWriter extends AbstractDsonDocWriter {
         public void reset() {
             super.reset();
             style = ObjectStyle.INDENT;
-            headerWrited = false;
+            headerCount = 0;
         }
 
         @Override

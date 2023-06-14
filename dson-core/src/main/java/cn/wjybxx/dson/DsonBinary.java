@@ -58,6 +58,11 @@ public class DsonBinary extends DsonValue {
         Preconditions.checkBetween(type, 0, 255);
     }
 
+    /** 创建一个拷贝 */
+    public DsonBinary copy() {
+        return new DsonBinary(type, data.clone());
+    }
+
     public int getType() {
         return type;
     }

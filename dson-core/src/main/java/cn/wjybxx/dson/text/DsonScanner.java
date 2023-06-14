@@ -211,9 +211,6 @@ public class DsonScanner implements AutoCloseable {
                 DsonTexts.checkNullString(nextToken.castAsString());
                 return new DsonToken(TokenType.NULL, null, getPosition());
             }
-            case DsonTexts.LABEL_STRING_VALUE -> {
-                return new DsonToken(TokenType.STRING, scanStringValue(), getPosition());
-            }
             case DsonTexts.LABEL_TEXT -> {
                 return new DsonToken(TokenType.STRING, scanText(), getPosition());
             }
@@ -286,25 +283,6 @@ public class DsonScanner implements AutoCloseable {
         int c;
         while ((c = buffer.read()) != -1) {
             if (DsonTexts.isUnsafeStringChar(c)) {
-                break;
-            }
-            sb.append((char) c);
-        }
-        buffer.unread();
-        return sb.toString();
-    }
-
-    /** 扫描 VALUE上下文中的字符串 */
-    private String scanStringValue() {
-        int c = skipWhitespace();
-        checkEof(c);
-
-        DsonBuffer buffer = this.buffer;
-        StringBuilder sb = allocStringBuilder();
-        sb.append((char) c);
-        while ((c = buffer.read()) != -1) {
-            if (c == ',' || c == '}' || c == ']' ||
-                    Character.isWhitespace(c)) {
                 break;
             }
             sb.append((char) c);
