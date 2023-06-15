@@ -31,11 +31,11 @@ import java.util.Objects;
  * @author wjybxx
  * date - 2023/4/21
  */
-public class DefaultDsonDocWriter extends AbstractDsonDocWriter {
+public class DsonBinaryLiteWriter extends AbstractDsonLiteWriter {
 
     private DsonOutput output;
 
-    public DefaultDsonDocWriter(int recursionLimit, DsonOutput output) {
+    public DsonBinaryLiteWriter(int recursionLimit, DsonOutput output) {
         super(recursionLimit);
         this.output = output;
         setContext(new Context(null, DsonContextType.TOP_LEVEL));
@@ -77,7 +77,7 @@ public class DefaultDsonDocWriter extends AbstractDsonDocWriter {
         Context context = getContext();
         if (context.contextType == DsonContextType.OBJECT ||
                 context.contextType == DsonContextType.HEADER) {
-            output.writeString(context.curName);
+            output.writeUint32(context.curName);
         }
     }
     // endregion
@@ -147,6 +147,13 @@ public class DefaultDsonDocWriter extends AbstractDsonDocWriter {
     }
 
     @Override
+    protected void doWriteExtString(DsonExtString value, StringStyle style) {
+        DsonOutput output = this.output;
+        writeFullTypeAndCurrentName(output, DsonType.EXT_STRING, null);
+        DsonReaderUtils.writeExtString(output, value);
+    }
+
+    @Override
     protected void doWriteExtInt32(DsonExtInt32 value, WireType wireType) {
         DsonOutput output = this.output;
         writeFullTypeAndCurrentName(output, DsonType.EXT_INT32, wireType);
@@ -158,13 +165,6 @@ public class DefaultDsonDocWriter extends AbstractDsonDocWriter {
         DsonOutput output = this.output;
         writeFullTypeAndCurrentName(output, DsonType.EXT_INT64, wireType);
         DsonReaderUtils.writeExtInt64(output, value, wireType);
-    }
-
-    @Override
-    protected void doWriteExtString(DsonExtString value, StringStyle style) {
-        DsonOutput output = this.output;
-        writeFullTypeAndCurrentName(output, DsonType.EXT_STRING, null);
-        DsonReaderUtils.writeExtString(output, value);
     }
 
     @Override
@@ -242,7 +242,7 @@ public class DefaultDsonDocWriter extends AbstractDsonDocWriter {
         setPooledContext(context);
     }
 
-    private static class Context extends AbstractDsonDocWriter.Context {
+    private static class Context extends AbstractDsonLiteWriter.Context {
 
         int preWritten = 0;
 

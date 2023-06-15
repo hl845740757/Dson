@@ -19,8 +19,8 @@ package cn.wjybxx.codec.binary;
 import cn.wjybxx.codec.*;
 import cn.wjybxx.codec.binary.codecs.MessageCodec;
 import cn.wjybxx.codec.binary.codecs.MessageEnumCodec;
-import cn.wjybxx.dson.DefaultDsonBinReader;
-import cn.wjybxx.dson.DefaultDsonBinWriter;
+import cn.wjybxx.dson.DsonBinaryLiteReader;
+import cn.wjybxx.dson.DsonBinaryLiteWriter;
 import cn.wjybxx.dson.internal.CollectionUtils;
 import cn.wjybxx.dson.io.*;
 import com.google.protobuf.MessageLite;
@@ -106,7 +106,7 @@ public class DefaultBinaryConverter implements BinaryConverter {
 
     private void encodeObject(DsonOutput outputStream, @Nullable Object value, TypeArgInfo<?> typeArgInfo) {
         try (BinaryObjectWriter wrapper = new DefaultBinaryObjectWriter(this,
-                new DefaultDsonBinWriter(options.recursionLimit, outputStream))) {
+                new DsonBinaryLiteWriter(options.recursionLimit, outputStream))) {
             wrapper.writeObject(value, typeArgInfo);
             wrapper.flush();
         }
@@ -114,7 +114,7 @@ public class DefaultBinaryConverter implements BinaryConverter {
 
     private <U> U decodeObject(DsonInput inputStream, TypeArgInfo<U> typeArgInfo) {
         try (BinaryObjectReader wrapper = new DefaultBinaryObjectReader(this,
-                new DefaultDsonBinReader(options.recursionLimit, inputStream))) {
+                new DsonBinaryLiteReader(options.recursionLimit, inputStream))) {
             return wrapper.readObject(typeArgInfo);
         }
     }

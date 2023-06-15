@@ -37,9 +37,9 @@ import java.util.Objects;
 public class DefaultBinaryObjectWriter implements BinaryObjectWriter {
 
     private final DefaultBinaryConverter converter;
-    private final DsonBinWriter writer;
+    private final DsonLiteWriter writer;
 
-    public DefaultBinaryObjectWriter(DefaultBinaryConverter converter, DsonBinWriter writer) {
+    public DefaultBinaryObjectWriter(DefaultBinaryConverter converter, DsonLiteWriter writer) {
         this.converter = converter;
         this.writer = writer;
     }

@@ -96,17 +96,17 @@ public abstract class DsonValue {
     //
 
     @SuppressWarnings("unchecked")
-    public MutableDsonHeader<FieldNumber> asBinHeader() {
+    public MutableDsonHeader<FieldNumber> asLiteHeader() {
         return (MutableDsonHeader<FieldNumber>) this;
     }
 
     @SuppressWarnings("unchecked")
-    public MutableDsonArray<FieldNumber> asBinArray() {
+    public MutableDsonArray<FieldNumber> asLiteArray() {
         return (MutableDsonArray<FieldNumber>) this;
     }
 
     @SuppressWarnings("unchecked")
-    public MutableDsonObject<FieldNumber> asBinObject() {
+    public MutableDsonObject<FieldNumber> asLiteObject() {
         return (MutableDsonObject<FieldNumber>) this;
     }
 

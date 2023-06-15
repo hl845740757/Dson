@@ -24,7 +24,7 @@ import cn.wjybxx.dson.types.ObjectRef;
 import com.google.protobuf.Parser;
 
 /**
- * 与{@link DefaultDsonBinReader}的主要区别：
+ * 与{@link DsonBinaryLiteReader}的主要区别：
  * 1.name和classId由Int变为String
  * 2.没有className时，写入的是空字符串(会写入长度，但不会被编码)
  * 3.skipName不是通过读取name跳过，而是真实跳过
@@ -35,11 +35,11 @@ import com.google.protobuf.Parser;
  * @author wjybxx
  * date - 2023/4/22
  */
-public class DefaultDsonDocReader extends AbstractDsonDocReader {
+public class DsonBinaryReader extends AbstractDsonReader {
 
     private DsonInput input;
 
-    public DefaultDsonDocReader(int recursionLimit, DsonInput input) {
+    public DsonBinaryReader(int recursionLimit, DsonInput input) {
         super(recursionLimit);
         this.input = input;
         setContext(new Context(null, DsonContextType.TOP_LEVEL));
@@ -234,7 +234,7 @@ public class DefaultDsonDocReader extends AbstractDsonDocReader {
         setPooledContext(context);
     }
 
-    private static class Context extends AbstractDsonDocReader.Context {
+    private static class Context extends AbstractDsonReader.Context {
 
         int oldLimit = -1;
 

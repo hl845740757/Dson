@@ -33,9 +33,9 @@ import java.util.Objects;
 public class DefaultBinaryObjectReader implements BinaryObjectReader {
 
     private final DefaultBinaryConverter converter;
-    private final DsonBinReader reader;
+    private final DsonLiteReader reader;
 
-    public DefaultBinaryObjectReader(DefaultBinaryConverter converter, DsonBinReader reader) {
+    public DefaultBinaryObjectReader(DefaultBinaryConverter converter, DsonLiteReader reader) {
         this.converter = converter;
         this.reader = reader;
     }
@@ -191,7 +191,7 @@ public class DefaultBinaryObjectReader implements BinaryObjectReader {
     @Override
     public <T> T readObject(int name, TypeArgInfo<T> typeArgInfo) {
         Class<T> declaredType = typeArgInfo.declaredType;
-        DsonBinReader reader = this.reader;
+        DsonLiteReader reader = this.reader;
         // 基础类型不能返回null
         if (declaredType.isPrimitive()) {
             return (T) NumberCodecHelper.readPrimitive(reader, name, declaredType);
@@ -239,7 +239,7 @@ public class DefaultBinaryObjectReader implements BinaryObjectReader {
     }
 
     private <T> T readAsDsonValue(DsonType dsonType, int name, Class<T> declaredType) {
-        final DsonBinReader reader = this.reader;
+        final DsonLiteReader reader = this.reader;
         Object value = switch (dsonType) {
             case INT32 -> reader.readInt32(name);
             case INT64 -> reader.readInt64(name);

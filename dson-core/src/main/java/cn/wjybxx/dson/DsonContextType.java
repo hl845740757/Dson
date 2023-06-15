@@ -49,7 +49,7 @@ public enum DsonContextType {
     }
 
     public boolean isContainer() {
-        return dsonType.isContainer();
+        return dsonType != null && dsonType.isContainer();
     }
 
     public boolean isLikeArray() {

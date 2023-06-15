@@ -136,7 +136,7 @@ public interface DocumentObjectWriter extends AutoCloseable {
 
     void writeName(String name);
 
-    /** @see DsonBinWriter#writeValueBytes(int, DsonType, byte[]) */
+    /** @see DsonLiteWriter#writeValueBytes(int, DsonType, byte[]) */
     void writeValueBytes(String name, DsonType dsonType, byte[] data);
 
     /**

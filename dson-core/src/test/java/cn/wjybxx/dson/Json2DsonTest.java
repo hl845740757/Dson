@@ -14,11 +14,8 @@
  * limitations under the License.
  */
 
-package cn.wjybxx.codec;
+package cn.wjybxx.dson;
 
-import cn.wjybxx.codec.document.DocumentConverterUtils;
-import cn.wjybxx.dson.DsonObject;
-import cn.wjybxx.dson.DsonValue;
 import cn.wjybxx.dson.text.DsonLinesBuffer;
 import cn.wjybxx.dson.text.DsonScanner;
 import cn.wjybxx.dson.text.DsonTextReader;
@@ -43,13 +40,13 @@ public class Json2DsonTest {
     void test() {
         DsonValue dsonValue;
         try (DsonTextReader reader = new DsonTextReader(16, new DsonScanner(DsonLinesBuffer.ofJson(jsonString)))) {
-            dsonValue = DocumentConverterUtils.readTopDsonValue(reader);
+            dsonValue = Dsons.readTopDsonValue(reader);
             Assertions.assertInstanceOf(DsonObject.class, dsonValue);
         }
 
         DsonValue dsonValue2;
         try (DsonTextReader reader = new DsonTextReader(16, new DsonScanner(new JsonBuffer(jsonString)))) {
-            dsonValue2 = DocumentConverterUtils.readTopDsonValue(reader);
+            dsonValue2 = Dsons.readTopDsonValue(reader);
             Assertions.assertInstanceOf(DsonObject.class, dsonValue);
         }
         Assertions.assertEquals(dsonValue, dsonValue2);

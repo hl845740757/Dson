@@ -130,7 +130,7 @@ public interface DocumentObjectReader extends AutoCloseable {
     /**
      * 读取下一个数据类型
      *
-     * @see DsonBinReader#readDsonType()
+     * @see DsonLiteReader#readDsonType()
      */
     DsonType readDsonType();
 

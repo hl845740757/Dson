@@ -40,7 +40,7 @@ import java.util.Objects;
  * @author wjybxx
  * date - 2023/6/2
  */
-public class DsonTextReader extends AbstractDsonDocReader {
+public class DsonTextReader extends AbstractDsonReader {
 
     private static final List<TokenType> VALUE_SEPARATOR_TOKENS = List.of(TokenType.COMMA, TokenType.END_OBJECT, TokenType.END_ARRAY);
     private static final DsonToken TOKEN_START_HEADER = new DsonToken(TokenType.HEADER, "@{", -1);
@@ -158,7 +158,7 @@ public class DsonTextReader extends AbstractDsonDocReader {
         Context context = getContext();
         if (context.count == 0) {
             // object和array可以有一个修饰自己的header，其合法性在读取到{和[时验证
-            if (context.contextType.isContainer() && context.beginToken.lastChar() == '@') {
+            if (context.headerCount == 0 && context.contextType.isContainer() && context.beginToken.lastChar() == '@') {
                 DsonToken headerToken = popToken();
                 verifyTokenType(context, headerToken, TokenType.HEADER);
                 pushNextValue(headerToken);
@@ -694,7 +694,7 @@ public class DsonTextReader extends AbstractDsonDocReader {
         setPooledContext(context);
     }
 
-    private static class Context extends AbstractDsonDocReader.Context {
+    private static class Context extends AbstractDsonReader.Context {
 
         DsonToken beginToken;
         /** header只可触发一次流程 */

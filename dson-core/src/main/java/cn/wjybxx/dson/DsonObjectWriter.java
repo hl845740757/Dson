@@ -10,7 +10,7 @@ import com.google.protobuf.MessageLite;
  * @author wjybxx
  * date - 2023/6/13
  */
-public class DsonObjectWriter extends AbstractDsonDocWriter {
+public class DsonObjectWriter extends AbstractDsonWriter {
 
     public DsonObjectWriter(int recursionLimit) {
         super(recursionLimit);
@@ -156,7 +156,7 @@ public class DsonObjectWriter extends AbstractDsonDocWriter {
         setPooledContext(context);
     }
 
-    private static class Context extends AbstractDsonDocWriter.Context {
+    private static class Context extends AbstractDsonWriter.Context {
 
         DsonValue container;
 

@@ -27,11 +27,11 @@ import com.google.protobuf.Parser;
  * @author wjybxx
  * date - 2023/4/22
  */
-public class DefaultDsonBinReader extends AbstractDsonBinReader {
+public class DsonBinaryLiteReader extends AbstractDsonLiteReader {
 
     private DsonInput input;
 
-    public DefaultDsonBinReader(int recursionLimit, DsonInput input) {
+    public DsonBinaryLiteReader(int recursionLimit, DsonInput input) {
         super(recursionLimit);
         this.input = input;
         setContext(new Context(null, DsonContextType.TOP_LEVEL));
@@ -222,7 +222,7 @@ public class DefaultDsonBinReader extends AbstractDsonBinReader {
         setPooledContext(context);
     }
 
-    private static class Context extends AbstractDsonBinReader.Context {
+    private static class Context extends AbstractDsonLiteReader.Context {
 
         int oldLimit = -1;
 

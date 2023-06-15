@@ -29,7 +29,7 @@ import cn.wjybxx.dson.*;
  */
 class NumberCodecHelper {
 
-    static DsonType readOrGetDsonType(DsonDocReader reader) {
+    static DsonType readOrGetDsonType(DsonReader reader) {
         if (reader.isAtType()) {
             return reader.readDsonType();
         } else {
@@ -37,7 +37,7 @@ class NumberCodecHelper {
         }
     }
 
-    static int readInt(DsonDocReader reader, String name) {
+    static int readInt(DsonReader reader, String name) {
         DsonType dsonType = readOrGetDsonType(reader);
         return switch (dsonType) {
             case INT32 -> reader.readInt32(name);
@@ -54,7 +54,7 @@ class NumberCodecHelper {
         };
     }
 
-    static long readLong(DsonDocReader reader, String name) {
+    static long readLong(DsonReader reader, String name) {
         DsonType dsonType = readOrGetDsonType(reader);
         return switch (dsonType) {
             case INT32 -> reader.readInt32(name);
@@ -71,7 +71,7 @@ class NumberCodecHelper {
         };
     }
 
-    static float readFloat(DsonDocReader reader, String name) {
+    static float readFloat(DsonReader reader, String name) {
         DsonType dsonType = readOrGetDsonType(reader);
         return switch (dsonType) {
             case INT32 -> reader.readInt32(name);
@@ -87,7 +87,7 @@ class NumberCodecHelper {
         };
     }
 
-    static double readDouble(DsonDocReader reader, String name) {
+    static double readDouble(DsonReader reader, String name) {
         DsonType dsonType = readOrGetDsonType(reader);
         return switch (dsonType) {
             case INT32 -> reader.readInt32(name);
@@ -103,7 +103,7 @@ class NumberCodecHelper {
         };
     }
 
-    static boolean readBool(DsonDocReader reader, String name) {
+    static boolean readBool(DsonReader reader, String name) {
         DsonType dsonType = readOrGetDsonType(reader);
         return switch (dsonType) {
             case INT32 -> reader.readInt32(name) != 0;
@@ -119,7 +119,7 @@ class NumberCodecHelper {
         };
     }
 
-    static String readString(DsonDocReader reader, String name) {
+    static String readString(DsonReader reader, String name) {
         DsonType dsonType = readOrGetDsonType(reader);
         return switch (dsonType) {
             case STRING -> reader.readString(name);
@@ -132,7 +132,7 @@ class NumberCodecHelper {
         };
     }
 
-    static DsonExtString readExtString(DsonDocReader reader, String name) {
+    static DsonExtString readExtString(DsonReader reader, String name) {
         DsonType dsonType = readOrGetDsonType(reader);
         return switch (dsonType) {
             case STRING -> new DsonExtString((byte) 0, reader.readString(name));
@@ -145,7 +145,7 @@ class NumberCodecHelper {
         };
     }
 
-    static DsonExtInt32 readExtInt32(DsonDocReader reader, String name) {
+    static DsonExtInt32 readExtInt32(DsonReader reader, String name) {
         DsonType dsonType = readOrGetDsonType(reader);
         return switch (dsonType) {
             case INT32 -> new DsonExtInt32((byte) 0, reader.readInt32(name));
@@ -158,7 +158,7 @@ class NumberCodecHelper {
         };
     }
 
-    static DsonExtInt64 readExtInt64(DsonDocReader reader, String name) {
+    static DsonExtInt64 readExtInt64(DsonReader reader, String name) {
         DsonType dsonType = readOrGetDsonType(reader);
         return switch (dsonType) {
             case INT64 -> new DsonExtInt64((byte) 0, reader.readInt64(name));
@@ -171,7 +171,7 @@ class NumberCodecHelper {
         };
     }
 
-    static DsonBinary readBinary(DsonDocReader reader, String name) {
+    static DsonBinary readBinary(DsonReader reader, String name) {
         DsonType dsonType = readOrGetDsonType(reader);
         return switch (dsonType) {
             case BINARY -> reader.readBinary(name);
@@ -185,7 +185,7 @@ class NumberCodecHelper {
     }
 
     //
-    static Object readPrimitive(DsonDocReader reader, String name, Class<?> declared) {
+    static Object readPrimitive(DsonReader reader, String name, Class<?> declared) {
         if (declared == int.class) {
             return readInt(reader, name);
         }

@@ -16,7 +16,6 @@
 
 package cn.wjybxx.dson.types;
 
-import javax.annotation.concurrent.Immutable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -27,7 +26,6 @@ import java.util.Objects;
  * @author wjybxx
  * date - 2023/5/27
  */
-@Immutable
 public final class ObjectHeader {
 
     /** 对象的类型名 */

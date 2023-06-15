@@ -20,7 +20,6 @@ import cn.wjybxx.codec.ClassIdRegistries;
 import cn.wjybxx.codec.ClassIdRegistry;
 import cn.wjybxx.codec.ConverterUtils;
 import cn.wjybxx.codec.document.codecs.*;
-import cn.wjybxx.dson.*;
 import cn.wjybxx.dson.internal.InternalUtils;
 
 import javax.annotation.Nullable;
@@ -150,101 +149,5 @@ public class DocumentConverterUtils extends ConverterUtils {
         return Integer.toString(idx);
     }
 
-    // region 直接读取为DsonObject
-
-    /** @return 如果到达文件尾部，则返回null */
-    public static DsonValue readTopDsonValue(DsonDocReader reader) {
-        DsonType dsonType = reader.readDsonType();
-        if (dsonType == DsonType.END_OF_OBJECT) {
-            return null;
-        }
-        if (dsonType == DsonType.OBJECT) {
-            return readObject(reader);
-        } else {
-            return readArray(reader);
-        }
-    }
-
-    /** 外部需要先readName */
-    private static MutableDsonObject<String> readObject(DsonDocReader reader) {
-        DsonType dsonType;
-        String name;
-        DsonValue value;
-
-        MutableDsonObject<String> dsonObject = new MutableDsonObject<>();
-        reader.readStartObject();
-        while ((dsonType = reader.readDsonType()) != DsonType.END_OF_OBJECT) {
-            if (dsonType == DsonType.HEADER) {
-                readHeader(reader, dsonObject.getHeader());
-            } else {
-                name = reader.readName();
-                value = readAsDsonValue(reader, dsonType, name);
-                dsonObject.put(name, value);
-            }
-        }
-        reader.readEndObject();
-        return dsonObject;
-    }
-
-    private static void readHeader(DsonDocReader reader, DsonHeader<String> header) {
-        DsonType dsonType;
-        String name;
-        DsonValue value;
-        reader.readStartHeader();
-        while ((dsonType = reader.readDsonType()) != DsonType.END_OF_OBJECT) {
-            name = reader.readName();
-            value = readAsDsonValue(reader, dsonType, name);
-            header.put(name, value);
-        }
-        reader.readEndHeader();
-    }
-
-    /** 外部需要先readName */
-    private static MutableDsonArray<String> readArray(DsonDocReader reader) {
-        DsonType dsonType;
-        DsonValue value;
-
-        MutableDsonArray<String> dsonArray = new MutableDsonArray<>(8);
-        reader.readStartArray();
-        while ((dsonType = reader.readDsonType()) != DsonType.END_OF_OBJECT) {
-            if (dsonType == DsonType.HEADER) {
-                readHeader(reader, dsonArray.getHeader());
-            } else {
-                value = readAsDsonValue(reader, dsonType, null);
-                dsonArray.add(value);
-            }
-        }
-        reader.readEndArray();
-        return dsonArray;
-    }
-
-    private static DsonValue readAsDsonValue(DsonDocReader reader, DsonType dsonType, String name) {
-        return switch (dsonType) {
-            case INT32 -> new DsonInt32(reader.readInt32(name));
-            case INT64 -> new DsonInt64(reader.readInt64(name));
-            case FLOAT -> new DsonFloat(reader.readFloat(name));
-            case DOUBLE -> new DsonDouble(reader.readDouble(name));
-            case BOOLEAN -> new DsonBool(reader.readBoolean(name));
-            case STRING -> new DsonString(reader.readString(name));
-            case BINARY -> reader.readBinary(name);
-            case EXT_STRING -> reader.readExtString(name);
-            case EXT_INT32 -> reader.readExtInt32(name);
-            case EXT_INT64 -> reader.readExtInt64(name);
-            case REFERENCE -> new DsonObjectRef(reader.readRef(name));
-            case NULL -> {
-                reader.readNull(name);
-                yield DsonNull.INSTANCE;
-            }
-            case HEADER -> {
-                MutableDsonHeader<String> header = new MutableDsonHeader<>();
-                readHeader(reader, header);
-                yield header;
-            }
-            case OBJECT -> readObject(reader);
-            case ARRAY -> readArray(reader);
-            case END_OF_OBJECT -> throw new AssertionError();
-        };
-    }
-    // endregion
 
 }

@@ -31,7 +31,7 @@ import com.google.protobuf.MessageLite;
  * date - 2023/4/20
  */
 @SuppressWarnings("unused")
-public interface DsonDocWriter extends AutoCloseable {
+public interface DsonWriter extends AutoCloseable {
 
     void flush();
 
@@ -146,7 +146,7 @@ public interface DsonDocWriter extends AutoCloseable {
      * 1.请确保合法性
      * 2.支持的类型与读方法相同
      *
-     * @param data {@link DsonDocReader#readValueAsBytes(String)}读取的数据
+     * @param data {@link DsonReader#readValueAsBytes(String)}读取的数据
      */
     void writeValueBytes(String name, DsonType type, byte[] data);
 

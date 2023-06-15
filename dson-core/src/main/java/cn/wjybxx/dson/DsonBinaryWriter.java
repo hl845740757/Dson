@@ -31,11 +31,11 @@ import java.util.Objects;
  * @author wjybxx
  * date - 2023/4/21
  */
-public class DefaultDsonBinWriter extends AbstractDsonBinWriter {
+public class DsonBinaryWriter extends AbstractDsonWriter {
 
     private DsonOutput output;
 
-    public DefaultDsonBinWriter(int recursionLimit, DsonOutput output) {
+    public DsonBinaryWriter(int recursionLimit, DsonOutput output) {
         super(recursionLimit);
         this.output = output;
         setContext(new Context(null, DsonContextType.TOP_LEVEL));
@@ -77,7 +77,7 @@ public class DefaultDsonBinWriter extends AbstractDsonBinWriter {
         Context context = getContext();
         if (context.contextType == DsonContextType.OBJECT ||
                 context.contextType == DsonContextType.HEADER) {
-            output.writeUint32(context.curName);
+            output.writeString(context.curName);
         }
     }
     // endregion
@@ -147,13 +147,6 @@ public class DefaultDsonBinWriter extends AbstractDsonBinWriter {
     }
 
     @Override
-    protected void doWriteExtString(DsonExtString value, StringStyle style) {
-        DsonOutput output = this.output;
-        writeFullTypeAndCurrentName(output, DsonType.EXT_STRING, null);
-        DsonReaderUtils.writeExtString(output, value);
-    }
-
-    @Override
     protected void doWriteExtInt32(DsonExtInt32 value, WireType wireType) {
         DsonOutput output = this.output;
         writeFullTypeAndCurrentName(output, DsonType.EXT_INT32, wireType);
@@ -165,6 +158,13 @@ public class DefaultDsonBinWriter extends AbstractDsonBinWriter {
         DsonOutput output = this.output;
         writeFullTypeAndCurrentName(output, DsonType.EXT_INT64, wireType);
         DsonReaderUtils.writeExtInt64(output, value, wireType);
+    }
+
+    @Override
+    protected void doWriteExtString(DsonExtString value, StringStyle style) {
+        DsonOutput output = this.output;
+        writeFullTypeAndCurrentName(output, DsonType.EXT_STRING, null);
+        DsonReaderUtils.writeExtString(output, value);
     }
 
     @Override
@@ -242,7 +242,7 @@ public class DefaultDsonBinWriter extends AbstractDsonBinWriter {
         setPooledContext(context);
     }
 
-    private static class Context extends AbstractDsonBinWriter.Context {
+    private static class Context extends AbstractDsonWriter.Context {
 
         int preWritten = 0;
 

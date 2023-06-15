@@ -28,12 +28,12 @@ import javax.annotation.Nullable;
 import java.util.*;
 
 /**
- * 对{@link DsonBinReader}的封装，主要提供类型管理和兼容性支持
+ * 对{@link DsonLiteReader}的封装，主要提供类型管理和兼容性支持
  * Dson的元素数据是严格读写，业务层通常不需要如此；
  * Dson的类型信息是{@link ClassId}，业务层其实面对的{@link Class}
  * 不过，暂时还是不打算提供随机读取支持，会大幅增加开销。
  * <p>
- * 1.代理api可参考{@link DsonBinReader}的文档
+ * 1.代理api可参考{@link DsonLiteReader}的文档
  * 2.顶层对象和数组内元素{@literal name}传0
  *
  * @author wjybxx
@@ -131,7 +131,7 @@ public interface BinaryObjectReader extends AutoCloseable {
     /**
      * 读取下一个数据类型
      *
-     * @see DsonBinReader#readDsonType()
+     * @see DsonLiteReader#readDsonType()
      */
     DsonType readDsonType();
 

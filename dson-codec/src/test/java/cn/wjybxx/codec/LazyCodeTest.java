@@ -16,8 +16,8 @@
 
 package cn.wjybxx.codec;
 
+import cn.wjybxx.dson.DsonLites;
 import cn.wjybxx.dson.DsonType;
-import cn.wjybxx.dson.Dsons;
 import cn.wjybxx.codec.binary.BinaryObjectReader;
 import cn.wjybxx.codec.binary.BinaryObjectWriter;
 import cn.wjybxx.codec.binary.BinaryPojoCodecImpl;
@@ -103,18 +103,18 @@ public class LazyCodeTest {
 
         @Override
         public void writeObject(MyStruct instance, BinaryObjectWriter writer, TypeArgInfo<?> typeArgInfo) {
-            writer.writeString(Dsons.makeFullNumber(0, 0), instance.strVal);
+            writer.writeString(DsonLites.makeFullNumber(0, 0), instance.strVal);
             if (role == Role.ROUTER) {
-                writer.writeValueBytes(Dsons.makeFullNumber(0, 1), DsonType.OBJECT, (byte[]) instance.nestStruct);
+                writer.writeValueBytes(DsonLites.makeFullNumber(0, 1), DsonType.OBJECT, (byte[]) instance.nestStruct);
             } else {
                 // 不在编码器里，定制写
                 NestStruct nestStruct = (NestStruct) instance.nestStruct;
-                writer.writeStartObject(Dsons.makeFullNumber(0, 1), nestStruct, TypeArgInfo.of(NestStruct.class));
+                writer.writeStartObject(DsonLites.makeFullNumber(0, 1), nestStruct, TypeArgInfo.of(NestStruct.class));
                 {
-                    writer.writeInt(Dsons.makeFullNumber(0, 0), nestStruct.intVal);
-                    writer.writeLong(Dsons.makeFullNumber(0, 1), nestStruct.longVal);
-                    writer.writeFloat(Dsons.makeFullNumber(0, 2), nestStruct.floatVal);
-                    writer.writeDouble(Dsons.makeFullNumber(0, 3), nestStruct.doubleVal);
+                    writer.writeInt(DsonLites.makeFullNumber(0, 0), nestStruct.intVal);
+                    writer.writeLong(DsonLites.makeFullNumber(0, 1), nestStruct.longVal);
+                    writer.writeFloat(DsonLites.makeFullNumber(0, 2), nestStruct.floatVal);
+                    writer.writeDouble(DsonLites.makeFullNumber(0, 3), nestStruct.doubleVal);
                 }
                 writer.writeEndObject();
             }
@@ -122,17 +122,17 @@ public class LazyCodeTest {
 
         @Override
         public MyStruct readObject(BinaryObjectReader reader, TypeArgInfo<?> typeArgInfo) {
-            String strVal = reader.readString(Dsons.makeFullNumber(0, 0));
+            String strVal = reader.readString(DsonLites.makeFullNumber(0, 0));
             Object nestStruct;
             if (role == Role.ROUTER) {
-                nestStruct = reader.readValueAsBytes(Dsons.makeFullNumber(0, 1));
+                nestStruct = reader.readValueAsBytes(DsonLites.makeFullNumber(0, 1));
             } else {
-                reader.readStartObject(Dsons.makeFullNumber(0, 1), TypeArgInfo.of(NestStruct.class));
+                reader.readStartObject(DsonLites.makeFullNumber(0, 1), TypeArgInfo.of(NestStruct.class));
                 nestStruct = new NestStruct(
-                        reader.readInt(Dsons.makeFullNumber(0, 0)),
-                        reader.readLong(Dsons.makeFullNumber(0, 1)),
-                        reader.readFloat(Dsons.makeFullNumber(0, 2)),
-                        reader.readDouble(Dsons.makeFullNumber(0, 3)));
+                        reader.readInt(DsonLites.makeFullNumber(0, 0)),
+                        reader.readLong(DsonLites.makeFullNumber(0, 1)),
+                        reader.readFloat(DsonLites.makeFullNumber(0, 2)),
+                        reader.readDouble(DsonLites.makeFullNumber(0, 3)));
                 reader.readEndObject();
             }
             return new MyStruct(strVal, nestStruct);

@@ -37,9 +37,9 @@ import java.util.Objects;
 public class DefaultDocumentObjectWriter implements DocumentObjectWriter {
 
     private final DefaultDocumentConverter converter;
-    private final DsonDocWriter writer;
+    private final DsonWriter writer;
 
-    public DefaultDocumentObjectWriter(DefaultDocumentConverter converter, DsonDocWriter writer) {
+    public DefaultDocumentObjectWriter(DefaultDocumentConverter converter, DsonWriter writer) {
         this.converter = converter;
         this.writer = writer;
     }

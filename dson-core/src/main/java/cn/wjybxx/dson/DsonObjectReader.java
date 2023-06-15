@@ -29,7 +29,7 @@ import java.util.Objects;
  * @author wjybxx
  * date - 2023/6/13
  */
-public class DsonObjectReader extends AbstractDsonDocReader {
+public class DsonObjectReader extends AbstractDsonReader {
 
     private String nextName;
     private DsonValue nextValue;
@@ -280,7 +280,7 @@ public class DsonObjectReader extends AbstractDsonDocReader {
         setPooledContext(context);
     }
 
-    private static class Context extends AbstractDsonDocReader.Context {
+    private static class Context extends AbstractDsonReader.Context {
 
         /** 如果不为null，则表示需要先读取header */
         private DsonHeader<String> header;

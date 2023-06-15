@@ -27,16 +27,18 @@ import javax.annotation.Nonnull;
  */
 public final class FieldNumber implements Comparable<FieldNumber> {
 
+    public static final FieldNumber ZERO = new FieldNumber((byte) 0, 0);
+
     /** 类的继承深度 - Depth of Inheritance */
     private final byte idep;
     /** 字段正在类本地的编号 - localNumber */
     private final int lnumber;
 
     public FieldNumber(byte idep, int lnumber) {
-        if (idep < 0 || idep > Dsons.IDEP_MAX_VALUE) {
+        if (idep < 0 || idep > DsonLites.IDEP_MAX_VALUE) {
             throw invalidArgs(idep, lnumber);
         }
-        if (lnumber < 0 || lnumber > Dsons.LNUMBER_MAX_VALUE) {
+        if (lnumber < 0 || lnumber > DsonLites.LNUMBER_MAX_VALUE) {
             throw invalidArgs(idep, lnumber);
         }
         this.lnumber = lnumber;
@@ -52,15 +54,15 @@ public final class FieldNumber implements Comparable<FieldNumber> {
     }
 
     public static FieldNumber ofFullNumber(int fullNumber) {
-        return new FieldNumber(Dsons.idepOfFullNumber(fullNumber),
-                Dsons.lnumberOfFullNumber(fullNumber));
+        return new FieldNumber(DsonLites.idepOfFullNumber(fullNumber),
+                DsonLites.lnumberOfFullNumber(fullNumber));
     }
 
     /**
      * 获取字段的完整编号
      */
     public int getFullNumber() {
-        return Dsons.makeFullNumber(idep, lnumber);
+        return DsonLites.makeFullNumber(idep, lnumber);
     }
 
     public int getLnumber() {
@@ -75,13 +77,13 @@ public final class FieldNumber implements Comparable<FieldNumber> {
 
     /** 比较两个fullNumber的大小 */
     public static int compare(int fullNumber1, int fullNumber2) {
-        int r = Byte.compare(Dsons.idepOfFullNumber(fullNumber1),
-                Dsons.idepOfFullNumber(fullNumber2));
+        int r = Byte.compare(DsonLites.idepOfFullNumber(fullNumber1),
+                DsonLites.idepOfFullNumber(fullNumber2));
         if (r != 0) {
             return r;
         }
-        return Integer.compare(Dsons.lnumberOfFullNumber(fullNumber1),
-                Dsons.lnumberOfFullNumber(fullNumber2));
+        return Integer.compare(DsonLites.lnumberOfFullNumber(fullNumber1),
+                DsonLites.lnumberOfFullNumber(fullNumber2));
     }
 
     @Override

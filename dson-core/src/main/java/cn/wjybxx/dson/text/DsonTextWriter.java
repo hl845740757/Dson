@@ -23,7 +23,6 @@ import com.google.protobuf.MessageLite;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Writer;
-import java.util.Objects;
 
 /**
  * 总指导：
@@ -33,7 +32,7 @@ import java.util.Objects;
  * @author wjybxx
  * date - 2023/4/21
  */
-public class DsonTextWriter extends AbstractDsonDocWriter {
+public class DsonTextWriter extends AbstractDsonWriter {
 
     private DsonPrinter printer;
     private final DsonTextWriterSettings settings;
@@ -74,7 +73,7 @@ public class DsonTextWriter extends AbstractDsonDocWriter {
 
     private void writeCurrentName(DsonPrinter printer, DsonType dsonType) {
         Context context = getContext();
-        if (context.count > 0) {
+        if (context.contextType != DsonContextType.TOP_LEVEL && context.count > 0) {
             printer.print(",");
         }
         if (context.style == ObjectStyle.INDENT || printer.getColumn() >= settings.softLineLength) {
@@ -86,8 +85,7 @@ public class DsonTextWriter extends AbstractDsonDocWriter {
         } else if (context.count > 0) {
             printer.print(' ');
         }
-        if (context.contextType == DsonContextType.OBJECT ||
-                context.contextType == DsonContextType.HEADER) {
+        if (context.contextType.isLikeObject() && dsonType != DsonType.HEADER) {
             printStringNonSS(printer, context.curName);
             printer.print(": ");
         }
@@ -395,7 +393,7 @@ public class DsonTextWriter extends AbstractDsonDocWriter {
         writeCurrentName(printer, contextType.dsonType);
 
         Context newContext = newContext(getContext(), contextType);
-        newContext.style = Objects.requireNonNull(style);
+        newContext.style = style;
 
         printer.print(contextType.startSymbol);
         if (style == ObjectStyle.INDENT) {
@@ -461,7 +459,7 @@ public class DsonTextWriter extends AbstractDsonDocWriter {
         setPooledContext(context);
     }
 
-    private static class Context extends AbstractDsonDocWriter.Context {
+    private static class Context extends AbstractDsonWriter.Context {
 
         ObjectStyle style = ObjectStyle.INDENT;
         int headerCount = 0;
@@ -478,6 +476,7 @@ public class DsonTextWriter extends AbstractDsonDocWriter {
             super.reset();
             style = ObjectStyle.INDENT;
             headerCount = 0;
+            count = 0;
         }
 
         @Override

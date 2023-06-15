@@ -17,7 +17,6 @@
 package cn.wjybxx.dson;
 
 import cn.wjybxx.dson.internal.DsonReaderUtils;
-import cn.wjybxx.dson.internal.Preconditions;
 import cn.wjybxx.dson.io.Chunk;
 import cn.wjybxx.dson.io.DsonIOException;
 import cn.wjybxx.dson.text.ObjectStyle;
@@ -32,7 +31,7 @@ import java.util.Objects;
  * @author wjybxx
  * date - 2023/4/28
  */
-public abstract class AbstractDsonBinWriter implements DsonBinWriter {
+public abstract class AbstractDsonWriter implements DsonWriter {
 
     protected final int recursionLimit;
     private Context context;
@@ -40,7 +39,7 @@ public abstract class AbstractDsonBinWriter implements DsonBinWriter {
 
     protected int recursionDepth;
 
-    public AbstractDsonBinWriter(int recursionLimit) {
+    public AbstractDsonWriter(int recursionLimit) {
         this.recursionLimit = recursionLimit;
     }
 
@@ -79,8 +78,8 @@ public abstract class AbstractDsonBinWriter implements DsonBinWriter {
     }
 
     @Override
-    public void writeName(int name) {
-        Preconditions.checkNonNegative(name, "name");
+    public void writeName(String name) {
+        Objects.requireNonNull(name, "name");
         Context context = this.context;
         if (context.state != DsonWriterState.NAME) {
             throw invalidState(List.of(DsonWriterState.NAME), context.state);
@@ -90,12 +89,12 @@ public abstract class AbstractDsonBinWriter implements DsonBinWriter {
         doWriteName(name);
     }
 
-    /** 执行{@link #writeName(int)}时调用 */
-    protected void doWriteName(int name) {
+    /** 执行{@link #writeName(String)}时调用 */
+    protected void doWriteName(String name) {
 
     }
 
-    protected void advanceToValueState(int name) {
+    protected void advanceToValueState(String name) {
         Context context = this.context;
         if (context.state == DsonWriterState.NAME) {
             writeName(name);
@@ -125,42 +124,42 @@ public abstract class AbstractDsonBinWriter implements DsonBinWriter {
 
     // region 简单值
     @Override
-    public void writeInt32(int name, int value, WireType wireType, boolean stronglyTyped) {
+    public void writeInt32(String name, int value, WireType wireType, boolean stronglyTyped) {
         advanceToValueState(name);
         doWriteInt32(value, wireType, stronglyTyped);
         setNextState();
     }
 
     @Override
-    public void writeInt64(int name, long value, WireType wireType, boolean stronglyTyped) {
+    public void writeInt64(String name, long value, WireType wireType, boolean stronglyTyped) {
         advanceToValueState(name);
         doWriteInt64(value, wireType, stronglyTyped);
         setNextState();
     }
 
     @Override
-    public void writeFloat(int name, float value, boolean stronglyTyped) {
+    public void writeFloat(String name, float value, boolean stronglyTyped) {
         advanceToValueState(name);
         doWriteFloat(value, stronglyTyped);
         setNextState();
     }
 
     @Override
-    public void writeDouble(int name, double value) {
+    public void writeDouble(String name, double value) {
         advanceToValueState(name);
         doWriteDouble(value);
         setNextState();
     }
 
     @Override
-    public void writeBoolean(int name, boolean value) {
+    public void writeBoolean(String name, boolean value) {
         advanceToValueState(name);
         doWriteBool(value);
         setNextState();
     }
 
     @Override
-    public void writeString(int name, String value, StringStyle style) {
+    public void writeString(String name, String value, StringStyle style) {
         Objects.requireNonNull(value);
         advanceToValueState(name);
         doWriteString(value, style);
@@ -168,14 +167,14 @@ public abstract class AbstractDsonBinWriter implements DsonBinWriter {
     }
 
     @Override
-    public void writeNull(int name) {
+    public void writeNull(String name) {
         advanceToValueState(name);
         doWriteNull();
         setNextState();
     }
 
     @Override
-    public void writeBinary(int name, DsonBinary dsonBinary) {
+    public void writeBinary(String name, DsonBinary dsonBinary) {
         Objects.requireNonNull(dsonBinary);
         advanceToValueState(name);
         doWriteBinary(dsonBinary);
@@ -183,7 +182,7 @@ public abstract class AbstractDsonBinWriter implements DsonBinWriter {
     }
 
     @Override
-    public void writeBinary(int name, int type, Chunk chunk) {
+    public void writeBinary(String name, int type, Chunk chunk) {
         Objects.requireNonNull(chunk);
         advanceToValueState(name);
         doWriteBinary(type, chunk);
@@ -191,7 +190,7 @@ public abstract class AbstractDsonBinWriter implements DsonBinWriter {
     }
 
     @Override
-    public void writeExtInt32(int name, DsonExtInt32 value, WireType wireType) {
+    public void writeExtInt32(String name, DsonExtInt32 value, WireType wireType) {
         Objects.requireNonNull(value);
         advanceToValueState(name);
         doWriteExtInt32(value, wireType);
@@ -199,7 +198,7 @@ public abstract class AbstractDsonBinWriter implements DsonBinWriter {
     }
 
     @Override
-    public void writeExtInt64(int name, DsonExtInt64 value, WireType wireType) {
+    public void writeExtInt64(String name, DsonExtInt64 value, WireType wireType) {
         Objects.requireNonNull(value);
         advanceToValueState(name);
         doWriteExtInt64(value, wireType);
@@ -207,7 +206,7 @@ public abstract class AbstractDsonBinWriter implements DsonBinWriter {
     }
 
     @Override
-    public void writeExtString(int name, DsonExtString value, StringStyle style) {
+    public void writeExtString(String name, DsonExtString value, StringStyle style) {
         Objects.requireNonNull(value);
         advanceToValueState(name);
         doWriteExtString(value, style);
@@ -215,7 +214,7 @@ public abstract class AbstractDsonBinWriter implements DsonBinWriter {
     }
 
     @Override
-    public void writeRef(int name, ObjectRef objectRef) {
+    public void writeRef(String name, ObjectRef objectRef) {
         Objects.requireNonNull(objectRef);
         advanceToValueState(name);
         doWriteRef(objectRef);
@@ -282,6 +281,7 @@ public abstract class AbstractDsonBinWriter implements DsonBinWriter {
     }
 
     private void writeStartContainer(DsonContextType contextType, ObjectStyle style) {
+        Objects.requireNonNull(style);
         if (recursionDepth >= recursionLimit) {
             throw DsonIOException.recursionLimitExceeded();
         }
@@ -325,7 +325,7 @@ public abstract class AbstractDsonBinWriter implements DsonBinWriter {
     // region sp
 
     @Override
-    public void writeMessage(int name, int binaryType, MessageLite messageLite) {
+    public void writeMessage(String name, int binaryType, MessageLite messageLite) {
         DsonBinary.checksSubType(binaryType);
         advanceToValueState(name);
         doWriteMessage(binaryType, messageLite);
@@ -333,7 +333,7 @@ public abstract class AbstractDsonBinWriter implements DsonBinWriter {
     }
 
     @Override
-    public void writeValueBytes(int name, DsonType type, byte[] data) {
+    public void writeValueBytes(String name, DsonType type, byte[] data) {
         DsonReaderUtils.checkWriteValueAsBytes(type);
         advanceToValueState(name);
         doWriteValueBytes(type, data);
@@ -353,7 +353,7 @@ public abstract class AbstractDsonBinWriter implements DsonBinWriter {
         public Context parent;
         public DsonContextType contextType;
         public DsonWriterState state = DsonWriterState.INITIAL;
-        public int curName;
+        public String curName;
 
         public Context() {
         }
@@ -372,7 +372,7 @@ public abstract class AbstractDsonBinWriter implements DsonBinWriter {
             parent = null;
             contextType = null;
             state = DsonWriterState.INITIAL;
-            curName = 0;
+            curName = null;
         }
 
         /** 方便查看赋值的调用 */
@@ -383,6 +383,7 @@ public abstract class AbstractDsonBinWriter implements DsonBinWriter {
         public Context getParent() {
             return parent;
         }
+
     }
 
 }

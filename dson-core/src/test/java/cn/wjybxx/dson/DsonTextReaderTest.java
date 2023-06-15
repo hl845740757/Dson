@@ -14,13 +14,8 @@
  * limitations under the License.
  */
 
-package cn.wjybxx.codec;
+package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.DsonDocReader;
-import cn.wjybxx.dson.DsonObject;
-import cn.wjybxx.dson.DsonValue;
-import cn.wjybxx.dson.WireType;
-import cn.wjybxx.codec.document.DocumentConverterUtils;
 import cn.wjybxx.dson.text.*;
 import org.junit.jupiter.api.Test;
 
@@ -34,7 +29,7 @@ import java.util.List;
  */
 public class DsonTextReaderTest {
 
-    private static final String dosnString = """
+    private static final String dsonString = """
             --\s
             -- {@MyStruct\s
             -- \tname : wjybxx,
@@ -71,15 +66,13 @@ public class DsonTextReaderTest {
     @Test
     void test() {
         List<DsonValue> topObjects = new ArrayList<>(4);
-        try (DsonScanner scanner = new DsonScanner(new DsonStringBuffer(dosnString))) {
-            DsonDocReader reader = new DsonTextReader(16, scanner);
+        try (DsonScanner scanner = new DsonScanner(new DsonStringBuffer(dsonString))) {
+            DsonReader reader = new DsonTextReader(16, scanner);
             DsonValue dsonValue;
-
-            while ((dsonValue = DocumentConverterUtils.readTopDsonValue(reader)) != null) {
+            while ((dsonValue = Dsons.readTopDsonValue(reader)) != null) {
                 topObjects.add(dsonValue);
             }
         }
-        topObjects.forEach(System.out::println);
 
         StringWriter stringWriter = new StringWriter();
         DsonTextWriterSettings settings = DsonTextWriterSettings.newBuilder()
@@ -93,25 +86,10 @@ public class DsonTextReaderTest {
                 @SuppressWarnings("unchecked") DsonObject<String> dsonObject = (DsonObject<String>) topObj;
                 writer.writeStartObject(ObjectStyle.INDENT);
                 dsonObject.forEach((name, value) -> {
-                    switch (value.getDsonType()) {
-                        case INT32 -> writer.writeInt64(name, value.asInt32().getValue(), WireType.VARINT, true);
-                        case INT64 -> writer.writeInt64(name, value.asInt64().getValue(), WireType.VARINT, true);
-                        case FLOAT -> writer.writeFloat(name, value.asFloat().getValue(), true);
-                        case DOUBLE -> writer.writeDouble(name, value.asDouble().getValue());
-                        case BOOLEAN -> writer.writeBoolean(name, value.asBoolean().getValue());
-                        case NULL -> writer.writeNull(name);
-                        case STRING -> {
-                            if (name.equals("介绍")){
-                                writer.writeString(name, value.asString().getValue(), StringStyle.TEXT);
-                            } else {
-                                writer.writeString(name, value.asString().getValue(), StringStyle.AUTO);
-                            }
-                        }
-                        case BINARY -> writer.writeBinary(name, value.asBinary());
-                        case EXT_INT32 -> writer.writeExtInt32(name, value.asExtInt32(), WireType.VARINT);
-                        case EXT_INT64 -> writer.writeExtInt64(name, value.asExtInt64(), WireType.VARINT);
-                        case EXT_STRING -> writer.writeExtString(name, value.asExtString(), StringStyle.AUTO);
-                        case REFERENCE -> writer.writeRef(name, value.asReference().getValue());
+                    if (name.equals("介绍")) {
+                        writer.writeString(name, value.asString().getValue(), StringStyle.TEXT);
+                    } else {
+                        Dsons.writeDsonValue(writer, value, name);
                     }
                 });
                 writer.writeEndObject();
@@ -119,6 +97,6 @@ public class DsonTextReaderTest {
             }
             System.out.println(stringWriter.toString());
         }
-
     }
+
 }

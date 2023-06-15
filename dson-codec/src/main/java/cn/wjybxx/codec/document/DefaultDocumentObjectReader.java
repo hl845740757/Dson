@@ -34,9 +34,9 @@ import java.util.Objects;
 public class DefaultDocumentObjectReader implements DocumentObjectReader {
 
     private final DefaultDocumentConverter converter;
-    private final DsonDocReader reader;
+    private final DsonReader reader;
 
-    public DefaultDocumentObjectReader(DefaultDocumentConverter converter, DsonDocReader reader) {
+    public DefaultDocumentObjectReader(DefaultDocumentConverter converter, DsonReader reader) {
         this.converter = converter;
         this.reader = reader;
     }
@@ -216,7 +216,7 @@ public class DefaultDocumentObjectReader implements DocumentObjectReader {
     @Override
     public <T> T readObject(String name, TypeArgInfo<T> typeArgInfo) {
         Class<T> declaredType = typeArgInfo.declaredType;
-        DsonDocReader reader = this.reader;
+        DsonReader reader = this.reader;
         // 基础类型不能返回null
         if (declaredType.isPrimitive()) {
             return (T) NumberCodecHelper.readPrimitive(reader, name, declaredType);
@@ -264,7 +264,7 @@ public class DefaultDocumentObjectReader implements DocumentObjectReader {
     }
 
     private <T> T readAsDsonValue(DsonType dsonType, String name, Class<T> declaredType) {
-        final DsonDocReader reader = this.reader;
+        final DsonReader reader = this.reader;
         Object value = switch (dsonType) {
             case INT32 -> reader.readInt32(name);
             case INT64 -> reader.readInt64(name);

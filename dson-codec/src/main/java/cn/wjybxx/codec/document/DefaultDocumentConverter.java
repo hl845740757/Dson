@@ -19,8 +19,8 @@ package cn.wjybxx.codec.document;
 import cn.wjybxx.codec.*;
 import cn.wjybxx.codec.document.codecs.MessageCodec;
 import cn.wjybxx.codec.document.codecs.MessageEnumCodec;
-import cn.wjybxx.dson.DefaultDsonDocReader;
-import cn.wjybxx.dson.DefaultDsonDocWriter;
+import cn.wjybxx.dson.DsonBinaryReader;
+import cn.wjybxx.dson.DsonBinaryWriter;
 import cn.wjybxx.dson.internal.CollectionUtils;
 import cn.wjybxx.dson.io.*;
 import com.google.protobuf.MessageLite;
@@ -107,7 +107,7 @@ public class DefaultDocumentConverter implements DocumentConverter {
 
     private void encodeObject(DsonOutput outputStream, @Nullable Object value, TypeArgInfo<?> typeArgInfo) {
         try (DocumentObjectWriter wrapper = new DefaultDocumentObjectWriter(this,
-                new DefaultDsonDocWriter(options.recursionLimit, outputStream))) {
+                new DsonBinaryWriter(options.recursionLimit, outputStream))) {
             wrapper.writeObject(value, typeArgInfo);
             wrapper.flush();
         }
@@ -115,7 +115,7 @@ public class DefaultDocumentConverter implements DocumentConverter {
 
     private <U> U decodeObject(DsonInput inputStream, TypeArgInfo<U> typeArgInfo) {
         try (DocumentObjectReader wrapper = new DefaultDocumentObjectReader(this,
-                new DefaultDsonDocReader(options.recursionLimit, inputStream))) {
+                new DsonBinaryReader(options.recursionLimit, inputStream))) {
             return wrapper.readObject(typeArgInfo);
         }
     }

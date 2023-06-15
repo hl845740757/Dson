@@ -16,7 +16,6 @@
 
 package cn.wjybxx.codec.binary;
 
-import cn.wjybxx.dson.*;
 import cn.wjybxx.codec.binary.codecs.*;
 import cn.wjybxx.codec.ClassId;
 import cn.wjybxx.codec.ClassIdRegistries;
@@ -121,101 +120,6 @@ public class BinaryConverterUtils extends ConverterUtils {
     }
 
     // region 直接读取为DsonObject
-
-    /** @return 如果到达文件尾部，则返回null */
-    public static DsonValue readTopDsonValue(DsonBinReader reader) {
-        DsonType dsonType = reader.readDsonType();
-        if (dsonType == DsonType.END_OF_OBJECT) {
-            return null;
-        }
-        if (dsonType == DsonType.OBJECT) {
-            return readObject(reader);
-        } else {
-            return readArray(reader);
-        }
-    }
-
-    /** 外部需要先readName */
-    private static MutableDsonObject<FieldNumber> readObject(DsonBinReader reader) {
-        DsonType dsonType;
-        int name;
-        DsonValue value;
-
-        MutableDsonObject<FieldNumber> dsonObject = new MutableDsonObject<>();
-        reader.readStartObject();
-        while ((dsonType = reader.readDsonType()) != DsonType.END_OF_OBJECT) {
-            if (dsonType == DsonType.HEADER) {
-                readHeader(reader, dsonObject.getHeader());
-            } else {
-                name = reader.readName();
-                value = readAsDsonValue(reader, dsonType, name);
-                dsonObject.put(FieldNumber.ofFullNumber(name), value);
-            }
-        }
-        reader.readEndObject();
-        return dsonObject;
-    }
-
-    private static void readHeader(DsonBinReader reader, DsonHeader<FieldNumber> header) {
-        DsonType dsonType;
-        int name;
-        DsonValue value;
-
-        reader.readStartHeader();
-        while ((dsonType = reader.readDsonType()) != DsonType.END_OF_OBJECT) {
-            name = reader.readName();
-            value = readAsDsonValue(reader, dsonType, name);
-            header.put(FieldNumber.ofFullNumber(name), value);
-        }
-        reader.readEndHeader();
-    }
-
-    /** 外部需要先readName */
-    private static MutableDsonArray<FieldNumber> readArray(DsonBinReader reader) {
-        DsonType dsonType;
-        DsonValue value;
-
-        MutableDsonArray<FieldNumber> dsonArray = new MutableDsonArray<>(8);
-        reader.readStartArray();
-        while ((dsonType = reader.readDsonType()) != DsonType.END_OF_OBJECT) {
-            if (dsonType == DsonType.HEADER) {
-                readHeader(reader, dsonArray.getHeader());
-            } else {
-                value = readAsDsonValue(reader, dsonType, 0);
-                dsonArray.add(value);
-            }
-        }
-        reader.readEndArray();
-        return dsonArray;
-    }
-
-    private static DsonValue readAsDsonValue(DsonBinReader reader, DsonType dsonType, int name) {
-        return switch (dsonType) {
-            case INT32 -> new DsonInt32(reader.readInt32(name));
-            case INT64 -> new DsonInt64(reader.readInt64(name));
-            case FLOAT -> new DsonFloat(reader.readFloat(name));
-            case DOUBLE -> new DsonDouble(reader.readDouble(name));
-            case BOOLEAN -> new DsonBool(reader.readBoolean(name));
-            case STRING -> new DsonString(reader.readString(name));
-            case BINARY -> reader.readBinary(name);
-            case EXT_STRING -> reader.readExtString(name);
-            case EXT_INT32 -> reader.readExtInt32(name);
-            case EXT_INT64 -> reader.readExtInt64(name);
-            case REFERENCE -> new DsonObjectRef(reader.readRef(name));
-            case NULL -> {
-                reader.readNull(name);
-                yield DsonNull.INSTANCE;
-            }
-            case HEADER -> {
-                MutableDsonHeader<FieldNumber> header = new MutableDsonHeader<>();
-                readHeader(reader, header);
-                yield header;
-            }
-            case OBJECT -> readObject(reader);
-            case ARRAY -> readArray(reader);
-            case END_OF_OBJECT -> throw new AssertionError();
-        };
-    }
 
     // endregion
 

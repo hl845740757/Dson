@@ -25,7 +25,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * 对{@link DsonBinWriter}的封装，主要提供类型管理和兼容性支持
+ * 对{@link DsonLiteWriter}的封装，主要提供类型管理和兼容性支持
  * 1.对于对象类型，如果value为null，将自动调用{@link #writeNull(int)}
  * 2.
  *
@@ -141,7 +141,7 @@ public interface BinaryObjectWriter extends AutoCloseable {
      */
     void writeMessage(int name, MessageLite messageLite);
 
-    /** @see DsonBinWriter#writeValueBytes(int, DsonType, byte[]) */
+    /** @see DsonLiteWriter#writeValueBytes(int, DsonType, byte[]) */
     void writeValueBytes(int name, DsonType dsonType, byte[] data);
 
     // endregion

@@ -16,7 +16,7 @@
 
 package cn.wjybxx.codec;
 
-import cn.wjybxx.dson.Dsons;
+import cn.wjybxx.dson.DsonLites;
 
 /**
  * 在二进制编码中，包体大小是比较重要的，因此使用数字来映射类型
@@ -75,12 +75,12 @@ public final class ClassId {
     }
 
     public long getGuid() {
-        return Dsons.makeClassGuid(namespace, lclassId);
+        return DsonLites.makeClassGuid(namespace, lclassId);
     }
 
     public static ClassId ofGuid(long guid) {
-        int namespace = Dsons.namespaceOfClassGuid(guid);
-        int lclassId = Dsons.lclassIdOfClassGuid(guid);
+        int namespace = DsonLites.namespaceOfClassGuid(guid);
+        int lclassId = DsonLites.lclassIdOfClassGuid(guid);
         return new ClassId(namespace, lclassId);
     }
 

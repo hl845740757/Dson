@@ -33,9 +33,9 @@ import java.util.Objects;
  * @author wjybxx
  * date - 2023/4/28
  */
-public abstract class AbstractDsonDocReader implements DsonDocReader {
+public abstract class AbstractDsonLiteReader implements DsonLiteReader {
 
-    protected static final String INVALID_NAME = null;
+    protected static final int INVALID_NAME = -1;
 
     protected final int recursionLimit;
     private Context context;
@@ -45,9 +45,9 @@ public abstract class AbstractDsonDocReader implements DsonDocReader {
     protected int recursionDepth;
     protected DsonType currentDsonType;
     protected WireType currentWireType;
-    protected String currentName = INVALID_NAME;
+    protected int currentName = INVALID_NAME;
 
-    public AbstractDsonDocReader(int recursionLimit) {
+    public AbstractDsonLiteReader(int recursionLimit) {
         this.recursionLimit = recursionLimit;
     }
 
@@ -85,7 +85,7 @@ public abstract class AbstractDsonDocReader implements DsonDocReader {
     }
 
     @Override
-    public String getCurrentName() {
+    public int getCurrentName() {
         if (context.state != DsonReaderState.VALUE) {
             throw invalidState(List.of(DsonReaderState.VALUE));
         }
@@ -107,7 +107,12 @@ public abstract class AbstractDsonDocReader implements DsonDocReader {
     }
 
     @Override
-    public String readName() {
+    public boolean isAtName() {
+        return context.state == DsonReaderState.NAME;
+    }
+
+    @Override
+    public int readName() {
         if (context.state != DsonReaderState.NAME) {
             throw invalidState(List.of(DsonReaderState.NAME));
         }
@@ -117,9 +122,9 @@ public abstract class AbstractDsonDocReader implements DsonDocReader {
     }
 
     @Override
-    public void readName(String expected) {
-        String name = readName();
-        if (!Objects.equals(name, expected)) {
+    public void readName(int expected) {
+        int name = readName();
+        if (name != expected) {
             throw DsonIOException.unexpectedName(expected, name);
         }
     }
@@ -137,7 +142,6 @@ public abstract class AbstractDsonDocReader implements DsonDocReader {
         }
     }
 
-    /** 处理读取dsonType后的状态切换 */
     protected void onReadDsonType(Context context, DsonType dsonType) {
         if (dsonType == DsonType.END_OF_OBJECT) {
             // readEndXXX都是子上下文中执行的，因此正常情况下topLevel不会读取到 endOfObject 标记
@@ -168,7 +172,7 @@ public abstract class AbstractDsonDocReader implements DsonDocReader {
     }
 
     /** 前进到读值状态 */
-    protected void advanceToValueState(String name, @Nullable DsonType requiredType) {
+    protected void advanceToValueState(int name, @Nullable DsonType requiredType) {
         Context context = this.context;
         if (context.state == DsonReaderState.TYPE) {
             readDsonType();
@@ -197,12 +201,6 @@ public abstract class AbstractDsonDocReader implements DsonDocReader {
         context.setState(DsonReaderState.TYPE);
     }
 
-    protected static void verifyState(Context context, DsonReaderState expected) {
-        if (context.state != expected) {
-            throw DsonIOException.invalidState(context.contextType, List.of(expected), context.state);
-        }
-    }
-
     protected DsonIOException invalidState(List<DsonReaderState> expected) {
         return DsonIOException.invalidState(context.contextType, expected, context.state);
     }
@@ -210,7 +208,7 @@ public abstract class AbstractDsonDocReader implements DsonDocReader {
 
     // region 简单值
     @Override
-    public int readInt32(String name) {
+    public int readInt32(int name) {
         advanceToValueState(name, DsonType.INT32);
         int value = doReadInt32();
         setNextState();
@@ -218,7 +216,7 @@ public abstract class AbstractDsonDocReader implements DsonDocReader {
     }
 
     @Override
-    public long readInt64(String name) {
+    public long readInt64(int name) {
         advanceToValueState(name, DsonType.INT64);
         long value = doReadInt64();
         setNextState();
@@ -226,7 +224,7 @@ public abstract class AbstractDsonDocReader implements DsonDocReader {
     }
 
     @Override
-    public float readFloat(String name) {
+    public float readFloat(int name) {
         advanceToValueState(name, DsonType.FLOAT);
         float value = doReadFloat();
         setNextState();
@@ -234,7 +232,7 @@ public abstract class AbstractDsonDocReader implements DsonDocReader {
     }
 
     @Override
-    public double readDouble(String name) {
+    public double readDouble(int name) {
         advanceToValueState(name, DsonType.DOUBLE);
         double value = doReadDouble();
         setNextState();
@@ -242,7 +240,7 @@ public abstract class AbstractDsonDocReader implements DsonDocReader {
     }
 
     @Override
-    public boolean readBoolean(String name) {
+    public boolean readBoolean(int name) {
         advanceToValueState(name, DsonType.BOOLEAN);
         boolean value = doReadBool();
         setNextState();
@@ -250,7 +248,7 @@ public abstract class AbstractDsonDocReader implements DsonDocReader {
     }
 
     @Override
-    public String readString(String name) {
+    public String readString(int name) {
         advanceToValueState(name, DsonType.STRING);
         String value = doReadString();
         setNextState();
@@ -258,14 +256,14 @@ public abstract class AbstractDsonDocReader implements DsonDocReader {
     }
 
     @Override
-    public void readNull(String name) {
+    public void readNull(int name) {
         advanceToValueState(name, DsonType.NULL);
         doReadNull();
         setNextState();
     }
 
     @Override
-    public DsonBinary readBinary(String name) {
+    public DsonBinary readBinary(int name) {
         advanceToValueState(name, DsonType.BINARY);
         DsonBinary value = doReadBinary();
         setNextState();
@@ -273,7 +271,7 @@ public abstract class AbstractDsonDocReader implements DsonDocReader {
     }
 
     @Override
-    public DsonExtInt32 readExtInt32(String name) {
+    public DsonExtInt32 readExtInt32(int name) {
         advanceToValueState(name, DsonType.EXT_INT32);
         DsonExtInt32 value = doReadExtInt32();
         setNextState();
@@ -281,7 +279,7 @@ public abstract class AbstractDsonDocReader implements DsonDocReader {
     }
 
     @Override
-    public DsonExtInt64 readExtInt64(String name) {
+    public DsonExtInt64 readExtInt64(int name) {
         advanceToValueState(name, DsonType.EXT_INT64);
         DsonExtInt64 value = doReadExtInt64();
         setNextState();
@@ -289,7 +287,7 @@ public abstract class AbstractDsonDocReader implements DsonDocReader {
     }
 
     @Override
-    public DsonExtString readExtString(String name) {
+    public DsonExtString readExtString(int name) {
         advanceToValueState(name, DsonType.EXT_STRING);
         DsonExtString value = doReadExtString();
         setNextState();
@@ -297,7 +295,7 @@ public abstract class AbstractDsonDocReader implements DsonDocReader {
     }
 
     @Override
-    public ObjectRef readRef(String name) {
+    public ObjectRef readRef(int name) {
         advanceToValueState(name, DsonType.REFERENCE);
         ObjectRef value = doReadRef();
         setNextState();
@@ -473,7 +471,7 @@ public abstract class AbstractDsonDocReader implements DsonDocReader {
     }
 
     @Override
-    public <T> T readMessage(String name, int binaryType, @Nonnull Parser<T> parser) {
+    public <T> T readMessage(int name, int binaryType, @Nonnull Parser<T> parser) {
         Objects.requireNonNull(parser, "parser");
         advanceToValueState(name, DsonType.BINARY);
         T value = doReadMessage(binaryType, parser);
@@ -482,7 +480,7 @@ public abstract class AbstractDsonDocReader implements DsonDocReader {
     }
 
     @Override
-    public byte[] readValueAsBytes(String name) {
+    public byte[] readValueAsBytes(int name) {
         advanceToValueState(name, null);
         DsonReaderUtils.checkReadValueAsBytes(currentDsonType);
         byte[] data = doReadValueAsBytes();
@@ -514,7 +512,7 @@ public abstract class AbstractDsonDocReader implements DsonDocReader {
         public Context parent;
         public DsonContextType contextType;
         public DsonReaderState state = DsonReaderState.INITIAL;
-        public String name = INVALID_NAME;
+        public int name = INVALID_NAME;
 
         public Context() {
         }

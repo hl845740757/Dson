@@ -30,7 +30,7 @@ import javax.annotation.Nonnull;
  * date - 2023/4/20
  */
 @SuppressWarnings("unused")
-public interface DsonDocReader extends AutoCloseable {
+public interface DsonReader extends AutoCloseable {
 
     @Override
     void close();
@@ -52,6 +52,9 @@ public interface DsonDocReader extends AutoCloseable {
      * }</pre>
      */
     DsonType readDsonType();
+
+    /** 当前是否处于应该读取name状态 */
+    boolean isAtName();
 
     /**
      * 读取下一个值的name

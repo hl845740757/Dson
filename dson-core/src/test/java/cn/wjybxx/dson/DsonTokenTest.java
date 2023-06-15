@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cn.wjybxx.codec;
+package cn.wjybxx.dson;
 
 import cn.wjybxx.dson.text.*;
 import org.junit.jupiter.api.Assertions;

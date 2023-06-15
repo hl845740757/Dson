@@ -22,7 +22,7 @@ import cn.wjybxx.codec.binary.BinaryPojoCodecImpl;
 import cn.wjybxx.codec.document.DocumentObjectReader;
 import cn.wjybxx.codec.document.DocumentObjectWriter;
 import cn.wjybxx.codec.document.DocumentPojoCodecImpl;
-import cn.wjybxx.dson.Dsons;
+import cn.wjybxx.dson.DsonLites;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
@@ -177,47 +177,47 @@ class CodecStructs {
         @Override
         public void writeObject(MyStruct instance, BinaryObjectWriter writer, TypeArgInfo<?> typeArgInfo) {
             NestStruct nestStruct = instance.nestStruct;
-            writer.writeStartObject(Dsons.makeFullNumber(0, 0), nestStruct, TypeArgInfo.of(NestStruct.class));
+            writer.writeStartObject(DsonLites.makeFullNumber(0, 0), nestStruct, TypeArgInfo.of(NestStruct.class));
             {
-                writer.writeInt(Dsons.makeFullNumber(0, 0), nestStruct.intVal);
-                writer.writeLong(Dsons.makeFullNumber(0, 1), nestStruct.longVal);
-                writer.writeFloat(Dsons.makeFullNumber(0, 2), nestStruct.floatVal);
-                writer.writeDouble(Dsons.makeFullNumber(0, 3), nestStruct.doubleVal);
+                writer.writeInt(DsonLites.makeFullNumber(0, 0), nestStruct.intVal);
+                writer.writeLong(DsonLites.makeFullNumber(0, 1), nestStruct.longVal);
+                writer.writeFloat(DsonLites.makeFullNumber(0, 2), nestStruct.floatVal);
+                writer.writeDouble(DsonLites.makeFullNumber(0, 3), nestStruct.doubleVal);
             }
             writer.writeEndObject();
 
-            writer.writeInt(Dsons.makeFullNumber(0, 1), instance.intVal);
-            writer.writeLong(Dsons.makeFullNumber(0, 2), instance.longVal);
-            writer.writeFloat(Dsons.makeFullNumber(0, 3), instance.floatVal);
-            writer.writeDouble(Dsons.makeFullNumber(0, 4), instance.doubleVal);
-            writer.writeBoolean(Dsons.makeFullNumber(0, 5), instance.boolVal);
-            writer.writeString(Dsons.makeFullNumber(0, 6), instance.strVal);
-            writer.writeBytes(Dsons.makeFullNumber(0, 7), instance.bytes);
-            writer.writeObject(Dsons.makeFullNumber(0, 8), instance.map, TypeArgInfo.STRING_LINKEDHASHMAP);
-            writer.writeObject(Dsons.makeFullNumber(0, 9), instance.list, TypeArgInfo.ARRAYLIST);
+            writer.writeInt(DsonLites.makeFullNumber(0, 1), instance.intVal);
+            writer.writeLong(DsonLites.makeFullNumber(0, 2), instance.longVal);
+            writer.writeFloat(DsonLites.makeFullNumber(0, 3), instance.floatVal);
+            writer.writeDouble(DsonLites.makeFullNumber(0, 4), instance.doubleVal);
+            writer.writeBoolean(DsonLites.makeFullNumber(0, 5), instance.boolVal);
+            writer.writeString(DsonLites.makeFullNumber(0, 6), instance.strVal);
+            writer.writeBytes(DsonLites.makeFullNumber(0, 7), instance.bytes);
+            writer.writeObject(DsonLites.makeFullNumber(0, 8), instance.map, TypeArgInfo.STRING_LINKEDHASHMAP);
+            writer.writeObject(DsonLites.makeFullNumber(0, 9), instance.list, TypeArgInfo.ARRAYLIST);
         }
 
         @SuppressWarnings("unchecked")
         @Override
         public MyStruct readObject(BinaryObjectReader reader, TypeArgInfo<?> typeArgInfo) {
-            reader.readStartObject(Dsons.makeFullNumber(0, 0), TypeArgInfo.of(NestStruct.class));
+            reader.readStartObject(DsonLites.makeFullNumber(0, 0), TypeArgInfo.of(NestStruct.class));
             NestStruct nestStruct = new NestStruct(
-                    reader.readInt(Dsons.makeFullNumber(0, 0)),
-                    reader.readLong(Dsons.makeFullNumber(0, 1)),
-                    reader.readFloat(Dsons.makeFullNumber(0, 2)),
-                    reader.readDouble(Dsons.makeFullNumber(0, 3)));
+                    reader.readInt(DsonLites.makeFullNumber(0, 0)),
+                    reader.readLong(DsonLites.makeFullNumber(0, 1)),
+                    reader.readFloat(DsonLites.makeFullNumber(0, 2)),
+                    reader.readDouble(DsonLites.makeFullNumber(0, 3)));
             reader.readEndObject();
 
             return new MyStruct(
-                    reader.readInt(Dsons.makeFullNumber(0, 1)),
-                    reader.readLong(Dsons.makeFullNumber(0, 2)),
-                    reader.readFloat(Dsons.makeFullNumber(0, 3)),
-                    reader.readDouble(Dsons.makeFullNumber(0, 4)),
-                    reader.readBoolean(Dsons.makeFullNumber(0, 5)),
-                    reader.readString(Dsons.makeFullNumber(0, 6)),
-                    reader.readBytes(Dsons.makeFullNumber(0, 7)),
-                    reader.readObject(Dsons.makeFullNumber(0, 8), TypeArgInfo.STRING_LINKEDHASHMAP),
-                    reader.readObject(Dsons.makeFullNumber(0, 9), TypeArgInfo.ARRAYLIST),
+                    reader.readInt(DsonLites.makeFullNumber(0, 1)),
+                    reader.readLong(DsonLites.makeFullNumber(0, 2)),
+                    reader.readFloat(DsonLites.makeFullNumber(0, 3)),
+                    reader.readDouble(DsonLites.makeFullNumber(0, 4)),
+                    reader.readBoolean(DsonLites.makeFullNumber(0, 5)),
+                    reader.readString(DsonLites.makeFullNumber(0, 6)),
+                    reader.readBytes(DsonLites.makeFullNumber(0, 7)),
+                    reader.readObject(DsonLites.makeFullNumber(0, 8), TypeArgInfo.STRING_LINKEDHASHMAP),
+                    reader.readObject(DsonLites.makeFullNumber(0, 9), TypeArgInfo.ARRAYLIST),
                     nestStruct);
         }
 
