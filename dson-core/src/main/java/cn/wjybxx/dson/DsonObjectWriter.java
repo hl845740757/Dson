@@ -4,6 +4,7 @@ import cn.wjybxx.dson.io.Chunk;
 import cn.wjybxx.dson.text.ObjectStyle;
 import cn.wjybxx.dson.text.StringStyle;
 import cn.wjybxx.dson.types.ObjectRef;
+import cn.wjybxx.dson.types.OffsetTimestamp;
 import com.google.protobuf.MessageLite;
 
 /**
@@ -99,6 +100,11 @@ public class DsonObjectWriter extends AbstractDsonWriter {
     @Override
     protected void doWriteRef(ObjectRef objectRef) {
         getContext().add(new DsonObjectRef(objectRef));
+    }
+
+    @Override
+    protected void doWriteTimestamp(OffsetTimestamp timestamp) {
+        getContext().add(new DsonTimestamp(timestamp));
     }
 
     @Override

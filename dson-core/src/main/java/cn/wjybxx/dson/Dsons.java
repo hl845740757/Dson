@@ -17,10 +17,10 @@
 package cn.wjybxx.dson;
 
 import cn.wjybxx.dson.internal.InternalUtils;
-import cn.wjybxx.dson.text.ObjectStyle;
-import cn.wjybxx.dson.text.StringStyle;
+import cn.wjybxx.dson.text.*;
 
 import javax.annotation.Nullable;
+import java.io.StringWriter;
 import java.util.Properties;
 
 /**
@@ -243,6 +243,7 @@ public final class Dsons {
             case EXT_INT64 -> writer.writeExtInt64(name, dsonValue.asExtInt64(), WireType.VARINT);
             case EXT_STRING -> writer.writeExtString(name, dsonValue.asExtString(), StringStyle.AUTO);
             case REFERENCE -> writer.writeRef(name, dsonValue.asReference().getValue());
+            case TIMESTAMP -> writer.writeTimestamp(name, dsonValue.asTimestamp().getValue());
             case HEADER -> writeHeader(writer, dsonValue.asHeader());
             case ARRAY -> writeArray(writer, dsonValue.asArray(), ObjectStyle.INDENT);
             case OBJECT -> writeObject(writer, dsonValue.asObject(), ObjectStyle.INDENT);
@@ -270,6 +271,7 @@ public final class Dsons {
             case EXT_INT64 -> reader.readExtInt64(name);
             case EXT_STRING -> reader.readExtString(name);
             case REFERENCE -> new DsonObjectRef(reader.readRef(name));
+            case TIMESTAMP -> new DsonTimestamp(reader.readTimestamp(name));
             case HEADER -> {
                 MutableDsonHeader<String> header = new MutableDsonHeader<>();
                 readHeader(reader, header);
@@ -279,6 +281,27 @@ public final class Dsons {
             case ARRAY -> readArray(reader);
             case END_OF_OBJECT -> throw new AssertionError();
         };
+    }
+
+    public static String toDson(DsonValue dsonValue) {
+        return toDson(dsonValue, DsonTextWriterSettings.newBuilder().build());
+    }
+
+    public static String toDson(DsonValue dsonValue, DsonTextWriterSettings settings) {
+        if (!dsonValue.getDsonType().isContainer()) {
+            throw new IllegalArgumentException("invalid dsonType " + dsonValue.getDsonType());
+        }
+        StringWriter stringWriter = new StringWriter(1024);
+        try (DsonTextWriter writer = new DsonTextWriter(16, stringWriter, settings)) {
+            writeTopDsonValue(writer, dsonValue, ObjectStyle.INDENT);
+        }
+        return stringWriter.toString();
+    }
+
+    public static DsonValue fromDson(String dsonString) {
+        try (DsonTextReader reader = new DsonTextReader(16, dsonString)) {
+            return readTopDsonValue(reader);
+        }
     }
 
     // endregion

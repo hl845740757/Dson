@@ -22,6 +22,7 @@ import cn.wjybxx.dson.io.DsonIOException;
 import cn.wjybxx.dson.text.ObjectStyle;
 import cn.wjybxx.dson.text.StringStyle;
 import cn.wjybxx.dson.types.ObjectRef;
+import cn.wjybxx.dson.types.OffsetTimestamp;
 import com.google.protobuf.MessageLite;
 
 import java.util.List;
@@ -221,6 +222,14 @@ public abstract class AbstractDsonWriter implements DsonWriter {
         setNextState();
     }
 
+    @Override
+    public void writeTimestamp(String name, OffsetTimestamp timestamp) {
+        Objects.requireNonNull(timestamp);
+        advanceToValueState(name);
+        doWriteTimestamp(timestamp);
+        setNextState();
+    }
+
     protected abstract void doWriteInt32(int value, WireType wireType, boolean stronglyTyped);
 
     protected abstract void doWriteInt64(long value, WireType wireType, boolean stronglyTyped);
@@ -247,6 +256,8 @@ public abstract class AbstractDsonWriter implements DsonWriter {
 
     protected abstract void doWriteRef(ObjectRef objectRef);
 
+    protected abstract void doWriteTimestamp(OffsetTimestamp timestamp);
+
     // endregion
 
     // region 容器
@@ -272,6 +283,11 @@ public abstract class AbstractDsonWriter implements DsonWriter {
 
     @Override
     public void writeStartHeader(ObjectStyle style) {
+        // object下默认是name状态
+        Context context = this.context;
+        if (context.contextType == DsonContextType.OBJECT && context.state == DsonWriterState.NAME) {
+            context.setState(DsonWriterState.VALUE);
+        }
         writeStartContainer(DsonContextType.HEADER, style);
     }
 

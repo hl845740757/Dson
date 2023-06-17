@@ -19,6 +19,7 @@ package cn.wjybxx.dson;
 import cn.wjybxx.dson.internal.DsonReaderUtils;
 import cn.wjybxx.dson.io.DsonIOException;
 import cn.wjybxx.dson.types.ObjectRef;
+import cn.wjybxx.dson.types.OffsetTimestamp;
 import com.google.protobuf.Parser;
 
 import javax.annotation.Nonnull;
@@ -303,6 +304,14 @@ public abstract class AbstractDsonReader implements DsonReader {
         return value;
     }
 
+    @Override
+    public OffsetTimestamp readTimestamp(String name) {
+        advanceToValueState(name, DsonType.TIMESTAMP);
+        OffsetTimestamp value = doReadTimestamp();
+        setNextState();
+        return value;
+    }
+
     protected abstract int doReadInt32();
 
     protected abstract long doReadInt64();
@@ -326,6 +335,8 @@ public abstract class AbstractDsonReader implements DsonReader {
     protected abstract DsonExtString doReadExtString();
 
     protected abstract ObjectRef doReadRef();
+
+    protected abstract OffsetTimestamp doReadTimestamp();
 
     // region 容器
 

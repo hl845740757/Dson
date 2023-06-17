@@ -28,12 +28,14 @@ public class DsonTextWriterSettings {
     public final int softLineLength;
     public final boolean unicodeChar;
     public final boolean enableText;
+    public final float lengthFactorOfText;
 
     private DsonTextWriterSettings(Builder builder) {
         this.lineSeparator = Objects.requireNonNull(builder.lineSeparator);
         this.softLineLength = Math.max(8, builder.softLineLength);
         this.unicodeChar = builder.unicodeChar;
         this.enableText = builder.enableText;
+        this.lengthFactorOfText = builder.lengthFactorOfText;
     }
 
     public static Builder newBuilder() {
@@ -58,9 +60,13 @@ public class DsonTextWriterSettings {
         private boolean unicodeChar = false;
         /**
          * 是否支持纯文本模式
-         * 如果{@link #unicodeChar}为true，该值通常需要关闭
+         * 如果{@link #unicodeChar}为true，该值通常需要关闭，text模式不会执行转义，也就不会处理unicode字符
          */
         private boolean enableText = true;
+        /**
+         * 当字符串的长度达到 lineLength  * factor 触发text模式
+         */
+        private float lengthFactorOfText = 2;
 
         private Builder() {
         }
@@ -102,6 +108,15 @@ public class DsonTextWriterSettings {
 
         public Builder setEnableText(boolean enableText) {
             this.enableText = enableText;
+            return this;
+        }
+
+        public float getLengthFactorOfText() {
+            return lengthFactorOfText;
+        }
+
+        public Builder setLengthFactorOfText(float lengthFactorOfText) {
+            this.lengthFactorOfText = lengthFactorOfText;
             return this;
         }
     }

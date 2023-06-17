@@ -20,9 +20,12 @@ import cn.wjybxx.dson.io.Chunk;
 import cn.wjybxx.dson.text.ObjectStyle;
 import cn.wjybxx.dson.text.StringStyle;
 import cn.wjybxx.dson.types.ObjectRef;
+import cn.wjybxx.dson.types.OffsetTimestamp;
 import com.google.protobuf.MessageLite;
 
 /**
+ * 由于java的泛型是擦除实现，我们为避免拆装箱开销，提供了几乎重复的实现。
+ * <p>
  * 1.写数组普通元素的时候，{@code name}传0，写嵌套对象时使用无name参数的start方法（实在不想定义太多的方法）
  * 2.double、boolean、null由于可以从无符号字符串精确解析得出，因此可以总是不输出类型标签，
  * 3.内置结构体总是输出类型标签，且总是Flow模式，可以降低使用复杂度；
@@ -84,6 +87,8 @@ public interface DsonLiteWriter extends AutoCloseable {
     void writeExtString(int name, DsonExtString value, StringStyle style);
 
     void writeRef(int name, ObjectRef objectRef);
+
+    void writeTimestamp(int name, OffsetTimestamp timestamp);
 
     // endregion
 

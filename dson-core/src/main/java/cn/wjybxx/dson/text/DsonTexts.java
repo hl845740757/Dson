@@ -38,7 +38,7 @@ public class DsonTexts {
     public static final String LABEL_FLOAT = "f";
     public static final String LABEL_DOUBLE = "d";
     public static final String LABEL_BOOL = "b";
-    public static final String LABEL_STRING = "s";
+    private static final String LABEL_STRING = "s";
     public static final String LABEL_NULL = "N";
 
     public static final String LABEL_BINARY = "bin";
@@ -46,6 +46,7 @@ public class DsonTexts {
     public static final String LABEL_EXTINT64 = "eL";
     public static final String LABEL_EXTSTRING = "es";
     public static final String LABEL_REFERENCE = "ref";
+    public static final String LABEL_DATETIME = "dt";
 
     /** 长文本，字符串不需要加引号，不对内容进行转义，可直接换行 */
     public static final String LABEL_TEXT = "ss";
@@ -55,7 +56,8 @@ public class DsonTexts {
     private static final Set<String> LABEL_SET = Set.of(
             LABEL_INT32, LABEL_INT64, LABEL_FLOAT, LABEL_DOUBLE,
             LABEL_BOOL, LABEL_NULL, LABEL_BINARY,
-            LABEL_EXTINT32, LABEL_EXTINT64, LABEL_EXTSTRING, LABEL_REFERENCE,
+            LABEL_EXTINT32, LABEL_EXTINT64, LABEL_EXTSTRING,
+            LABEL_REFERENCE, LABEL_DATETIME,
             LABEL_TEXT, LABEL_ARRAY, LABEL_OBJECT);
 
     // 行首标签

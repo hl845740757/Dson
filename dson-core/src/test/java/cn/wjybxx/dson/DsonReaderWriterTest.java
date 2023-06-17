@@ -110,7 +110,7 @@ public class DsonReaderWriterTest {
             DsonLiteReader reader = new DsonBinaryLiteReader(16, dsonInput);
             DsonValue dsonValue;
             while ((dsonValue = DsonLites.readTopDsonValue(reader)) != null) {
-                copiedList.add(dsonValue.asLiteObject());
+                copiedList.add(dsonValue.asObjectLite());
             }
         }
 

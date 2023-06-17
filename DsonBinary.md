@@ -15,27 +15,29 @@ Dson提供了两个版本的二进制格式，从整体上看他们是一样的�
 
 ### length区域
 
-1. binary/Object/Array/header的length为fixed32编码，以方便扩展 - binary的length包含subType。
+1. binary/Object/Array/header的length为fixed32编码，以方便扩展。
 
 ### 类型区域
 
 1. 字段的类型由 DsonType和 *WireType(数字编码类型)* 构成，共1个字节。
 2. WireType分为：VarInt、UINT、SINT、FIXED -- 可参考ProtocolBuffer。
-3. int32和int64数字的编码类型会随着数字序列化，以确保对方正确的解码
+3. int32和int64数字的编码类型会随着数字序列化，以确保对方正确的解码。
 
 ### number区域
 
 1. Dson最初是为序列化而创建的，因此考虑过继承问题，Dson是支持继承的。
 2. 字段的fullNumber由两部分构成，localNumber(本地编号)  + idep(继承深度)。
-3. fullNumber为uint32类型，1~3个字节
+3. fullNumber为uint32类型，1~3个字节。
 
 ### 子length区
 
 1. 嵌套对象和顶层对象一样都写入了数据长度。
-2. 固定长度的属性类型没有length字段
-3. 数字没有length字段
+2. 固定长度的属性类型没有length字段。
+3. 数字没有length字段。
 4. **string的length是uint32变长编码**，以节省开销 —— 只有最上面提到4种数据的length是fixed32。
 5. extInt32、extInt64和extString都是两个简单值的连续写入，subType采用uint32编码，value采用对应值类型的编码。
+6. ref为4个值的连续写入，string,string,uint32,uint32
+7. timestamp也是4个值的连续写入，uint64,uint32,uint32,uint32
 
 ### 其它
 

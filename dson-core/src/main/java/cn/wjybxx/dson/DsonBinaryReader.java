@@ -21,6 +21,7 @@ import cn.wjybxx.dson.io.BinaryUtils;
 import cn.wjybxx.dson.io.DsonIOException;
 import cn.wjybxx.dson.io.DsonInput;
 import cn.wjybxx.dson.types.ObjectRef;
+import cn.wjybxx.dson.types.OffsetTimestamp;
 import com.google.protobuf.Parser;
 
 /**
@@ -149,6 +150,11 @@ public class DsonBinaryReader extends AbstractDsonReader {
     @Override
     protected ObjectRef doReadRef() {
         return DsonReaderUtils.readRef(input);
+    }
+
+    @Override
+    protected OffsetTimestamp doReadTimestamp() {
+        return DsonReaderUtils.readTimestamp(input);
     }
 
     // endregion

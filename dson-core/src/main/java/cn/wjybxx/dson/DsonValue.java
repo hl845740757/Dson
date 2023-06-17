@@ -79,6 +79,10 @@ public abstract class DsonValue {
         return (DsonObjectRef) this;
     }
 
+    public DsonTimestamp asTimestamp() {
+        return (DsonTimestamp) this;
+    }
+
     @SuppressWarnings("unchecked")
     public MutableDsonHeader<String> asHeader() {
         return (MutableDsonHeader<String>) this;
@@ -96,17 +100,17 @@ public abstract class DsonValue {
     //
 
     @SuppressWarnings("unchecked")
-    public MutableDsonHeader<FieldNumber> asLiteHeader() {
+    public MutableDsonHeader<FieldNumber> asHeaderLite() {
         return (MutableDsonHeader<FieldNumber>) this;
     }
 
     @SuppressWarnings("unchecked")
-    public MutableDsonArray<FieldNumber> asLiteArray() {
+    public MutableDsonArray<FieldNumber> asArrayLite() {
         return (MutableDsonArray<FieldNumber>) this;
     }
 
     @SuppressWarnings("unchecked")
-    public MutableDsonObject<FieldNumber> asLiteObject() {
+    public MutableDsonObject<FieldNumber> asObjectLite() {
         return (MutableDsonObject<FieldNumber>) this;
     }
 

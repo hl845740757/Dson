@@ -63,6 +63,10 @@ public enum DsonType {
      * 对象引用
      */
     REFERENCE(12),
+    /**
+     * 时间戳
+     */
+    TIMESTAMP(13),
 
     /**
      * 对象头信息，与Object类型编码格式类似

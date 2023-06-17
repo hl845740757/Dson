@@ -36,7 +36,7 @@ public final class ObjectRef {
     public static final String FIELDS_TYPE = "type";
     public static final String FIELDS_POLICY = "policy";
 
-    /** 引用对象所属的命名空间 - 也可能就是对象的id */
+    /** 引用对象所属的命名空间 */
     private final String namespace;
     /** 引用对象的本地id - 如果目标对象是容器中的一员，该值是其容器内编号 */
     private final String localId;

@@ -22,6 +22,7 @@ import cn.wjybxx.dson.io.DsonOutput;
 import cn.wjybxx.dson.text.ObjectStyle;
 import cn.wjybxx.dson.text.StringStyle;
 import cn.wjybxx.dson.types.ObjectRef;
+import cn.wjybxx.dson.types.OffsetTimestamp;
 import com.google.protobuf.MessageLite;
 
 import javax.annotation.Nullable;
@@ -172,6 +173,13 @@ public class DsonBinaryLiteWriter extends AbstractDsonLiteWriter {
         DsonOutput output = this.output;
         writeFullTypeAndCurrentName(output, DsonType.REFERENCE, null);
         DsonReaderUtils.writeRef(output, objectRef);
+    }
+
+    @Override
+    protected void doWriteTimestamp(OffsetTimestamp timestamp) {
+        DsonOutput output = this.output;
+        writeFullTypeAndCurrentName(output, DsonType.TIMESTAMP, null);
+        DsonReaderUtils.writeTimestamp(output, timestamp);
     }
 
     // endregion

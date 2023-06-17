@@ -82,6 +82,16 @@ public final class DsonPrinter implements AutoCloseable {
         }
     }
 
+    public void printIndent(int offset) {
+        try {
+            int len = indent - offset;
+            builder.append(indentionArray, offset, len);
+            column += len;
+        } catch (Exception e) {
+            ExceptionUtils.rethrow(e);
+        }
+    }
+
     public void print(char c) {
         try {
             builder.append(c);
@@ -162,6 +172,11 @@ public final class DsonPrinter implements AutoCloseable {
         } catch (Exception e) {
             ExceptionUtils.rethrow(e);
         }
+    }
+
+    /** 当前的缩进长度 */
+    public int indentLength() {
+        return indent;
     }
 
     public void indent() {

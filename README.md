@@ -6,7 +6,8 @@ Dson同时设计了二进制和文本格式，二进制用于网络传输，文�
 Dson核心包不提供Dson到对象的编解码实现，只包含Dson的二进制流和文本解析实现；会在Codec模块提供一个简单的编解码实现。
 Dson支持复杂的数据结构，同时还设计了对象头，因此实现自己的Codec是很容易的。
 
-Dson最初是为序列化而创建的，但我们在这里只讨论文本格式，二进制格式详见[Dson二进制流](https://github.com/hl845740757/Dson/blob/dev/DsonBinary.md)。
+Dson最初是为序列化而创建的，但我们在这里只讨论文本格式，二进制格式详见[Dson二进制流](https://github.com/hl845740757/Dson/blob/dev/DsonBinary.md)。  
+另外，Dson的一些设计可能与你期望的不同，为避免频繁提问，我将一些设计理由进行了整理，见[Dson设计过程中的一些反思](https://github.com/hl845740757/Dson/blob/dev/DsonIssues.md)。
 
 ## Dson文本格式的目标
 
@@ -14,6 +15,8 @@ Dson最初是为序列化而创建的，但我们在这里只讨论文本格式�
 2. 易于编写和阅读
 3. 易于维护
 4. 易于扩展
+
+PS：Dson的文本格式从设计到最终实现大概1个月时间，尝试了多个版本的语法和行首，现版本我认为还是达到了目标，在缺乏编辑器的情况下，手写和阅读的体验都还不错。
 
 ## Dson的特性
 
@@ -24,7 +27,6 @@ Dson最初是为序列化而创建的，但我们在这里只讨论文本格式�
 5. 支持对象头，可自定义对象头内容
 6. 支持类型传递，适用数组元素和Object
 7. 支持读取Json
-8. 支持引用，可扩展解析规则
 
 ## 行首
 
@@ -61,6 +63,7 @@ Dson支持的值类型和内置结构体包括：
 | eL  | extInt64  | 带类型标签的int64  | {<br> int32 type;<br> int64 value <br>}                                              | 格式固定二元数组 \[@eL type, value] <br> \[@eL 1,  10086]                                                             |
 | es  | extString | 带类型标签的string | {<br> int32 type;<br> string value <br>}                                             | 格式固定二元数组 \[@es type, value] <br> \[@es 10, "abcd"]                                                            |
 | ref | reference | 引用           | {<br> string namespace;<br> string localId;<br> int32 type; <br> int32 policy; <br>} | 格式为单值 '@ref localId' 格式或 object格式 <br/> @ref abcdefg <br> {@ref namespace: wjybxx, localId: abcdefg, type: 0} |
+| dt  | datetime  | 日期时间         | { <br>  int64 seconds; <br> int32 nanos;<br> int32 offset;<br> int32 enables; <br> } | 无需引号<br/> {@dt date: 2023-06-17, time: 18:37:00, offset: +08:00, millis: 100}                                 |
 
 ## 特殊标签
 
@@ -75,20 +78,10 @@ Dson支持的值类型和内置结构体包括：
 ## @声明标签
 
 我们可以通过'@label'声明一个元素的类型，一般是修饰下一个元素，元素可以是 key，也可以是value，取决于上下文。  
-普通value类型，可在value的前方通过@声明类型， @label 和 value之间通过空白字符分割；object和array则在{} 和 [] 内声明header，且声明时
-**和外层括号之间无空格**。
+普通value类型，可在value的前方通过@声明类型， @label 和 value之间通过空白字符分割；object和array则在{}和[]
+内声明header，且声明时和外层括号之间无空格。
 
-当 @ 作用于普通值类型和内置简单结构体时，我们称 @ 声明的是其类型；当 @ 作用于 object 和 array 时，我们称 @
-声明的是对象的头信息，在object 和 array下可声明更多的属性。我们以object为例，以下是三种情况：
-
-```
-    # 不声明header
-    { x: 0, y: 0, z: 0 }
-    # 只声明ClassName
-    {@Vector3 x: 0, y: 0, z: 0 }
-    # 声明复杂的header
-    {@{clsName: Vector3, localId: 321123} x: 1, y: 1, z: 1} 
-```
+当 @ 作用于普通值类型和内置简单结构体时，我们称 @ 声明的是其类型；当 @ 作用于 object和array 时，我们称 @ 声明的是对象的头信息。
 
 ### Header支持的特殊属性
 
@@ -96,7 +89,7 @@ Dson支持的值类型和内置结构体包括：
 |-------------|---------------------------------------------|----------------|
 | clsName     | className的缩写，表达当前对象的类型                      | 可包括内置基础值和内置结构体 | 
 | compClsName | componentClassName的缩写，表示数组成员或Object的value类型 | 可包括内置基础值和内置结构体 |
-| localId     | 对象本地id，字符串类型                                | 通常用于解析引用       |
+| localId     | 对象本地id，字符串类型                                | 用于支持默认的引用解析    |
 
 ## 全局规范：
 
@@ -117,7 +110,7 @@ Dson支持的值类型和内置结构体包括：
 4. 数字如果包含了不安全字符，需要使用双引号
 
 ``` 
-    -- {value: @i 0XFF }
+    {value: @i 0XFF }
 ```
 
 ### bool值
@@ -130,7 +123,7 @@ Dson支持的值类型和内置结构体包括：
 2. 普通无引号字符串只能由安全字符构成，安全字符较多，我们给出不安全字符集。
 3. 无引号字符串遇见不安全字符时将判定为结束。
 4. 使用双引号时，\ 是转义字符，解析时将对引号进行转义，因此内容中出现双引号时需要转义
-5. 在纯文本中，不需要加引号，\ 不是转移字符，所见即所得，遇见 '--' 行首时表示结束。
+5. 在纯文本中，不需要加引号，\ 不是转义字符，所见即所得，遇见 '--' 行首时表示结束。
 6. 在纯文本中，每行只有行首标签后的第一个空白字符是缩进，另外 @ss 后也必须有一个空格。
 7. 存在一些特殊含义的字符串，用户最好总是使用双引号强调是字符串，否则可能发生兼容性问题。
 
@@ -155,15 +148,48 @@ Dson支持的值类型和内置结构体包括：
 
 ### ref
 
-1. ref支持两种范式 @ref localId 和 {@ref localId: $localId, namespace: $namespace, type: $type ...}
-2. ref localId 简写方式适用大多数情况。
-3. **Dson默认不解析引用**，只存储为ref结构，会提供根据localId的简单解析方法。
+1. ref支持两种范式 @ref localId 和 {@ref localId: $localId, namespace: $namespace, type: $type, policy: $policy}
+2. ref localId 简写方式适用大多数情况，结构体用于复杂情况。
+3. 结构体格式下，localId 和 namespace至少输入一个，其它参数可选。
+4. **Dson默认不解析引用**，只存储为ref结构，会提供根据localId的简单解析方法。
+
+```
+   {@ref localId: "10001", namespace : global, type: 1 }
+   {@ref localId: "10001", namespace : global, type: 1, policy: 1}
+```
+
+### dt-日期时间
+
+1. dt只支持标准的结构体样式 {@dt date: yyyy-MM-dd, time: HH:mm:ss, offset: ±HH:mm:ss, millis: $millis, nanos: $nanos}
+2. date 部分为 "yyyy-MM-dd" 格式。
+3. time 部分为 "HH:mm:ss" 格式，不可省略秒部分。
+4. offset 部分为 "±HH:mm" 或 "±HH:mm:ss"  格式，不可以省略正负号。
+5. millis 表示精确到毫秒，其值为秒的 毫秒部分。
+6. nanos 表示精确到纳秒，其值为秒的 纳秒部分， millis 和 nanos通常只应该出现一个。
+7. date 和 time 至少输入一个，其它属性都是可选的。
+
+```
+    {@dt date: 2023-06-17, time: 18:37:00}
+    {@dt date: 2023-06-17, time: 18:37:00, offset: +08:00}    
+    {@dt date: 2023-06-17, time: 18:37:00, offset: +08:00, millis: 100}
+    {@dt date: 2023-06-17, time: 18:37:00, offset: +08:00, nanos: 100000000}
+```
+
+关于结构体的说明
+
+1. seconds 是纪元时间的秒时间
+2. nanos 是时间戳的纳秒部分
+3. offset 是时区的秒数
+4. enables 记录了用户输入了哪些部分，由掩码构成，后4个比特位有效。
+    1. date 的掩码是 1000
+    2. time 的掩码是 0100
+    3. offset 的掩码是 0010
 
 ### object
 
 1. 键值对之间通过 ',' (英文逗号) 分隔。
-2. key和value之间通过 ':' (英文冒号)分隔，空格分隔冒号不是必须的，但建议输入空格。
-3. key为字符串类型，适用字符串规范，无特殊字符时可省略双引号
+2. key和value之间通过 ':' (英文冒号)分隔，空格分隔冒号不是必须的，但冒号和value之间建议输入空格。
+3. key为字符串类型，适用字符串规范，无特殊字符时可省略双引号，也可以使用 @ss 标签。
 4. 声明对象自己的类型时，@和object的 { 之间无空格，即： {@xxxx ，否则将被解释为下一个元素的类型信息。
 5. @className时，className和正式内容之间至少键入一个空白字符；@{...}时，后面可以不键入空格，但建议键入。
 6. 当声明value的类型时，可通过声明header结构体，并指定 'compClsName' 属性实现。
@@ -183,6 +209,17 @@ Dson支持的值类型和内置结构体包括：
 4. className为字符串类型，适用字符串配置规范。
 5. header结构体不可以再内嵌header
 6. header没有默认结构体，以允许用户自行扩展。
+
+以下是object声明header的示例
+
+```
+    # 不声明header
+    { x: 0, y: 0, z: 0 }
+    # 只声明ClassName
+    {@Vector3 x: 0, y: 0, z: 0 }
+    # 声明复杂的header
+    {@{clsName: Vector3, localId: 321123} x: 1, y: 1, z: 1} 
+```
 
 ### 无类型value解析规则
 
@@ -207,21 +244,47 @@ Dson支持的值类型和内置结构体包括：
 
 ## 文本示例
 
+以下代码来自 DsonTextReaderTest2.java
+
 ```
-    -- {@{clsName: MyClassInfo, localId: 10001, type: 0}
-    --     name: wjybxx,
-    --     age: 28,
-    --     pos: {@Vector3 x: 0, y: 0, z: 0},
-    --     address: [
-    --         beijng,
-    --         chengdu,
-    --     ],
-    --     intro: @ss 
-    -|     我是wjybxx，是一个游戏开发者，Dson是我设计的文档型数据表达法，
-    -| 你可以通过github联系到我。
-    ->     thanks
-    --   , url: @ss https://www.github.com/hl845740757
-    -- }
+   # 输入文本
+   -- {@{clsName: MyClassInfo, guid: 10001, flags: 0}
+   --     name: wjybxx,
+   --     age: 28,
+   --     pos: {@Vector3 x: 0, y: 0, z: 0},
+   --     address: [
+   --         beijing,
+   --         chengdu,
+   --     ],
+   --     intro: @sss
+   -|     我是wjybxx，是一个游戏开发者，Dson是我设计的文档型数据表达法，
+   -| 你可以通过github联系到我。
+   ->     thanks
+   --   , url: @ss https://www.github.com/hl845740757
+   --   , time: {@dt date: 2023-06-17, time: 18:37:00,  millis: 100, offset: +08:00}
+   -- }
+    
+   # 测试用例输出
+   -- {@{clsName: MyClassInfo, guid: 10001, flags: 0}
+   --   name: wjybxx,
+   --   age: 28,
+   --   pos: {@{clsName: Vector3}
+   --     x: 0,
+   --     y: 0,
+   --     z: 0
+   --   },
+   --   address: [
+   --     beijing,
+   --     chengdu
+   --   ],
+   --   intro: @ss     我是wjybxx，是一个游戏开发者，Dson是我设计的文档型数
+   -| 据表达法，你可以通过github联系到我。
+   ->     thanks
+   -- , url: "https://www.github.com/hl845740757",
+   --   time: {@dt date: 2023-06-17, time: 18:37:00, 
+   -- millis: 100, offset: +08:00}
+   -- }
+    
 ```
 
 ## Dson编辑器（缺失）

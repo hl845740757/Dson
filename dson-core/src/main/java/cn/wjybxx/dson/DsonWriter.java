@@ -20,6 +20,7 @@ import cn.wjybxx.dson.io.Chunk;
 import cn.wjybxx.dson.text.ObjectStyle;
 import cn.wjybxx.dson.text.StringStyle;
 import cn.wjybxx.dson.types.ObjectRef;
+import cn.wjybxx.dson.types.OffsetTimestamp;
 import com.google.protobuf.MessageLite;
 
 /**
@@ -84,6 +85,8 @@ public interface DsonWriter extends AutoCloseable {
     void writeExtString(String name, DsonExtString value, StringStyle style);
 
     void writeRef(String name, ObjectRef objectRef);
+
+    void writeTimestamp(String name, OffsetTimestamp timestamp);
 
     // endregion
 

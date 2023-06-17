@@ -18,11 +18,9 @@ package cn.wjybxx.dson.internal;
 
 import cn.wjybxx.dson.*;
 import cn.wjybxx.dson.anno.Internal;
-import cn.wjybxx.dson.io.Chunk;
-import cn.wjybxx.dson.io.DsonIOException;
-import cn.wjybxx.dson.io.DsonInput;
-import cn.wjybxx.dson.io.DsonOutput;
+import cn.wjybxx.dson.io.*;
 import cn.wjybxx.dson.types.ObjectRef;
+import cn.wjybxx.dson.types.OffsetTimestamp;
 import com.google.protobuf.MessageLite;
 import com.google.protobuf.Parser;
 
@@ -56,7 +54,7 @@ public class DsonReaderUtils {
     public static DsonBinary readDsonBinary(DsonInput input) {
         int size = input.readFixed32();
         return new DsonBinary(
-                input.readRawByte(),
+                BinaryUtils.toUint8(input.readRawByte()),
                 input.readRawBytes(size - 1));
     }
 
@@ -104,6 +102,21 @@ public class DsonReaderUtils {
         return new ObjectRef(
                 input.readString(),
                 input.readString(),
+                input.readUint32(),
+                input.readUint32());
+    }
+
+    public static void writeTimestamp(DsonOutput output, OffsetTimestamp timestamp) {
+        output.writeUint64(timestamp.getSeconds());
+        output.writeUint32(timestamp.getNanos());
+        output.writeUint32(timestamp.getOffset());
+        output.writeUint32(timestamp.getEnables());
+    }
+
+    public static OffsetTimestamp readTimestamp(DsonInput input) {
+        return new OffsetTimestamp(
+                input.readUint64(),
+                input.readUint32(),
                 input.readUint32(),
                 input.readUint32());
     }
@@ -192,6 +205,14 @@ public class DsonReaderUtils {
                 input.readUint32();
                 return;
             }
+            case TIMESTAMP -> {
+                input.readUint64();
+                input.readUint32();
+                input.readUint32();
+                input.readUint32();
+                return;
+            }
+
             case BINARY, ARRAY, OBJECT, HEADER -> {
                 skip = input.readFixed32();
             }
@@ -237,10 +258,24 @@ public class DsonReaderUtils {
                 case TYPE -> DsonReaderGuide.READ_TYPE;
                 case VALUE -> DsonReaderGuide.READ_VALUE;
                 case NAME -> DsonReaderGuide.READ_NAME;
-                case WAIT_START_OBJECT ->
-                        contextType == DsonContextType.ARRAY ? DsonReaderGuide.START_ARRAY : DsonReaderGuide.START_OBJECT;
-                case WAIT_END_OBJECT ->
-                        contextType == DsonContextType.ARRAY ? DsonReaderGuide.END_ARRAY : DsonReaderGuide.END_OBJECT;
+                case WAIT_START_OBJECT -> {
+                    if (contextType == DsonContextType.HEADER) {
+                        yield DsonReaderGuide.START_HEADER;
+                    }
+                    if (contextType == DsonContextType.ARRAY) {
+                        yield DsonReaderGuide.START_ARRAY;
+                    }
+                    yield DsonReaderGuide.START_OBJECT;
+                }
+                case WAIT_END_OBJECT -> {
+                    if (contextType == DsonContextType.HEADER) {
+                        yield DsonReaderGuide.END_HEADER;
+                    }
+                    if (contextType == DsonContextType.ARRAY) {
+                        yield DsonReaderGuide.END_ARRAY;
+                    }
+                    yield DsonReaderGuide.END_OBJECT;
+                }
                 case INITIAL, END_OF_FILE -> throw new AssertionError("invalid state " + state);
             };
         }

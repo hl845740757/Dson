@@ -18,6 +18,7 @@ package cn.wjybxx.dson;
 
 import cn.wjybxx.dson.anno.Beta;
 import cn.wjybxx.dson.types.ObjectRef;
+import cn.wjybxx.dson.types.OffsetTimestamp;
 import com.google.protobuf.Parser;
 
 import javax.annotation.Nonnull;
@@ -118,6 +119,8 @@ public interface DsonLiteReader extends AutoCloseable {
     DsonExtString readExtString(int name);
 
     ObjectRef readRef(int name);
+
+    OffsetTimestamp readTimestamp(int name);
 
     // endregion
 

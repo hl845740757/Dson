@@ -17,6 +17,7 @@
 package cn.wjybxx.dson;
 
 import cn.wjybxx.dson.types.ObjectRef;
+import cn.wjybxx.dson.types.OffsetTimestamp;
 import com.google.protobuf.Parser;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
@@ -179,6 +180,11 @@ public class DsonObjectReader extends AbstractDsonReader {
     @Override
     protected ObjectRef doReadRef() {
         return popNextValue().asReference().getValue();
+    }
+
+    @Override
+    protected OffsetTimestamp doReadTimestamp() {
+        return popNextValue().asTimestamp().getValue();
     }
 
     // endregion

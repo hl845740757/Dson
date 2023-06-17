@@ -19,6 +19,7 @@ package cn.wjybxx.dson.text;
 import cn.wjybxx.dson.*;
 import cn.wjybxx.dson.io.Chunk;
 import cn.wjybxx.dson.types.ObjectRef;
+import cn.wjybxx.dson.types.OffsetTimestamp;
 import com.google.protobuf.MessageLite;
 import org.apache.commons.lang3.StringUtils;
 
@@ -73,19 +74,30 @@ public class DsonTextWriter extends AbstractDsonWriter {
 
     private void writeCurrentName(DsonPrinter printer, DsonType dsonType) {
         Context context = getContext();
+        final boolean onlyLhead = isOnlyLhead(printer); // 在打印逗号前记录
         if (context.contextType != DsonContextType.TOP_LEVEL && context.count > 0) {
             printer.print(",");
         }
-        if (context.style == ObjectStyle.INDENT || printer.getColumn() >= settings.softLineLength) {
-            printer.println();
-            printer.printLhead(LheadType.APPEND_LINE);
-            if (context.style == ObjectStyle.INDENT) {
+        // header不能换行，且和外层对象无缩进
+        if (dsonType != DsonType.HEADER
+                && (context.style == ObjectStyle.INDENT || printer.getColumn() >= settings.softLineLength)) {
+            if (printer.getColumn() == 0) {
+                // 首行不换行
+                printer.printLhead(LheadType.APPEND_LINE);
+            } else if (onlyLhead) {
+                // 文本结束行不换行
+                printer.printIndent(1);
+            } else if (context.style == ObjectStyle.INDENT) {
+                // 正常缩进
+                printer.println();
+                printer.printLhead(LheadType.APPEND_LINE);
                 printer.printIndent();
             }
         } else if (context.count > 0) {
             printer.print(' ');
         }
-        if (context.contextType.isLikeObject() && dsonType != DsonType.HEADER) {
+        // header是匿名属性
+        if (dsonType != DsonType.HEADER && context.contextType.isLikeObject()) {
             printStringNonSS(printer, context.curName);
             printer.print(": ");
         }
@@ -113,7 +125,7 @@ public class DsonTextWriter extends AbstractDsonWriter {
             case AUTO -> {
                 if (DsonTexts.canUnquoteString(value) && DsonTexts.isASCIIText(value)) {
                     printer.print(value);
-                } else if (!settings.enableText || value.length() < settings.softLineLength * 2) {
+                } else if (!settings.enableText || value.length() < settings.softLineLength * settings.lengthFactorOfText) {
                     printEscaped(value);
                 } else {
                     printText(value);
@@ -223,6 +235,10 @@ public class DsonTextWriter extends AbstractDsonWriter {
         }
     }
 
+    private static boolean isOnlyLhead(DsonPrinter printer) {
+        return printer.getColumn() <= DsonTexts.CONTENT_LHEAD_LENGTH + 1;
+    }
+
     // endregion
 
     // region 简单值
@@ -254,14 +270,24 @@ public class DsonTextWriter extends AbstractDsonWriter {
         if (stronglyTyped) {
             printer.print("@f ");
         }
-        printer.print(Float.toString(value));
+        int iv = (int) value; // NaN安全
+        if (iv == value) {
+            printer.print(Integer.toString(iv));
+        } else {
+            printer.print(Float.toString(value));
+        }
     }
 
     @Override
     protected void doWriteDouble(double value) {
         DsonPrinter printer = this.printer;
         writeCurrentName(printer, DsonType.DOUBLE);
-        printer.print(Double.toString(value));
+        long lv = (long) value; // NaN安全
+        if (lv == value) {
+            printer.print(Long.toString(lv));
+        } else {
+            printer.print(Double.toString(value));
+        }
     }
 
     @Override
@@ -383,6 +409,46 @@ public class DsonTextWriter extends AbstractDsonWriter {
         printer.print('}');
     }
 
+    @Override
+    protected void doWriteTimestamp(OffsetTimestamp timestamp) {
+        DsonPrinter printer = this.printer;
+        writeCurrentName(printer, DsonType.TIMESTAMP);
+        printer.print("{@dt ");
+        if (timestamp.hasDate()) {
+            printer.print(OffsetTimestamp.FIELDS_DATE);
+            printer.print(": ");
+            printer.print(OffsetTimestamp.formatDate(timestamp.getSeconds()));
+        }
+        if (timestamp.hasTime()) {
+            if (timestamp.hasDate()) printer.print(", ");
+            checkLineLength(printer, LheadType.APPEND_LINE);
+            printer.print(OffsetTimestamp.FIELDS_TIME);
+            printer.print(": ");
+            printer.print(OffsetTimestamp.formatTime(timestamp.getSeconds()));
+        }
+        if (timestamp.getNanos() > 0) {
+            printer.print(", ");
+            checkLineLength(printer, LheadType.APPEND_LINE);
+            if (timestamp.canConvertNanosToMillis()) {
+                printer.print(OffsetTimestamp.FIELDS_MILLIS);
+                printer.print(": ");
+                printer.print(Integer.toString(timestamp.getMillisOfNanos()));
+            } else {
+                printer.print(OffsetTimestamp.FIELDS_NANOS);
+                printer.print(": ");
+                printer.print(Integer.toString(timestamp.getNanos()));
+            }
+        }
+        if (timestamp.hasOffset()) {
+            printer.print(", ");
+            checkLineLength(printer, LheadType.APPEND_LINE);
+            printer.print(OffsetTimestamp.FIELDS_OFFSET);
+            printer.print(": ");
+            printer.print(OffsetTimestamp.formatOffset(timestamp.getOffset()));
+        }
+        printer.print('}');
+    }
+
     // endregion
 
     // region 容器
@@ -412,7 +478,7 @@ public class DsonTextWriter extends AbstractDsonWriter {
         if (context.style == ObjectStyle.INDENT) {
             printer.retract();
             // 打印了内容的情况下才换行结束
-            if (context.headerCount > 0 || context.count > 0) {
+            if (!isOnlyLhead(printer) && context.headerCount > 0 || context.count > 0) {
                 printer.println();
                 printer.printLhead(LheadType.APPEND_LINE);
                 printer.printIndent();

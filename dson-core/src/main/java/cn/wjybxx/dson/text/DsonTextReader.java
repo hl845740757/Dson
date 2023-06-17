@@ -20,10 +20,15 @@ import cn.wjybxx.dson.*;
 import cn.wjybxx.dson.internal.CollectionUtils;
 import cn.wjybxx.dson.io.DsonIOException;
 import cn.wjybxx.dson.types.ObjectRef;
+import cn.wjybxx.dson.types.OffsetTimestamp;
 import com.google.protobuf.Parser;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneOffset;
 import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Objects;
@@ -324,6 +329,10 @@ public class DsonTextReader extends AbstractDsonReader {
             pushNextValue(scanRef(context));
             return DsonType.REFERENCE;
         }
+        if (DsonTexts.LABEL_DATETIME.equals(clsName)) {
+            pushNextValue(scanTimestamp(context));
+            return DsonType.TIMESTAMP;
+        }
 
         escapeHeaderAndPush(headerToken);
         pushNextValue(valueToken); // push以供context保存
@@ -381,7 +390,6 @@ public class DsonTextReader extends AbstractDsonReader {
         String localId = null;
         int type = 0;
         int policy = 0;
-
         DsonToken keyToken;
         while ((keyToken = popToken()).getType() != TokenType.END_OBJECT) {
             // key必须是字符串
@@ -414,15 +422,85 @@ public class DsonTextReader extends AbstractDsonReader {
                     throw new DsonIOException("invalid ref fieldName: " + keyToken.castAsString());
                 }
             }
-            // 每读取一个值，判断下分隔符，尾部最多只允许一个逗号 -- 这里在尾部更容易处理
-            if ((keyToken = popToken()).getType() == TokenType.COMMA
-                    && (keyToken = popToken()).getType() == TokenType.COMMA) {
-                throw DsonIOException.invalidTokenType(context.contextType, keyToken);
-            } else {
-                pushToken(keyToken);
-            }
+            checkSeparator(context);
         }
         return new ObjectRef(namespace, localId, type, policy);
+    }
+
+    private OffsetTimestamp scanTimestamp(Context context) {
+        LocalDate date = LocalDate.EPOCH;
+        LocalTime time = LocalTime.MIN;
+        int nanos = 0;
+        int offset = 0;
+        int enables = 0;
+        DsonToken keyToken;
+        while ((keyToken = popToken()).getType() != TokenType.END_OBJECT) {
+            // key必须是字符串
+            ensureStringsToken(context, keyToken);
+
+            // 下一个应该是冒号
+            DsonToken colonToken = popToken();
+            verifyTokenType(context, colonToken, TokenType.COLON);
+
+            // 根据name校验
+            switch (keyToken.castAsString()) {
+                case OffsetTimestamp.FIELDS_DATE -> {
+                    String dateString = scanStringUtilComma();
+                    date = OffsetTimestamp.parseDate(dateString);
+                    enables |= OffsetTimestamp.MASK_DATE;
+                }
+                case OffsetTimestamp.FIELDS_TIME -> {
+                    String timeString = scanStringUtilComma();
+                    time = OffsetTimestamp.parseTime(timeString);
+                    enables |= OffsetTimestamp.MASK_TIME;
+                }
+                case OffsetTimestamp.FIELDS_OFFSET -> {
+                    String offsetString = scanStringUtilComma();
+                    offset = OffsetTimestamp.parseOffset(offsetString);
+                    enables |= OffsetTimestamp.MASK_OFFSET;
+                }
+                case OffsetTimestamp.FIELDS_NANOS -> {
+                    DsonToken valueToken = popToken();
+                    ensureStringsToken(context, valueToken);
+                    nanos = Integer.parseInt(valueToken.castAsString());
+                    if (nanos < 0) {
+                        throw new IllegalArgumentException("invaloid nanos " + nanos);
+                    }
+                }
+                case OffsetTimestamp.FIELDS_MILLIS -> {
+                    DsonToken valueToken = popToken();
+                    ensureStringsToken(context, valueToken);
+                    int millis = Integer.parseInt(valueToken.castAsString());
+                    if (millis < 0 || millis > 999) {
+                        throw new IllegalArgumentException("invalid millis " + millis);
+                    }
+                    nanos = millis * 1000000;
+                }
+                default -> {
+                    throw new DsonIOException("invalid datetime fieldName: " + keyToken.castAsString());
+                }
+            }
+            checkSeparator(context);
+        }
+        long seconds = LocalDateTime.of(date, time).toEpochSecond(ZoneOffset.UTC);
+        return new OffsetTimestamp(seconds, nanos, offset, enables);
+    }
+
+    /** 扫描string，直到遇见逗号或结束符 */
+    private String scanStringUtilComma() {
+        StringBuilder sb = new StringBuilder(12);
+        while (true) {
+            DsonToken valueToken = popToken();
+            switch (valueToken.getType()) {
+                case COMMA, END_OBJECT, END_ARRAY ->  {
+                    pushToken(valueToken);
+                    return sb.toString();
+                }
+                default -> {
+                    sb.append(valueToken.castAsString());
+                }
+            }
+        }
     }
 
     private Tuple2 scanTuple2(Context context) {
@@ -451,6 +529,17 @@ public class DsonTextReader extends AbstractDsonReader {
         public Tuple2(int type, String value) {
             this.type = type;
             this.value = value;
+        }
+    }
+
+    private void checkSeparator(Context context) {
+        // 每读取一个值，判断下分隔符，尾部最多只允许一个逗号 -- 这里在尾部更容易处理
+        DsonToken keyToken;
+        if ((keyToken = popToken()).getType() == TokenType.COMMA
+                && (keyToken = popToken()).getType() == TokenType.COMMA) {
+            throw DsonIOException.invalidTokenType(context.contextType, keyToken);
+        } else {
+            pushToken(keyToken);
         }
     }
 
@@ -573,6 +662,11 @@ public class DsonTextReader extends AbstractDsonReader {
     @Override
     protected ObjectRef doReadRef() {
         return (ObjectRef) Objects.requireNonNull(popNextValue());
+    }
+
+    @Override
+    protected OffsetTimestamp doReadTimestamp() {
+        return (OffsetTimestamp) Objects.requireNonNull(popNextValue());
     }
 
     // endregion
