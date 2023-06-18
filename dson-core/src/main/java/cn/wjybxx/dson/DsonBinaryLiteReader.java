@@ -35,7 +35,7 @@ public class DsonBinaryLiteReader extends AbstractDsonLiteReader {
     public DsonBinaryLiteReader(int recursionLimit, DsonInput input) {
         super(recursionLimit);
         this.input = input;
-        setContext(new Context(null, DsonContextType.TOP_LEVEL));
+        setContext(new Context().init(null, DsonContextType.TOP_LEVEL, null));
     }
 
     @Override
@@ -153,8 +153,8 @@ public class DsonBinaryLiteReader extends AbstractDsonLiteReader {
     // region 容器
 
     @Override
-    protected void doReadStartContainer(DsonContextType contextType) {
-        Context newContext = newContext(getContext(), contextType);
+    protected void doReadStartContainer(DsonContextType contextType, DsonType dsonType) {
+        Context newContext = newContext(getContext(), contextType, dsonType);
         int length = input.readFixed32();
         newContext.oldLimit = input.pushLimit(length);
         newContext.name = currentName;
@@ -211,14 +211,14 @@ public class DsonBinaryLiteReader extends AbstractDsonLiteReader {
 
     // region context
 
-    private Context newContext(Context parent, DsonContextType contextType) {
+    private Context newContext(Context parent, DsonContextType contextType, DsonType dsonType) {
         Context context = getPooledContext();
         if (context != null) {
             setPooledContext(null);
         } else {
             context = new Context();
         }
-        context.init(parent, contextType);
+        context.init(parent, contextType, dsonType);
         return context;
     }
 
@@ -232,10 +232,6 @@ public class DsonBinaryLiteReader extends AbstractDsonLiteReader {
         int oldLimit = -1;
 
         public Context() {
-        }
-
-        public Context(Context parent, DsonContextType contextType) {
-            super(parent, contextType);
         }
 
         public void reset() {

@@ -1,5 +1,7 @@
 package cn.wjybxx.dson.types;
 
+import cn.wjybxx.dson.DsonLites;
+
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 
@@ -17,12 +19,6 @@ public class OffsetTimestamp {
 
     public static final int MASK_DATETIME = MASK_DATE | MASK_TIME;
     public static final int MASK_OFFSET_DATETIME = MASK_DATE | MASK_TIME | MASK_OFFSET;
-
-    public static final String FIELDS_DATE = "date";
-    public static final String FIELDS_TIME = "time";
-    public static final String FIELDS_NANOS = "nanos";
-    public static final String FIELDS_OFFSET = "offset";
-    public static final String FIELDS_MILLIS = "millis";
 
     private final long seconds;
     private final int nanos;
@@ -91,16 +87,12 @@ public class OffsetTimestamp {
         return (mask & value) == mask;
     }
 
-    public boolean isSimpleDateTime() {
-        return enables == MASK_DATETIME;
-    }
-
     public boolean canConvertNanosToMillis() {
-        return (nanos % 1000000) == 0;
+        return (nanos % 1000_000) == 0;
     }
 
     public int getMillisOfNanos() {
-        return nanos / 1000000;
+        return nanos / 1000_000;
     }
 
     public OffsetDateTime toOffsetDateTime() {
@@ -200,4 +192,19 @@ public class OffsetTimestamp {
         return sb.append('}')
                 .toString();
     }
+
+    //
+    public static final String NAMES_DATE = "date";
+    public static final String NAMES_TIME = "time";
+    public static final String NAMES_MILLIS = "millis";
+
+    public static final String NAMES_SECONDS = "seconds";
+    public static final String NAMES_NANOS = "nanos";
+    public static final String NAMES_OFFSET = "offset";
+    public static final String NAMES_ENABLES = "enables";
+
+    public static final int NUMBERS_SECONDS = DsonLites.makeFullNumberZeroIdep(0);
+    public static final int NUMBERS_NANOS = DsonLites.makeFullNumberZeroIdep(1);
+    public static final int NUMBERS_OFFSET = DsonLites.makeFullNumberZeroIdep(2);
+    public static final int NUMBERS_ENABLES = DsonLites.makeFullNumberZeroIdep(3);
 }

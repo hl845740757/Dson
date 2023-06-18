@@ -58,6 +58,10 @@ public final class FieldNumber implements Comparable<FieldNumber> {
                 DsonLites.lnumberOfFullNumber(fullNumber));
     }
 
+    public static FieldNumber ofLnumber(int lnumber) {
+        return new FieldNumber((byte) 0, lnumber);
+    }
+
     /**
      * 获取字段的完整编号
      */
@@ -77,6 +81,9 @@ public final class FieldNumber implements Comparable<FieldNumber> {
 
     /** 比较两个fullNumber的大小 */
     public static int compare(int fullNumber1, int fullNumber2) {
+        if (fullNumber1 == fullNumber2) {
+            return 0;
+        }
         int r = Byte.compare(DsonLites.idepOfFullNumber(fullNumber1),
                 DsonLites.idepOfFullNumber(fullNumber2));
         if (r != 0) {

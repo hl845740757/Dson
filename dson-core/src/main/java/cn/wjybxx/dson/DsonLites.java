@@ -111,8 +111,8 @@ public class DsonLites {
         writer.writeEndObject();
     }
 
-    public static MutableDsonObject<FieldNumber> readObject(DsonLiteReader reader) {
-        MutableDsonObject<FieldNumber> dsonObject = new MutableDsonObject<>();
+    public static DsonObject<FieldNumber> readObject(DsonLiteReader reader) {
+        DsonObject<FieldNumber> dsonObject = new DsonObject<>();
         DsonType dsonType;
         FieldNumber name;
         DsonValue value;
@@ -142,8 +142,8 @@ public class DsonLites {
         writer.writeEndArray();
     }
 
-    public static MutableDsonArray<FieldNumber> readArray(DsonLiteReader reader) {
-        MutableDsonArray<FieldNumber> dsonArray = new MutableDsonArray<>(8);
+    public static DsonArray<FieldNumber> readArray(DsonLiteReader reader) {
+        DsonArray<FieldNumber> dsonArray = new DsonArray<>(8);
         DsonType dsonType;
         DsonValue value;
         reader.readStartArray();
@@ -166,12 +166,13 @@ public class DsonLites {
     }
 
     public static DsonHeader<FieldNumber> readHeader(DsonLiteReader reader, @Nullable DsonHeader<FieldNumber> header) {
-        if (header == null) header = new MutableDsonHeader<>();
+        if (header == null) header = new DsonHeader<>();
         DsonType dsonType;
         FieldNumber name;
         DsonValue value;
         reader.readStartHeader();
         while ((dsonType = reader.readDsonType()) != DsonType.END_OF_OBJECT) {
+            assert dsonType != DsonType.HEADER;
             name = FieldNumber.ofFullNumber(reader.readName());
             value = readDsonValue(reader);
             header.put(name, value);
@@ -227,7 +228,7 @@ public class DsonLites {
             case REFERENCE -> new DsonObjectRef(reader.readRef(name));
             case TIMESTAMP -> new DsonTimestamp(reader.readTimestamp(name));
             case HEADER -> {
-                MutableDsonHeader<FieldNumber> header = new MutableDsonHeader<>();
+                DsonHeader<FieldNumber> header = new DsonHeader<>();
                 readHeader(reader, header);
                 yield header;
             }

@@ -16,7 +16,7 @@
 
 package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.anno.Beta;
+import cn.wjybxx.dson.internal.Beta;
 
 /**
  * @author wjybxx

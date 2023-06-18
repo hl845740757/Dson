@@ -44,15 +44,34 @@ public class DsonReaderWriterTest {
     private static final int loop = 3;
     private List<DsonObject<String>> srcList;
 
+    private static final String dsonString = """
+            -- {@{clsName: MyClassInfo, guid: 10001, flags: 0}
+            --     name: wjybxx,
+            --     age: 28,
+            --     pos: {@Vector3 x: 0, y: 0, z: 0},
+            --     address: [
+            --         beijing,
+            --         chengdu,
+            --     ],
+            --     intro: @ss\s
+            -|     我是wjybxx，是一个游戏开发者，Dson是我设计的文档型数据表达法，
+            -| 你可以通过github联系到我。
+            ->     thanks
+            --   , url: @ss https://www.github.com/hl845740757
+            --   , time: {@dt date: 2023-06-17, time: 18:37:00,  millis: 100, offset: +08:00}
+            -- }
+            """;
+
     @BeforeEach
     void initSrcList() {
         srcList = new ArrayList<>(loop);
         for (int i = 0; i < loop; i++) {
-            DsonObject<String> obj1 = new MutableDsonObject<>(6);
+            DsonObject<String> obj1 = new DsonObject<String>(6);
             obj1.append("name", new DsonString("wjybxx"))
                     .append("age", new DsonInt32(RandomUtils.nextInt(28, 32)))
-                    .append("intro", new DsonString("http://www.wjybxx.cn"))
-                    .append("time", new DsonInt64(System.currentTimeMillis()));
+                    .append("url", new DsonString("http://www.wjybxx.cn"))
+                    .append("time", new DsonInt64(System.currentTimeMillis()))
+                    .append("wrapped", Dsons.fromDson(dsonString));
             srcList.add(obj1);
             // 让数值有所不同
             LockSupport.parkNanos(TimeUnit.MICROSECONDS.toNanos(50));
@@ -82,6 +101,24 @@ public class DsonReaderWriterTest {
     }
 
     @Test
+    void testObjet() {
+        DsonArray<String> dsonArray = new DsonArray<>();
+        try (DsonWriter writer = new DsonObjectWriter(16, dsonArray)) {
+            for (DsonObject<String> dsonObject : srcList) {
+                Dsons.writeObject(writer, dsonObject, ObjectStyle.INDENT);
+            }
+        }
+        List<DsonObject<String>> copiedList = new ArrayList<>(loop);
+        try (DsonReader reader = new DsonObjectReader(16, dsonArray)) {
+            DsonValue dsonValue;
+            while ((dsonValue = Dsons.readTopDsonValue(reader)) != null) {
+                copiedList.add(dsonValue.asObject());
+            }
+        }
+        Assertions.assertEquals(srcList, copiedList);
+    }
+
+    @Test
     void testLite() throws InterruptedException {
         final byte[] buffer = new byte[4096];
         final int loop = 3;
@@ -93,7 +130,7 @@ public class DsonReaderWriterTest {
         try (DsonOutput dsonOutput = DsonOutputs.newInstance(buffer)) {
             DsonLiteWriter writer = new DsonBinaryLiteWriter(16, dsonOutput);
             for (int i = 0; i < loop; i++) {
-                DsonObject<FieldNumber> obj1 = new MutableDsonObject<>(6);
+                DsonObject<FieldNumber> obj1 = new DsonObject<FieldNumber>(6);
                 obj1.append(FieldNumber.of(0, 0), new DsonString("wjybxx"))
                         .append(FieldNumber.of(0, 1), new DsonInt32(RandomUtils.nextInt(28, 32)))
                         .append(FieldNumber.of(0, 2), new DsonString("www.wjybxx.cn"))

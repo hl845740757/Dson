@@ -85,7 +85,7 @@ public class DsonLinesBuffer extends AbstractDsonBuffer<DsonLinesBuffer.LocalLin
         }
     }
 
-    private static List<LocalLineInfo> preprocess(List<String> originLines, List<LocalLineInfo> lines) {
+    private static void preprocess(List<String> originLines, List<LocalLineInfo> lines) {
         int ln = 0;
         int startPos;
         int endPos = -1;
@@ -111,8 +111,6 @@ public class DsonLinesBuffer extends AbstractDsonBuffer<DsonLinesBuffer.LocalLin
                     lheadType, ln, lines.size(),
                     line));
         }
-        return lines;
     }
-
 
 }

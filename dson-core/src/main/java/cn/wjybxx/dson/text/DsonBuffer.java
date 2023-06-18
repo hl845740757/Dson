@@ -95,12 +95,6 @@ public interface DsonBuffer extends AutoCloseable {
     @Override
     void close();
 
-    interface Marker {
-
-        void reset();
-
-    }
-
     class LnCol {
 
         private final int ln;

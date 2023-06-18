@@ -16,7 +16,7 @@
 
 package cn.wjybxx.dson.io;
 
-import cn.wjybxx.dson.anno.Internal;
+import cn.wjybxx.dson.internal.Internal;
 
 import java.nio.Buffer;
 

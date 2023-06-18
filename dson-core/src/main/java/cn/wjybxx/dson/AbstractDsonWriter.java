@@ -263,7 +263,7 @@ public abstract class AbstractDsonWriter implements DsonWriter {
     // region 容器
     @Override
     public void writeStartArray(ObjectStyle style) {
-        writeStartContainer(DsonContextType.ARRAY, style);
+        writeStartContainer(DsonContextType.ARRAY, DsonType.ARRAY, style);
     }
 
     @Override
@@ -273,7 +273,7 @@ public abstract class AbstractDsonWriter implements DsonWriter {
 
     @Override
     public void writeStartObject(ObjectStyle style) {
-        writeStartContainer(DsonContextType.OBJECT, style);
+        writeStartContainer(DsonContextType.OBJECT, DsonType.OBJECT, style);
     }
 
     @Override
@@ -288,7 +288,7 @@ public abstract class AbstractDsonWriter implements DsonWriter {
         if (context.contextType == DsonContextType.OBJECT && context.state == DsonWriterState.NAME) {
             context.setState(DsonWriterState.VALUE);
         }
-        writeStartContainer(DsonContextType.HEADER, style);
+        writeStartContainer(DsonContextType.HEADER, DsonType.HEADER, style);
     }
 
     @Override
@@ -296,7 +296,7 @@ public abstract class AbstractDsonWriter implements DsonWriter {
         writeEndContainer(DsonContextType.HEADER, DsonWriterState.NAME);
     }
 
-    private void writeStartContainer(DsonContextType contextType, ObjectStyle style) {
+    private void writeStartContainer(DsonContextType contextType, DsonType dsonType, ObjectStyle style) {
         Objects.requireNonNull(style);
         if (recursionDepth >= recursionLimit) {
             throw DsonIOException.recursionLimitExceeded();
@@ -304,7 +304,7 @@ public abstract class AbstractDsonWriter implements DsonWriter {
         Context context = this.context;
         autoStartTopLevel(context);
         ensureValueState(context);
-        doWriteStartContainer(contextType, style);
+        doWriteStartContainer(contextType, dsonType, style);
         setNextState(); // 设置新上下文状态
     }
 
@@ -332,7 +332,7 @@ public abstract class AbstractDsonWriter implements DsonWriter {
     }
 
     /** 写入类型信息，创建新上下文，压入上下文 */
-    protected abstract void doWriteStartContainer(DsonContextType contextType, ObjectStyle style);
+    protected abstract void doWriteStartContainer(DsonContextType contextType, DsonType dsonType, ObjectStyle style);
 
     /** 弹出上下文 */
     protected abstract void doWriteEndContainer();
@@ -368,25 +368,24 @@ public abstract class AbstractDsonWriter implements DsonWriter {
 
         public Context parent;
         public DsonContextType contextType;
+        public DsonType dsonType; // 用于在Object/Array模式下写入内置数据结构
         public DsonWriterState state = DsonWriterState.INITIAL;
         public String curName;
 
         public Context() {
         }
 
-        public Context(Context parent, DsonContextType contextType) {
+        public Context init(Context parent, DsonContextType contextType, DsonType dsonType) {
             this.parent = parent;
             this.contextType = contextType;
-        }
-
-        public void init(Context parent, DsonContextType contextType) {
-            this.parent = parent;
-            this.contextType = contextType;
+            this.dsonType = dsonType;
+            return this;
         }
 
         public void reset() {
             parent = null;
             contextType = null;
+            dsonType = null;
             state = DsonWriterState.INITIAL;
             curName = null;
         }

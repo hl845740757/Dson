@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cn.wjybxx.dson.anno;
+package cn.wjybxx.dson.internal;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

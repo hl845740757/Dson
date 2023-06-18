@@ -16,7 +16,7 @@
 
 package cn.wjybxx.dson.text;
 
-import cn.wjybxx.dson.anno.Internal;
+import cn.wjybxx.dson.internal.Internal;
 
 /**
  * @author wjybxx

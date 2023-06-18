@@ -17,38 +17,58 @@
 package cn.wjybxx.dson;
 
 import javax.annotation.Nonnull;
-import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.IntFunction;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.RandomAccess;
 
 /**
  * @author wjybxx
  * date - 2023/4/19
  */
-public abstract class DsonArray<K> extends DsonValue implements List<DsonValue>, RandomAccess {
+public class DsonArray<K> extends DsonListAdapter implements RandomAccess {
 
-    final List<DsonValue> values;
+    private final DsonHeader<K> header;
 
-    protected DsonArray(List<DsonValue> values) {
-        this.values = values;
+    public DsonArray() {
+        this(new ArrayList<>(), ImmutableDsons.POLICY_DEFAULT, new DsonHeader<>());
+    }
+
+    public DsonArray(int initCapacity) {
+        this(new ArrayList<>(initCapacity), ImmutableDsons.POLICY_DEFAULT, new DsonHeader<>());
+    }
+
+    public DsonArray(int initCapacity, DsonHeader<K> header) {
+        this(new ArrayList<>(initCapacity), ImmutableDsons.POLICY_DEFAULT, header);
+    }
+
+    public DsonArray(DsonArray<K> src) {
+        this(src.values, ImmutableDsons.POLICY_COPY, new DsonHeader<>(src.getHeader()));
+    }
+
+    private DsonArray(List<DsonValue> values, int policy, DsonHeader<K> header) {
+        super(values, policy);
+        this.header = Objects.requireNonNull(header);
     }
 
     //
+    private static final DsonArray<?> EMPTY = new DsonArray<>(List.of(), ImmutableDsons.POLICY_IMMUTABLE,
+            DsonHeader.empty());
 
     public static <K> DsonArray<K> toImmutable(DsonArray<K> src) {
-        return ImmutableDsons.dsonArray(src);
+        return new DsonArray<>(src.values, ImmutableDsons.POLICY_IMMUTABLE,
+                DsonHeader.toImmutable(src.getHeader()));
     }
 
+    @SuppressWarnings("unchecked")
     public static <K> DsonArray<K> empty() {
-        return ImmutableDsons.dsonArray();
+        return (DsonArray<K>) EMPTY;
     }
 
     @Nonnull
-    public abstract DsonHeader<K> getHeader();
-
-    public abstract DsonArray<K> setHeader(DsonHeader<K> header);
+    public DsonHeader<K> getHeader() {
+        return header;
+    }
 
     @Nonnull
     @Override
@@ -56,177 +76,4 @@ public abstract class DsonArray<K> extends DsonValue implements List<DsonValue>,
         return DsonType.ARRAY;
     }
 
-    public List<DsonValue> getValues() {
-        return Collections.unmodifiableList(values);
-    }
-
-    // equals和hash不测试header，只要内容一致即可
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        return o instanceof DsonArray<?> that && values.equals(that.values);
-    }
-
-    @Override
-    public int hashCode() {
-        return values.hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + "{" +
-                "values=" + values +
-                ", header=" + getHeader() +
-                '}';
-    }
-
-    // region 代理实现
-
-    @Override
-    public int size() {
-        return values.size();
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return values.isEmpty();
-    }
-
-    @Override
-    public boolean contains(Object o) {
-        return values.contains(o);
-    }
-
-    @Override
-    public <T> T[] toArray(T[] a) {
-        return values.toArray(a);
-    }
-
-    @Override
-    public boolean add(DsonValue dsonValue) {
-        return values.add(dsonValue);
-    }
-
-    @Override
-    public boolean remove(Object o) {
-        return values.remove(o);
-    }
-
-    @Override
-    public boolean containsAll(Collection<?> c) {
-        return values.containsAll(c);
-    }
-
-    @Override
-    public boolean addAll(Collection<? extends DsonValue> c) {
-        return values.addAll(c);
-    }
-
-    @Override
-    public boolean addAll(int index, Collection<? extends DsonValue> c) {
-        return values.addAll(index, c);
-    }
-
-    @Override
-    public boolean removeAll(Collection<?> c) {
-        return values.removeAll(c);
-    }
-
-    @Override
-    public boolean retainAll(Collection<?> c) {
-        return values.retainAll(c);
-    }
-
-    @Override
-    public void replaceAll(UnaryOperator<DsonValue> operator) {
-        values.replaceAll(operator);
-    }
-
-    @Override
-    public void sort(Comparator<? super DsonValue> c) {
-        values.sort(c);
-    }
-
-    @Override
-    public void clear() {
-        values.clear();
-    }
-
-    @Override
-    public DsonValue get(int index) {
-        return values.get(index);
-    }
-
-    @Override
-    public DsonValue set(int index, DsonValue element) {
-        return values.set(index, element);
-    }
-
-    @Override
-    public void add(int index, DsonValue element) {
-        values.add(index, element);
-    }
-
-    @Override
-    public DsonValue remove(int index) {
-        return values.remove(index);
-    }
-
-    @Override
-    public int indexOf(Object o) {
-        return values.indexOf(o);
-    }
-
-    @Override
-    public int lastIndexOf(Object o) {
-        return values.lastIndexOf(o);
-    }
-
-    @Override
-    public Iterator<DsonValue> iterator() {
-        return values.iterator();
-    }
-
-    @Override
-    public ListIterator<DsonValue> listIterator() {
-        return values.listIterator();
-    }
-
-    @Override
-    public ListIterator<DsonValue> listIterator(int index) {
-        return values.listIterator(index);
-    }
-
-    @Override
-    public List<DsonValue> subList(int fromIndex, int toIndex) {
-        return values.subList(fromIndex, toIndex);
-    }
-
-    @Override
-    public Spliterator<DsonValue> spliterator() {
-        return values.spliterator();
-    }
-
-    @Override
-    public Object[] toArray() {
-        return values.toArray();
-    }
-
-    @Override
-    public <T> T[] toArray(IntFunction<T[]> generator) {
-        return values.toArray(generator);
-    }
-
-    @Override
-    public boolean removeIf(Predicate<? super DsonValue> filter) {
-        return values.removeIf(filter);
-    }
-
-    @Override
-    public void forEach(Consumer<? super DsonValue> action) {
-        values.forEach(action);
-    }
-
-    // endregion
 }

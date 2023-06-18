@@ -17,7 +17,6 @@
 package cn.wjybxx.dson.internal;
 
 import cn.wjybxx.dson.*;
-import cn.wjybxx.dson.anno.Internal;
 import cn.wjybxx.dson.io.*;
 import cn.wjybxx.dson.types.ObjectRef;
 import cn.wjybxx.dson.types.OffsetTimestamp;

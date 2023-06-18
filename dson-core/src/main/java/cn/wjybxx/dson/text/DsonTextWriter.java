@@ -42,7 +42,7 @@ public class DsonTextWriter extends AbstractDsonWriter {
         super(recursionLimit);
         this.settings = settings;
         this.printer = new DsonPrinter(writer, settings.lineSeparator);
-        setContext(new Context(null, DsonContextType.TOP_LEVEL));
+        setContext(new Context().init(null, DsonContextType.TOP_LEVEL, null));
     }
 
     @Override
@@ -381,28 +381,28 @@ public class DsonTextWriter extends AbstractDsonWriter {
         int count = 0;
         if (objectRef.hasNamespace()) {
             count++;
-            printer.print(ObjectRef.FIELDS_NAMESPACE);
+            printer.print(ObjectRef.NAMES_NAMESPACE);
             printer.print(": ");
             printStringNonSS(printer, objectRef.getNamespace());
         }
         if (objectRef.hasLocalId()) {
             if (count++ > 0) printer.print(", ");
             checkLineLength(printer, LheadType.APPEND_LINE);
-            printer.print(ObjectRef.FIELDS_LOCAL_ID);
+            printer.print(ObjectRef.NAMES_LOCAL_ID);
             printer.print(": ");
             printStringNonSS(printer, objectRef.getLocalId());
         }
         if (objectRef.getType() != 0) {
             if (count++ > 0) printer.print(", ");
             checkLineLength(printer, LheadType.APPEND_LINE);
-            printer.print(ObjectRef.FIELDS_TYPE);
+            printer.print(ObjectRef.NAMES_TYPE);
             printer.print(": ");
             printer.print(Integer.toString(objectRef.getType()));
         }
         if (objectRef.getPolicy() != 0) {
             if (count > 0) printer.print(", ");
             checkLineLength(printer, LheadType.APPEND_LINE);
-            printer.print(ObjectRef.FIELDS_POLICY);
+            printer.print(ObjectRef.NAMES_POLICY);
             printer.print(": ");
             printer.print(Integer.toString(objectRef.getPolicy()));
         }
@@ -415,14 +415,14 @@ public class DsonTextWriter extends AbstractDsonWriter {
         writeCurrentName(printer, DsonType.TIMESTAMP);
         printer.print("{@dt ");
         if (timestamp.hasDate()) {
-            printer.print(OffsetTimestamp.FIELDS_DATE);
+            printer.print(OffsetTimestamp.NAMES_DATE);
             printer.print(": ");
             printer.print(OffsetTimestamp.formatDate(timestamp.getSeconds()));
         }
         if (timestamp.hasTime()) {
             if (timestamp.hasDate()) printer.print(", ");
             checkLineLength(printer, LheadType.APPEND_LINE);
-            printer.print(OffsetTimestamp.FIELDS_TIME);
+            printer.print(OffsetTimestamp.NAMES_TIME);
             printer.print(": ");
             printer.print(OffsetTimestamp.formatTime(timestamp.getSeconds()));
         }
@@ -430,11 +430,11 @@ public class DsonTextWriter extends AbstractDsonWriter {
             printer.print(", ");
             checkLineLength(printer, LheadType.APPEND_LINE);
             if (timestamp.canConvertNanosToMillis()) {
-                printer.print(OffsetTimestamp.FIELDS_MILLIS);
+                printer.print(OffsetTimestamp.NAMES_MILLIS);
                 printer.print(": ");
                 printer.print(Integer.toString(timestamp.getMillisOfNanos()));
             } else {
-                printer.print(OffsetTimestamp.FIELDS_NANOS);
+                printer.print(OffsetTimestamp.NAMES_NANOS);
                 printer.print(": ");
                 printer.print(Integer.toString(timestamp.getNanos()));
             }
@@ -442,7 +442,7 @@ public class DsonTextWriter extends AbstractDsonWriter {
         if (timestamp.hasOffset()) {
             printer.print(", ");
             checkLineLength(printer, LheadType.APPEND_LINE);
-            printer.print(OffsetTimestamp.FIELDS_OFFSET);
+            printer.print(OffsetTimestamp.NAMES_OFFSET);
             printer.print(": ");
             printer.print(OffsetTimestamp.formatOffset(timestamp.getOffset()));
         }
@@ -454,11 +454,11 @@ public class DsonTextWriter extends AbstractDsonWriter {
     // region 容器
 
     @Override
-    protected void doWriteStartContainer(DsonContextType contextType, ObjectStyle style) {
+    protected void doWriteStartContainer(DsonContextType contextType, DsonType dsonType, ObjectStyle style) {
         DsonPrinter printer = this.printer;
-        writeCurrentName(printer, contextType.dsonType);
+        writeCurrentName(printer, dsonType);
 
-        Context newContext = newContext(getContext(), contextType);
+        Context newContext = newContext(getContext(), contextType, dsonType);
         newContext.style = style;
 
         printer.print(contextType.startSymbol);
@@ -509,14 +509,14 @@ public class DsonTextWriter extends AbstractDsonWriter {
 
     // region context
 
-    private Context newContext(Context parent, DsonContextType contextType) {
+    private Context newContext(Context parent, DsonContextType contextType, DsonType dsonType) {
         Context context = getPooledContext();
         if (context != null) {
             setPooledContext(null);
         } else {
             context = new Context();
         }
-        context.init(parent, contextType);
+        context.init(parent, contextType, dsonType);
         return context;
     }
 
@@ -532,10 +532,6 @@ public class DsonTextWriter extends AbstractDsonWriter {
         int count = 0;
 
         public Context() {
-        }
-
-        public Context(Context parent, DsonContextType contextType) {
-            super(parent, contextType);
         }
 
         public void reset() {

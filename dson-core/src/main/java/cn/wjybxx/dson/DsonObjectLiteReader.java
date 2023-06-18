@@ -29,12 +29,12 @@ import java.util.Objects;
  * @author wjybxx
  * date - 2023/6/13
  */
-public class DsonObjectReader extends AbstractDsonReader {
+public class DsonObjectLiteReader extends AbstractDsonLiteReader {
 
-    private String nextName;
+    private FieldNumber nextName = null;
     private DsonValue nextValue;
 
-    public DsonObjectReader(int recursionLimit, DsonArray<String> dsonArray) {
+    public DsonObjectLiteReader(int recursionLimit, DsonArray<FieldNumber> dsonArray) {
         super(recursionLimit);
         Context context = new Context();
         context.init(null, DsonContextType.TOP_LEVEL, null);
@@ -64,12 +64,12 @@ public class DsonObjectReader extends AbstractDsonReader {
         return r;
     }
 
-    private void pushNextName(String nextName) {
+    private void pushNextName(FieldNumber nextName) {
         this.nextName = Objects.requireNonNull(nextName);
     }
 
-    private String popNextName() {
-        String r = this.nextName;
+    private FieldNumber popNextName() {
+        FieldNumber r = this.nextName;
         this.nextName = null;
         return r;
     }
@@ -96,7 +96,7 @@ public class DsonObjectReader extends AbstractDsonReader {
                 dsonType = nextValue.getDsonType();
             }
         } else {
-            Map.Entry<String, DsonValue> nextElement = context.nextElement();
+            Map.Entry<FieldNumber, DsonValue> nextElement = context.nextElement();
             if (nextElement == null) {
                 dsonType = DsonType.END_OF_OBJECT;
             } else {
@@ -116,7 +116,7 @@ public class DsonObjectReader extends AbstractDsonReader {
 
     @Override
     protected void doReadName() {
-        currentName = popNextName();
+        currentName = popNextName().getFullNumber();
     }
 
     // endregion
@@ -197,16 +197,16 @@ public class DsonObjectReader extends AbstractDsonReader {
         Context newContext = newContext(getContext(), contextType, dsonType);
         DsonValue dsonValue = popNextValue();
         if (dsonValue.getDsonType() == DsonType.OBJECT) {
-            DsonObject<String> dsonObject = dsonValue.asObject();
+            DsonObject<FieldNumber> dsonObject = dsonValue.asObjectLite();
             newContext.header = dsonObject.getHeader();
             newContext.objectIterator = dsonObject.entrySet().iterator();
         } else if (dsonValue.getDsonType() == DsonType.ARRAY) {
-            DsonArray<String> dsonArray = dsonValue.asArray();
+            DsonArray<FieldNumber> dsonArray = dsonValue.asArrayLite();
             newContext.header = dsonArray.getHeader();
             newContext.arrayIterator = dsonArray.iterator();
         } else {
             // 其它内置结构体
-            newContext.objectIterator = dsonValue.asHeader().entrySet().iterator();
+            newContext.objectIterator = dsonValue.asHeaderLite().entrySet().iterator();
         }
         newContext.name = currentName;
 
@@ -287,11 +287,11 @@ public class DsonObjectReader extends AbstractDsonReader {
         setPooledContext(context);
     }
 
-    private static class Context extends AbstractDsonReader.Context {
+    private static class Context extends AbstractDsonLiteReader.Context {
 
         /** 如果不为null，则表示需要先读取header */
-        private DsonHeader<String> header;
-        private Iterator<Map.Entry<String, DsonValue>> objectIterator;
+        private DsonHeader<FieldNumber> header;
+        private Iterator<Map.Entry<FieldNumber, DsonValue>> objectIterator;
         private Iterator<DsonValue> arrayIterator;
 
         public Context() {
@@ -309,7 +309,7 @@ public class DsonObjectReader extends AbstractDsonReader {
                     ? arrayIterator.next() : null;
         }
 
-        public Map.Entry<String, DsonValue> nextElement() {
+        public Map.Entry<FieldNumber, DsonValue> nextElement() {
             return objectIterator.hasNext()
                     ? objectIterator.next() : null;
         }

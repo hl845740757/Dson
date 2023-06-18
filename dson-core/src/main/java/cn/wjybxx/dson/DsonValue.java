@@ -84,34 +84,34 @@ public abstract class DsonValue {
     }
 
     @SuppressWarnings("unchecked")
-    public MutableDsonHeader<String> asHeader() {
-        return (MutableDsonHeader<String>) this;
+    public DsonHeader<String> asHeader() {
+        return (DsonHeader<String>) this;
     }
 
     @SuppressWarnings("unchecked")
-    public MutableDsonArray<String> asArray() {
-        return (MutableDsonArray<String>) this;
+    public DsonArray<String> asArray() {
+        return (DsonArray<String>) this;
     }
 
     @SuppressWarnings("unchecked")
-    public MutableDsonObject<String> asObject() {
-        return (MutableDsonObject<String>) this;
+    public DsonObject<String> asObject() {
+        return (DsonObject<String>) this;
     }
     //
 
     @SuppressWarnings("unchecked")
-    public MutableDsonHeader<FieldNumber> asHeaderLite() {
-        return (MutableDsonHeader<FieldNumber>) this;
+    public DsonHeader<FieldNumber> asHeaderLite() {
+        return (DsonHeader<FieldNumber>) this;
     }
 
     @SuppressWarnings("unchecked")
-    public MutableDsonArray<FieldNumber> asArrayLite() {
-        return (MutableDsonArray<FieldNumber>) this;
+    public DsonArray<FieldNumber> asArrayLite() {
+        return (DsonArray<FieldNumber>) this;
     }
 
     @SuppressWarnings("unchecked")
-    public MutableDsonObject<FieldNumber> asObjectLite() {
-        return (MutableDsonObject<FieldNumber>) this;
+    public DsonObject<FieldNumber> asObjectLite() {
+        return (DsonObject<FieldNumber>) this;
     }
 
 }

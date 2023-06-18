@@ -16,11 +16,10 @@
 
 package cn.wjybxx.dson;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
+
 import javax.annotation.Nonnull;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * 1.Header不可以再持有header，否则陷入死循环
@@ -29,46 +28,35 @@ import java.util.Set;
  * @author wjybxx
  * date - 2023/5/27
  */
-public abstract class DsonHeader<K> extends DsonValue implements Map<K, DsonValue> {
+public class DsonHeader<K> extends DsonMapAdapter<K> {
 
-    protected final Map<K, DsonValue> valueMap;
+    public DsonHeader() {
+        // ref结构体通常很小，适合Array结构
+        super(new Object2ObjectArrayMap<>(2), ImmutableDsons.POLICY_DEFAULT);
+    }
 
-    protected DsonHeader(Map<K, DsonValue> valueMap) {
-        this.valueMap = valueMap;
+    public DsonHeader(Map<K, DsonValue> valueMap) {
+        super(valueMap, ImmutableDsons.POLICY_COPY);
+    }
+
+    private DsonHeader(Map<K, DsonValue> valueMap, int policy) {
+        super(valueMap, policy);
     }
 
     public static <K> DsonHeader<K> toImmutable(DsonHeader<K> src) {
-        return ImmutableDsons.header(src);
+        return new DsonHeader<>(src.valueMap, ImmutableDsons.POLICY_IMMUTABLE);
     }
 
     public static <K> DsonHeader<K> empty() {
-        return ImmutableDsons.header();
+        return new DsonHeader<>(Map.of(), ImmutableDsons.POLICY_IMMUTABLE);
     }
 
     //
-
-    public Map<K, DsonValue> getValueMap() {
-        return Collections.unmodifiableMap(valueMap);
-    }
 
     /** @return this */
     public DsonHeader<K> append(K key, DsonValue value) {
         put(key, value);
         return this;
-    }
-
-    @Override
-    public DsonValue put(K key, DsonValue value) {
-        DsonObject.checkKeyValue(key, value);
-        return valueMap.put(key, value);
-    }
-
-    @Override
-    public void putAll(Map<? extends K, ? extends DsonValue> m) {
-        // 需要检测key-value的空
-        for (Entry<? extends K, ? extends DsonValue> entry : m.entrySet()) {
-            put(entry.getKey(), entry.getValue());
-        }
     }
 
     @Nonnull
@@ -77,76 +65,23 @@ public abstract class DsonHeader<K> extends DsonValue implements Map<K, DsonValu
         return DsonType.HEADER;
     }
 
-    // 默认只比较value，不比较Header
+    //
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        return o instanceof DsonHeader<?> that && valueMap.equals(that.valueMap);
-    }
+    // header常见属性名
+    public static final String NAMES_CLASS_NAME = "clsName";
+    public static final String NAMES_COMP_CLASS_NAME = "compClsName";
+    public static final String NAMES_CLASS_ID = "clsId";
+    public static final String NAMES_COMP_CLASS_ID = "compClsId";
+    public static final String NAMES_GUID = "guid";
+    public static final String NAMES_LOCAL_ID = "localId";
+    public static final String NAMES_TAGS = "tags";
 
-    @Override
-    public int hashCode() {
-        return valueMap.hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + "{" +
-                "valueMap=" + valueMap +
-                '}';
-    }
-
-    // region 代理实现
-    @Override
-    public int size() {
-        return valueMap.size();
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return valueMap.isEmpty();
-    }
-
-    @Override
-    public boolean containsKey(Object key) {
-        return valueMap.containsKey(key);
-    }
-
-    @Override
-    public boolean containsValue(Object value) {
-        return valueMap.containsValue(value);
-    }
-
-    @Override
-    public DsonValue get(Object key) {
-        return valueMap.get(key);
-    }
-
-    @Override
-    public DsonValue remove(Object key) {
-        return valueMap.remove(key);
-    }
-
-    @Override
-    public void clear() {
-        valueMap.clear();
-    }
-
-    @Override
-    public Set<K> keySet() {
-        return valueMap.keySet();
-    }
-
-    @Override
-    public Collection<DsonValue> values() {
-        return valueMap.values();
-    }
-
-    @Override
-    public Set<Entry<K, DsonValue>> entrySet() {
-        return valueMap.entrySet();
-    }
-    // endregion
+    public static final int NUMBERS_CLASS_NAME = DsonLites.makeFullNumberZeroIdep(0);
+    public static final int NUMBERS_COMP_CLASS_NAME = DsonLites.makeFullNumberZeroIdep(1);
+    public static final int NUMBERS_CLASS_ID = DsonLites.makeFullNumberZeroIdep(2);
+    public static final int NUMBERS_COMP_CLASS_ID = DsonLites.makeFullNumberZeroIdep(3);
+    public static final int NUMBERS_GUID = DsonLites.makeFullNumberZeroIdep(4);
+    public static final int NUMBERS_LOCAL_ID = DsonLites.makeFullNumberZeroIdep(5);
+    public static final int NUMBERS_TAGS = DsonLites.makeFullNumberZeroIdep(6);
 
 }

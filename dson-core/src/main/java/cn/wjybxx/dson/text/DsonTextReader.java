@@ -51,7 +51,7 @@ public class DsonTextReader extends AbstractDsonReader {
     private static final DsonToken TOKEN_START_HEADER = new DsonToken(TokenType.HEADER, "@{", -1);
     private static final DsonToken TOKEN_END_OBJECT = new DsonToken(TokenType.END_OBJECT, "}", -1);
     private static final DsonToken TOKEN_COLON = new DsonToken(TokenType.COLON, ":", -1);
-    private static final DsonToken TOKEN_CLASSNAME = new DsonToken(TokenType.UNQUOTE_STRING, DsonTexts.CLASS_NAME, -1);
+    private static final DsonToken TOKEN_CLASSNAME = new DsonToken(TokenType.UNQUOTE_STRING, DsonHeader.NAMES_CLASS_NAME, -1);
 
     private DsonScanner scanner;
     private final ArrayDeque<DsonToken> pushedTokenQueue = new ArrayDeque<>(6);
@@ -70,7 +70,7 @@ public class DsonTextReader extends AbstractDsonReader {
     public DsonTextReader(int recursionLimit, DsonScanner scanner) {
         super(recursionLimit);
         this.scanner = scanner;
-        setContext(new Context(null, DsonContextType.TOP_LEVEL));
+        setContext(new Context().init(null, DsonContextType.TOP_LEVEL, null));
     }
 
     @Override
@@ -402,19 +402,19 @@ public class DsonTextReader extends AbstractDsonReader {
             // 根据name校验
             DsonToken valueToken = popToken();
             switch (keyToken.castAsString()) {
-                case ObjectRef.FIELDS_NAMESPACE -> {
+                case ObjectRef.NAMES_NAMESPACE -> {
                     ensureStringsToken(context, valueToken);
                     namespace = valueToken.castAsString();
                 }
-                case ObjectRef.FIELDS_LOCAL_ID -> {
+                case ObjectRef.NAMES_LOCAL_ID -> {
                     ensureStringsToken(context, valueToken);
                     localId = valueToken.castAsString();
                 }
-                case ObjectRef.FIELDS_TYPE -> {
+                case ObjectRef.NAMES_TYPE -> {
                     verifyTokenType(context, valueToken, TokenType.UNQUOTE_STRING);
                     type = DsonTexts.parseInt(valueToken.castAsString());
                 }
-                case ObjectRef.FIELDS_POLICY -> {
+                case ObjectRef.NAMES_POLICY -> {
                     verifyTokenType(context, valueToken, TokenType.UNQUOTE_STRING);
                     policy = DsonTexts.parseInt(valueToken.castAsString());
                 }
@@ -444,35 +444,35 @@ public class DsonTextReader extends AbstractDsonReader {
 
             // 根据name校验
             switch (keyToken.castAsString()) {
-                case OffsetTimestamp.FIELDS_DATE -> {
+                case OffsetTimestamp.NAMES_DATE -> {
                     String dateString = scanStringUtilComma();
                     date = OffsetTimestamp.parseDate(dateString);
                     enables |= OffsetTimestamp.MASK_DATE;
                 }
-                case OffsetTimestamp.FIELDS_TIME -> {
+                case OffsetTimestamp.NAMES_TIME -> {
                     String timeString = scanStringUtilComma();
                     time = OffsetTimestamp.parseTime(timeString);
                     enables |= OffsetTimestamp.MASK_TIME;
                 }
-                case OffsetTimestamp.FIELDS_OFFSET -> {
+                case OffsetTimestamp.NAMES_OFFSET -> {
                     String offsetString = scanStringUtilComma();
                     offset = OffsetTimestamp.parseOffset(offsetString);
                     enables |= OffsetTimestamp.MASK_OFFSET;
                 }
-                case OffsetTimestamp.FIELDS_NANOS -> {
+                case OffsetTimestamp.NAMES_NANOS -> {
                     DsonToken valueToken = popToken();
                     ensureStringsToken(context, valueToken);
                     nanos = Integer.parseInt(valueToken.castAsString());
                     if (nanos < 0) {
-                        throw new IllegalArgumentException("invaloid nanos " + nanos);
+                        throw new IllegalArgumentException("invalid nanos " + valueToken);
                     }
                 }
-                case OffsetTimestamp.FIELDS_MILLIS -> {
+                case OffsetTimestamp.NAMES_MILLIS -> {
                     DsonToken valueToken = popToken();
                     ensureStringsToken(context, valueToken);
                     int millis = Integer.parseInt(valueToken.castAsString());
                     if (millis < 0 || millis > 999) {
-                        throw new IllegalArgumentException("invalid millis " + millis);
+                        throw new IllegalArgumentException("invalid millis " + valueToken);
                     }
                     nanos = millis * 1000000;
                 }
@@ -492,7 +492,7 @@ public class DsonTextReader extends AbstractDsonReader {
         while (true) {
             DsonToken valueToken = popToken();
             switch (valueToken.getType()) {
-                case COMMA, END_OBJECT, END_ARRAY ->  {
+                case COMMA, END_OBJECT, END_ARRAY -> {
                     pushToken(valueToken);
                     return sb.toString();
                 }
@@ -580,7 +580,7 @@ public class DsonTextReader extends AbstractDsonReader {
         // 将header中的特殊属性记录下来
         Context context = getContext();
         if (context.contextType == DsonContextType.HEADER) {
-            if (context.compClsNameToken == null && DsonTexts.COMP_CLASS_NAME.equals(currentName)) {
+            if (context.compClsNameToken == null && DsonHeader.NAMES_COMP_CLASS_NAME.equals(currentName)) {
                 context.compClsNameToken = new DsonToken(TokenType.HEADER, nextValue, -1);
             }
             // 其它属性
@@ -674,8 +674,8 @@ public class DsonTextReader extends AbstractDsonReader {
     // region 容器
 
     @Override
-    protected void doReadStartContainer(DsonContextType contextType) {
-        Context newContext = newContext(getContext(), contextType);
+    protected void doReadStartContainer(DsonContextType contextType, DsonType dsonType) {
+        Context newContext = newContext(getContext(), contextType, dsonType);
         newContext.beginToken = (DsonToken) Objects.requireNonNull(popNextValue());
         newContext.name = currentName;
 
@@ -772,14 +772,14 @@ public class DsonTextReader extends AbstractDsonReader {
 
     // region context
 
-    private Context newContext(Context parent, DsonContextType contextType) {
+    private Context newContext(Context parent, DsonContextType contextType, DsonType dsonType) {
         Context context = getPooledContext();
         if (context != null) {
             setPooledContext(null);
         } else {
             context = new Context();
         }
-        context.init(parent, contextType);
+        context.init(parent, contextType, dsonType);
         return context;
     }
 
@@ -799,10 +799,6 @@ public class DsonTextReader extends AbstractDsonReader {
         DsonToken compClsNameToken;
 
         public Context() {
-        }
-
-        public Context(Context parent, DsonContextType contextType) {
-            super(parent, contextType);
         }
 
         public void reset() {

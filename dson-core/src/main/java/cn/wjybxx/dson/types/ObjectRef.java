@@ -16,6 +16,8 @@
 
 package cn.wjybxx.dson.types;
 
+import cn.wjybxx.dson.DsonLites;
+import cn.wjybxx.dson.FieldNumber;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.concurrent.Immutable;
@@ -23,18 +25,12 @@ import java.util.Objects;
 
 /**
  * 对象引用的默认结构体
- * 注意：相等性比较时只比较 guid 和 localId，只要指向的是同一个对象就认为相等
  *
  * @author wjybxx
  * date - 2023/5/26
  */
 @Immutable
 public final class ObjectRef {
-
-    public static final String FIELDS_NAMESPACE = "namespace";
-    public static final String FIELDS_LOCAL_ID = "localId";
-    public static final String FIELDS_TYPE = "type";
-    public static final String FIELDS_POLICY = "policy";
 
     /** 引用对象所属的命名空间 */
     private final String namespace;
@@ -116,4 +112,15 @@ public final class ObjectRef {
                 ", policy=" + policy +
                 '}';
     }
+
+    // ref常见属性名
+    public static final String NAMES_NAMESPACE = "namespace";
+    public static final String NAMES_LOCAL_ID = "localId";
+    public static final String NAMES_TYPE = "type";
+    public static final String NAMES_POLICY = "policy";
+
+    public static final int NUMBERS_NAMESPACE = DsonLites.makeFullNumberZeroIdep(0);
+    public static final int NUMBERS_LOCAL_ID = DsonLites.makeFullNumberZeroIdep(1);
+    public static final int NUMBERS_TYPE = DsonLites.makeFullNumberZeroIdep(2);
+    public static final int NUMBERS_POLICY = DsonLites.makeFullNumberZeroIdep(3);
 }

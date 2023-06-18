@@ -13,9 +13,9 @@ import java.util.Objects;
  * @author wjybxx
  * date - 2023/6/13
  */
-public class DsonObjectWriter extends AbstractDsonWriter {
+public class DsonObjectLiteWriter extends AbstractDsonLiteWriter {
 
-    public DsonObjectWriter(int recursionLimit, DsonArray<String> outList) {
+    public DsonObjectLiteWriter(int recursionLimit, DsonArray<FieldNumber> outList) {
         super(recursionLimit);
         // 顶层输出是一个数组
         Context context = new Context();
@@ -168,29 +168,29 @@ public class DsonObjectWriter extends AbstractDsonWriter {
         setPooledContext(context);
     }
 
-    private static class Context extends AbstractDsonWriter.Context {
+    private static class Context extends AbstractDsonLiteWriter.Context {
 
         DsonValue container;
 
         public Context() {
         }
 
-        public DsonHeader<String> getHeader() {
+        public DsonHeader<FieldNumber> getHeader() {
             if (container.getDsonType() == DsonType.OBJECT) {
-                return container.asObject().getHeader();
+                return container.asObjectLite().getHeader();
             } else {
-                return container.asArray().getHeader();
+                return container.asArrayLite().getHeader();
             }
         }
 
         @SuppressWarnings("unchecked")
         public void add(DsonValue value) {
             if (container.getDsonType() == DsonType.OBJECT) {
-                ((DsonObject<String>) container).put(curName, value);
+                ((DsonObject<FieldNumber>) container).put(FieldNumber.ofFullNumber(curName), value);
             } else if (container.getDsonType() == DsonType.ARRAY) {
-                ((DsonArray<String>) container).add(value);
+                ((DsonArray<FieldNumber>) container).add(value);
             } else {
-                ((DsonHeader<String>) container).put(curName, value);
+                ((DsonHeader<FieldNumber>) container).put(FieldNumber.ofFullNumber(curName), value);
             }
         }
 

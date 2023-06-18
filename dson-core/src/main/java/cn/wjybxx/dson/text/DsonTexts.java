@@ -70,15 +70,6 @@ public class DsonTexts {
     public static final Set<String> ALL_LHEAD_SET = Set.of(LHEAD_COMMENT, LHEAD_APPEND_LINE, LHEAD_APPEND, LHEAD_APPEND_TEXT_LINE);
     public static final Set<String> CONTENT_LHEAD_SET = Set.of(LHEAD_APPEND_LINE, LHEAD_APPEND, LHEAD_APPEND_TEXT_LINE);
 
-    // header常见属性名
-    public static final String CLASS_NAME = "clsName";
-    public static final String CLASS_ID = "clsId";
-    public static final String COMP_CLASS_NAME = "compClsName";
-    public static final String COMP_CLASS_ID = "compClsId";
-    public static final String LOCAL_ID = "localId";
-    public static final String GUID = "guid";
-    public static final String TAGS = "tags";
-
     /** 有特殊含义的字符串 */
     private static final Set<String> PARSABLE_STRINGS = Set.of("true", "false",
             "null", "undefine",
@@ -235,6 +226,7 @@ public class DsonTexts {
     }
 
     private static int toDigit(final char ch, final int index) {
+        // 相当于Switch-case 字符，返回对应的数字
         final int digit = Character.digit(ch, 16);
         if (digit == -1) {
             throw new DsonIOException("Illegal hexadecimal character " + ch + " at index " + index);

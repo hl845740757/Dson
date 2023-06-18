@@ -157,8 +157,8 @@ public final class Dsons {
         writer.writeEndObject();
     }
 
-    public static MutableDsonObject<String> readObject(DsonReader reader) {
-        MutableDsonObject<String> dsonObject = new MutableDsonObject<>();
+    public static DsonObject<String> readObject(DsonReader reader) {
+        DsonObject<String> dsonObject = new DsonObject<>();
         DsonType dsonType;
         String name;
         DsonValue value;
@@ -188,8 +188,8 @@ public final class Dsons {
         writer.writeEndArray();
     }
 
-    public static MutableDsonArray<String> readArray(DsonReader reader) {
-        MutableDsonArray<String> dsonArray = new MutableDsonArray<>(8);
+    public static DsonArray<String> readArray(DsonReader reader) {
+        DsonArray<String> dsonArray = new DsonArray<>(8);
         DsonType dsonType;
         DsonValue value;
         reader.readStartArray();
@@ -212,12 +212,13 @@ public final class Dsons {
     }
 
     public static DsonHeader<String> readHeader(DsonReader reader, @Nullable DsonHeader<String> header) {
-        if (header == null) header = new MutableDsonHeader<>();
+        if (header == null) header = new DsonHeader<>();
         DsonType dsonType;
         String name;
         DsonValue value;
         reader.readStartHeader();
         while ((dsonType = reader.readDsonType()) != DsonType.END_OF_OBJECT) {
+            assert dsonType != DsonType.HEADER;
             name = reader.readName();
             value = readDsonValue(reader);
             header.put(name, value);
@@ -254,7 +255,7 @@ public final class Dsons {
     public static DsonValue readDsonValue(DsonReader reader) {
         DsonType dsonType = reader.getCurrentDsonType();
         reader.skipName();
-        final String name = null;
+        final String name = "";
         return switch (dsonType) {
             case INT32 -> new DsonInt32(reader.readInt32(name));
             case INT64 -> new DsonInt64(reader.readInt64(name));
@@ -273,7 +274,7 @@ public final class Dsons {
             case REFERENCE -> new DsonObjectRef(reader.readRef(name));
             case TIMESTAMP -> new DsonTimestamp(reader.readTimestamp(name));
             case HEADER -> {
-                MutableDsonHeader<String> header = new MutableDsonHeader<>();
+                DsonHeader<String> header = new DsonHeader<String>();
                 readHeader(reader, header);
                 yield header;
             }

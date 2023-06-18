@@ -16,7 +16,7 @@
 
 package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.anno.Internal;
+import cn.wjybxx.dson.internal.Internal;
 
 /**
  * @author wjybxx
@@ -25,31 +25,29 @@ import cn.wjybxx.dson.anno.Internal;
 public enum DsonContextType {
 
     /** 当前在最顶层，尚未开始读写（topLevel相当于一个数组） */
-    TOP_LEVEL(null, null, null),
+    TOP_LEVEL(null, null),
 
     /** 当前是一个普通对象结构（文档结构） */
-    OBJECT(DsonType.OBJECT, "{", "}"),
+    OBJECT("{", "}"),
 
     /** 当前是一个数组结构 */
-    ARRAY(DsonType.ARRAY, "[", "]"),
+    ARRAY("[", "]"),
 
     /** 当前是一个Header结构 - 类Object */
-    HEADER(DsonType.HEADER, "@{", "}");
+    HEADER("@{", "}");
 
-    public final DsonType dsonType;
     @Internal
     public final String startSymbol;
     @Internal
     public final String endSymbol;
 
-    DsonContextType(DsonType dsonType, String startSymbol, String endSymbol) {
-        this.dsonType = dsonType;
+    DsonContextType(String startSymbol, String endSymbol) {
         this.startSymbol = startSymbol;
         this.endSymbol = endSymbol;
     }
 
     public boolean isContainer() {
-        return dsonType != null && dsonType.isContainer();
+        return this == OBJECT || this == ARRAY;
     }
 
     public boolean isLikeArray() {

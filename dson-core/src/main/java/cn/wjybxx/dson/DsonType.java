@@ -44,19 +44,19 @@ public enum DsonType {
     /**
      * Int32的扩展类型
      * 基本类型的int无法直接表达其使用目的，需要额外的类型支持；
-     * 通过扩展类型，可避免破坏业务代码，可避免用户自行封装Long
+     * 通过扩展类型，可避免破坏业务代码，可避免用户自行封装
      */
     EXT_INT32(9),
     /**
      * Int64的扩展类型
      * 基本类型的long无法直接表达其使用目的，需要额外的类型支持；
-     * 通过扩展类型，可避免破坏业务代码，可避免用户自行封装Long
+     * 通过扩展类型，可避免破坏业务代码，可避免用户自行封装
      */
     EXT_INT64(10),
     /**
      * String的扩展类型
      * 基本类型的String无法直接表达其使用目的，需要额外的类型支持；
-     * 通过扩展类型，可避免破坏业务代码，可避免用户自行封装Long
+     * 通过扩展类型，可避免破坏业务代码，可避免用户自行封装
      */
     EXT_STRING(11),
     /**
@@ -99,6 +99,10 @@ public enum DsonType {
 
     public int getNumber() {
         return number;
+    }
+
+    public boolean isPrimitive() {
+        return number >= 1 && number <= 6;
     }
 
     /** header不属于普通意义上的容器 */

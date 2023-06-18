@@ -16,12 +16,9 @@
 
 package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.internal.CollectionUtils;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 
-import javax.annotation.Nonnull;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @author wjybxx
@@ -29,120 +26,40 @@ import java.util.Objects;
  */
 final class ImmutableDsons {
 
-    public static <K> DsonHeader<K> header(DsonHeader<K> src) {
-        Objects.requireNonNull(src);
-        if (src instanceof ImmutableHeader<K>) {
-            return src;
-        }
-        Map<K, DsonValue> valueMap = CollectionUtils.toImmutableLinkedHashMap(src.getValueMap());
-        return new ImmutableHeader<>(valueMap);
-    }
+    static final int POLICY_DEFAULT = 0;
+    static final int POLICY_COPY = 1;
+    static final int POLICY_IMMUTABLE = 2;
 
-    public static <K> DsonObject<K> dsonObject(DsonObject<K> src) {
-        Objects.requireNonNull(src);
-        if (src instanceof ImmutableDsonObject<K>) {
-            return src;
-        }
-        Map<K, DsonValue> valueMap = CollectionUtils.toImmutableLinkedHashMap(src.valueMap);
-        DsonHeader<K> header = header(src.getHeader());
-        return new ImmutableDsonObject<>(valueMap, header);
-    }
-
-    public static <K> DsonArray<K> dsonArray(DsonArray<K> src) {
-        Objects.requireNonNull(src);
-        if (src instanceof ImmutableDsonArray<K>) {
-            return src;
-        }
-        DsonHeader<K> header = header(src.getHeader());
-        List<DsonValue> values = List.copyOf(src.getValues());
-        return new ImmutableDsonArray<>(values, header);
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <K> DsonArray<K> dsonArray() {
-        return (DsonArray<K>) EMPTY_ARRAY;
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <K> DsonObject<K> dsonObject() {
-        return (DsonObject<K>) EMPTY_OBJECT;
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <K> DsonHeader<K> header() {
-        return (DsonHeader<K>) EMPTY_HEADER;
-    }
-
-    //
-    private static final DsonHeader<?> EMPTY_HEADER = new ImmutableHeader<>(Map.of());
-    private static final DsonArray<?> EMPTY_ARRAY = new ImmutableDsonArray<>(List.of(), EMPTY_HEADER);
-    private static final DsonObject<?> EMPTY_OBJECT = new ImmutableDsonObject<>(Map.of(), EMPTY_HEADER);
-
-    private static class ImmutableDsonObject<K> extends DsonObject<K> {
-
-        private final DsonHeader<K> header;
-
-        private ImmutableDsonObject(Map<K, DsonValue> valueMap,
-                                    DsonHeader<K> header) {
-            super(valueMap);
-            this.header = header;
-        }
-
-        @Nonnull
-        @Override
-        public DsonHeader<K> getHeader() {
-            return header;
-        }
-
-        @Override
-        public DsonObject<K> setHeader(DsonHeader<K> header) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public Map<K, DsonValue> getValueMap() {
+    /** @param policy 策略：0.直接持有 1.可变拷贝 2.不可变拷贝 */
+    static <K> Map<K, DsonValue> resolveMapPolicy(Map<K, DsonValue> valueMap, int policy) {
+        Objects.requireNonNull(valueMap, "valueMap");
+        if (policy == 1) {
+            if (valueMap.getClass() == Object2ObjectArrayMap.class) {
+                return new Object2ObjectArrayMap<>(valueMap);
+            } else {
+                return new LinkedHashMap<>(valueMap);
+            }
+        } else if (policy == 2) {
+            // 需要保持顺序，size小的情况下使用ArrayMap
+            if (valueMap.size() <= 4) {
+                return Collections.unmodifiableMap(new Object2ObjectArrayMap<>(valueMap));
+            } else {
+                return Collections.unmodifiableMap(new LinkedHashMap<>(valueMap));
+            }
+        } else {
             return valueMap;
         }
-
     }
 
-    private static class ImmutableHeader<K> extends DsonHeader<K> {
-
-        private ImmutableHeader(Map<K, DsonValue> valueMap) {
-            super(valueMap);
-        }
-
-        @Override
-        public Map<K, DsonValue> getValueMap() {
-            return valueMap;
-        }
-
-    }
-
-    private static class ImmutableDsonArray<K> extends DsonArray<K> {
-
-        private final DsonHeader<K> header;
-
-        public ImmutableDsonArray(List<DsonValue> values, DsonHeader<K> header) {
-            super(values);
-            this.header = header;
-        }
-
-        @Nonnull
-        @Override
-        public DsonHeader<K> getHeader() {
-            return header;
-        }
-
-        @Override
-        public DsonArray<K> setHeader(DsonHeader<K> header) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public List<DsonValue> getValues() {
+    /** @param policy 策略：0.直接持有 1.可变拷贝 2.不可变拷贝 */
+    static List<DsonValue> resolveListPolicy(List<DsonValue> values, int policy) {
+        Objects.requireNonNull(values, "values");
+        if (policy == 1) {
+            return new ArrayList<>(values);
+        } else if (policy == 2) {
+            return List.copyOf(values);
+        } else {
             return values;
         }
     }
-
 }

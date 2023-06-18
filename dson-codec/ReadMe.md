@@ -178,7 +178,7 @@ Dson除了基本的值类型外，还提供了ExtInt32（带标签的Int32）、
 ，因此Dson的数据就更容易转换为其它数据格式。
 
 ```
-    @FieldImpl(dsonType = DsonType.EXT_STRING, extStringType = DsonExtStringType.REGULAR_EXPRESSION)
+    @FieldImpl(dsonType = DsonType.EXT_STRING, subType = DsonExtStringType.REGULAR_EXPRESSION)
     public String reg;
     
     // 生成的编码代码

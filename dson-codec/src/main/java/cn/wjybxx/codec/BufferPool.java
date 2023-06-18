@@ -16,7 +16,7 @@
 
 package cn.wjybxx.codec;
 
-import cn.wjybxx.dson.anno.Internal;
+import cn.wjybxx.dson.internal.Internal;
 import cn.wjybxx.dson.internal.InternalUtils;
 
 import java.util.ArrayDeque;

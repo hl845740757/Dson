@@ -341,7 +341,7 @@ public abstract class AbstractDsonLiteReader implements DsonLiteReader {
 
     @Override
     public void readStartArray() {
-        readStartContainer(DsonType.ARRAY, DsonContextType.ARRAY);
+        readStartContainer(DsonContextType.ARRAY, DsonType.ARRAY);
     }
 
     @Override
@@ -351,7 +351,7 @@ public abstract class AbstractDsonLiteReader implements DsonLiteReader {
 
     @Override
     public void readStartObject() {
-        readStartContainer(DsonType.OBJECT, DsonContextType.OBJECT);
+        readStartContainer(DsonContextType.OBJECT, DsonType.OBJECT);
     }
 
     @Override
@@ -361,7 +361,7 @@ public abstract class AbstractDsonLiteReader implements DsonLiteReader {
 
     @Override
     public void readStartHeader() {
-        readStartContainer(DsonType.HEADER, DsonContextType.HEADER);
+        readStartContainer(DsonContextType.HEADER, DsonType.HEADER);
     }
 
     @Override
@@ -381,7 +381,7 @@ public abstract class AbstractDsonLiteReader implements DsonLiteReader {
         context.setState(DsonReaderState.WAIT_START_OBJECT);
     }
 
-    private void readStartContainer(DsonType dsonType, DsonContextType contextType) {
+    private void readStartContainer(DsonContextType contextType, DsonType dsonType) {
         Context context = this.context;
         if (context.state == DsonReaderState.WAIT_START_OBJECT) {
             setNextState();
@@ -392,7 +392,7 @@ public abstract class AbstractDsonLiteReader implements DsonLiteReader {
         }
         autoStartTopLevel(context);
         ensureValueState(context, dsonType);
-        doReadStartContainer(contextType);
+        doReadStartContainer(contextType, dsonType);
         setNextState(); // 设置新上下文状态
     }
 
@@ -420,7 +420,7 @@ public abstract class AbstractDsonLiteReader implements DsonLiteReader {
     }
 
     protected void recoverDsonType(Context context) {
-        this.currentDsonType = Objects.requireNonNull(context.contextType.dsonType);
+        this.currentDsonType = Objects.requireNonNull(context.dsonType);
         this.currentWireType = WireType.VARINT;
         this.currentName = context.name;
     }
@@ -428,7 +428,7 @@ public abstract class AbstractDsonLiteReader implements DsonLiteReader {
     /**
      * 创建新的context，读取classId，压入上下文
      */
-    protected abstract void doReadStartContainer(DsonContextType contextType);
+    protected abstract void doReadStartContainer(DsonContextType contextType, DsonType dsonType);
 
     /**
      * 恢复到旧的上下文，恢复{@link #currentDsonType}，弹出上下文
@@ -522,25 +522,24 @@ public abstract class AbstractDsonLiteReader implements DsonLiteReader {
 
         public Context parent;
         public DsonContextType contextType;
+        public DsonType dsonType; // 用于在Object/Array模式下写入内置数据结构
         public DsonReaderState state = DsonReaderState.INITIAL;
         public int name = INVALID_NAME;
 
         public Context() {
         }
 
-        public Context(Context parent, DsonContextType contextType) {
+        public Context init(Context parent, DsonContextType contextType, DsonType dsonType) {
             this.parent = parent;
             this.contextType = contextType;
-        }
-
-        public void init(Context parent, DsonContextType contextType) {
-            this.parent = parent;
-            this.contextType = contextType;
+            this.dsonType = dsonType;
+            return this;
         }
 
         public void reset() {
             parent = null;
             contextType = null;
+            dsonType = null;
             state = DsonReaderState.INITIAL;
             name = INVALID_NAME;
         }

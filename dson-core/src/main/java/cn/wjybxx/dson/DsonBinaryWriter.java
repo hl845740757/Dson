@@ -26,7 +26,6 @@ import cn.wjybxx.dson.types.OffsetTimestamp;
 import com.google.protobuf.MessageLite;
 
 import javax.annotation.Nullable;
-import java.util.Objects;
 
 /**
  * @author wjybxx
@@ -39,7 +38,7 @@ public class DsonBinaryWriter extends AbstractDsonWriter {
     public DsonBinaryWriter(int recursionLimit, DsonOutput output) {
         super(recursionLimit);
         this.output = output;
-        setContext(new Context(null, DsonContextType.TOP_LEVEL));
+        setContext(new Context().init(null, DsonContextType.TOP_LEVEL, null));
     }
 
     @Override
@@ -75,10 +74,12 @@ public class DsonBinaryWriter extends AbstractDsonWriter {
         } else {
             output.writeRawByte((byte) Dsons.makeFullType(dsonType.getNumber(), wireType.getNumber()));
         }
-        Context context = getContext();
-        if (context.contextType == DsonContextType.OBJECT ||
-                context.contextType == DsonContextType.HEADER) {
-            output.writeString(context.curName);
+        if (dsonType != DsonType.HEADER) { // header是匿名属性
+            Context context = getContext();
+            if (context.contextType == DsonContextType.OBJECT ||
+                    context.contextType == DsonContextType.HEADER) {
+                output.writeString(context.curName);
+            }
         }
     }
     // endregion
@@ -186,12 +187,11 @@ public class DsonBinaryWriter extends AbstractDsonWriter {
     // region 容器
 
     @Override
-    protected void doWriteStartContainer(DsonContextType contextType, ObjectStyle style) {
+    protected void doWriteStartContainer(DsonContextType contextType, DsonType dsonType, ObjectStyle style) {
         DsonOutput output = this.output;
-        DsonType dsonType = Objects.requireNonNull(contextType.dsonType);
         writeFullTypeAndCurrentName(output, dsonType, null);
 
-        Context newContext = newContext(getContext(), contextType);
+        Context newContext = newContext(getContext(), contextType, dsonType);
         newContext.preWritten = output.position();
         output.writeFixed32(0);
 
@@ -233,14 +233,14 @@ public class DsonBinaryWriter extends AbstractDsonWriter {
 
     // region context
 
-    private Context newContext(Context parent, DsonContextType contextType) {
+    private Context newContext(Context parent, DsonContextType contextType, DsonType dsonType) {
         Context context = getPooledContext();
         if (context != null) {
             setPooledContext(null);
         } else {
             context = new Context();
         }
-        context.init(parent, contextType);
+        context.init(parent, contextType, dsonType);
         return context;
     }
 
@@ -254,10 +254,6 @@ public class DsonBinaryWriter extends AbstractDsonWriter {
         int preWritten = 0;
 
         public Context() {
-        }
-
-        public Context(Context parent, DsonContextType contextType) {
-            super(parent, contextType);
         }
 
         public void reset() {

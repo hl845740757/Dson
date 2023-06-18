@@ -16,7 +16,7 @@
 
 package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.anno.Internal;
+import cn.wjybxx.dson.internal.Internal;
 
 /**
  * Object、Header循环： NAME-VALUE
