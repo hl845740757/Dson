@@ -74,14 +74,14 @@ public class DsonLinesBuffer extends AbstractDsonBuffer<DsonLinesBuffer.LocalLin
         @Override
         public String toString() {
             return "LocalLineInfo{" +
-                    "line='" + line + '\'' +
-                    ", startPos=" + startPos +
-                    ", endPos=" + endPos +
-                    ", contentStartPos=" + contentStartPos +
-                    ", lheadType=" + lheadType +
-                    ", ln=" + ln +
-                    ", index=" + index +
-                    '}';
+                   "line='" + line + '\'' +
+                   ", startPos=" + startPos +
+                   ", endPos=" + endPos +
+                   ", contentStartPos=" + contentStartPos +
+                   ", lheadType=" + lheadType +
+                   ", ln=" + ln +
+                   ", index=" + index +
+                   '}';
         }
     }
 

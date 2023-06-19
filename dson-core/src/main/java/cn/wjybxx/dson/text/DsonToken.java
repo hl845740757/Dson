@@ -92,9 +92,9 @@ public class DsonToken {
     @Override
     public String toString() {
         return "DsonToken{" +
-                "type=" + type +
-                ", value=" + value +
-                ", pos=" + pos +
-                '}';
+               "type=" + type +
+               ", value=" + value +
+               ", pos=" + pos +
+               '}';
     }
 }

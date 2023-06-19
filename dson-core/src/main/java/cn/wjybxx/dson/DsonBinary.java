@@ -101,9 +101,9 @@ public class DsonBinary extends DsonValue {
     @Override
     public String toString() {
         return "DsonBinary{" +
-                "type=" + type +
-                ", data=" + Arrays.toString(data) +
-                '}';
+               "type=" + type +
+               ", data=" + Arrays.toString(data) +
+               '}';
     }
 
 }

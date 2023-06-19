@@ -71,7 +71,7 @@ public class BinaryUtils {
 
     public static short getShort(byte[] buffer, int index) {
         return (short) ((buffer[index] << 8)
-                | (buffer[index + 1] & 0xff));
+                        | (buffer[index + 1] & 0xff));
     }
 
     public static void setInt(byte[] buffer, int index, int value) {
@@ -120,7 +120,7 @@ public class BinaryUtils {
 
     public static short getShortLE(byte[] buffer, int index) {
         return (short) ((buffer[index] & 0xff)
-                | (buffer[index + 1] << 8));
+                        | (buffer[index + 1] << 8));
     }
 
     public static void setIntLE(byte[] buffer, int index, int value) {

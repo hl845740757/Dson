@@ -462,7 +462,7 @@ public class DsonTextReader extends AbstractDsonReader {
                 case OffsetTimestamp.NAMES_NANOS -> {
                     DsonToken valueToken = popToken();
                     ensureStringsToken(context, valueToken);
-                    nanos = Integer.parseInt(valueToken.castAsString());
+                    nanos = DsonTexts.parseInt(valueToken.castAsString());
                     if (nanos < 0) {
                         throw new IllegalArgumentException("invalid nanos " + valueToken);
                     }
@@ -470,7 +470,7 @@ public class DsonTextReader extends AbstractDsonReader {
                 case OffsetTimestamp.NAMES_MILLIS -> {
                     DsonToken valueToken = popToken();
                     ensureStringsToken(context, valueToken);
-                    int millis = Integer.parseInt(valueToken.castAsString());
+                    int millis = DsonTexts.parseInt(valueToken.castAsString());
                     if (millis < 0 || millis > 999) {
                         throw new IllegalArgumentException("invalid millis " + valueToken);
                     }
@@ -536,7 +536,7 @@ public class DsonTextReader extends AbstractDsonReader {
         // 每读取一个值，判断下分隔符，尾部最多只允许一个逗号 -- 这里在尾部更容易处理
         DsonToken keyToken;
         if ((keyToken = popToken()).getType() == TokenType.COMMA
-                && (keyToken = popToken()).getType() == TokenType.COMMA) {
+            && (keyToken = popToken()).getType() == TokenType.COMMA) {
             throw DsonIOException.invalidTokenType(context.contextType, keyToken);
         } else {
             pushToken(keyToken);

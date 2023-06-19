@@ -17,6 +17,7 @@
 package cn.wjybxx.dson;
 
 import cn.wjybxx.dson.io.Chunk;
+import cn.wjybxx.dson.text.NumberStyle;
 import cn.wjybxx.dson.text.ObjectStyle;
 import cn.wjybxx.dson.text.StringStyle;
 import cn.wjybxx.dson.types.ObjectRef;
@@ -57,15 +58,14 @@ public interface DsonLiteWriter extends AutoCloseable {
 
     // region 简单值
 
+    void writeInt32(int name, int value, WireType wireType, NumberStyle style);
+
+    void writeInt64(int name, long value, WireType wireType, NumberStyle style);
+
     /**
-     * @param stronglyTyped 是否输出为强类型的；该值主要用于减少满屏的 @ 标签；
-     *                      通常你只应该在外部存在类定义的情况下该值传入false；否则可能导致解码类型不一致。
+     * @param style 浮点数仅支持{@link NumberStyle#SIMPLE}和{@link NumberStyle#TYPED}
      */
-    void writeInt32(int name, int value, WireType wireType, boolean stronglyTyped);
-
-    void writeInt64(int name, long value, WireType wireType, boolean stronglyTyped);
-
-    void writeFloat(int name, float value, boolean stronglyTyped);
+    void writeFloat(int name, float value, NumberStyle style);
 
     void writeDouble(int name, double value);
 

@@ -183,7 +183,7 @@ public class JsonBuffer implements DsonBuffer {
                     continue;
                 }
                 lines.add(new LineInfo(startPos, endPos, startPos,
-                        LheadType.APPEND_LINE, ln, lines.size()));
+                        LheadType.NORMAL, ln, lines.size()));
                 break;
             }
             endPos++;

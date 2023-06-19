@@ -1,6 +1,7 @@
 package cn.wjybxx.dson;
 
 import cn.wjybxx.dson.text.DsonTextWriterSettings;
+import cn.wjybxx.dson.text.ObjectStyle;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -11,10 +12,10 @@ import org.junit.jupiter.api.Test;
 public class DsonTextReaderTest2 {
 
     private static final String dsonString = """
-            -- {@{clsName: MyClassInfo, guid: 10001, flags: 0}
-            --     name: wjybxx,
+            -- {@{clsName:MyClassInfo, guid :10001, flags: 0}
+            --     name : wjybxx,
             --     age: 28,
-            --     pos: {@Vector3 x: 0, y: 0, z: 0},
+            --     pos :{@Vector3 x: 0, y: 0, z: 0},
             --     address: [
             --         beijing,
             --         chengdu,
@@ -31,7 +32,7 @@ public class DsonTextReaderTest2 {
     @Test
     void test() {
         DsonObject<String> dsonObject = Dsons.fromDson(dsonString).asObject();
-        String dsonString2 = Dsons.toDson(dsonObject, DsonTextWriterSettings.newBuilder()
+        String dsonString2 = Dsons.toDson(dsonObject, ObjectStyle.INDENT, DsonTextWriterSettings.newBuilder()
                 .setSoftLineLength(50)
                 .setLengthFactorOfText(1)
                 .build());
@@ -41,4 +42,10 @@ public class DsonTextReaderTest2 {
         Assertions.assertEquals(dsonObject, dsonObject2);
     }
 
+    @Test
+    void testNumber() {
+        String numberString = "-- {value:@i 0xFF, value1 : @i 0b10010001, value2 :@d Infinity, value3: @d NaN, value4: @i 100_000_000}";
+        DsonValue value = Dsons.fromDson(numberString);
+        System.out.println(Dsons.toDson(value, ObjectStyle.FLOW));
+    }
 }

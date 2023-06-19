@@ -1,6 +1,7 @@
 package cn.wjybxx.dson;
 
 import cn.wjybxx.dson.io.Chunk;
+import cn.wjybxx.dson.text.NumberStyle;
 import cn.wjybxx.dson.text.ObjectStyle;
 import cn.wjybxx.dson.text.StringStyle;
 import cn.wjybxx.dson.types.ObjectRef;
@@ -41,17 +42,17 @@ public class DsonObjectWriter extends AbstractDsonWriter {
     //
 
     @Override
-    protected void doWriteInt32(int value, WireType wireType, boolean stronglyTyped) {
+    protected void doWriteInt32(int value, WireType wireType, NumberStyle style) {
         getContext().add(new DsonInt32(value));
     }
 
     @Override
-    protected void doWriteInt64(long value, WireType wireType, boolean stronglyTyped) {
+    protected void doWriteInt64(long value, WireType wireType, NumberStyle style) {
         getContext().add(new DsonInt64(value));
     }
 
     @Override
-    protected void doWriteFloat(float value, boolean stronglyTyped) {
+    protected void doWriteFloat(float value, NumberStyle style) {
         getContext().add(new DsonFloat(value));
     }
 

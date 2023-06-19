@@ -96,9 +96,6 @@ public class OffsetTimestamp {
     }
 
     public OffsetDateTime toOffsetDateTime() {
-        if (!hasDate() || !hasTime()) {
-            throw new IllegalStateException("this timestamp is not a datetime");
-        }
         return OffsetDateTime.ofInstant(Instant.ofEpochSecond(seconds, nanos),
                 ZoneOffset.ofTotalSeconds(offset));
     }

@@ -84,7 +84,7 @@ public class DsonFloat extends DsonNumber implements Comparable<DsonFloat> {
     @Override
     public String toString() {
         return "DsonFloat{" +
-                "value=" + value +
-                '}';
+               "value=" + value +
+               '}';
     }
 }

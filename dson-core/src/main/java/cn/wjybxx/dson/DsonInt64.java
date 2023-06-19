@@ -84,7 +84,7 @@ public class DsonInt64 extends DsonNumber implements Comparable<DsonInt64> {
     @Override
     public String toString() {
         return "DsonInt64{" +
-                "value=" + value +
-                '}';
+               "value=" + value +
+               '}';
     }
 }

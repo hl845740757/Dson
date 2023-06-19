@@ -17,7 +17,6 @@
 package cn.wjybxx.dson.types;
 
 import cn.wjybxx.dson.DsonLites;
-import cn.wjybxx.dson.FieldNumber;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.concurrent.Immutable;
@@ -106,11 +105,11 @@ public final class ObjectRef {
     @Override
     public String toString() {
         return "ObjectRef{" +
-                "namespace='" + namespace + '\'' +
-                ", localId='" + localId + '\'' +
-                ", type=" + type +
-                ", policy=" + policy +
-                '}';
+               "namespace='" + namespace + '\'' +
+               ", localId='" + localId + '\'' +
+               ", type=" + type +
+               ", policy=" + policy +
+               '}';
     }
 
     // ref常见属性名

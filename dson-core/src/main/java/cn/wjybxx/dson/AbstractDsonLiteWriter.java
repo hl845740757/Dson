@@ -20,6 +20,7 @@ import cn.wjybxx.dson.internal.DsonReaderUtils;
 import cn.wjybxx.dson.internal.Preconditions;
 import cn.wjybxx.dson.io.Chunk;
 import cn.wjybxx.dson.io.DsonIOException;
+import cn.wjybxx.dson.text.NumberStyle;
 import cn.wjybxx.dson.text.ObjectStyle;
 import cn.wjybxx.dson.text.StringStyle;
 import cn.wjybxx.dson.types.ObjectRef;
@@ -126,23 +127,23 @@ public abstract class AbstractDsonLiteWriter implements DsonLiteWriter {
 
     // region 简单值
     @Override
-    public void writeInt32(int name, int value, WireType wireType, boolean stronglyTyped) {
+    public void writeInt32(int name, int value, WireType wireType, NumberStyle style) {
         advanceToValueState(name);
-        doWriteInt32(value, wireType, stronglyTyped);
+        doWriteInt32(value, wireType, style);
         setNextState();
     }
 
     @Override
-    public void writeInt64(int name, long value, WireType wireType, boolean stronglyTyped) {
+    public void writeInt64(int name, long value, WireType wireType, NumberStyle style) {
         advanceToValueState(name);
-        doWriteInt64(value, wireType, stronglyTyped);
+        doWriteInt64(value, wireType, style);
         setNextState();
     }
 
     @Override
-    public void writeFloat(int name, float value, boolean stronglyTyped) {
+    public void writeFloat(int name, float value, NumberStyle style) {
         advanceToValueState(name);
-        doWriteFloat(value, stronglyTyped);
+        doWriteFloat(value, style);
         setNextState();
     }
 
@@ -231,11 +232,11 @@ public abstract class AbstractDsonLiteWriter implements DsonLiteWriter {
         setNextState();
     }
 
-    protected abstract void doWriteInt32(int value, WireType wireType, boolean stronglyTyped);
+    protected abstract void doWriteInt32(int value, WireType wireType, NumberStyle style);
 
-    protected abstract void doWriteInt64(long value, WireType wireType, boolean stronglyTyped);
+    protected abstract void doWriteInt64(long value, WireType wireType, NumberStyle style);
 
-    protected abstract void doWriteFloat(float value, boolean stronglyTyped);
+    protected abstract void doWriteFloat(float value, NumberStyle style);
 
     protected abstract void doWriteDouble(double value);
 
@@ -318,7 +319,7 @@ public abstract class AbstractDsonLiteWriter implements DsonLiteWriter {
 
     private void autoStartTopLevel(Context context) {
         if (context.contextType == DsonContextType.TOP_LEVEL
-                && context.state == DsonWriterState.INITIAL) {
+            && context.state == DsonWriterState.INITIAL) {
             context.setState(DsonWriterState.VALUE);
         }
     }

@@ -100,10 +100,10 @@ public final class ObjectHeader {
     @Override
     public String toString() {
         return "ObjectHeader{" +
-                "className='" + className + '\'' +
-                ", compClassName='" + compClassName + '\'' +
-                ", localId='" + localId + '\'' +
-                ", tags=" + tags +
-                '}';
+               "className='" + className + '\'' +
+               ", compClassName='" + compClassName + '\'' +
+               ", localId='" + localId + '\'' +
+               ", tags=" + tags +
+               '}';
     }
 }

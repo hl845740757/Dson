@@ -85,7 +85,7 @@ public class DsonDouble extends DsonNumber implements Comparable<DsonDouble> {
     @Override
     public String toString() {
         return "DsonDouble{" +
-                "value=" + value +
-                '}';
+               "value=" + value +
+               '}';
     }
 }

@@ -62,13 +62,13 @@ public class DsonTexts {
 
     // 行首标签
     public static final String LHEAD_COMMENT = "#";
-    public static final String LHEAD_APPEND_LINE = "--";
+    public static final String LHEAD_NORMAL = "--";
     public static final String LHEAD_APPEND = "-|";
-    public static final String LHEAD_APPEND_TEXT_LINE = "->";
+    public static final String LHEAD_LINE = "->";
     public static final int CONTENT_LHEAD_LENGTH = 2;
 
-    public static final Set<String> ALL_LHEAD_SET = Set.of(LHEAD_COMMENT, LHEAD_APPEND_LINE, LHEAD_APPEND, LHEAD_APPEND_TEXT_LINE);
-    public static final Set<String> CONTENT_LHEAD_SET = Set.of(LHEAD_APPEND_LINE, LHEAD_APPEND, LHEAD_APPEND_TEXT_LINE);
+    public static final Set<String> ALL_LHEAD_SET = Set.of(LHEAD_COMMENT, LHEAD_NORMAL, LHEAD_APPEND, LHEAD_LINE);
+    public static final Set<String> CONTENT_LHEAD_SET = Set.of(LHEAD_NORMAL, LHEAD_APPEND, LHEAD_LINE);
 
     /** 有特殊含义的字符串 */
     private static final Set<String> PARSABLE_STRINGS = Set.of("true", "false",
@@ -156,23 +156,48 @@ public class DsonTexts {
     }
 
     public static int parseInt(String str) {
-        if (str.startsWith("0x") || str.startsWith("0X")) {
+        if (str.indexOf('_') >= 0) {
+            str = replaceUnderline(str);
+        }
+        if (str.startsWith("0x")) {
             return Integer.parseInt(str, 2, str.length(), 16);
         }
-        if (str.startsWith("-0x") || str.startsWith("-0X")) {
+        if (str.startsWith("-0x")) {
             return Integer.parseInt(str, 3, str.length(), 16);
+        }
+        if (str.startsWith("0b")) {
+            return Integer.parseInt(str, 2, str.length(), 2);
+        }
+        if (str.startsWith("-0b")) {
+            return Integer.parseInt(str, 3, str.length(), 2);
         }
         return Integer.parseInt(str);
     }
 
     public static long parseLong(String str) {
-        if (str.startsWith("0x") || str.startsWith("0X")) {
+        if (str.indexOf('_') >= 0) {
+            str = replaceUnderline(str);
+        }
+        if (str.startsWith("0x")) {
             return Long.parseLong(str, 2, str.length(), 16);
         }
-        if (str.startsWith("-0x") || str.startsWith("-0X")) {
+        if (str.startsWith("-0x")) {
             return Long.parseLong(str, 3, str.length(), 16);
         }
+        if (str.startsWith("0b")) {
+            return Long.parseLong(str, 2, str.length(), 2);
+        }
+        if (str.startsWith("-0b")) {
+            return Long.parseLong(str, 3, str.length(), 2);
+        }
         return Long.parseLong(str);
+    }
+
+    private static String replaceUnderline(String str) {
+        if (str.charAt(0) == '-' || str.charAt(str.length() - 1) == '_') {
+            throw new NumberFormatException(str);
+        }
+        return str.replace("_", "");
     }
 
     public static float parseFloat(String str) {

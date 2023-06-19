@@ -284,17 +284,17 @@ public final class Dsons {
         };
     }
 
-    public static String toDson(DsonValue dsonValue) {
-        return toDson(dsonValue, DsonTextWriterSettings.newBuilder().build());
+    public static String toDson(DsonValue dsonValue, ObjectStyle style) {
+        return toDson(dsonValue, style, DsonTextWriterSettings.newBuilder().build());
     }
 
-    public static String toDson(DsonValue dsonValue, DsonTextWriterSettings settings) {
+    public static String toDson(DsonValue dsonValue, ObjectStyle style, DsonTextWriterSettings settings) {
         if (!dsonValue.getDsonType().isContainer()) {
             throw new IllegalArgumentException("invalid dsonType " + dsonValue.getDsonType());
         }
         StringWriter stringWriter = new StringWriter(1024);
         try (DsonTextWriter writer = new DsonTextWriter(16, stringWriter, settings)) {
-            writeTopDsonValue(writer, dsonValue, ObjectStyle.INDENT);
+            writeTopDsonValue(writer, dsonValue, style);
         }
         return stringWriter.toString();
     }

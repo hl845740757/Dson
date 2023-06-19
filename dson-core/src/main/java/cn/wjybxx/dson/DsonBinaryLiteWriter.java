@@ -19,6 +19,7 @@ package cn.wjybxx.dson;
 import cn.wjybxx.dson.internal.DsonReaderUtils;
 import cn.wjybxx.dson.io.Chunk;
 import cn.wjybxx.dson.io.DsonOutput;
+import cn.wjybxx.dson.text.NumberStyle;
 import cn.wjybxx.dson.text.ObjectStyle;
 import cn.wjybxx.dson.text.StringStyle;
 import cn.wjybxx.dson.types.ObjectRef;
@@ -77,7 +78,7 @@ public class DsonBinaryLiteWriter extends AbstractDsonLiteWriter {
         if (dsonType != DsonType.HEADER) { // header是匿名属性
             Context context = getContext();
             if (context.contextType == DsonContextType.OBJECT
-                    || context.contextType == DsonContextType.HEADER) {
+                || context.contextType == DsonContextType.HEADER) {
                 output.writeUint32(context.curName);
             }
         }
@@ -87,21 +88,21 @@ public class DsonBinaryLiteWriter extends AbstractDsonLiteWriter {
     // region 简单值
 
     @Override
-    protected void doWriteInt32(int value, WireType wireType, boolean stronglyTyped) {
+    protected void doWriteInt32(int value, WireType wireType, NumberStyle style) {
         DsonOutput output = this.output;
         writeFullTypeAndCurrentName(output, DsonType.INT32, wireType);
         wireType.writeInt32(output, value);
     }
 
     @Override
-    protected void doWriteInt64(long value, WireType wireType, boolean stronglyTyped) {
+    protected void doWriteInt64(long value, WireType wireType, NumberStyle style) {
         DsonOutput output = this.output;
         writeFullTypeAndCurrentName(output, DsonType.INT64, wireType);
         wireType.writeInt64(output, value);
     }
 
     @Override
-    protected void doWriteFloat(float value, boolean stronglyTyped) {
+    protected void doWriteFloat(float value, NumberStyle style) {
         DsonOutput output = this.output;
         writeFullTypeAndCurrentName(output, DsonType.FLOAT, null);
         output.writeFloat(value);

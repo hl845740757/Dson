@@ -304,10 +304,10 @@ public class DsonScanner implements AutoCloseable {
         int c;
         while ((c = buffer.readSlowly()) != -1) {
             if (c == -2) { // 产生换行
-                if (buffer.lhead() == LheadType.APPEND_LINE) { // 读取结束
+                if (buffer.lhead() == LheadType.NORMAL) { // 读取结束
                     break;
                 }
-                if (buffer.lhead() == LheadType.APPEND_TEXT_LINE) { // 开启新行
+                if (buffer.lhead() == LheadType.APPEND_LINE) { // 开启新行
                     sb.append('\n');
                 }// else 行合并
             } else {
