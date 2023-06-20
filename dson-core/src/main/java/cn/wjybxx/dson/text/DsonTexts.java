@@ -62,13 +62,11 @@ public class DsonTexts {
 
     // 行首标签
     public static final String LHEAD_COMMENT = "#";
-    public static final String LHEAD_NORMAL = "--";
+    public static final String LHEAD_APPEND_LINE = "--";
     public static final String LHEAD_APPEND = "-|";
-    public static final String LHEAD_LINE = "->";
+    public static final String LHEAD_SWITCH_MODE = "-^";
+    public static final String LHEAD_END_OF_TEXT = "~~";
     public static final int CONTENT_LHEAD_LENGTH = 2;
-
-    public static final Set<String> ALL_LHEAD_SET = Set.of(LHEAD_COMMENT, LHEAD_NORMAL, LHEAD_APPEND, LHEAD_LINE);
-    public static final Set<String> CONTENT_LHEAD_SET = Set.of(LHEAD_NORMAL, LHEAD_APPEND, LHEAD_LINE);
 
     /** 有特殊含义的字符串 */
     private static final Set<String> PARSABLE_STRINGS = Set.of("true", "false",

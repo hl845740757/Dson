@@ -36,6 +36,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
 
 /**
+ * 测试编解码结果的一致性
+ *
  * @author wjybxx
  * date - 2023/6/3
  */
@@ -43,24 +45,7 @@ public class DsonReaderWriterTest {
 
     private static final int loop = 3;
     private List<DsonObject<String>> srcList;
-
-    private static final String dsonString = """
-            -- {@{clsName: MyClassInfo, guid: 10001, flags: 0}
-            --     name: wjybxx,
-            --     age: 28,
-            --     pos: {@Vector3 x: 0, y: 0, z: 0},
-            --     address: [
-            --         beijing,
-            --         chengdu,
-            --     ],
-            --     intro: @ss\s
-            -|     我是wjybxx，是一个游戏开发者，Dson是我设计的文档型数据表达法，
-            -| 你可以通过github联系到我。
-            ->     thanks
-            --   , url: @ss https://www.github.com/hl845740757
-            --   , time: {@dt date: 2023-06-17, time: 18:37:00,  millis: 100, offset: +08:00}
-            -- }
-            """;
+    private static final String dsonString = DsonTextReaderTest2.dsonString;
 
     @BeforeEach
     void initSrcList() {

@@ -186,10 +186,11 @@ public abstract class AbstractDsonBuffer<T extends LineInfo> implements DsonBuff
             throw new DsonParseException(String.format("The first indent char must be a space, ln: %d, char: '%c' ", ln, line.charAt(endIndex)));
         }
         String lhead = line.subSequence(startIndex, endIndex).toString();
-        if (DsonTexts.CONTENT_LHEAD_SET.contains(lhead)) {
-            return LheadType.ofLabel(lhead);
+        LheadType lheadType = LheadType.forLabel(lhead);
+        if (lheadType == null) {
+            throw new DsonParseException("Unknown head " + lhead);
         }
-        throw new DsonParseException("Unknown head " + lhead);
+        return lheadType;
     }
 
     /**
@@ -197,9 +198,8 @@ public abstract class AbstractDsonBuffer<T extends LineInfo> implements DsonBuff
      * @param endPos   exclusive 0-based
      */
     static int indexContentStart(CharSequence line, int startPos, int endPos) {
-        // 我们的内容label都是两个字符，都是 - 开头，且和内容之间一个空白字符
         int startIndex = startPos;
-        while (line.charAt(startIndex) != '-') {
+        while (startIndex < endPos && Character.isWhitespace(line.charAt(startIndex))) {
             startIndex++;
         }
         final int targetIndex = startIndex + DsonTexts.CONTENT_LHEAD_LENGTH + 1;

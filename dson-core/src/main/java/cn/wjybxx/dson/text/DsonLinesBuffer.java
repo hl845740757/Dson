@@ -36,7 +36,7 @@ public class DsonLinesBuffer extends AbstractDsonBuffer<DsonLinesBuffer.LocalLin
     }
 
     public static DsonLinesBuffer ofJson(String json) {
-        List<String> lines = json.lines().map(e -> "-- " + e)
+        List<String> lines = json.lines().map(e -> DsonTexts.LHEAD_APPEND + " " + e)
                 .collect(Collectors.toList());
         return new DsonLinesBuffer(lines);
     }

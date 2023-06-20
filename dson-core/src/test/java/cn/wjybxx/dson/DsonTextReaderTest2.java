@@ -11,21 +11,21 @@ import org.junit.jupiter.api.Test;
  */
 public class DsonTextReaderTest2 {
 
-    private static final String dsonString = """
+    static final String dsonString = """
             -- {@{clsName:MyClassInfo, guid :10001, flags: 0}
-            --     name : wjybxx,
-            --     age: 28,
-            --     pos :{@Vector3 x: 0, y: 0, z: 0},
-            --     address: [
-            --         beijing,
-            --         chengdu,
-            --     ],
-            --     intro: @ss\s
-            -|     我是wjybxx，是一个游戏开发者，Dson是我设计的文档型数据表达法，
+            --   name : wjybxx,
+            --   age: 28,
+            --   pos :{@Vector3 x: 0, y: 0, z: 0},
+            --   address: [
+            --     beijing,
+            --     chengdu
+            --   ],
+            --   intro: @ss\s
+            -|   我是wjybxx，是一个游戏开发者，Dson是我设计的文档型数据表达法，
             -| 你可以通过github联系到我。
-            ->     thanks
-            --   , url: @ss https://www.github.com/hl845740757
-            --   , time: {@dt date: 2023-06-17, time: 18:37:00,  millis: 100, offset: +08:00}
+            --   thanks
+            ~~   , url: @ss https://www.github.com/hl845740757
+            ~~   , time: {@dt date: 2023-06-17, time: 18:37:00,  millis: 100, offset: +08:00}
             -- }
             """;
 

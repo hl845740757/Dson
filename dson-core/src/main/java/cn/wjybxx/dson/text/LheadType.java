@@ -24,15 +24,14 @@ public enum LheadType {
 
     /** 注释 */
     COMMENT(DsonTexts.LHEAD_COMMENT),
-
-    /** 普通行 */
-    NORMAL(DsonTexts.LHEAD_NORMAL),
-
+    /** 添加新行 */
+    APPEND_LINE(DsonTexts.LHEAD_APPEND_LINE),
     /** 与上一行合并 */
     APPEND(DsonTexts.LHEAD_APPEND),
-
-    /** 文本段中开启新行 */
-    APPEND_LINE(DsonTexts.LHEAD_LINE);
+    /** 切换模式 */
+    SWITCH_MODE(DsonTexts.LHEAD_SWITCH_MODE),
+    /** 文本输入结束 */
+    END_OF_TEXT(DsonTexts.LHEAD_END_OF_TEXT);
 
     public final String label;
 
@@ -40,13 +39,14 @@ public enum LheadType {
         this.label = label;
     }
 
-    public static LheadType ofLabel(String label) {
+    public static LheadType forLabel(String label) {
         return switch (label) {
             case DsonTexts.LHEAD_COMMENT -> COMMENT;
-            case DsonTexts.LHEAD_NORMAL -> NORMAL;
+            case DsonTexts.LHEAD_APPEND_LINE -> APPEND_LINE;
             case DsonTexts.LHEAD_APPEND -> APPEND;
-            case DsonTexts.LHEAD_LINE -> APPEND_LINE;
-            default -> throw new IllegalArgumentException("invalid label: " + label);
+            case DsonTexts.LHEAD_SWITCH_MODE -> SWITCH_MODE;
+            case DsonTexts.LHEAD_END_OF_TEXT -> END_OF_TEXT;
+            default -> null;
         };
     }
 

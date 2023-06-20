@@ -31,8 +31,14 @@ public class Json2DsonTest {
 
     private static final String jsonString = """
             {
-             "name":"wjybxx",
-             "age" : 28
+                "Name":"C语言中文网",
+                "Url":"http://c.biancheng.net/",
+                "Tutorial":"JSON",
+                "Article":[
+                    "JSON 是什么？",
+                    "JSONP 是什么？",
+                    "JSON 语法规则"
+                ]
             }
             """;
 
