@@ -15,7 +15,7 @@
 
     <modules>
         <module>dson-core</module>
-        <module>dson-codec</module>
+<!--        <module>dson-codec</module>-->
     </modules>
 
     <!-- 证书 -->

@@ -1,5 +1,6 @@
 package cn.wjybxx.dson;
 
+import cn.wjybxx.dson.text.NumberStyle;
 import cn.wjybxx.dson.text.ObjectStyle;
 import cn.wjybxx.dson.text.StringStyle;
 
@@ -186,9 +187,9 @@ public class DsonLites {
             writer.writeName(name);
         }
         switch (dsonValue.getDsonType()) {
-            case INT32 -> writer.writeInt32(name, dsonValue.asInt32().getValue(), WireType.VARINT, true);
-            case INT64 -> writer.writeInt64(name, dsonValue.asInt64().getValue(), WireType.VARINT, true);
-            case FLOAT -> writer.writeFloat(name, dsonValue.asFloat().getValue(), true);
+            case INT32 -> writer.writeInt32(name, dsonValue.asInt32().getValue(), WireType.VARINT, NumberStyle.TYPED);
+            case INT64 -> writer.writeInt64(name, dsonValue.asInt64().getValue(), WireType.VARINT, NumberStyle.TYPED);
+            case FLOAT -> writer.writeFloat(name, dsonValue.asFloat().getValue(), NumberStyle.TYPED);
             case DOUBLE -> writer.writeDouble(name, dsonValue.asDouble().getValue());
             case BOOLEAN -> writer.writeBoolean(name, dsonValue.asBoolean().getValue());
             case STRING -> writer.writeString(name, dsonValue.asString().getValue(), StringStyle.AUTO);

@@ -230,8 +230,12 @@ public class DsonScanner implements AutoCloseable {
     private String scanString(char quoteChar) {
         StringBuilder sb = allocStringBuilder();
         while (true) {
-            int c = buffer.read();
-            if (c == '\\') { // 处理转义字符
+            int c = buffer.readSlowly();
+            if (c == -2) {
+                if (buffer.lhead()==LheadType.APPEND_LINE) {
+                    sb.append('\n');
+                }
+            } else if (c == '\\') { // 处理转义字符
                 c = buffer.read();
                 switch (c) {
                     case '"' -> sb.append('"'); // 双引号字符串下，双引号需要转义
@@ -296,10 +300,9 @@ public class DsonScanner implements AutoCloseable {
         // ss的下一行通常是合并行，如果允许换行符代替空格缩进，将与行首规则冲突
         DsonBuffer buffer = this.buffer;
         int indentChar = buffer.readSlowly();
-        if (!Character.isWhitespace(indentChar)) {
+        if (indentChar != ' ') {
             throw spaceRequired(indentChar, getPosition());
         }
-
         StringBuilder sb = allocStringBuilder();
         int c;
         while ((c = buffer.readSlowly()) != -1) {

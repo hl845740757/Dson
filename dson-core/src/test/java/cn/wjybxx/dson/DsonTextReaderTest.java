@@ -38,7 +38,11 @@ public class DsonTextReaderTest {
             -- \tintro: "hello world",
             -- \tref1 : {@ref localId: 10001, namespace: 16148b3b4e7b8923d398},
             -- \tref2 : @ref 17630eb4f916148b,
-            -- \tbin : [@bin 0, 35df2e75e6a4be9e6f4571c64cb6d08b]
+            -- \tbin : [@bin 0, 35df2e75e6a4be9e6f4571c64cb6d08b],
+            -- \tstr :\s
+            -- "abcdefg,
+            -> hijkfg,
+            -> uvw,xyz"
             -- }
             --
             -- {@MyStruct\s
