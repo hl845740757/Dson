@@ -85,7 +85,7 @@ public class DsonTextWriter extends AbstractDsonWriter {
                 // 首行不换行
                 printer.printLhead(LheadType.APPEND_LINE);
             } else if (onlyLhead) {
-                // 文本结束行不换行
+                // 文本结束行不换行 - 少打印一个空格
                 printer.printIndent(1);
             } else if (context.style == ObjectStyle.INDENT) {
                 // 正常缩进
@@ -113,17 +113,21 @@ public class DsonTextWriter extends AbstractDsonWriter {
      * 不能无引号的情况下只回退为双引号模式；通常用于打印短字符串
      */
     private void printStringNonSS(DsonPrinter printer, String text) {
-        if (DsonTexts.canUnquoteString(text) && DsonTexts.isASCIIText(text)) {
+        if (canPrintDirectly(text)) {
             printer.print(text);
         } else {
             printEscaped(text);
         }
     }
 
+    private boolean canPrintDirectly(String text) {
+        return DsonTexts.canUnquoteString(text) && (!settings.unicodeChar || DsonTexts.isASCIIText(text));
+    }
+
     private void printString(DsonPrinter printer, String value, StringStyle style) {
         switch (style) {
             case AUTO -> {
-                if (DsonTexts.canUnquoteString(value) && DsonTexts.isASCIIText(value)) {
+                if (canPrintDirectly(value)) {
                     printer.print(value);
                 } else if (!settings.enableText || value.length() < settings.softLineLength * settings.lengthFactorOfText) {
                     printEscaped(value);
@@ -483,7 +487,7 @@ public class DsonTextWriter extends AbstractDsonWriter {
         if (context.style == ObjectStyle.INDENT) {
             printer.retract();
             // 打印了内容的情况下才换行结束
-            if (!isOnlyLhead(printer) && context.headerCount > 0 || context.count > 0) {
+            if (!isOnlyLhead(printer) && (context.headerCount > 0 || context.count > 0)) {
                 printer.println();
                 printer.printLhead(LheadType.APPEND_LINE);
                 printer.printIndent();

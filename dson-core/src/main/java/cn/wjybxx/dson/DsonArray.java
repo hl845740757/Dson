@@ -16,6 +16,8 @@
 
 package cn.wjybxx.dson;
 
+import cn.wjybxx.dson.internal.InternalUtils;
+
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,19 +33,19 @@ public class DsonArray<K> extends DsonListAdapter implements RandomAccess {
     private final DsonHeader<K> header;
 
     public DsonArray() {
-        this(new ArrayList<>(), ImmutableDsons.POLICY_DEFAULT, new DsonHeader<>());
+        this(new ArrayList<>(), InternalUtils.POLICY_DEFAULT, new DsonHeader<>());
     }
 
     public DsonArray(int initCapacity) {
-        this(new ArrayList<>(initCapacity), ImmutableDsons.POLICY_DEFAULT, new DsonHeader<>());
+        this(new ArrayList<>(initCapacity), InternalUtils.POLICY_DEFAULT, new DsonHeader<>());
     }
 
     public DsonArray(int initCapacity, DsonHeader<K> header) {
-        this(new ArrayList<>(initCapacity), ImmutableDsons.POLICY_DEFAULT, header);
+        this(new ArrayList<>(initCapacity), InternalUtils.POLICY_DEFAULT, header);
     }
 
     public DsonArray(DsonArray<K> src) {
-        this(src.values, ImmutableDsons.POLICY_COPY, new DsonHeader<>(src.getHeader()));
+        this(src.values, InternalUtils.POLICY_COPY, new DsonHeader<>(src.getHeader()));
     }
 
     private DsonArray(List<DsonValue> values, int policy, DsonHeader<K> header) {
@@ -52,11 +54,11 @@ public class DsonArray<K> extends DsonListAdapter implements RandomAccess {
     }
 
     //
-    private static final DsonArray<?> EMPTY = new DsonArray<>(List.of(), ImmutableDsons.POLICY_IMMUTABLE,
+    private static final DsonArray<?> EMPTY = new DsonArray<>(List.of(), InternalUtils.POLICY_IMMUTABLE,
             DsonHeader.empty());
 
     public static <K> DsonArray<K> toImmutable(DsonArray<K> src) {
-        return new DsonArray<>(src.values, ImmutableDsons.POLICY_IMMUTABLE,
+        return new DsonArray<>(src.values, InternalUtils.POLICY_IMMUTABLE,
                 DsonHeader.toImmutable(src.getHeader()));
     }
 

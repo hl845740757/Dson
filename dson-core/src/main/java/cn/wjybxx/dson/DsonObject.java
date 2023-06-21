@@ -16,6 +16,8 @@
 
 package cn.wjybxx.dson;
 
+import cn.wjybxx.dson.internal.InternalUtils;
+
 import javax.annotation.Nonnull;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -30,19 +32,19 @@ public class DsonObject<K> extends DsonMapAdapter<K> {
     private final DsonHeader<K> header;
 
     public DsonObject() {
-        this(new LinkedHashMap<>(8), ImmutableDsons.POLICY_DEFAULT, new DsonHeader<>());
+        this(new LinkedHashMap<>(8), InternalUtils.POLICY_DEFAULT, new DsonHeader<>());
     }
 
     public DsonObject(int expectedSize) {
-        this(new LinkedHashMap<>(expectedSize), ImmutableDsons.POLICY_DEFAULT, new DsonHeader<>());
+        this(new LinkedHashMap<>(expectedSize), InternalUtils.POLICY_DEFAULT, new DsonHeader<>());
     }
 
     public DsonObject(int expectedSize, DsonHeader<K> header) {
-        this(new LinkedHashMap<>(expectedSize), ImmutableDsons.POLICY_DEFAULT, header);
+        this(new LinkedHashMap<>(expectedSize), InternalUtils.POLICY_DEFAULT, header);
     }
 
     public DsonObject(DsonObject<K> src) {
-        this(src.valueMap, ImmutableDsons.POLICY_COPY, new DsonHeader<>(src.getHeader()));
+        this(src.valueMap, InternalUtils.POLICY_COPY, new DsonHeader<>(src.getHeader()));
     }
 
     private DsonObject(Map<K, DsonValue> valueMap, int policy, DsonHeader<K> header) {
@@ -51,7 +53,7 @@ public class DsonObject<K> extends DsonMapAdapter<K> {
     }
 
     //
-    private static final DsonObject<?> EMPTY = new DsonObject<>(Map.of(), ImmutableDsons.POLICY_IMMUTABLE,
+    private static final DsonObject<?> EMPTY = new DsonObject<>(Map.of(), InternalUtils.POLICY_IMMUTABLE,
             DsonHeader.empty());
 
     /**
@@ -59,7 +61,7 @@ public class DsonObject<K> extends DsonMapAdapter<K> {
      * 暂时未实现为深度的不可变，存在一些困难，主要是相互引用的问题
      */
     public static <K> DsonObject<K> toImmutable(DsonObject<K> src) {
-        return new DsonObject<>(src.valueMap, ImmutableDsons.POLICY_IMMUTABLE,
+        return new DsonObject<>(src.valueMap, InternalUtils.POLICY_IMMUTABLE,
                 DsonHeader.toImmutable(src.getHeader()));
     }
 

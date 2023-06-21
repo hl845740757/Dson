@@ -17,10 +17,9 @@
 package cn.wjybxx.dson.text;
 
 import cn.wjybxx.dson.io.DsonIOException;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
-import it.unimi.dsi.fastutil.ints.IntSet;
 import org.apache.commons.lang3.math.NumberUtils;
 
+import java.util.BitSet;
 import java.util.Set;
 
 /**
@@ -73,28 +72,28 @@ public class DsonTexts {
             "null", "undefine",
             "NaN", "Infinity", "-Infinity");
 
-    /** 规定哪些不安全较为容易，规定哪些安全反而不容易 */
-    private static final IntSet unsafeCharSet;
+    /**
+     * 规定哪些不安全较为容易，规定哪些安全反而不容易
+     * 这些字符都是128内，使用bitset很快，还可以避免第三方依赖
+     */
+    private static final BitSet unsafeCharSet = new BitSet(128);
 
     static {
         char[] tokenCharArray = "{}[],:\"@\\".toCharArray();
         // 圆括号、单引号
         char[] reservedCharArray = "()'".toCharArray();
-        IntArrayList intChars = new IntArrayList();
-        addAll(intChars, tokenCharArray);
-        addAll(intChars, reservedCharArray);
-        unsafeCharSet = IntSet.of(intChars.toIntArray());
-    }
 
-    private static void addAll(IntArrayList src, char[] target) {
-        for (char c : target) {
-            src.add(c);
+        for (char c : tokenCharArray) {
+            unsafeCharSet.set(c);
+        }
+        for (char c : reservedCharArray) {
+            unsafeCharSet.set(c);
         }
     }
 
     /** 是否是不安全的字符，不能省略引号的字符 */
     public static boolean isUnsafeStringChar(int c) {
-        return Character.isWhitespace(c) || unsafeCharSet.contains(c);
+        return unsafeCharSet.get(c) || Character.isWhitespace(c);
     }
 
     /**
@@ -103,7 +102,7 @@ public class DsonTexts {
      * 因此不能因为每个字符安全，就认为整个字符串安全
      */
     public static boolean isSafeStringChar(int c) {
-        return !Character.isWhitespace(c) && !unsafeCharSet.contains(c);
+        return !unsafeCharSet.get(c) && !Character.isWhitespace(c);
     }
 
     /**

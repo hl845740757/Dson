@@ -1,5 +1,7 @@
 package cn.wjybxx.dson;
 
+import cn.wjybxx.dson.internal.InternalUtils;
+
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
@@ -15,7 +17,7 @@ public abstract class DsonListAdapter extends DsonValue implements List<DsonValu
     final List<DsonValue> values;
 
     DsonListAdapter(List<DsonValue> values, int policy) {
-        this.values = ImmutableDsons.resolveListPolicy(values, policy);
+        this.values = InternalUtils.resolveListPolicy(values, policy);
     }
 
     public List<DsonValue> getValues() {

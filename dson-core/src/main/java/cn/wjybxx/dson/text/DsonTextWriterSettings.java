@@ -54,11 +54,6 @@ public class DsonTextWriterSettings {
          */
         private int softLineLength = 120;
         /**
-         * 不可打印的ascii码字符是否转为unicode字符
-         * (ascii码32~126以外的字符)
-         */
-        private boolean unicodeChar = false;
-        /**
          * 是否支持纯文本模式
          * 如果{@link #unicodeChar}为true，该值通常需要关闭，text模式不会执行转义，也就不会处理unicode字符
          */
@@ -67,6 +62,12 @@ public class DsonTextWriterSettings {
          * 当字符串的长度达到 lineLength  * factor 触发text模式
          */
         private float lengthFactorOfText = 2;
+        /**
+         * 不可打印的ascii码字符是否转为unicode字符
+         * (ascii码32~126以外的字符)
+         * 通常用于非UTF8文本的移植
+         */
+        private boolean unicodeChar = false;
 
         private Builder() {
         }

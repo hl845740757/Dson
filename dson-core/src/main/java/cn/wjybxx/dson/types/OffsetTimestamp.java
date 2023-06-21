@@ -2,6 +2,7 @@ package cn.wjybxx.dson.types;
 
 import cn.wjybxx.dson.DsonLites;
 
+import javax.annotation.concurrent.Immutable;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 
@@ -11,7 +12,8 @@ import java.time.format.DateTimeFormatter;
  * @author wjybxx
  * date - 2023/6/17
  */
-public class OffsetTimestamp {
+@Immutable
+public final class OffsetTimestamp {
 
     public static final int MASK_DATE = 1 << 3;
     public static final int MASK_TIME = 1 << 2;
@@ -39,10 +41,13 @@ public class OffsetTimestamp {
         if (!isEnabled(MASK_DATE, enables) && !isEnabled(MASK_TIME, enables)) {
             throw new IllegalArgumentException("date and time are disabled");
         }
-        if (nanos < 0) throw new IllegalArgumentException("nanos cant be negative");
         if (offset != 0 && !isEnabled(MASK_OFFSET, enables)) {
             throw new IllegalArgumentException("offset is disable, but the value is not 0");
         }
+        if (nanos > 999_999_999 || nanos < 0) {
+            throw new IllegalArgumentException("nanos > 999999999 or < 0");
+        }
+
         this.seconds = seconds;
         this.nanos = nanos;
         this.offset = offset;

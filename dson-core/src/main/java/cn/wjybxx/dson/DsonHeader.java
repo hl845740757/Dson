@@ -16,9 +16,10 @@
 
 package cn.wjybxx.dson;
 
-import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
+import cn.wjybxx.dson.internal.InternalUtils;
 
 import javax.annotation.Nonnull;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -31,12 +32,11 @@ import java.util.Map;
 public class DsonHeader<K> extends DsonMapAdapter<K> {
 
     public DsonHeader() {
-        // ref结构体通常很小，适合Array结构
-        super(new Object2ObjectArrayMap<>(2), ImmutableDsons.POLICY_DEFAULT);
+        super(new LinkedHashMap<>(4), InternalUtils.POLICY_DEFAULT);
     }
 
     public DsonHeader(Map<K, DsonValue> valueMap) {
-        super(valueMap, ImmutableDsons.POLICY_COPY);
+        super(valueMap, InternalUtils.POLICY_COPY);
     }
 
     private DsonHeader(Map<K, DsonValue> valueMap, int policy) {
@@ -44,11 +44,11 @@ public class DsonHeader<K> extends DsonMapAdapter<K> {
     }
 
     public static <K> DsonHeader<K> toImmutable(DsonHeader<K> src) {
-        return new DsonHeader<>(src.valueMap, ImmutableDsons.POLICY_IMMUTABLE);
+        return new DsonHeader<>(src.valueMap, InternalUtils.POLICY_IMMUTABLE);
     }
 
     public static <K> DsonHeader<K> empty() {
-        return new DsonHeader<>(Map.of(), ImmutableDsons.POLICY_IMMUTABLE);
+        return new DsonHeader<>(Map.of(), InternalUtils.POLICY_IMMUTABLE);
     }
 
     //

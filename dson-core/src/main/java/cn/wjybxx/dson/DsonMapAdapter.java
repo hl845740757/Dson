@@ -1,6 +1,7 @@
 package cn.wjybxx.dson;
 
 import cn.wjybxx.dson.internal.CollectionUtils;
+import cn.wjybxx.dson.internal.InternalUtils;
 
 import java.util.*;
 
@@ -13,7 +14,7 @@ public abstract class DsonMapAdapter<K> extends DsonValue implements Map<K, Dson
     final Map<K, DsonValue> valueMap;
 
     DsonMapAdapter(Map<K, DsonValue> valueMap, int policy) {
-        this.valueMap = ImmutableDsons.resolveMapPolicy(valueMap, policy);
+        this.valueMap = InternalUtils.resolveMapPolicy(valueMap, policy);
     }
 
     static <K> void checkKeyValue(K key, DsonValue value) {

@@ -23,6 +23,12 @@
             <artifactId>dson-core</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/it.unimi.dsi/fastutil-core -->
+        <dependency>
+            <groupId>it.unimi.dsi</groupId>
+            <artifactId>fastutil-core</artifactId>
+            <version>${fastutil.version}</version>
+        </dependency>
     </dependencies>
 
 </project>
