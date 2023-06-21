@@ -12,21 +12,21 @@ import org.junit.jupiter.api.Test;
 public class DsonTextReaderTest2 {
 
     static final String dsonString = """
-            -- {@{clsName:MyClassInfo, guid :10001, flags: 0}
-            --   name : wjybxx,
-            --   age: 28,
-            --   pos :{@Vector3 x: 0, y: 0, z: 0},
-            --   address: [
-            --     beijing,
-            --     chengdu
-            --   ],
-            --   intro: @ss\s
-            -|   我是wjybxx，是一个游戏开发者，Dson是我设计的文档型数据表达法，
-            -| 你可以通过github联系到我。
-            --   thanks
-            ~~   , url: @ss https://www.github.com/hl845740757
-            ~~   , time: {@dt date: 2023-06-17, time: 18:37:00,  millis: 100, offset: +08:00}
-            -- }
+            - {@{clsName:MyClassInfo, guid :10001, flags: 0}
+            -   name : wjybxx,
+            -   age: 28,
+            -   pos :{@Vector3 x: 0, y: 0, z: 0},
+            -   address: [
+            -     beijing,
+            -     chengdu
+            -   ],
+            -   intro: @ss\s
+            |   我是wjybxx，是一个游戏开发者，Dson是我设计的文档型数据表达法，
+            | 你可以通过github联系到我。
+            -   thanks
+            ~   , url: @ss https://www.github.com/hl845740757
+            ~   , time: {@dt date: 2023-06-17, time: 18:37:00,  millis: 100, offset: +08:00}
+            - }
             """;
 
     @Test
@@ -42,10 +42,21 @@ public class DsonTextReaderTest2 {
         Assertions.assertEquals(dsonObject, dsonObject2);
     }
 
+    static final String numberString = """
+            - {
+            - value1: 10001,\s
+            - value2: 1.0E-6,
+            - value3: @i 0xFF,\s
+            - value4: @i 0b10010001,
+            - value5: @d Infinity,\s
+            - value6: @d NaN,\s
+            - value7: @i 100_000_000
+            - }
+            """;
+
     @Test
     void testNumber() {
-        String numberString = "-- {value:@i 0xFF, value1 : @i 0b10010001, value2 :@d Infinity, value3: @d NaN, value4: @i 100_000_000}";
         DsonValue value = Dsons.fromDson(numberString);
-        System.out.println(Dsons.toDson(value, ObjectStyle.FLOW));
+        System.out.println(Dsons.toDson(value, ObjectStyle.INDENT));
     }
 }

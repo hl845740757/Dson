@@ -154,7 +154,7 @@ public abstract class AbstractDsonLiteReader implements DsonLiteReader {
             }
         } else {
             // topLevel只可是容器对象
-            if (context.contextType == DsonContextType.TOP_LEVEL && !dsonType.isContainer()) {
+            if (context.contextType == DsonContextType.TOP_LEVEL && !dsonType.isContainerOrHeader()) {
                 throw DsonIOException.invalidDsonType(context.contextType, dsonType);
             }
             if (context.contextType == DsonContextType.OBJECT) {

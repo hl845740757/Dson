@@ -30,37 +30,38 @@ import java.util.List;
 public class DsonTextReaderTest {
 
     private static final String dsonString = """
-            --\s
-            -- {@MyStruct\s
-            -- \tname : wjybxx,
-            -- \tage:28,
-            -- \t介绍: 这是一段中文而且非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常长 ,
-            -- \tintro: "hello world",
-            -- \tref1 : {@ref localId: 10001, namespace: 16148b3b4e7b8923d398},
-            -- \tref2 : @ref 17630eb4f916148b,
-            -- \tbin : [@bin 0, 35df2e75e6a4be9e6f4571c64cb6d08b],
-            -- }
-            --
-            -- {@MyStruct\s
-            -- \tname : wjybxx,
-            -- \tintro: "hello world",
-            -- \tref1 : {@ref localId: 10001, namespace: 16148b3b4e7b8923d398},
-            -- \tref2 : @ref 17630eb4f916148b
-            --  }
-            --
-            -- [
-            --  [@bin 1, FFFA],
-            --  [@ei 1, 10010],
-            --  [@eL 1, 10010],
-            --  [@es 1, 10010],
-            -- ]
-            --
-            -- [@{compClsName : ei}
-            --  [ 1, 0xFFFA],
-            --  [ 2, 10010],
-            --  [ 3, 10010],
-            --  [ 4, 10010],
-            -- ]
+            - @{clsName: FileHeader, intro: 预留设计，允许定义文件头}
+            -
+            - {@MyStruct\s
+            - \tname : wjybxx,
+            - \tage:28,
+            - \t介绍: 这是一段中文而且非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常长 ,
+            - \tintro: "hello world",
+            - \tref1 : {@ref localId: 10001, namespace: 16148b3b4e7b8923d398},
+            - \tref2 : @ref 17630eb4f916148b,
+            - \tbin : [@bin 0, 35df2e75e6a4be9e6f4571c64cb6d08b],
+            - }
+            -
+            - {@MyStruct\s
+            - \tname : wjybxx,
+            - \tintro: "hello world",
+            - \tref1 : {@ref localId: 10001, namespace: 16148b3b4e7b8923d398},
+            - \tref2 : @ref 17630eb4f916148b
+            -  }
+            -
+            - [
+            -  [@bin 1, FFFA],
+            -  [@ei 1, 10010],
+            -  [@eL 1, 10010],
+            -  [@es 1, 10010],
+            - ]
+            -
+            - [@{compClsName : ei}
+            -  [ 1, 0xFFFA],
+            -  [ 2, 10010],
+            -  [ 3, 10010],
+            -  [ 4, 10010],
+            - ]
             """;
 
     @Test
@@ -76,27 +77,16 @@ public class DsonTextReaderTest {
 
         StringWriter stringWriter = new StringWriter();
         DsonTextWriterSettings settings = DsonTextWriterSettings.newBuilder()
-                .setSoftLineLength(30)
+                .setSoftLineLength(40)
                 .setUnicodeChar(false)
                 .build();
 
         DsonValue topObj = topObjects.get(0);
         try (DsonTextWriter writer = new DsonTextWriter(16, stringWriter, settings)) {
-            if (topObj instanceof DsonObject) {
-                @SuppressWarnings("unchecked") DsonObject<String> dsonObject = (DsonObject<String>) topObj;
-                writer.writeStartObject(ObjectStyle.INDENT);
-                dsonObject.forEach((name, value) -> {
-                    if (name.equals("介绍")) {
-                        writer.writeString(name, value.asString().getValue(), StringStyle.TEXT);
-                    } else {
-                        Dsons.writeDsonValue(writer, value, name);
-                    }
-                });
-                writer.writeEndObject();
-                writer.flush();
-            }
-            System.out.println(stringWriter.toString());
+            Dsons.writeTopDsonValue(writer, topObj, ObjectStyle.INDENT);
+            writer.flush();
         }
+        System.out.println(stringWriter.toString());
     }
 
 }

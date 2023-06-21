@@ -119,7 +119,6 @@ public class DsonIOException extends RuntimeException {
 
     // endregion
 
-
     //
 
     public static DsonIOException unsupportedType(Class<?> type) {

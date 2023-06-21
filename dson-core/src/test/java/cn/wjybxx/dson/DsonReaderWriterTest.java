@@ -32,8 +32,6 @@ import org.junit.jupiter.api.Test;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.LockSupport;
 
 /**
  * 测试编解码结果的一致性
@@ -48,7 +46,7 @@ public class DsonReaderWriterTest {
     private static final String dsonString = DsonTextReaderTest2.dsonString;
 
     @BeforeEach
-    void initSrcList() {
+    void initSrcList() throws InterruptedException {
         srcList = new ArrayList<>(loop);
         for (int i = 0; i < loop; i++) {
             DsonObject<String> obj1 = new DsonObject<String>(6);
@@ -58,8 +56,7 @@ public class DsonReaderWriterTest {
                     .append("time", new DsonInt64(System.currentTimeMillis()))
                     .append("wrapped", Dsons.fromDson(dsonString));
             srcList.add(obj1);
-            // 让数值有所不同
-            LockSupport.parkNanos(TimeUnit.MICROSECONDS.toNanos(50));
+            Thread.sleep(50);// 让数值有所不同
         }
     }
 
@@ -116,10 +113,10 @@ public class DsonReaderWriterTest {
             DsonLiteWriter writer = new DsonBinaryLiteWriter(16, dsonOutput);
             for (int i = 0; i < loop; i++) {
                 DsonObject<FieldNumber> obj1 = new DsonObject<FieldNumber>(6);
-                obj1.append(FieldNumber.of(0, 0), new DsonString("wjybxx"))
-                        .append(FieldNumber.of(0, 1), new DsonInt32(RandomUtils.nextInt(28, 32)))
-                        .append(FieldNumber.of(0, 2), new DsonString("www.wjybxx.cn"))
-                        .append(FieldNumber.of(0, 3), new DsonInt64(System.currentTimeMillis()));
+                obj1.append(FieldNumber.ofLnumber(0), new DsonString("wjybxx"))
+                        .append(FieldNumber.ofLnumber(1), new DsonInt32(RandomUtils.nextInt(28, 32)))
+                        .append(FieldNumber.ofLnumber(2), new DsonString("www.wjybxx.cn"))
+                        .append(FieldNumber.ofLnumber(3), new DsonInt64(System.currentTimeMillis()));
                 srcList.add(obj1);
 
                 DsonLites.writeObject(writer, obj1, ObjectStyle.INDENT);

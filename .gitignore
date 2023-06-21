@@ -36,3 +36,6 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+### flatten 用于解决maven多模块版本管理
+.flattened*

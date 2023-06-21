@@ -110,6 +110,10 @@ public enum DsonType {
         return this == OBJECT || this == ARRAY;
     }
 
+    public boolean isContainerOrHeader() {
+        return this == OBJECT || this == ARRAY || this == HEADER;
+    }
+
     public static DsonType forNumber(int number) {
         return LOOK_UP[number];
     }

@@ -307,7 +307,13 @@ public class DsonTextReader extends AbstractDsonReader {
             return DsonType.REFERENCE;
         }
         // 对象的header只在beginObject和beginArray可能产生，其它时候都不能出现
-        throw DsonIOException.invalidTokenType(context.contextType, valueToken);
+        if (context.contextType != DsonContextType.TOP_LEVEL) {
+            throw DsonIOException.invalidTokenType(context.contextType, valueToken);
+        }
+        // 允许顶层出现header方便未来扩展
+        escapeHeaderAndPush(valueToken);
+        pushNextValue(popToken());
+        return DsonType.HEADER;
     }
 
     /** 处理内置结构体的语法糖 */

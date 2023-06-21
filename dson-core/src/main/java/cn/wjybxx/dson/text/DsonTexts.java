@@ -62,11 +62,11 @@ public class DsonTexts {
 
     // 行首标签
     public static final String LHEAD_COMMENT = "#";
-    public static final String LHEAD_APPEND_LINE = "--";
-    public static final String LHEAD_APPEND = "-|";
-    public static final String LHEAD_SWITCH_MODE = "-^";
-    public static final String LHEAD_END_OF_TEXT = "~~";
-    public static final int CONTENT_LHEAD_LENGTH = 2;
+    public static final String LHEAD_APPEND_LINE = "-";
+    public static final String LHEAD_APPEND = "|";
+    public static final String LHEAD_SWITCH_MODE = "^";
+    public static final String LHEAD_END_OF_TEXT = "~";
+    public static final int CONTENT_LHEAD_LENGTH = 1;
 
     /** 有特殊含义的字符串 */
     private static final Set<String> PARSABLE_STRINGS = Set.of("true", "false",
@@ -260,23 +260,17 @@ public class DsonTexts {
     //
 
     /**
+     * 测试是否是换行符
      * 现在操作系统的换行符只有: \r\n (windows) 和 \n (unix, mac)
-     * 检查中途是否出现单独的 \r
      */
-    static void checkLRLF(CharSequence buffer, int bufferLength, int pos, char c) {
-        if (c == '\r') {
-            if (pos + 1 == bufferLength || buffer.charAt(pos + 1) != '\n') {
-                throw new DsonParseException("invalid input. A separate \\r, \\r\\n or \\n is require, Position: " + pos);
-            }
-        }
+    static boolean isCRLF(char c, CharSequence buffer, int pos) {
+        if (c == '\n') return true;
+        return c == '\r' && (pos + 1 < buffer.length() && buffer.charAt(pos + 1) == '\n');
     }
 
     /** @return 换行符的长度 */
-    static int lengthLRLF(char c) {
-        // \r\n
+    static int lengthCRLF(char c) {
         return c == '\r' ? 2 : 1;
     }
-
-    //
 
 }

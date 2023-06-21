@@ -128,8 +128,10 @@ public final class Dsons {
     public static void writeTopDsonValue(DsonWriter writer, DsonValue dsonValue, ObjectStyle style) {
         if (dsonValue.getDsonType() == DsonType.OBJECT) {
             writeObject(writer, dsonValue.asObject(), style);
-        } else {
+        } else if (dsonValue.getDsonType() == DsonType.ARRAY) {
             writeArray(writer, dsonValue.asArray(), style);
+        } else {
+            writeHeader(writer, dsonValue.asHeader());
         }
     }
 
@@ -141,9 +143,11 @@ public final class Dsons {
         }
         if (dsonType == DsonType.OBJECT) {
             return readObject(reader);
-        } else {
-            assert dsonType == DsonType.ARRAY;
+        } else if (dsonType == DsonType.ARRAY) {
             return readArray(reader);
+        } else {
+            assert dsonType == DsonType.HEADER;
+            return readHeader(reader, new DsonHeader<>());
         }
     }
 
@@ -289,7 +293,7 @@ public final class Dsons {
     }
 
     public static String toDson(DsonValue dsonValue, ObjectStyle style, DsonTextWriterSettings settings) {
-        if (!dsonValue.getDsonType().isContainer()) {
+        if (!dsonValue.getDsonType().isContainerOrHeader()) {
             throw new IllegalArgumentException("invalid dsonType " + dsonValue.getDsonType());
         }
         StringWriter stringWriter = new StringWriter(1024);

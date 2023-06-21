@@ -186,14 +186,11 @@ public class DsonTextWriter extends AbstractDsonWriter {
         printer.print("@ss "); // 开始符
         for (int i = 0, length = text.length(); i < length; i++) {
             char c = text.charAt(i);
-            if (c == '\r') {
-                DsonTexts.checkLRLF(text, length, i, c);
-                i++;
-                c = text.charAt(i);
-            }
-            if (c == '\n') { // 要执行文本中的换行符
+            // 要执行文本中的换行符
+            if (DsonTexts.isCRLF(c, text, i)) {
                 printer.println();
                 printer.printLhead(LheadType.APPEND_LINE);
+                i += DsonTexts.lengthCRLF(c) - 1; // for循环+1
                 continue;
             }
             printer.print(c);

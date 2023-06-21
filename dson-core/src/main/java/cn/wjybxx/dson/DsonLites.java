@@ -83,8 +83,10 @@ public class DsonLites {
     public static void writeTopDsonValue(DsonLiteWriter writer, DsonValue dsonValue, ObjectStyle style) {
         if (dsonValue.getDsonType() == DsonType.OBJECT) {
             writeObject(writer, dsonValue.asObjectLite(), style);
-        } else {
+        } else if (dsonValue.getDsonType() == DsonType.ARRAY) {
             writeArray(writer, dsonValue.asArrayLite(), style);
+        } else {
+            writeHeader(writer, dsonValue.asHeaderLite());
         }
     }
 
@@ -96,9 +98,11 @@ public class DsonLites {
         }
         if (dsonType == DsonType.OBJECT) {
             return readObject(reader);
-        } else {
-            assert dsonType == DsonType.ARRAY;
+        } else if (dsonType == DsonType.ARRAY) {
             return readArray(reader);
+        } else {
+            assert dsonType == DsonType.HEADER;
+            return readHeader(reader, new DsonHeader<>());
         }
     }
 
