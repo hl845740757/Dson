@@ -49,18 +49,18 @@ public class DsonTextReaderTest {
             - \tref2 : @ref 17630eb4f916148b
             -  }
             -
-            - [
+            - [@{localId : 10001}
             -  [@bin 1, FFFA],
             -  [@ei 1, 10010],
             -  [@eL 1, 10010],
             -  [@es 1, 10010],
             - ]
             -
-            - [@{compClsName : ei}
+            - [@{compClsName : ei, localId: 17630eb4f916148b}
             -  [ 1, 0xFFFA],
-            -  [ 2, 10010],
+            -  [ 2, 10100],
             -  [ 3, 10010],
-            -  [ 4, 10010],
+            -  [ 4, 10001],
             - ]
             """;
 
@@ -87,6 +87,13 @@ public class DsonTextReaderTest {
             writer.flush();
         }
         System.out.println(stringWriter.toString());
+    }
+
+    @Test
+    void testRef() {
+        DsonRepository repository = DsonRepository.fromDson(dsonString, true);
+        System.out.println(repository.find("10001"));;
+        System.out.println(repository.find("17630eb4f916148b"));
     }
 
 }

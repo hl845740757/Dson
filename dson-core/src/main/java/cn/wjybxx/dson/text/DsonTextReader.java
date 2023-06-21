@@ -280,6 +280,18 @@ public class DsonTextReader extends AbstractDsonReader {
                 }
             }
         }
+        if (context.contextType == DsonContextType.HEADER) {
+            // 处理header的特殊属性依赖
+            switch (nextName) {
+                case DsonHeader.NAMES_CLASS_NAME,
+                        DsonHeader.NAMES_COMP_CLASS_NAME,
+                        DsonHeader.NAMES_LOCAL_ID -> {
+                    pushNextValue(unquotedString);
+                    return DsonType.STRING;
+                }
+            }
+        }
+
         if ("true".equals(unquotedString) || "false".equals(unquotedString)) {
             pushNextValue(Boolean.valueOf(unquotedString));
             return DsonType.BOOLEAN;

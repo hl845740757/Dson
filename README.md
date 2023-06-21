@@ -220,13 +220,13 @@ ps: 当 @ 作用于普通值类型和内置简单结构体时，我们称 @ 声�
 
 1. ref支持两种范式 @ref localId 和 {@ref localId: $localId, namespace: $namespace, type: $type, policy: $policy}
 2. ref localId 简写方式适用大多数情况，结构体用于复杂情况。
-3. 结构体格式下，localId 和 namespace至少输入一个，其它参数可选。
+3. 结构体格式下，localId 和 namespace至少输入一个，其它参数可选。localId和namespace限定字符串，无特殊符号时可省略引号。
 4. **Dson默认不解析引用**，只存储为ref结构，会提供根据localId解析的简单方法。
 5. 字段拼写错误将引发异常。
 
 ```
-   {@ref localId: "10001", namespace : global, type: 1 }
-   {@ref localId: "10001", namespace : global, type: 1, policy: 1}
+   {@ref localId: 10001, namespace : global, type: 1 }
+   {@ref localId: 10001, namespace : global, type: 1, policy: 1}
 ```
 
 PS：对于配置文件，引用的最大作用是复用和减少嵌套。
@@ -286,13 +286,13 @@ PS：对于配置文件，引用的最大作用是复用和减少嵌套。
 
 #### Header特殊属性依赖
 
-虽然header没有默认结构体，但我们还是依赖了一些属性，以支持一些基础功能。
+虽然header没有默认结构体，但我们还是依赖了一些属性，以支持一些基础功能。因此，如果用户扩展header，使用了这三个属性名，请确保类型一致，否则可能引发兼容性问题。
 
-| 属性名         | 含义                                          | 备注             |
-|-------------|---------------------------------------------|----------------|
-| clsName     | className的缩写，表达当前对象的类型                      | 可包括内置基础值和内置结构体 | 
-| compClsName | componentClassName的缩写，表示数组成员或Object的value类型 | 可包括内置基础值和内置结构体 |
-| localId     | 对象本地id，字符串类型                                | 用于支持默认的引用解析    |
+| 属性名         | 类型     | 含义                                          | 备注             |
+|-------------|--------|---------------------------------------------|----------------|
+| clsName     | string | className的缩写，表达当前对象的类型                      | 可包括内置基础值和内置结构体 | 
+| compClsName | string | componentClassName的缩写，表示数组成员或Object的value类型 | 可包括内置基础值和内置结构体 |
+| localId     | string | 对象本地id                                      | 用于支持默认的引用解析    |
 
 以下是object声明header的示例
 
