@@ -50,7 +50,7 @@ public class DsonStringBuffer extends AbstractDsonBuffer<LineInfo> {
             boolean crlf = DsonTexts.isCRLF(c, buffer, endPos);
             if (crlf || endPos == bufferLength - 1) {
                 if (startPos == endPos) { // 空行
-                    endPos += DsonTexts.lengthCRLF(c);
+                    startPos = endPos = endPos + DsonTexts.lengthCRLF(c);
                     continue;
                 }
                 if (endPos == bufferLength - 1 && !crlf) { // eof - parse需要扫描到该位置
@@ -58,7 +58,7 @@ public class DsonStringBuffer extends AbstractDsonBuffer<LineInfo> {
                 }
                 LheadType lheadType = parseLhead(buffer, startPos, endPos, ln);
                 if (lheadType == LheadType.COMMENT) { // 注释行
-                    endPos += DsonTexts.lengthCRLF(c);
+                    startPos = endPos = endPos + DsonTexts.lengthCRLF(c);
                     continue;
                 }
                 int contentStartPos = indexContentStart(buffer, startPos, endPos);

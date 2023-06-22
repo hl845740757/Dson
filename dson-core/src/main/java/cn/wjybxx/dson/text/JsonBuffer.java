@@ -172,14 +172,14 @@ public class JsonBuffer implements DsonBuffer {
             boolean crlf = DsonTexts.isCRLF(c, buffer, endPos);
             if (crlf || endPos == bufferLength - 1) {
                 if (startPos == endPos) { // 空行
-                    endPos += DsonTexts.lengthCRLF(c);
+                    startPos = endPos = endPos + DsonTexts.lengthCRLF(c);
                     continue;
                 }
                 if (endPos == bufferLength - 1 && !crlf) { // eof - parse需要扫描到该位置
                     endPos = bufferLength;
                 }
                 if (DsonStringBuffer.isCommentLine(buffer, startPos, endPos)) { // 注释行
-                    endPos += DsonTexts.lengthCRLF(c);
+                    startPos = endPos = endPos + DsonTexts.lengthCRLF(c);
                     continue;
                 }
                 lines.add(new LineInfo(startPos, endPos, startPos,

@@ -92,7 +92,7 @@ public class DsonTextReaderTest {
     @Test
     void testRef() {
         DsonRepository repository = DsonRepository.fromDson(dsonString, true);
-        System.out.println(repository.find("10001"));;
+        System.out.println(repository.find("10001"));
         System.out.println(repository.find("17630eb4f916148b"));
     }
 

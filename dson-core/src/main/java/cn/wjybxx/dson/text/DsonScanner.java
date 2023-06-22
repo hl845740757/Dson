@@ -273,6 +273,7 @@ public class DsonScanner implements AutoCloseable {
         while ((c = buffer.readSlowly()) != -1) {
             if (c == -2) {
                 if (buffer.lhead() != LheadType.SWITCH_MODE) { // 退出模式切换
+                    buffer.unread();
                     break;
                 }
             } else {
@@ -286,6 +287,7 @@ public class DsonScanner implements AutoCloseable {
         while ((c = buffer.readSlowly()) != -1) {
             if (c == -2) {
                 if (buffer.lhead() != LheadType.SWITCH_MODE) { // 退出模式切换
+                    buffer.unread();
                     break;
                 }
             } else if (c == '\\') {
