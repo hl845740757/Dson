@@ -427,7 +427,7 @@ public abstract class AbstractDsonReader implements DsonReader {
     }
 
     /**
-     * 创建新的context，读取classId，压入上下文
+     * 创建新的context，保存信息，压入上下文
      */
     protected abstract void doReadStartContainer(DsonContextType contextType, DsonType dsonType);
 

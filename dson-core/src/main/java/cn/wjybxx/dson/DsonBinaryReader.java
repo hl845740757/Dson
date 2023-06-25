@@ -25,13 +25,6 @@ import cn.wjybxx.dson.types.OffsetTimestamp;
 import com.google.protobuf.Parser;
 
 /**
- * 与{@link DsonBinaryLiteReader}的主要区别：
- * 1.name和classId由Int变为String
- * 2.没有className时，写入的是空字符串(会写入长度，但不会被编码)
- * 3.skipName不是通过读取name跳过，而是真实跳过
- *
- * <h3>字符串池化</h3>
- * {@link Dsons#enableFieldIntern}{@link Dsons#enableClassIntern}
  *
  * @author wjybxx
  * date - 2023/4/22

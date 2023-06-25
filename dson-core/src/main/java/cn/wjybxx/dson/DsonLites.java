@@ -67,7 +67,7 @@ public class DsonLites {
 
     // classId
     public static long makeClassGuid(int namespace, int classId) {
-        return ((long) namespace << 32) | ((long) classId & 0xFF_FF_FF_FFL);
+        return ((long) namespace << 32) | ((long) classId & 0xFFFF_FFFFL);
     }
 
     public static int namespaceOfClassGuid(long guid) {

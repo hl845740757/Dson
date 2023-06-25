@@ -17,6 +17,18 @@ public class DsonRepository {
     private final Map<String, DsonValue> indexMap = new HashMap<>();
     private final List<DsonValue> valueList = new ArrayList<>();
 
+    public int size() {
+        return valueList.size();
+    }
+
+    public DsonValue getAt(int idx) {
+        return valueList.get(idx);
+    }
+
+    public List<DsonValue> getValues() {
+        return Collections.unmodifiableList(valueList);
+    }
+
     public DsonRepository add(DsonValue value) {
         if (!value.getDsonType().isContainerOrHeader()) {
             throw new IllegalArgumentException();
@@ -78,8 +90,7 @@ public class DsonRepository {
                     resolveReference(value);
                 }
             }
-        }
-        if (dsonValue instanceof DsonArray<?> dsonArray) {
+        } else if (dsonValue instanceof DsonArray<?> dsonArray) {
             for (int i = 0; i < dsonArray.size(); i++) {
                 DsonValue value = dsonArray.get(i);
                 if (value.getDsonType() == DsonType.REFERENCE) {

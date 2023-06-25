@@ -16,13 +16,10 @@
 
 package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.internal.Beta;
-
 /**
  * @author wjybxx
  * date - 2023/4/23
  */
-@Beta
 public enum DsonReaderGuide {
 
     /** 当前应该读取type */
