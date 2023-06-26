@@ -20,8 +20,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 
-import static cn.wjybxx.dson.internal.InternalUtils.nullToDef;
-
 /**
  * @author wjybxx
  * date 2023/3/31
@@ -213,14 +211,6 @@ public class CollectionUtils {
         V v = map.get(key);
         if (v == null && !map.containsKey(key)) {
             throw new IllegalArgumentException(String.format("key is absent, key %s", key));
-        }
-        return v;
-    }
-
-    public static <K, V> V checkedGet(Map<K, V> map, K key, String property) {
-        V v = map.get(key);
-        if (v == null && !map.containsKey(key)) {
-            throw new IllegalArgumentException(String.format("%s is absent, key %s", nullToDef(property, "key"), key));
         }
         return v;
     }

@@ -143,20 +143,6 @@ public class Preconditions {
 
     // region 集合检查
 
-    public static <K, V> void checkContains(Map<K, V> map, K key,
-                                            @Nullable String property) {
-        if (!map.containsKey(key)) {
-            throw new IllegalArgumentException(String.format("%s is absent, key %s", nullToDef(property, "key"), key));
-        }
-    }
-
-    public static <K, V> void checkNotContains(Map<K, V> map, K key,
-                                               @Nullable String property) {
-        if (map.containsKey(key)) {
-            throw new IllegalArgumentException(String.format("%s is duplicate, key %s", nullToDef(property, "key"), key));
-        }
-    }
-
     public static void checkNotEmpty(Collection<?> collection, @Nullable String msg) {
         if (collection == null || collection.isEmpty()) {
             throw new IllegalArgumentException(nullToDef(msg, "collection cant be empty"));

@@ -16,6 +16,7 @@
 
 package cn.wjybxx.dson.codec;
 
+import cn.wjybxx.common.OptionalBool;
 import cn.wjybxx.dson.codec.document.codecs.MapAsObjectCodec;
 
 import javax.annotation.concurrent.Immutable;
