@@ -20,6 +20,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 
+import static cn.wjybxx.dson.internal.InternalUtils.nullToDef;
+
 /**
  * @author wjybxx
  * date 2023/3/31
@@ -207,10 +209,18 @@ public class CollectionUtils {
     }
 
     /** 如果给定键不存在则抛出异常 */
-    public static <K, V> V checkedGet(Map<K, V> map, K key) {
+    public static <K, V> V getOrThrow(Map<K, V> map, K key) {
         V v = map.get(key);
-        if (v == null && !map.containsKey(key)) {
+        if (v == null) {
             throw new IllegalArgumentException(String.format("key is absent, key %s", key));
+        }
+        return v;
+    }
+
+    public static <K, V> V getOrThrow(Map<K, V> map, K key, String desc) {
+        V v = map.get(key);
+        if (v == null) {
+            throw new IllegalArgumentException(String.format("%s is absent, key %s", nullToDef(desc, "key"), key));
         }
         return v;
     }
@@ -271,7 +281,9 @@ public class CollectionUtils {
     private static final int MAX_POWER_OF_TWO = 1 << 30;
 
     private static int capacity(int expectedSize) {
-        Preconditions.checkPositive(expectedSize, "expectedSize");
+        if (expectedSize < 0) {
+            throw new IllegalArgumentException("expectedSize cant be negative, value: " + expectedSize);
+        }
         if (expectedSize < 3) {
             return 4;
         }

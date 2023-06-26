@@ -186,6 +186,7 @@ public abstract class AbstractDsonWriter implements DsonWriter {
     @Override
     public void writeBinary(String name, int type, Chunk chunk) {
         Objects.requireNonNull(chunk);
+        DsonBinary.checksSubType(type);
         advanceToValueState(name);
         doWriteBinary(type, chunk);
         setNextState();

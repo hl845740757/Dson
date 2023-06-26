@@ -16,7 +16,6 @@
 
 package cn.wjybxx.dson.codec;
 
-import cn.wjybxx.dson.internal.Preconditions;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Objects;
@@ -43,7 +42,7 @@ public final class ClassDesc {
     }
 
     public ClassDesc(String className, long classId) {
-        this.className = Preconditions.checkNotContainsWhiteSpace(className, null);
+        this.className = className;
         this.classId = classId;
     }
 
@@ -84,8 +83,8 @@ public final class ClassDesc {
     @Override
     public String toString() {
         return "ClassDesc{" +
-                "className='" + className + '\'' +
-                ", classId=" + classId +
-                '}';
+               "className='" + className + '\'' +
+               ", classId=" + classId +
+               '}';
     }
 }

@@ -135,13 +135,13 @@ public class DefaultBinaryConverter implements BinaryConverter {
         Objects.requireNonNull(options, "options");
         // 检查classId是否存在，以及命名空间是否非法
         for (Class<?> clazz : allProtoBufClasses) {
-            ClassId classId = CollectionUtils.checkedGet(typeIdMap, clazz, "class");
+            ClassId classId = CollectionUtils.getOrThrow(typeIdMap, clazz, "class");
             if (classId.isDefaultNameSpace()) {
                 throw new IllegalArgumentException("bad classId " + classId + ", class " + clazz);
             }
         }
         for (BinaryPojoCodecImpl<?> codecImpl : pojoCodecImplList) {
-            ClassId classId = CollectionUtils.checkedGet(typeIdMap, codecImpl.getEncoderClass(), "class");
+            ClassId classId = CollectionUtils.getOrThrow(typeIdMap, codecImpl.getEncoderClass(), "class");
             if (classId.isDefaultNameSpace()) {
                 throw new IllegalArgumentException("bad classId " + classId + ", class " + codecImpl.getEncoderClass());
             }

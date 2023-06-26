@@ -16,8 +16,6 @@
 
 package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.internal.Preconditions;
-
 import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.Objects;
@@ -55,7 +53,9 @@ public class DsonBinary extends DsonValue {
     }
 
     public static void checksSubType(int type) {
-        Preconditions.checkBetween(type, 0, 255);
+        if (type < 0 || type > 255) {
+            throw new IllegalArgumentException("the type of binary must between[0, 255], but found: " + type);
+        }
     }
 
     /** 创建一个拷贝 */

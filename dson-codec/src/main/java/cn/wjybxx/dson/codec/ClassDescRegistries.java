@@ -17,7 +17,6 @@
 package cn.wjybxx.dson.codec;
 
 import cn.wjybxx.dson.internal.CollectionUtils;
-import cn.wjybxx.dson.internal.Preconditions;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
@@ -46,9 +45,9 @@ public class ClassDescRegistries {
 
         for (Class<?> type : typeSet) {
             final ClassDesc classDesc = classIdMapper.map(type);
-            Preconditions.checkNotContains(type2DescMap, type, "type");
-            Preconditions.checkNotContains(name2DescMap, classDesc.getClassName(), "className");
-            Preconditions.checkNotContains(classId2DescMap, classDesc.getClassId(), "classId");
+            checkNotContains(type2DescMap, type, "type");
+            checkNotContains(name2DescMap, classDesc.getClassName(), "className");
+            checkNotContains(classId2DescMap, classDesc.getClassId(), "classId");
 
             type2DescMap.put(type, classDesc);
             name2DescMap.put(classDesc.getClassName(), classDesc);
@@ -66,6 +65,12 @@ public class ClassDescRegistries {
             type2DescMap.putAll(registry.export());
         }
         return fromMapper(type2DescMap.keySet(), type2DescMap::get);
+    }
+
+    private static <K, V> void checkNotContains(Map<K, V> map, K key, String desc) {
+        if (map.containsKey(key)) {
+            throw new IllegalArgumentException(String.format("%s (%s) is duplicate", desc, key));
+        }
     }
 
     private static class ClassDescRegistryImpl implements ClassDescRegistry {

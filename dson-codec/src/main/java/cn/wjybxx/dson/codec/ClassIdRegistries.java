@@ -17,7 +17,6 @@
 package cn.wjybxx.dson.codec;
 
 import cn.wjybxx.dson.codec.document.DocumentPojoCodecImpl;
-import cn.wjybxx.dson.internal.Preconditions;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -45,8 +44,9 @@ public class ClassIdRegistries {
 
         for (Class<?> type : typeSet) {
             final T classId = classIdMapper.map(type);
-            Preconditions.checkNotContains(name2TypeMap, classId, "classId");
-
+            if (name2TypeMap.containsKey(classId)) {
+                throw new IllegalArgumentException("classId %s is duplicate".formatted(classId));
+            }
             type2NameMap.put(type, classId);
             name2TypeMap.put(classId, type);
         }

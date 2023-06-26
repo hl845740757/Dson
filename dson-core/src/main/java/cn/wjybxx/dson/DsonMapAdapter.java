@@ -44,6 +44,29 @@ public abstract class DsonMapAdapter<K> extends DsonValue implements Map<K, Dson
         return Collections.unmodifiableMap(valueMap);
     }
 
+    public DsonValue getOrThrow(K key) {
+        Objects.requireNonNull(key);
+        DsonValue value = valueMap.get(key);
+        if (value == null) {
+            throw new IllegalArgumentException("the value is absent, key " + key);
+        }
+        return value;
+    }
+
+    public DsonValue getOrElse(K key, DsonValue defaultValue) {
+        Objects.requireNonNull(key);
+        DsonValue value = valueMap.get(key);
+        if (value == null) {
+            return defaultValue;
+        }
+        return value;
+    }
+
+    @Override
+    public DsonValue getOrDefault(Object key, DsonValue defaultValue) {
+        return valueMap.getOrDefault(key, defaultValue);
+    }
+
     /**
      * @throws NoSuchElementException 如果对象为空
      */

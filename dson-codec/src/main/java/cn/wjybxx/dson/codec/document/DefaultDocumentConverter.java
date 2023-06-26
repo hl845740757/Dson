@@ -136,13 +136,13 @@ public class DefaultDocumentConverter implements DocumentConverter {
         Objects.requireNonNull(options, "options");
         // 检查classId是否存在，以及命名是否非法
         for (Class<?> clazz : allProtoBufClasses) {
-            String classId = CollectionUtils.checkedGet(typeIdMap, clazz, "class");
+            String classId = CollectionUtils.getOrThrow(typeIdMap, clazz, "class");
             if (StringUtils.isBlank(classId)) {
                 throw new IllegalArgumentException("bad classId " + classId + ", class " + clazz);
             }
         }
         for (DocumentPojoCodecImpl<?> codecImpl : pojoCodecImplList) {
-            String classId = CollectionUtils.checkedGet(typeIdMap, codecImpl.getEncoderClass(), "class");
+            String classId = CollectionUtils.getOrThrow(typeIdMap, codecImpl.getEncoderClass(), "class");
             if (StringUtils.isBlank(classId)) {
                 throw new IllegalArgumentException("bad classId " + classId + ", class " + codecImpl.getEncoderClass());
             }

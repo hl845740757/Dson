@@ -17,7 +17,6 @@
 package cn.wjybxx.dson;
 
 import cn.wjybxx.dson.internal.DsonReaderUtils;
-import cn.wjybxx.dson.internal.Preconditions;
 import cn.wjybxx.dson.io.Chunk;
 import cn.wjybxx.dson.io.DsonIOException;
 import cn.wjybxx.dson.text.NumberStyle;
@@ -82,7 +81,9 @@ public abstract class AbstractDsonLiteWriter implements DsonLiteWriter {
 
     @Override
     public void writeName(int name) {
-        Preconditions.checkNonNegative(name, "name");
+        if (name < 0) {
+            throw new IllegalArgumentException("name cant be negative, but found: " + name);
+        }
         Context context = this.context;
         if (context.state != DsonWriterState.NAME) {
             throw invalidState(List.of(DsonWriterState.NAME), context.state);
@@ -187,6 +188,7 @@ public abstract class AbstractDsonLiteWriter implements DsonLiteWriter {
     @Override
     public void writeBinary(int name, int type, Chunk chunk) {
         Objects.requireNonNull(chunk);
+        DsonBinary.checksSubType(type);
         advanceToValueState(name);
         doWriteBinary(type, chunk);
         setNextState();
