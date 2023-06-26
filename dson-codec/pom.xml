@@ -6,7 +6,7 @@
 
     <groupId>cn.wjybxx.dson</groupId>
     <artifactId>dson-codec</artifactId>
-    <version>1.0-snapshot</version>
+    <version>1.0-SNAPSHOT</version>
 
     <name>Dson-Codec</name>
     <description>基于Dson的对象简单编解码实现</description>
@@ -64,6 +64,24 @@
             <groupId>cn.wjybxx.dson</groupId>
             <artifactId>dson-core</artifactId>
             <version>${dson-core.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.wjybxx.commons</groupId>
+            <artifactId>commons-base</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.wjybxx.dson</groupId>
+            <artifactId>dson-apt</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/it.unimi.dsi/fastutil-core -->
         <dependency>

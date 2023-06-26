@@ -17,7 +17,7 @@
 
 ```
     DsonObject<String> dsonObject = Dsons.fromDson(dsonString).asObject();
-    String dosnString = Dsons.toDson(value, ObjectStyle.INDENT);
+    String dsonString = Dsons.toDson(value, ObjectStyle.INDENT);
     System.out.println(dsonString)
 ```
 
