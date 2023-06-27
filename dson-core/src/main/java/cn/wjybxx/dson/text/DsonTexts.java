@@ -21,6 +21,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.BitSet;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * Dson的文本表示法
@@ -123,7 +124,7 @@ public class DsonTexts {
                 return false;
             }
         }
-        if (NumberUtils.isCreatable(value)) { // 可解析的数字类型，这个开销大放最后检测
+        if (isParsable(value)) { // 可解析的数字类型，这个开销大放最后检测
             return false;
         }
         return true;
@@ -190,25 +191,53 @@ public class DsonTexts {
         return Long.parseLong(str);
     }
 
-    private static String replaceUnderline(String str) {
-        if (str.charAt(0) == '-' || str.charAt(str.length() - 1) == '_') {
-            throw new NumberFormatException(str);
-        }
-        return str.replace("_", "");
-    }
-
     public static float parseFloat(String str) {
+        if (str.indexOf('_') >= 0) {
+            str = replaceUnderline(str);
+        }
         return Float.parseFloat(str);
     }
 
     public static double parseDouble(String str) {
+        if (str.indexOf('_') >= 0) {
+            str = replaceUnderline(str);
+        }
         return Double.parseDouble(str);
+    }
+
+    private static String replaceUnderline(String str) {
+        int length = str.length();
+        if (str.charAt(0) == '-' || str.charAt(length - 1) == '_') {
+            throw new NumberFormatException(str);
+        }
+        StringBuilder sb = new StringBuilder(length - 1);
+        boolean hasUnderline = false;
+        for (int i = 0; i < length; i++) {
+            char c = str.charAt(i);
+            if (c == '_') {
+                if (hasUnderline) throw new NumberFormatException(str);
+                hasUnderline = true;
+            } else {
+                sb.append(c);
+                hasUnderline = false;
+            }
+        }
+        return sb.toString();
+    }
+
+    // 正则的性能不好
+    private static final Pattern number_rule = Pattern.compile("^([+-]?\\d+\\.\\d+)|([+-]?\\d+)|([+-]?\\.\\d+)$");
+    private static final Pattern scientific_rule = Pattern.compile("^[+-]?((\\d+\\.?\\d*)|(\\.\\d+))[Ee][+-]?\\d+$");
+
+    public static boolean isParsable(String str) {
+        return NumberUtils.isParsable(str);
     }
 
     // 修改自commons-codec，避免引入依赖
 
-    private static final char[] DIGITS_UPPER = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D',
-            'E', 'F'};
+    private static final char[] DIGITS_UPPER = {
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+            'A', 'B', 'C', 'D', 'E', 'F'};
 
     static void encodeHex(final byte[] data, final int dataOffset, final int dataLen,
                           final char[] out, final int outOffset) {

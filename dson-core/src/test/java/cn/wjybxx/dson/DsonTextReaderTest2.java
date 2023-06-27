@@ -45,12 +45,13 @@ public class DsonTextReaderTest2 {
     static final String numberString = """
             - {
             - value1: 10001,\s
-            - value2: 1.0E-6,
+            - value2: 1.05,
             - value3: @i 0xFF,\s
             - value4: @i 0b10010001,
-            - value5: @d Infinity,\s
-            - value6: @d NaN,\s
-            - value7: @i 100_000_000
+            - value5: @i 100_000_000,\s
+            - value6: @d 1.0E-6,
+            - value7: @d Infinity,\s
+            - value8: @d NaN,\s
             - }
             """;
 

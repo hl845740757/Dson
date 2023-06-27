@@ -276,14 +276,18 @@ public class DsonTextWriter extends AbstractDsonWriter {
     protected void doWriteFloat(float value, NumberStyle style) {
         DsonPrinter printer = this.printer;
         writeCurrentName(printer, DsonType.FLOAT);
-        if (style != NumberStyle.SIMPLE) {
-            printer.print("@f ");
-        }
         int iv = (int) value; // NaN安全
         if (iv == value) {
+            if (style != NumberStyle.SIMPLE) {
+                printer.print("@f ");
+            }
             printer.print(Integer.toString(iv));
         } else {
-            printer.print(Float.toString(value));
+            String fs = Float.toString(value);
+            if (style != NumberStyle.SIMPLE || !DsonTexts.isParsable(fs)) { // 特殊值加上标签
+                printer.print("@f ");
+            }
+            printer.print(fs);
         }
     }
 
@@ -295,7 +299,11 @@ public class DsonTextWriter extends AbstractDsonWriter {
         if (lv == value) {
             printer.print(Long.toString(lv));
         } else {
-            printer.print(Double.toString(value));
+            String ds = Double.toString(value);
+            if (!DsonTexts.isParsable(ds)) { // 特殊值加上标签
+                printer.print("@d ");
+            }
+            printer.print(ds);
         }
     }
 

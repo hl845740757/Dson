@@ -301,8 +301,8 @@ public class DsonTextReader extends AbstractDsonReader {
             return DsonType.NULL;
         }
         // 简单的数
-        if (NumberUtils.isCreatable(unquotedString)) {
-            pushNextValue(Double.parseDouble(unquotedString));
+        if (DsonTexts.isParsable(unquotedString)) {
+            pushNextValue(DsonTexts.parseDouble(unquotedString));
             return DsonType.DOUBLE;
         }
         pushNextValue(unquotedString);
