@@ -177,13 +177,14 @@ ps: 我去除了顶层不能是header的限制，因此可以用顶层的header�
 
 ### bool值
 
-1. bool 只支持 true 和 false 两个值，且大小写严格；
-2. 声明类型的情况下，拼写错误将引发错误 -- null同理
+1. 未声明类型的情况下，只支持 true和false 两个值，且大小写严格；
+2. 声明类型的情况下，支持 0和1 输入； 1表示true，0表示false；
+3. 声明类型的情况下，拼写错误将引发错误 -- null同理
 
 ```
-   {value: true, value2: false}
+   {value1: true, value2: false, value3: @b 1, value4: @b 0}
    # 拼写错误将引发异常
-   {value: @b ture, value2: @N nul} 
+   {value1: @b ture, value2: @N nul} 
 ```
 
 ### 字符串

@@ -148,8 +148,8 @@ public class DsonTexts {
     }
 
     public static Object parseBool(String str) {
-        if ("true".equals(str)) return Boolean.TRUE;
-        if ("false".equals(str)) return Boolean.FALSE;
+        if (str.equals("true") || str.equals("1")) return true;
+        if (str.equals("false") || str.equals("0")) return false;
         throw new IllegalArgumentException("invalid bool str: " + str);
     }
 
