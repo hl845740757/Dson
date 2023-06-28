@@ -283,11 +283,13 @@ public class DsonTextWriter extends AbstractDsonWriter {
             }
             printer.print(Integer.toString(iv));
         } else {
-            String fs = Float.toString(value);
-            if (style != NumberStyle.SIMPLE || !DsonTexts.isParsable(fs)) { // 特殊值加上标签
+            String str = Float.toString(value);
+            if (style != NumberStyle.SIMPLE
+                    || Float.isNaN(value) || Float.isInfinite(value)  // 特殊值加上标签
+                    || str.indexOf('E') > 0) { // 科学计数法加标签
                 printer.print("@f ");
             }
-            printer.print(fs);
+            printer.print(str);
         }
     }
 
@@ -299,11 +301,12 @@ public class DsonTextWriter extends AbstractDsonWriter {
         if (lv == value) {
             printer.print(Long.toString(lv));
         } else {
-            String ds = Double.toString(value);
-            if (!DsonTexts.isParsable(ds)) { // 特殊值加上标签
+            String str = Double.toString(value);
+            if (Double.isNaN(value) || Double.isInfinite(value) // 特殊值加上标签
+                    || str.indexOf('E') > 0) { // 科学计数法加标签
                 printer.print("@d ");
             }
-            printer.print(ds);
+            printer.print(str);
         }
     }
 

@@ -16,7 +16,6 @@
 
 package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.internal.DsonReaderUtils;
 import cn.wjybxx.dson.io.BinaryUtils;
 import cn.wjybxx.dson.io.DsonIOException;
 import cn.wjybxx.dson.io.DsonInput;

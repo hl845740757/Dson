@@ -155,7 +155,7 @@ public class DsonTexts {
 
     public static int parseInt(String str) {
         if (str.indexOf('_') >= 0) {
-            str = replaceUnderline(str);
+            str = deleteUnderline(str);
         }
         if (str.startsWith("0x")) {
             return Integer.parseInt(str, 2, str.length(), 16);
@@ -174,7 +174,7 @@ public class DsonTexts {
 
     public static long parseLong(String str) {
         if (str.indexOf('_') >= 0) {
-            str = replaceUnderline(str);
+            str = deleteUnderline(str);
         }
         if (str.startsWith("0x")) {
             return Long.parseLong(str, 2, str.length(), 16);
@@ -193,19 +193,19 @@ public class DsonTexts {
 
     public static float parseFloat(String str) {
         if (str.indexOf('_') >= 0) {
-            str = replaceUnderline(str);
+            str = deleteUnderline(str);
         }
         return Float.parseFloat(str);
     }
 
     public static double parseDouble(String str) {
         if (str.indexOf('_') >= 0) {
-            str = replaceUnderline(str);
+            str = deleteUnderline(str);
         }
         return Double.parseDouble(str);
     }
 
-    private static String replaceUnderline(String str) {
+    private static String deleteUnderline(String str) {
         int length = str.length();
         if (str.charAt(0) == '-' || str.charAt(length - 1) == '_') {
             throw new NumberFormatException(str);
@@ -230,6 +230,10 @@ public class DsonTexts {
     private static final Pattern scientific_rule = Pattern.compile("^[+-]?((\\d+\\.?\\d*)|(\\.\\d+))[Ee][+-]?\\d+$");
 
     public static boolean isParsable(String str) {
+        int length = str.length();
+        if (length == 0 || length > 66) { // 最长也不应该比二进制格式长
+            return false;
+        }
         return NumberUtils.isParsable(str);
     }
 

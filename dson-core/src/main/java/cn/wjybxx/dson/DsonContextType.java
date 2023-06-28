@@ -27,13 +27,13 @@ public enum DsonContextType {
     /** 当前在最顶层，尚未开始读写（topLevel相当于一个数组） */
     TOP_LEVEL(null, null),
 
-    /** 当前是一个普通对象结构（文档结构） */
+    /** 当前是一个普通对象结构 */
     OBJECT("{", "}"),
 
     /** 当前是一个数组结构 */
     ARRAY("[", "]"),
 
-    /** 当前是一个Header结构 - 类Object */
+    /** 当前是一个Header结构 - 类似Object */
     HEADER("@{", "}");
 
     @Internal

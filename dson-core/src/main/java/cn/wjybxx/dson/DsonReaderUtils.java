@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package cn.wjybxx.dson.internal;
+package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.*;
 import cn.wjybxx.dson.io.*;
 import cn.wjybxx.dson.types.ObjectRef;
 import cn.wjybxx.dson.types.OffsetTimestamp;
@@ -29,7 +28,6 @@ import java.util.List;
  * @author wjybxx
  * date - 2023/5/31
  */
-@Internal
 public class DsonReaderUtils {
 
     /** 支持读取为bytes和直接写入bytes的数据类型 */

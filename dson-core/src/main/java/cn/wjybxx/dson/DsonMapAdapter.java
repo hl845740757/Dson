@@ -17,29 +17,6 @@ public abstract class DsonMapAdapter<K> extends DsonValue implements Map<K, Dson
         this.valueMap = InternalUtils.resolveMapPolicy(valueMap, policy);
     }
 
-    static <K> void checkKeyValue(K key, DsonValue value) {
-        if (key == null) {
-            throw new IllegalArgumentException("key cant be null");
-        }
-        if (value == null) {
-            throw new IllegalArgumentException("value cant be null");
-        }
-    }
-
-    @Override
-    public DsonValue put(K key, DsonValue value) {
-        checkKeyValue(key, value);
-        return valueMap.put(key, value);
-    }
-
-    @Override
-    public void putAll(Map<? extends K, ? extends DsonValue> m) {
-        // 需要检测key-value的空
-        for (Map.Entry<? extends K, ? extends DsonValue> entry : m.entrySet()) {
-            put(entry.getKey(), entry.getValue());
-        }
-    }
-
     public Map<K, DsonValue> getValueMap() {
         return Collections.unmodifiableMap(valueMap);
     }
@@ -72,6 +49,29 @@ public abstract class DsonMapAdapter<K> extends DsonValue implements Map<K, Dson
      */
     public K firstKey() {
         return CollectionUtils.firstKey(valueMap);
+    }
+
+    static <K> void checkKeyValue(K key, DsonValue value) {
+        if (key == null) {
+            throw new IllegalArgumentException("key cant be null");
+        }
+        if (value == null) {
+            throw new IllegalArgumentException("value cant be null");
+        }
+    }
+
+    @Override
+    public DsonValue put(K key, DsonValue value) {
+        checkKeyValue(key, value);
+        return valueMap.put(key, value);
+    }
+
+    @Override
+    public void putAll(Map<? extends K, ? extends DsonValue> m) {
+        // 需要检测key-value的空
+        for (Map.Entry<? extends K, ? extends DsonValue> entry : m.entrySet()) {
+            put(entry.getKey(), entry.getValue());
+        }
     }
 
     // region equals
