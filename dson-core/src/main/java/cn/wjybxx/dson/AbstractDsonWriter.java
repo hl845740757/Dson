@@ -318,7 +318,7 @@ public abstract class AbstractDsonWriter implements DsonWriter {
 
     private void autoStartTopLevel(Context context) {
         if (context.contextType == DsonContextType.TOP_LEVEL
-            && context.state == DsonWriterState.INITIAL) {
+                && context.state == DsonWriterState.INITIAL) {
             context.setState(DsonWriterState.VALUE);
         }
     }

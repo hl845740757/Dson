@@ -65,7 +65,7 @@ public class DsonString extends DsonValue implements Comparable<DsonString> {
     @Override
     public String toString() {
         return "DsonString{" +
-               "value='" + value + '\'' +
-               '}';
+                "value='" + value + '\'' +
+                '}';
     }
 }

@@ -80,7 +80,7 @@ public class DsonTextWriter extends AbstractDsonWriter {
         }
         // header和外层对象之间不能有空格
         if (dsonType != DsonType.HEADER
-            && (context.style == ObjectStyle.INDENT || printer.getColumn() >= settings.softLineLength)) {
+                && (context.style == ObjectStyle.INDENT || printer.getColumn() >= settings.softLineLength)) {
             if (printer.getColumn() == 0) {
                 // 首行不换行
                 printer.printLhead(LheadType.APPEND_LINE);
@@ -391,7 +391,7 @@ public class DsonTextWriter extends AbstractDsonWriter {
         DsonPrinter printer = this.printer;
         writeCurrentName(printer, DsonType.REFERENCE);
         if (StringUtils.isBlank(objectRef.getNamespace())
-            && objectRef.getType() == 0 && objectRef.getPolicy() == 0) {
+                && objectRef.getType() == 0 && objectRef.getPolicy() == 0) {
             printer.print("@ref ");
             printStringNonSS(printer, objectRef.getLocalId());
             return;

@@ -45,7 +45,7 @@ public class DsonTimestamp extends DsonValue {
     @Override
     public String toString() {
         return "DsonTimestamp{" +
-               "value=" + value +
-               '}';
+                "value=" + value +
+                '}';
     }
 }

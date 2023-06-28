@@ -61,8 +61,8 @@ public class DsonObjectRef extends DsonValue {
     @Override
     public String toString() {
         return "DsonObjectRef{" +
-               "value=" + value +
-               '}';
+                "value=" + value +
+                '}';
     }
 
 }

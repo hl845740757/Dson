@@ -83,8 +83,8 @@ public final class ClassDesc {
     @Override
     public String toString() {
         return "ClassDesc{" +
-               "className='" + className + '\'' +
-               ", classId=" + classId +
-               '}';
+                "className='" + className + '\'' +
+                ", classId=" + classId +
+                '}';
     }
 }

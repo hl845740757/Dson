@@ -91,8 +91,8 @@ public abstract class DsonMapAdapter<K> extends DsonValue implements Map<K, Dson
     @Override
     public String toString() {
         return getClass().getSimpleName() + "{" +
-               "valueMap=" + valueMap +
-               '}';
+                "valueMap=" + valueMap +
+                '}';
     }
     // endregion
 

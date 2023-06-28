@@ -41,8 +41,8 @@ public abstract class DsonListAdapter extends DsonValue implements List<DsonValu
     @Override
     public String toString() {
         return getClass().getSimpleName() + "{" +
-               "values=" + values +
-               '}';
+                "values=" + values +
+                '}';
     }
     // endregion
 

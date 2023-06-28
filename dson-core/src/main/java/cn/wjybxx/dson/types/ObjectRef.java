@@ -105,11 +105,11 @@ public final class ObjectRef {
     @Override
     public String toString() {
         return "ObjectRef{" +
-               "namespace='" + namespace + '\'' +
-               ", localId='" + localId + '\'' +
-               ", type=" + type +
-               ", policy=" + policy +
-               '}';
+                "namespace='" + namespace + '\'' +
+                ", localId='" + localId + '\'' +
+                ", type=" + type +
+                ", policy=" + policy +
+                '}';
     }
 
     // ref常见属性名

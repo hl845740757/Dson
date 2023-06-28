@@ -77,7 +77,7 @@ public class DsonBinaryLiteWriter extends AbstractDsonLiteWriter {
         if (dsonType != DsonType.HEADER) { // header是匿名属性
             Context context = getContext();
             if (context.contextType == DsonContextType.OBJECT
-                || context.contextType == DsonContextType.HEADER) {
+                    || context.contextType == DsonContextType.HEADER) {
                 output.writeUint32(context.curName);
             }
         }

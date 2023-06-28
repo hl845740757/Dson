@@ -71,7 +71,7 @@ public class DsonBool extends DsonValue implements Comparable<DsonBool> {
     @Override
     public String toString() {
         return "DsonBool{" +
-               "value=" + value +
-               '}';
+                "value=" + value +
+                '}';
     }
 }

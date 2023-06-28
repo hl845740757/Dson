@@ -105,12 +105,14 @@ public final class OffsetTimestamp {
                 ZoneOffset.ofTotalSeconds(offset));
     }
 
+    /** @return 固定格式 yyyy-MM-dd */
     public static String formatDate(long seconds) {
         return LocalDateTime.ofEpochSecond(seconds, 0, ZoneOffset.UTC)
                 .toLocalDate()
                 .toString();
     }
 
+    /** @return 固定格式 HH:mm:ss */
     public static String formatTime(long seconds) {
         return LocalDateTime.ofEpochSecond(seconds, 1, ZoneOffset.UTC)
                 .toLocalTime()
@@ -118,29 +120,44 @@ public final class OffsetTimestamp {
                 .substring(0, 8);
     }
 
+    /**
+     * Z
+     * +HH:mm
+     * +HH:mm:ss
+     */
     public static String formatOffset(int offset) {
+        if (offset == 0) {
+            return "Z";
+        }
         String pre = offset < 0 ? "-" : "+";
         return pre + LocalTime.ofSecondOfDay(offset).toString();
     }
 
+    /** @param dateString 限定格式 yyyy-MM-dd */
     public static LocalDate parseDate(String dateString) {
         if (dateString.length() != 10) throw new IllegalArgumentException("invalid dateString " + dateString);
         return LocalDate.parse(dateString, DateTimeFormatter.ISO_DATE);
     }
 
+    /** @param timeString 限定格式 HH:mm:ss */
     public static LocalTime parseTime(String timeString) {
         if (timeString.length() != 8) throw new IllegalArgumentException("invalid timeString " + timeString);
         return LocalTime.parse(timeString, DateTimeFormatter.ISO_TIME);
     }
 
+    /**
+     * Z
+     * +H
+     * +HH
+     * +HH:mm
+     * +HH:mm:ss
+     */
     public static int parseOffset(String offsetString) {
-        if (offsetString.charAt(0) == '-') {
-            return -1 * LocalTime.parse(offsetString.substring(1)).toSecondOfDay();
-        }
-        if (offsetString.charAt(0) == '+') {
-            return LocalTime.parse(offsetString.substring(1)).toSecondOfDay();
-        }
-        throw new IllegalArgumentException("invalid offset string " + offsetString);
+        //
+        return switch (offsetString.length()) {
+            case 1, 2, 3, 6, 9 -> ZoneOffset.of(offsetString).getTotalSeconds();
+            default -> throw new IllegalArgumentException("invalid offset string " + offsetString);
+        };
     }
 
     // endregion

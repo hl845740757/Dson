@@ -123,8 +123,8 @@ public final class FieldNumber implements Comparable<FieldNumber> {
     @Override
     public String toString() {
         return "FieldNumber{" +
-               "idep=" + idep +
-               ", lnumber=" + lnumber +
-               '}';
+                "idep=" + idep +
+                ", lnumber=" + lnumber +
+                '}';
     }
 }

@@ -80,8 +80,8 @@ public class DsonExtString extends DsonValue implements Comparable<DsonExtString
     @Override
     public String toString() {
         return "DsonExtString{" +
-               "type=" + type +
-               ", value='" + value + '\'' +
-               '}';
+                "type=" + type +
+                ", value='" + value + '\'' +
+                '}';
     }
 }

@@ -276,13 +276,13 @@ public class DsonOutputs {
         @Override
         public String toString() {
             return "ArrayOutput{" +
-                   "arrayLength=" + buffer.length +
-                   ", offset=" + offset +
-                   ", limit=" + limit +
-                   ", codedOutputStreamOffset=" + codedOutputStreamOffset +
-                   ", codedOutputStreamTotalBytesWritten=" + codedOutputStream.getTotalBytesWritten() +
-                   ", totalBytesWritten=" + position() +
-                   '}';
+                    "arrayLength=" + buffer.length +
+                    ", offset=" + offset +
+                    ", limit=" + limit +
+                    ", codedOutputStreamOffset=" + codedOutputStreamOffset +
+                    ", codedOutputStreamTotalBytesWritten=" + codedOutputStream.getTotalBytesWritten() +
+                    ", totalBytesWritten=" + position() +
+                    '}';
         }
     }
 

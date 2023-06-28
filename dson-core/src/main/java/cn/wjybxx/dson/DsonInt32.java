@@ -85,7 +85,7 @@ public class DsonInt32 extends DsonNumber implements Comparable<DsonInt32> {
     @Override
     public String toString() {
         return "DsonInt32{" +
-               "value=" + value +
-               '}';
+                "value=" + value +
+                '}';
     }
 }

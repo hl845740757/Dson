@@ -52,11 +52,11 @@ class LineInfo {
     @Override
     public String toString() {
         return "LineInfo{" +
-               " startPos=" + startPos +
-               ", endPos=" + endPos +
-               ", contentStartPos=" + contentStartPos +
-               ", lheadType=" + lheadType +
-               ", ln=" + ln +
-               '}';
+                " startPos=" + startPos +
+                ", endPos=" + endPos +
+                ", contentStartPos=" + contentStartPos +
+                ", lheadType=" + lheadType +
+                ", ln=" + ln +
+                '}';
     }
 }

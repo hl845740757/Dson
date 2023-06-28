@@ -23,7 +23,6 @@ import cn.wjybxx.dson.types.ObjectRef;
 import cn.wjybxx.dson.types.OffsetTimestamp;
 import com.google.protobuf.Parser;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -554,7 +553,7 @@ public class DsonTextReader extends AbstractDsonReader {
         // 每读取一个值，判断下分隔符，尾部最多只允许一个逗号 -- 这里在尾部更容易处理
         DsonToken keyToken;
         if ((keyToken = popToken()).getType() == TokenType.COMMA
-            && (keyToken = popToken()).getType() == TokenType.COMMA) {
+                && (keyToken = popToken()).getType() == TokenType.COMMA) {
             throw DsonIOException.invalidTokenType(context.contextType, keyToken);
         } else {
             pushToken(keyToken);

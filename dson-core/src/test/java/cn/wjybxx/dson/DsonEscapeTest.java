@@ -17,7 +17,7 @@ public class DsonEscapeTest {
             #  @ss 纯文本模式下输入正则表达式
             -   reg1: [@es 10, @ss ^[\\u4e00-\\u9fa5_a-zA-Z0-9]+$
             ~   ],
-            
+                        
             #   在纯文本模式插入转义版本的正则表达式
             -   reg2: [@es 10, @ss\s
             ^ ^[\\\\u4e00-\\\\u9fa5_a-zA-Z0-9]+$

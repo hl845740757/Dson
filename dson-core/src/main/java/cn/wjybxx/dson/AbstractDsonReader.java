@@ -103,7 +103,7 @@ public abstract class AbstractDsonReader implements DsonReader {
             return true;
         }
         return context.contextType == DsonContextType.TOP_LEVEL
-               && context.state != DsonReaderState.VALUE; // INIT or DONE
+                && context.state != DsonReaderState.VALUE; // INIT or DONE
     }
 
     @Override
@@ -405,7 +405,7 @@ public abstract class AbstractDsonReader implements DsonReader {
 
     private void autoStartTopLevel(Context context) {
         if (context.contextType == DsonContextType.TOP_LEVEL
-            && (context.state == DsonReaderState.INITIAL || context.state == DsonReaderState.TYPE)) {
+                && (context.state == DsonReaderState.INITIAL || context.state == DsonReaderState.TYPE)) {
             readDsonType();
         }
     }
