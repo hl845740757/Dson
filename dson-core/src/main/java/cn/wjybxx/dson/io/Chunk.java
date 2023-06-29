@@ -16,6 +16,8 @@
 
 package cn.wjybxx.dson.io;
 
+import cn.wjybxx.dson.internal.BinaryUtils;
+
 /**
  * 二进制块
  * 默认编码length对应的部分

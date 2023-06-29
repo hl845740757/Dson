@@ -278,7 +278,7 @@ public final class Dsons {
             case REFERENCE -> new DsonObjectRef(reader.readRef(name));
             case TIMESTAMP -> new DsonTimestamp(reader.readTimestamp(name));
             case HEADER -> {
-                DsonHeader<String> header = new DsonHeader<String>();
+                DsonHeader<String> header = new DsonHeader<>();
                 readHeader(reader, header);
                 yield header;
             }

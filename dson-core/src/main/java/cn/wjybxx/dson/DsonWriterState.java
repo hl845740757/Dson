@@ -16,8 +16,6 @@
 
 package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.internal.Internal;
-
 /**
  * Object、Header循环： NAME-VALUE
  * 顶层上下文、Array循环： VALUE
@@ -27,7 +25,6 @@ import cn.wjybxx.dson.internal.Internal;
  * @author wjybxx
  * date - 2023/4/22
  */
-@Internal
 public enum DsonWriterState {
 
     /** 底层上下文初始状态 */

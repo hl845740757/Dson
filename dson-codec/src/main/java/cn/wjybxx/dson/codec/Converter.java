@@ -57,13 +57,6 @@ public interface Converter {
      */
     <U> U read(Chunk chunk, TypeArgInfo<U> typeArgInfo);
 
-    /** @return 写入的字节数 */
-    default int write(Object value, byte[] source, TypeArgInfo<?> typeArgInfo) {
-        Chunk chunk = new Chunk(source);
-        write(value, chunk, typeArgInfo);
-        return chunk.getUsed();
-    }
-
     @Nonnull
     default byte[] write(Object value) {
         return write(value, TypeArgInfo.OBJECT);
@@ -71,6 +64,17 @@ public interface Converter {
 
     default Object read(@Nonnull byte[] source) {
         return read(source, TypeArgInfo.OBJECT);
+    }
+
+    /**
+     * @param buffer      编码输出
+     * @param typeArgInfo 类型参数信息
+     * @return 写入的字节数
+     */
+    default int write(Object value, byte[] buffer, TypeArgInfo<?> typeArgInfo) {
+        Chunk chunk = new Chunk(buffer);
+        write(value, chunk, typeArgInfo);
+        return chunk.getUsed();
     }
 
     /**

@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-package cn.wjybxx.dson.io;
-
-import cn.wjybxx.dson.internal.Internal;
+package cn.wjybxx.dson.internal;
 
 import java.nio.Buffer;
 
@@ -26,7 +24,6 @@ import java.nio.Buffer;
  * @author wjybxx
  * date 2023/3/31
  */
-@Internal
 public class BinaryUtils {
 
     private BinaryUtils() {

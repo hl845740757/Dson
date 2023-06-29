@@ -6,7 +6,7 @@ package cn.wjybxx.dson.text;
  */
 public enum NumberStyle {
 
-    /** 简单的 - 无类型的 */
+    /** 简单的 - 无类型标签 */
     SIMPLE,
 
     /** 有类型标签的 */

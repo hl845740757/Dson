@@ -16,6 +16,7 @@
 
 package cn.wjybxx.dson.io;
 
+import cn.wjybxx.dson.internal.BinaryUtils;
 import com.google.protobuf.CodedOutputStream;
 import com.google.protobuf.MessageLite;
 

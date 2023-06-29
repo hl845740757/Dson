@@ -16,7 +16,6 @@
 
 package cn.wjybxx.dson.text;
 
-import cn.wjybxx.dson.internal.Internal;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.io.Writer;
@@ -29,7 +28,6 @@ import java.util.Objects;
  * @author wjybxx
  * date - 2023/6/5
  */
-@Internal
 public final class DsonPrinter implements AutoCloseable {
 
     private final Writer writer;
@@ -82,6 +80,7 @@ public final class DsonPrinter implements AutoCloseable {
         }
     }
 
+    /** 打印缩进，可指定一个偏移量 */
     public void printIndent(int offset) {
         try {
             int len = indent - offset;
@@ -104,7 +103,7 @@ public final class DsonPrinter implements AutoCloseable {
     public void print(char[] cBuffer) {
         try {
             builder.append(cBuffer);
-            column += 1;
+            column += cBuffer.length;
         } catch (Exception e) {
             ExceptionUtils.rethrow(e);
         }
@@ -153,7 +152,7 @@ public final class DsonPrinter implements AutoCloseable {
             if (builder.length() > 0) {
                 // 显式转cBuffer，避免toString的额外开销
                 char[] cBuffer = new char[builder.length()];
-                builder.getChars(0, builder.length(), cBuffer, 0);
+                builder.getChars(0, cBuffer.length, cBuffer, 0);
 
                 writer.write(cBuffer, 0, cBuffer.length);
                 builder.setLength(0);

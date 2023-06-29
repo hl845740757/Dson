@@ -118,30 +118,4 @@ public class DsonIOException extends RuntimeException {
     }
 
     // endregion
-
-    //
-
-    public static DsonIOException unsupportedType(Class<?> type) {
-        return new DsonIOException("Can't find a codec for " + type);
-    }
-
-    public static DsonIOException unsupportedKeyType(Class<?> type) {
-        return new DsonIOException("Can't find a codec for " + type + ", or key is not DsonEnum");
-    }
-
-    public static DsonIOException enumAbsent(Class<?> declared, int number) {
-        return new DsonIOException(String.format("DsonEnum is absent, declared: %s, number: %d", declared, number));
-    }
-
-    public static DsonIOException incompatible(DsonType expected, DsonType dsonType) {
-        return new DsonIOException(String.format("Incompatible data format, expected %s, but found %s", expected, dsonType));
-    }
-
-    public static DsonIOException incompatible(Class<?> declared, DsonType dsonType) {
-        return new DsonIOException(String.format("Incompatible data format, declaredType %s, tag %s", declared, dsonType));
-    }
-
-    public static <T> DsonIOException incompatible(Class<?> declared, T classId) {
-        return new DsonIOException(String.format("Incompatible data format, declaredType %s, classId %s", declared, classId));
-    }
 }

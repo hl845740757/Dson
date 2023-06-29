@@ -16,13 +16,10 @@
 
 package cn.wjybxx.dson.text;
 
-import cn.wjybxx.dson.internal.Internal;
-
 /**
  * @author wjybxx
  * date - 2023/6/3
  */
-@Internal
 class LineInfo {
 
     /** 行全局起始位置，包含行首，与上一行只差包含换行符 */

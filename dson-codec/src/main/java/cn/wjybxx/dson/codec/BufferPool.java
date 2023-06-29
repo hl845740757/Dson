@@ -16,7 +16,6 @@
 
 package cn.wjybxx.dson.codec;
 
-import cn.wjybxx.dson.internal.Internal;
 import cn.wjybxx.dson.internal.InternalUtils;
 
 import java.util.ArrayDeque;
@@ -29,7 +28,6 @@ import java.util.Queue;
  * @author wjybxx
  * date 2023/3/31
  */
-@Internal
 public class BufferPool {
 
     /**

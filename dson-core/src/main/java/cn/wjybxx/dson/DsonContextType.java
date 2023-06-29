@@ -16,8 +16,6 @@
 
 package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.internal.Internal;
-
 /**
  * @author wjybxx
  * date 2023/4/4
@@ -36,9 +34,7 @@ public enum DsonContextType {
     /** 当前是一个Header结构 - 类似Object */
     HEADER("@{", "}");
 
-    @Internal
     public final String startSymbol;
-    @Internal
     public final String endSymbol;
 
     DsonContextType(String startSymbol, String endSymbol) {

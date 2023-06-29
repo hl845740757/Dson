@@ -17,11 +17,7 @@
 package cn.wjybxx.dson.codec;
 
 import cn.wjybxx.dson.DsonContextType;
-import cn.wjybxx.dson.DsonReaderState;
 import cn.wjybxx.dson.DsonType;
-import cn.wjybxx.dson.DsonWriterState;
-import cn.wjybxx.dson.text.DsonToken;
-import cn.wjybxx.dson.text.TokenType;
 
 import java.util.List;
 
@@ -94,31 +90,11 @@ public class DsonCodecException extends RuntimeException {
         return new DsonCodecException(String.format("Unexpected subType, expected %d, but found %d", expected, subType));
     }
 
-    public static DsonCodecException invalidState(DsonContextType contextType, List<DsonReaderState> expected, DsonReaderState state) {
-        return new DsonCodecException(String.format("invalid state, contextType %s, expected %s, but found %s.",
-                contextType, expected, state));
-    }
-
-    public static DsonCodecException invalidState(DsonContextType contextType, List<DsonWriterState> expected, DsonWriterState state) {
-        return new DsonCodecException(String.format("invalid state, contextType %s, expected %s, but found %s.",
-                contextType, expected, state));
-    }
-
     public static DsonCodecException bytesRemain(int bytesUntilLimit) {
         return new DsonCodecException("bytes remain " + bytesUntilLimit);
     }
 
-    public static DsonCodecException invalidTokenType(DsonContextType contextType, DsonToken token) {
-        return new DsonCodecException(String.format("invalid token, contextType %s, token %s.", contextType, token));
-    }
-
-    public static DsonCodecException invalidTokenType(DsonContextType contextType, DsonToken token, List<TokenType> expected) {
-        return new DsonCodecException(String.format("invalid token, contextType %s, expected %s, but found %s.",
-                contextType, expected, token));
-    }
-
     // endregion
-
 
     //
 

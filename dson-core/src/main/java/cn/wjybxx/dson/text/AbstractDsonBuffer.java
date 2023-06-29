@@ -16,8 +16,6 @@
 
 package cn.wjybxx.dson.text;
 
-import cn.wjybxx.dson.internal.Internal;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -28,8 +26,7 @@ import java.util.Objects;
  * @author wjybxx
  * date - 2023/6/3
  */
-@Internal
-public abstract class AbstractDsonBuffer<T extends LineInfo> implements DsonBuffer {
+abstract class AbstractDsonBuffer<T extends LineInfo> implements DsonBuffer {
 
     protected final List<T> lines = new ArrayList<>();
     protected T curLine;

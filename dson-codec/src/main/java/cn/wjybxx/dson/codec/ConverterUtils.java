@@ -137,24 +137,6 @@ public class ConverterUtils {
         }
     }
 
-    /** 将数组对象转换为给定类型 */
-    @SuppressWarnings("unchecked")
-    public static <T> T castArrayValue(Class<T> arrayType, Object arrayValue) {
-        if (arrayType.isAssignableFrom(arrayValue.getClass())) {
-            return (T) arrayValue;
-        }
-
-        final Class<?> componentType = arrayType.getComponentType();
-        final int length = Array.getLength(arrayValue);
-        // System.arrayCopy并不支持对象数组到基础类型数组
-        final T tempArray = (T) Array.newInstance(componentType, length);
-        for (int index = 0; index < length; index++) {
-            Object element = Array.get(arrayValue, index);
-            Array.set(tempArray, index, element);
-        }
-        return tempArray;
-    }
-
     /** List转Array */
     @SuppressWarnings("unchecked")
     public static <T, E> T convertList2Array(List<?> list, Class<T> arrayType) {
@@ -181,18 +163,19 @@ public class ConverterUtils {
      * 枚举实例可能是枚举类的子类，如果枚举实例声明了代码块{}，在编解码时需要转换为声明类
      */
     public static Class<?> getEncodeClass(Object value) {
-        if (value instanceof Enum) {
-            return ((Enum<?>) value).getDeclaringClass();
+        if (value instanceof Enum<?> e) {
+            return e.getDeclaringClass();
         } else {
             return value.getClass();
         }
     }
 
     /**
-     * 注意：map是一个数组对象，而不是普通的对象
+     * 注意：默认情况下map是一个数组对象，而不是普通的对象
      */
     public static <T> boolean isEncodeAsArray(Class<T> encoderClass) {
-        return encoderClass.isArray() || Collection.class.isAssignableFrom(encoderClass)
+        return encoderClass.isArray()
+                || Collection.class.isAssignableFrom(encoderClass)
                 || Map.class.isAssignableFrom(encoderClass);
     }
 
