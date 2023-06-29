@@ -287,7 +287,7 @@ public class DsonObjectReader extends AbstractDsonReader {
         setPooledContext(context);
     }
 
-    private static class Context extends AbstractDsonReader.Context {
+    protected static class Context extends AbstractDsonReader.Context {
 
         /** 如果不为null，则表示需要先读取header */
         private DsonHeader<String> header;

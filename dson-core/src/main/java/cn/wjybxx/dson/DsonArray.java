@@ -28,7 +28,7 @@ import java.util.RandomAccess;
  * @author wjybxx
  * date - 2023/4/19
  */
-public class DsonArray<K> extends DsonListAdapter implements RandomAccess {
+public class DsonArray<K> extends AbstractDsonArray implements RandomAccess {
 
     private final DsonHeader<K> header;
 

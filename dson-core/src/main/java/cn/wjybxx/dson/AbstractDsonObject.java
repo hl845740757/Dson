@@ -9,11 +9,11 @@ import java.util.*;
  * @author wjybxx
  * date - 2023/6/18
  */
-public abstract class DsonMapAdapter<K> extends DsonValue implements Map<K, DsonValue> {
+public abstract class AbstractDsonObject<K> extends DsonValue implements Map<K, DsonValue> {
 
     final Map<K, DsonValue> valueMap;
 
-    DsonMapAdapter(Map<K, DsonValue> valueMap, int policy) {
+    AbstractDsonObject(Map<K, DsonValue> valueMap, int policy) {
         this.valueMap = InternalUtils.resolveMapPolicy(valueMap, policy);
     }
 
@@ -80,7 +80,7 @@ public abstract class DsonMapAdapter<K> extends DsonValue implements Map<K, Dson
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        return o instanceof DsonMapAdapter<?> that && valueMap.equals(that.valueMap);
+        return o instanceof AbstractDsonObject<?> that && valueMap.equals(that.valueMap);
     }
 
     @Override

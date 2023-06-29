@@ -287,7 +287,7 @@ public class DsonObjectLiteReader extends AbstractDsonLiteReader {
         setPooledContext(context);
     }
 
-    private static class Context extends AbstractDsonLiteReader.Context {
+    protected static class Context extends AbstractDsonLiteReader.Context {
 
         /** 如果不为null，则表示需要先读取header */
         private DsonHeader<FieldNumber> header;

@@ -12,11 +12,11 @@ import java.util.function.UnaryOperator;
  * @author wjybxx
  * date - 2023/6/18
  */
-public abstract class DsonListAdapter extends DsonValue implements List<DsonValue> {
+public abstract class AbstractDsonArray extends DsonValue implements List<DsonValue> {
 
     final List<DsonValue> values;
 
-    DsonListAdapter(List<DsonValue> values, int policy) {
+    AbstractDsonArray(List<DsonValue> values, int policy) {
         this.values = InternalUtils.resolveListPolicy(values, policy);
     }
 
@@ -30,7 +30,7 @@ public abstract class DsonListAdapter extends DsonValue implements List<DsonValu
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        return o instanceof DsonListAdapter that && values.equals(that.values);
+        return o instanceof AbstractDsonArray that && values.equals(that.values);
     }
 
     @Override

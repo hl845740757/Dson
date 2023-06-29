@@ -249,7 +249,7 @@ public class DsonBinaryWriter extends AbstractDsonWriter {
         setPooledContext(context);
     }
 
-    private static class Context extends AbstractDsonWriter.Context {
+    protected static class Context extends AbstractDsonWriter.Context {
 
         int preWritten = 0;
 

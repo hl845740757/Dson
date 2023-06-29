@@ -29,7 +29,7 @@ import java.util.Map;
  * @author wjybxx
  * date - 2023/5/27
  */
-public class DsonHeader<K> extends DsonMapAdapter<K> {
+public class DsonHeader<K> extends AbstractDsonObject<K> {
 
     public DsonHeader() {
         super(new LinkedHashMap<>(4), InternalUtils.POLICY_DEFAULT);

@@ -48,7 +48,7 @@ public class DsonParseException extends RuntimeException {
         return new DsonParseException(e);
     }
 
-    public static DsonParseException format(String format, Object... args) {
+    public static DsonParseException formatted(String format, Object... args) {
         return new DsonParseException(String.format(format, args));
     }
 

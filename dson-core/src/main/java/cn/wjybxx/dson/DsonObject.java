@@ -27,7 +27,7 @@ import java.util.Objects;
  * @author wjybxx
  * date - 2023/4/21
  */
-public class DsonObject<K> extends DsonMapAdapter<K> {
+public class DsonObject<K> extends AbstractDsonObject<K> {
 
     private final DsonHeader<K> header;
 

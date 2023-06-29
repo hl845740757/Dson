@@ -231,7 +231,7 @@ public class DsonBinaryReader extends AbstractDsonReader {
         setPooledContext(context);
     }
 
-    private static class Context extends AbstractDsonReader.Context {
+    protected static class Context extends AbstractDsonReader.Context {
 
         int oldLimit = -1;
 

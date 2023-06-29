@@ -169,7 +169,7 @@ public class DsonObjectWriter extends AbstractDsonWriter {
         setPooledContext(context);
     }
 
-    private static class Context extends AbstractDsonWriter.Context {
+    protected static class Context extends AbstractDsonWriter.Context {
 
         DsonValue container;
 

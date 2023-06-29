@@ -545,7 +545,7 @@ public class DsonTextWriter extends AbstractDsonWriter {
         setPooledContext(context);
     }
 
-    private static class Context extends AbstractDsonWriter.Context {
+    protected static class Context extends AbstractDsonWriter.Context {
 
         ObjectStyle style = ObjectStyle.INDENT;
         int headerCount = 0;

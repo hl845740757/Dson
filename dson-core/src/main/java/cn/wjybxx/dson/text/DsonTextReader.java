@@ -805,7 +805,7 @@ public class DsonTextReader extends AbstractDsonReader {
         setPooledContext(context);
     }
 
-    private static class Context extends AbstractDsonReader.Context {
+    protected static class Context extends AbstractDsonReader.Context {
 
         DsonToken beginToken;
         /** header只可触发一次流程 */
