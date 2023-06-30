@@ -81,9 +81,7 @@ public class DsonTexts {
 
     static {
         char[] tokenCharArray = "{}[],:\"@\\".toCharArray();
-        // 圆括号、单引号
-        char[] reservedCharArray = "()'".toCharArray();
-
+        char[] reservedCharArray = "()".toCharArray();
         for (char c : tokenCharArray) {
             unsafeCharSet.set(c);
         }
