@@ -24,6 +24,7 @@ import com.google.protobuf.MessageLite;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Writer;
+import java.math.BigDecimal;
 
 /**
  * 总指导：
@@ -276,20 +277,36 @@ public class DsonTextWriter extends AbstractDsonWriter {
     protected void doWriteFloat(float value, NumberStyle style) {
         DsonPrinter printer = this.printer;
         writeCurrentName(printer, DsonType.FLOAT);
-        int iv = (int) value; // NaN安全
-        if (iv == value) {
-            if (style != NumberStyle.SIMPLE) {
-                printer.print("@f ");
-            }
-            printer.print(Integer.toString(iv));
+        if (Float.isNaN(value) || Float.isInfinite(value)) { // 特殊值加上标签
+            printer.print("@f ");
+            printer.print(Float.toString(value));
         } else {
-            String str = Float.toString(value);
-            if (style != NumberStyle.SIMPLE
-                    || Float.isNaN(value) || Float.isInfinite(value)  // 特殊值加上标签
-                    || str.indexOf('E') > 0) { // 科学计数法加标签
-                printer.print("@f ");
+            // 先测试是否是整数，再测试是否禁用科学计数法
+            int iv = (int) value;
+            if (iv == value) {
+                if (style != NumberStyle.SIMPLE) {
+                    printer.print("@f ");
+                }
+                printer.print(Integer.toString(iv));
+            } else {
+                String str = Float.toString(value);
+                if (str.lastIndexOf('E') > 0) {
+                    if (settings.disableSci) { // 禁用科学计数法
+                        if (style != NumberStyle.SIMPLE) {
+                            printer.print("@f ");
+                        }
+                        printer.print(new BigDecimal(str).stripTrailingZeros().toPlainString());
+                    } else {
+                        printer.print("@f "); // 科学计数法加标签
+                        printer.print(str);
+                    }
+                } else {
+                    if (style != NumberStyle.SIMPLE) {
+                        printer.print("@f ");
+                    }
+                    printer.print(str);
+                }
             }
-            printer.print(str);
         }
     }
 
@@ -297,16 +314,28 @@ public class DsonTextWriter extends AbstractDsonWriter {
     protected void doWriteDouble(double value) {
         DsonPrinter printer = this.printer;
         writeCurrentName(printer, DsonType.DOUBLE);
-        long lv = (long) value; // NaN安全
-        if (lv == value) {
-            printer.print(Long.toString(lv));
+        if (Double.isNaN(value) || Double.isInfinite(value)) {
+            printer.print("@d ");
+            printer.print(Double.toString(value));
         } else {
-            String str = Double.toString(value);
-            if (Double.isNaN(value) || Double.isInfinite(value) // 特殊值加上标签
-                    || str.indexOf('E') > 0) { // 科学计数法加标签
-                printer.print("@d ");
+            // 先测试是否是整数，再测试是否禁用科学计数法
+            long lv = (long) value;
+            if (lv == value) {
+                printer.print(Long.toString(lv));
+            } else {
+                // 总是使用BigDecimal的话性能不好，我们假设出现科学计数法的频率较低，先toString再测试
+                String str = Double.toString(value);
+                if (str.lastIndexOf('E') > 0) {
+                    if (settings.disableSci) {
+                        printer.print(new BigDecimal(str).stripTrailingZeros().toPlainString());
+                    } else {
+                        printer.print("@d "); // 科学计数法加标签
+                        printer.print(str);
+                    }
+                } else {
+                    printer.print(str);
+                }
             }
-            printer.print(str);
         }
     }
 

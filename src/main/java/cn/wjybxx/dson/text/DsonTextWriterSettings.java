@@ -16,19 +16,22 @@
 
 package cn.wjybxx.dson.text;
 
+import javax.annotation.concurrent.Immutable;
 import java.util.Objects;
 
 /**
  * @author wjybxx
  * date - 2023/6/5
  */
+@Immutable
 public class DsonTextWriterSettings {
 
     public final String lineSeparator;
     public final int softLineLength;
-    public final boolean unicodeChar;
     public final boolean enableText;
     public final float lengthFactorOfText;
+    public final boolean unicodeChar;
+    public final boolean disableSci;
 
     private DsonTextWriterSettings(Builder builder) {
         this.lineSeparator = Objects.requireNonNull(builder.lineSeparator);
@@ -36,6 +39,7 @@ public class DsonTextWriterSettings {
         this.unicodeChar = builder.unicodeChar;
         this.enableText = builder.enableText;
         this.lengthFactorOfText = builder.lengthFactorOfText;
+        this.disableSci = builder.disableSci;
     }
 
     public static Builder newBuilder() {
@@ -68,6 +72,10 @@ public class DsonTextWriterSettings {
          * 通常用于非UTF8文本的移植
          */
         private boolean unicodeChar = false;
+        /**
+         * 是否禁用科学计数法输出
+         */
+        private boolean disableSci = false;
 
         private Builder() {
         }
@@ -118,6 +126,15 @@ public class DsonTextWriterSettings {
 
         public Builder setLengthFactorOfText(float lengthFactorOfText) {
             this.lengthFactorOfText = lengthFactorOfText;
+            return this;
+        }
+
+        public boolean isDisableSci() {
+            return disableSci;
+        }
+
+        public Builder setDisableSci(boolean disableSci) {
+            this.disableSci = disableSci;
             return this;
         }
     }

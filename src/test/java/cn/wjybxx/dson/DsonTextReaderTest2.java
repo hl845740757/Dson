@@ -49,7 +49,7 @@ public class DsonTextReaderTest2 {
             - value3: @i 0xFF,\s
             - value4: @i 0b10010001,
             - value5: @i 100_000_000,\s
-            - value6: @d 1.0E-6,
+            - value6: @d 1.05E-15,
             - value7: @d Infinity,\s
             - value8: @d NaN,\s
             - }
@@ -57,7 +57,10 @@ public class DsonTextReaderTest2 {
 
     @Test
     void testNumber() {
+        DsonTextWriterSettings settings = DsonTextWriterSettings.newBuilder()
+                .setDisableSci(true)
+                .build();
         DsonValue value = Dsons.fromDson(numberString);
-        System.out.println(Dsons.toDson(value, ObjectStyle.INDENT));
+        System.out.println(Dsons.toDson(value, ObjectStyle.INDENT, settings));
     }
 }
