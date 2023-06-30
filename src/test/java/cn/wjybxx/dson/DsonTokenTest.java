@@ -16,7 +16,10 @@
 
 package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.text.*;
+import cn.wjybxx.dson.text.DsonBuffer;
+import cn.wjybxx.dson.text.DsonScanner;
+import cn.wjybxx.dson.text.DsonToken;
+import cn.wjybxx.dson.text.TokenType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -25,6 +28,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
+ * 验证{@link DsonBuffer#newLinesBuffer(List)}
+ * 和{@link  DsonBuffer#newStringBuffer(CharSequence)}实现的相等性
+ *
  * @author wjybxx
  * date - 2023/6/3
  */
@@ -52,9 +58,13 @@ public class DsonTokenTest {
 
         List<DsonToken> tokenList1 = new ArrayList<>(64);
         List<DsonToken> tokenList2 = new ArrayList<>(64);
-        pullToList(new DsonScanner(new DsonLinesBuffer(x.lines().collect(Collectors.toList()))), tokenList1);
-        pullToList(new DsonScanner(new DsonStringBuffer(x)), tokenList2);
+        pullToList(new DsonScanner(DsonBuffer.newLinesBuffer(toLines(x))), tokenList1);
+        pullToList(new DsonScanner(DsonBuffer.newStringBuffer(x)), tokenList2);
         Assertions.assertEquals(tokenList1, tokenList2);
+    }
+
+    private static List<String> toLines(String x) {
+        return x.lines().collect(Collectors.toList());
     }
 
     private static void pullToList(DsonScanner scanner, List<DsonToken> outList) {

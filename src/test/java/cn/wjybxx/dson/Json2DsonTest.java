@@ -16,14 +16,19 @@
 
 package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.text.DsonLinesBuffer;
+import cn.wjybxx.dson.text.DsonBuffer;
 import cn.wjybxx.dson.text.DsonScanner;
 import cn.wjybxx.dson.text.DsonTextReader;
-import cn.wjybxx.dson.text.JsonBuffer;
+import cn.wjybxx.dson.text.DsonTexts;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
+ * 验证{@link DsonBuffer#newJsonBuffer(String)}的正确性
+ *
  * @author wjybxx
  * date - 2023/6/5
  */
@@ -45,16 +50,25 @@ public class Json2DsonTest {
     @Test
     void test() {
         DsonValue dsonValue;
-        try (DsonTextReader reader = new DsonTextReader(16, new DsonScanner(DsonLinesBuffer.ofJson(jsonString)))) {
+        try (DsonTextReader reader = new DsonTextReader(16, new DsonScanner(createLinesBuffer(jsonString)))) {
             dsonValue = Dsons.readTopDsonValue(reader);
             Assertions.assertInstanceOf(DsonObject.class, dsonValue);
         }
 
         DsonValue dsonValue2;
-        try (DsonTextReader reader = new DsonTextReader(16, new DsonScanner(new JsonBuffer(jsonString)))) {
+        try (DsonTextReader reader = new DsonTextReader(16, new DsonScanner(DsonBuffer.newJsonBuffer(jsonString)))) {
             dsonValue2 = Dsons.readTopDsonValue(reader);
             Assertions.assertInstanceOf(DsonObject.class, dsonValue);
         }
         Assertions.assertEquals(dsonValue, dsonValue2);
     }
+
+    /** 用于验证{@code JsonBuffer}的正确性 */
+    private static DsonBuffer createLinesBuffer(String json) {
+        List<String> lines = json.lines()
+                .map(e -> DsonTexts.LHEAD_APPEND + " " + e)
+                .collect(Collectors.toList());
+        return DsonBuffer.newLinesBuffer(lines);
+    }
+
 }

@@ -18,27 +18,17 @@ package cn.wjybxx.dson.text;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * @author wjybxx
  * date - 2023/6/2
  */
-public class DsonLinesBuffer extends AbstractDsonBuffer<DsonLinesBuffer.LocalLineInfo> {
+final class DsonLinesBuffer extends AbstractDsonBuffer<DsonLinesBuffer.LocalLineInfo> {
 
     private List<String> originLines;
 
-    /**
-     * @param originLines 不可以再包含换行符
-     */
-    public DsonLinesBuffer(List<String> originLines) {
+    DsonLinesBuffer(List<String> originLines) {
         this.originLines = Objects.requireNonNull(originLines);
-    }
-
-    public static DsonLinesBuffer ofJson(String json) {
-        List<String> lines = json.lines().map(e -> DsonTexts.LHEAD_APPEND + " " + e)
-                .collect(Collectors.toList());
-        return new DsonLinesBuffer(lines);
     }
 
     @Override

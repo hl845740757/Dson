@@ -67,7 +67,7 @@ public class DsonTextReaderTest {
     @Test
     void test() {
         List<DsonValue> topObjects = new ArrayList<>(4);
-        try (DsonScanner scanner = new DsonScanner(new DsonStringBuffer(dsonString))) {
+        try (DsonScanner scanner = new DsonScanner(DsonBuffer.newStringBuffer(dsonString))) {
             DsonReader reader = new DsonTextReader(16, scanner);
             DsonValue dsonValue;
             while ((dsonValue = Dsons.readTopDsonValue(reader)) != null) {

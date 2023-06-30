@@ -16,6 +16,8 @@
 
 package cn.wjybxx.dson.text;
 
+import java.util.List;
+
 /**
  * Dson是按照行解析的，缓存是也是基于行
  * 注意：
@@ -91,6 +93,33 @@ public interface DsonBuffer extends AutoCloseable {
     default LnCol getLnCol() {
         return new LnCol(getLn(), getCol());
     }
+
+    // region 工厂方法
+
+    /**
+     * 通过Dson标准字符串创建Buffer
+     *
+     * @param dsonString 由多行构成
+     */
+    static DsonBuffer newStringBuffer(CharSequence dsonString) {
+        return new DsonStringBuffer(dsonString);
+    }
+
+    /**
+     * 通过Dson标准行创建Buffer
+     *
+     * @param originLines 不可以再包含换行符
+     */
+    static DsonBuffer newLinesBuffer(List<String> originLines) {
+        return new DsonLinesBuffer(originLines);
+    }
+
+    /** 通过标准的json字符串创建dson的buffer */
+    static DsonBuffer newJsonBuffer(String json) {
+        return new JsonBuffer(json);
+    }
+
+    // endregion
 
     @Override
     void close();

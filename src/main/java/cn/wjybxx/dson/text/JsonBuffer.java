@@ -25,7 +25,7 @@ import java.util.List;
  * @author wjybxx
  * date - 2023/6/5
  */
-public final class JsonBuffer implements DsonBuffer {
+final class JsonBuffer implements DsonBuffer {
 
     private final CharSequence buffer;
 
@@ -35,7 +35,7 @@ public final class JsonBuffer implements DsonBuffer {
     private int position = -1;
     private boolean startLine = false;
 
-    public JsonBuffer(CharSequence buffer) {
+    JsonBuffer(CharSequence buffer) {
         this.buffer = buffer;
     }
 

@@ -19,7 +19,6 @@ package cn.wjybxx.dson.internal;
 import java.nio.Buffer;
 
 /**
- *
  * @author wjybxx
  * date 2023/3/31
  */

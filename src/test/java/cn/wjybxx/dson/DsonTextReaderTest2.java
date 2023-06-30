@@ -57,10 +57,19 @@ public class DsonTextReaderTest2 {
 
     @Test
     void testNumber() {
-        DsonTextWriterSettings settings = DsonTextWriterSettings.newBuilder()
-                .setDisableSci(true)
-                .build();
         DsonValue value = Dsons.fromDson(numberString);
-        System.out.println(Dsons.toDson(value, ObjectStyle.INDENT, settings));
+
+        String dsonString1 = Dsons.toDson(value, ObjectStyle.INDENT);
+        System.out.println();
+        System.out.println(dsonString1);
+
+        String dsonString2 = Dsons.toDson(value, ObjectStyle.INDENT, DsonTextWriterSettings.newBuilder()
+                .setDisableSci(true)
+                .build());
+        System.out.println();
+        System.out.println(dsonString2);
+
+        Assertions.assertEquals(value, Dsons.fromDson(dsonString1));
+        Assertions.assertEquals(value, Dsons.fromDson(dsonString2));
     }
 }

@@ -23,11 +23,11 @@ import java.util.Objects;
  * @author wjybxx
  * date - 2023/6/3
  */
-public class DsonStringBuffer extends AbstractDsonBuffer<LineInfo> {
+final class DsonStringBuffer extends AbstractDsonBuffer<LineInfo> {
 
     private final CharSequence buffer;
 
-    public DsonStringBuffer(CharSequence buffer) {
+    DsonStringBuffer(CharSequence buffer) {
         this.buffer = Objects.requireNonNull(buffer);
     }
 
