@@ -148,9 +148,9 @@ public abstract class AbstractDsonLiteWriter implements DsonLiteWriter {
     }
 
     @Override
-    public void writeDouble(int name, double value) {
+    public void writeDouble(int name, double value, NumberStyle style) {
         advanceToValueState(name);
-        doWriteDouble(value);
+        doWriteDouble(value, style);
         setNextState();
     }
 
@@ -194,18 +194,18 @@ public abstract class AbstractDsonLiteWriter implements DsonLiteWriter {
     }
 
     @Override
-    public void writeExtInt32(int name, DsonExtInt32 value, WireType wireType) {
+    public void writeExtInt32(int name, DsonExtInt32 value, WireType wireType, NumberStyle style) {
         Objects.requireNonNull(value);
         advanceToValueState(name);
-        doWriteExtInt32(value, wireType);
+        doWriteExtInt32(value, wireType, style);
         setNextState();
     }
 
     @Override
-    public void writeExtInt64(int name, DsonExtInt64 value, WireType wireType) {
+    public void writeExtInt64(int name, DsonExtInt64 value, WireType wireType, NumberStyle style) {
         Objects.requireNonNull(value);
         advanceToValueState(name);
-        doWriteExtInt64(value, wireType);
+        doWriteExtInt64(value, wireType, style);
         setNextState();
     }
 
@@ -239,7 +239,7 @@ public abstract class AbstractDsonLiteWriter implements DsonLiteWriter {
 
     protected abstract void doWriteFloat(float value, NumberStyle style);
 
-    protected abstract void doWriteDouble(double value);
+    protected abstract void doWriteDouble(double value, NumberStyle style);
 
     protected abstract void doWriteBool(boolean value);
 
@@ -251,9 +251,9 @@ public abstract class AbstractDsonLiteWriter implements DsonLiteWriter {
 
     protected abstract void doWriteBinary(int type, Chunk chunk);
 
-    protected abstract void doWriteExtInt32(DsonExtInt32 value, WireType wireType);
+    protected abstract void doWriteExtInt32(DsonExtInt32 value, WireType wireType, NumberStyle style);
 
-    protected abstract void doWriteExtInt64(DsonExtInt64 value, WireType wireType);
+    protected abstract void doWriteExtInt64(DsonExtInt64 value, WireType wireType, NumberStyle style);
 
     protected abstract void doWriteExtString(DsonExtString value, StringStyle style);
 

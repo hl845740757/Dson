@@ -63,11 +63,14 @@ public interface DsonLiteWriter extends AutoCloseable {
     void writeInt64(int name, long value, WireType wireType, NumberStyle style);
 
     /**
-     * @param style 浮点数仅支持{@link NumberStyle#SIMPLE}和{@link NumberStyle#TYPED}
+     * @param style 浮点数不支持{@link NumberStyle#BINARY}
      */
     void writeFloat(int name, float value, NumberStyle style);
 
-    void writeDouble(int name, double value);
+    /**
+     * @param style 浮点数不支持{@link NumberStyle#BINARY}
+     */
+    void writeDouble(int name, double value, NumberStyle style);
 
     void writeBoolean(int name, boolean value);
 
@@ -80,9 +83,9 @@ public interface DsonLiteWriter extends AutoCloseable {
     /** @param chunk 写入chunk的length区域 */
     void writeBinary(int name, int type, Chunk chunk);
 
-    void writeExtInt32(int name, DsonExtInt32 value, WireType wireType);
+    void writeExtInt32(int name, DsonExtInt32 value, WireType wireType, NumberStyle style);
 
-    void writeExtInt64(int name, DsonExtInt64 value, WireType wireType);
+    void writeExtInt64(int name, DsonExtInt64 value, WireType wireType, NumberStyle style);
 
     void writeExtString(int name, DsonExtString value, StringStyle style);
 

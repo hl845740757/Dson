@@ -57,7 +57,7 @@ public class DsonObjectWriter extends AbstractDsonWriter {
     }
 
     @Override
-    protected void doWriteDouble(double value) {
+    protected void doWriteDouble(double value, NumberStyle style) {
         getContext().add(new DsonDouble(value));
     }
 
@@ -87,12 +87,12 @@ public class DsonObjectWriter extends AbstractDsonWriter {
     }
 
     @Override
-    protected void doWriteExtInt32(DsonExtInt32 value, WireType wireType) {
+    protected void doWriteExtInt32(DsonExtInt32 value, WireType wireType, NumberStyle style) {
         getContext().add(value); // 不可变对象
     }
 
     @Override
-    protected void doWriteExtInt64(DsonExtInt64 value, WireType wireType) {
+    protected void doWriteExtInt64(DsonExtInt64 value, WireType wireType, NumberStyle style) {
         getContext().add(value);
     }
 

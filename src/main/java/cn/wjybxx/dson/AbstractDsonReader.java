@@ -412,7 +412,7 @@ public abstract class AbstractDsonReader implements DsonReader {
 
     private void checkEndContext(Context context, DsonContextType contextType) {
         if (context.contextType != contextType) {
-            throw DsonIOException.contextError(DsonContextType.OBJECT, context.contextType);
+            throw DsonIOException.contextError(contextType, context.contextType);
         }
         if (context.state != DsonReaderState.WAIT_END_OBJECT) {
             throw invalidState(List.of(DsonReaderState.WAIT_END_OBJECT));

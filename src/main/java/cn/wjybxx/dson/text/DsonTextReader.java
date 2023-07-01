@@ -279,8 +279,8 @@ public class DsonTextReader extends AbstractDsonReader {
                 }
             }
         }
+        // 处理header的特殊属性依赖
         if (context.contextType == DsonContextType.HEADER) {
-            // 处理header的特殊属性依赖
             switch (nextName) {
                 case DsonHeader.NAMES_CLASS_NAME,
                         DsonHeader.NAMES_COMP_CLASS_NAME,
@@ -290,7 +290,7 @@ public class DsonTextReader extends AbstractDsonReader {
                 }
             }
         }
-
+        // 处理特殊值解析
         if ("true".equals(unquotedString) || "false".equals(unquotedString)) {
             pushNextValue(Boolean.valueOf(unquotedString));
             return DsonType.BOOLEAN;
@@ -299,7 +299,6 @@ public class DsonTextReader extends AbstractDsonReader {
             pushNextValue(DsonNull.INSTANCE);
             return DsonType.NULL;
         }
-        // 简单的数
         if (DsonTexts.isParsable(unquotedString)) {
             pushNextValue(DsonTexts.parseDouble(unquotedString));
             return DsonType.DOUBLE;
@@ -480,18 +479,12 @@ public class DsonTextReader extends AbstractDsonReader {
                     DsonToken valueToken = popToken();
                     ensureStringsToken(context, valueToken);
                     nanos = DsonTexts.parseInt(valueToken.castAsString());
-                    if (nanos < 0) {
-                        throw new IllegalArgumentException("invalid nanos " + valueToken);
-                    }
                 }
                 case OffsetTimestamp.NAMES_MILLIS -> {
                     DsonToken valueToken = popToken();
                     ensureStringsToken(context, valueToken);
                     int millis = DsonTexts.parseInt(valueToken.castAsString());
-                    if (millis < 0 || millis > 999) {
-                        throw new IllegalArgumentException("invalid millis " + valueToken);
-                    }
-                    nanos = millis * 1000000;
+                    nanos = millis * 1000_000;
                 }
                 default -> {
                     throw new DsonIOException("invalid datetime fieldName: " + keyToken.castAsString());
@@ -735,13 +728,25 @@ public class DsonTextReader extends AbstractDsonReader {
 
     @Override
     protected void doSkipToEndOfObject() {
-        skipStack(1);
+        DsonToken endToken;
+        if (isAtType()) {
+            endToken = skipStack(1);
+        } else {
+            skipName();
+            endToken = switch (currentDsonType) { // 嵌套对象
+                case HEADER, OBJECT, ARRAY -> skipStack(2);
+                default -> skipStack(1);
+            };
+        }
+        pushToken(endToken);
+
         // 避免计数导致readDsonType异常
         getContext().count++;
         getContext().headerCount++;
     }
 
-    private void skipStack(int stack) {
+    /** @return 触发结束的token */
+    private DsonToken skipStack(int stack) {
         while (stack > 0) {
             DsonToken token = popToken();
             switch (token.getType()) {
@@ -752,10 +757,8 @@ public class DsonTextReader extends AbstractDsonReader {
                     }
                 }
                 case END_ARRAY, END_OBJECT -> {
-                    stack--;
-                    if (stack == 0) {
-                        pushToken(token);
-                        return;
+                    if (--stack == 0) {
+                        return token;
                     }
                 }
                 case EOF -> {
@@ -763,6 +766,7 @@ public class DsonTextReader extends AbstractDsonReader {
                 }
             }
         }
+        throw new AssertionError();
     }
 
     @Override

@@ -160,13 +160,6 @@ public class DsonReaderUtils {
         return input.readRawBytes(size);
     }
 
-    public static void skipToEndOfObject(DsonInput input) {
-        int size = input.getBytesUntilLimit();
-        if (size > 0) {
-            input.skipRawBytes(size);
-        }
-    }
-
     public static void checkReadValueAsBytes(DsonType dsonType) {
         if (!VALUE_BYTES_TYPES.contains(dsonType)) {
             throw DsonIOException.invalidDsonType(VALUE_BYTES_TYPES, dsonType);
@@ -176,6 +169,13 @@ public class DsonReaderUtils {
     public static void checkWriteValueAsBytes(DsonType dsonType) {
         if (!VALUE_BYTES_TYPES.contains(dsonType)) {
             throw DsonIOException.invalidDsonType(VALUE_BYTES_TYPES, dsonType);
+        }
+    }
+
+    public static void skipToEndOfObject(DsonInput input) {
+        int size = input.getBytesUntilLimit();
+        if (size > 0) {
+            input.skipRawBytes(size);
         }
     }
 
@@ -196,9 +196,6 @@ public class DsonReaderUtils {
                 wireType.readInt64(input);
                 return;
             }
-            case STRING -> {
-                skip = input.readUint32();  // string长度
-            }
             case EXT_INT32 -> {
                 input.readUint32(); // 子类型
                 wireType.readInt32(input);
@@ -208,6 +205,9 @@ public class DsonReaderUtils {
                 input.readUint32(); // 子类型
                 wireType.readInt64(input);
                 return;
+            }
+            case STRING -> {
+                skip = input.readUint32();  // string长度
             }
             case EXT_STRING -> {
                 input.readUint32(); // 子类型

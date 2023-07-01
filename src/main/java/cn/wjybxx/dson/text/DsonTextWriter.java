@@ -252,6 +252,10 @@ public class DsonTextWriter extends AbstractDsonWriter {
         if (style != NumberStyle.SIMPLE) {
             printer.print("@i ");
         }
+        printInt32(printer, value, style);
+    }
+
+    private static void printInt32(DsonPrinter printer, int value, NumberStyle style) {
         switch (style) {
             case BINARY -> printer.print(Integer.toBinaryString(value));
             case HEX -> printer.print(Integer.toHexString(value));
@@ -266,6 +270,10 @@ public class DsonTextWriter extends AbstractDsonWriter {
         if (style != NumberStyle.SIMPLE) {
             printer.print("@L ");
         }
+        printInt64(printer, value, style);
+    }
+
+    private static void printInt64(DsonPrinter printer, long value, NumberStyle style) {
         switch (style) {
             case BINARY -> printer.print(Long.toBinaryString(value));
             case HEX -> printer.print(Long.toHexString(value));
@@ -275,33 +283,32 @@ public class DsonTextWriter extends AbstractDsonWriter {
 
     @Override
     protected void doWriteFloat(float value, NumberStyle style) {
+        if (style == NumberStyle.BINARY) throw new IllegalArgumentException("unsupported style " + style);
         DsonPrinter printer = this.printer;
         writeCurrentName(printer, DsonType.FLOAT);
-        if (Float.isNaN(value) || Float.isInfinite(value)) { // 特殊值加上标签
+        if (style == NumberStyle.HEX) { // 16进制会自动处理NaN等
+            printer.print("@f ");
+            printer.print(Float.toHexString(value));
+        } else if (Float.isNaN(value) || Float.isInfinite(value)) { // 特殊值
             printer.print("@f ");
             printer.print(Float.toString(value));
         } else {
+            if (style != NumberStyle.SIMPLE) {
+                printer.print("@f ");
+            }
             // 先测试是否是整数，再测试是否禁用科学计数法
             int iv = (int) value;
             if (iv == value) {
-                if (style != NumberStyle.SIMPLE) {
-                    printer.print("@f ");
-                }
                 printer.print(Integer.toString(iv));
             } else {
                 String str = Float.toString(value);
-                if (str.lastIndexOf('E') > 0) {
-                    if (settings.disableSci) { // 禁用科学计数法
-                        if (style != NumberStyle.SIMPLE) {
-                            printer.print("@f ");
-                        }
-                        printer.print(new BigDecimal(str).stripTrailingZeros().toPlainString());
-                    } else {
-                        printer.print("@f "); // 科学计数法加标签
-                        printer.print(str);
-                    }
+                if (str.lastIndexOf('E') < 0) {
+                    printer.print(str);
+                } else if (settings.disableSci) { // 禁用科学计数法
+                    str = new BigDecimal(str).stripTrailingZeros().toPlainString();
+                    printer.print(str);
                 } else {
-                    if (style != NumberStyle.SIMPLE) {
+                    if (style == NumberStyle.SIMPLE) { // 科学计数法追加标签
                         printer.print("@f ");
                     }
                     printer.print(str);
@@ -311,13 +318,20 @@ public class DsonTextWriter extends AbstractDsonWriter {
     }
 
     @Override
-    protected void doWriteDouble(double value) {
+    protected void doWriteDouble(double value, NumberStyle style) {
+        if (style == NumberStyle.BINARY) throw new IllegalArgumentException("unsupported style " + style);
         DsonPrinter printer = this.printer;
         writeCurrentName(printer, DsonType.DOUBLE);
-        if (Double.isNaN(value) || Double.isInfinite(value)) {
+        if (style == NumberStyle.HEX) { // 16进制会自动处理NaN等
+            printer.print("@d ");
+            printer.print(Double.toHexString(value));
+        } else if (Double.isNaN(value) || Double.isInfinite(value)) { // 特殊值
             printer.print("@d ");
             printer.print(Double.toString(value));
         } else {
+            if (style != NumberStyle.SIMPLE) {
+                printer.print("@d ");
+            }
             // 先测试是否是整数，再测试是否禁用科学计数法
             long lv = (long) value;
             if (lv == value) {
@@ -325,14 +339,15 @@ public class DsonTextWriter extends AbstractDsonWriter {
             } else {
                 // 总是使用BigDecimal的话性能不好，我们假设出现科学计数法的频率较低，先toString再测试
                 String str = Double.toString(value);
-                if (str.lastIndexOf('E') > 0) {
-                    if (settings.disableSci) {
-                        printer.print(new BigDecimal(str).stripTrailingZeros().toPlainString());
-                    } else {
-                        printer.print("@d "); // 科学计数法加标签
-                        printer.print(str);
-                    }
+                if (str.indexOf('E') < 0) {
+                    printer.print(str);
+                } else if (settings.disableSci) { // 禁用科学计数法
+                    str = new BigDecimal(str).stripTrailingZeros().toPlainString();
+                    printer.print(str);
                 } else {
+                    if (style == NumberStyle.SIMPLE) { // 科学计数法追加标签
+                        printer.print("@d ");
+                    }
                     printer.print(str);
                 }
             }
@@ -383,24 +398,24 @@ public class DsonTextWriter extends AbstractDsonWriter {
     }
 
     @Override
-    protected void doWriteExtInt32(DsonExtInt32 value, WireType wireType) {
+    protected void doWriteExtInt32(DsonExtInt32 value, WireType wireType, NumberStyle style) {
         DsonPrinter printer = this.printer;
         writeCurrentName(printer, DsonType.EXT_INT32);
         printer.print("{@ei ");
         printer.print(Integer.toString(value.getType()));
         printer.print(", ");
-        printer.print(Integer.toString(value.getValue()));
+        printInt32(printer, value.getValue(), style);
         printer.print('}');
     }
 
     @Override
-    protected void doWriteExtInt64(DsonExtInt64 value, WireType wireType) {
+    protected void doWriteExtInt64(DsonExtInt64 value, WireType wireType, NumberStyle style) {
         DsonPrinter printer = this.printer;
         writeCurrentName(printer, DsonType.EXT_INT64);
         printer.print("{@eL ");
         printer.print(Integer.toString(value.getType()));
         printer.print(", ");
-        printer.print(Long.toString(value.getValue()));
+        printInt64(printer, value.getValue(), style);
         printer.print('}');
     }
 
