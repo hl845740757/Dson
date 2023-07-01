@@ -32,6 +32,15 @@ public interface DsonInput extends AutoCloseable {
 
     byte readRawByte();
 
+    /**
+     * 将一个byte读取为正整数
+     *
+     * @implNote 子类实现必须与默认实现等价
+     */
+    default int readUint8() {
+        return readRawByte() & 0XFF;
+    }
+
     //
     int readInt32();
 

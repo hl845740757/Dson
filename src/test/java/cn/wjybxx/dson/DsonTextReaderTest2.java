@@ -42,34 +42,4 @@ public class DsonTextReaderTest2 {
         Assertions.assertEquals(dsonObject, dsonObject2);
     }
 
-    static final String numberString = """
-            - {
-            - value1: 10001,\s
-            - value2: 1.05,
-            - value3: @i 0xFF,\s
-            - value4: @i 0b10010001,
-            - value5: @i 100_000_000,\s
-            - value6: @d 1.05E-15,
-            - value7: @d Infinity,\s
-            - value8: @d NaN,\s
-            - }
-            """;
-
-    @Test
-    void testNumber() {
-        DsonValue value = Dsons.fromDson(numberString);
-
-        String dsonString1 = Dsons.toDson(value, ObjectStyle.INDENT);
-        System.out.println();
-        System.out.println(dsonString1);
-
-        String dsonString2 = Dsons.toDson(value, ObjectStyle.INDENT, DsonTextWriterSettings.newBuilder()
-                .setDisableSci(true)
-                .build());
-        System.out.println();
-        System.out.println(dsonString2);
-
-        Assertions.assertEquals(value, Dsons.fromDson(dsonString1));
-        Assertions.assertEquals(value, Dsons.fromDson(dsonString2));
-    }
 }

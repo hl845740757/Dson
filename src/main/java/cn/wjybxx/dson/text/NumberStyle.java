@@ -12,10 +12,9 @@ public enum NumberStyle {
     /** 有类型标签的 */
     TYPED,
 
-    /** 二进制 -- 一定有标签 */
-    BINARY,
-
     /** 16进制 -- 一定有标签 */
     HEX,
 
+    /** 二进制 -- 一定有标签 */
+    BINARY,
 }

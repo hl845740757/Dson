@@ -1,15 +1,5 @@
 # Dson Java库指南
 
-引入maven依赖：
-
-```
-   <dependency>
-     <groupId>cn.wjybxx.dson</groupId>
-     <artifactId>dson-core</artifactId>
-     <version>0.99.beta</version>
-   </dependency>
-```
-
 ## Dsons和DsonLites工具类
 
 在Dson库中提供了Dsons和DsonLites两个工具类，提供了读写Dson的快捷API。  
@@ -38,4 +28,55 @@ Dsons和DsonLites中的方法默认不解析引用，库提供了简单解析引
     repository.resolveReference();
 ```
 
+## Java库特性
 
+解析规则不分语言，因此reader的实现应该保持一致，也就不存在特别的特性。
+但书写格式各个库的实现可能并不相同，这里谈一谈我为Java Dson库的设计的一些特性 —— 未来c#会具备相同的特性。
+
+### 全局设置
+
+1. 支持行长度限制，自动换行
+2. 支持关闭浮点数科学计数法输出
+3. 支持关闭纯文本模式
+4. 支持ASCII不可见字符转unicode字符输出
+
+一般不建议开启unicode字符输出，我设计它的目的仅仅是考虑到可能有跨语言移植的需求。
+
+### NumberStyle
+
+Number支持4种格式输出：
+
+1. SIMPLE 简单模式 —— 普通整数和小数格式，科学计数法
+2. TYPED 简单类型模式 —— 在简单模式的基础上打印类型
+3. HEX 16进制 —— 一定打印类型
+4. BINARY 2进制 —— 一定打印类型
+
+注意：
+
+1. 浮点数仅支持 SIMPLE和TYPED 两种模式
+2. 浮点数是NaN、Infinite或科学计数法格式时，简单模式下也会打印类型。
+3. 对于int64类型要小心使用 SIMPLE 模式，因为数字的默认解析类型是 double，如果int64超出double可表示的整数范围，解析将得到错误的结果。
+
+### StringStyle
+
+字符串支持4种格式：
+
+1. AUTO 自动判别
+    1. 当内容较短且无特殊字符，且不是特殊值时不加引号
+    2. 当内容长度中等时，打印为双引号字符串
+    3. 当内容较长时，打印为文本模式
+2. QUOTE 双引号模式
+3. UNQUOTE 无引号模式 —— 常用于输出一些简单格式字符串
+4. TEXT 文本模式 —— 常用于输出长字符串
+
+### ObjectStyle
+
+对象(object/array/header)支持两种格式：
+
+1. INDENT 缩进模式(换行)
+2. FLOW 流模式
+
+属性较少的对象适合使用Flow模式简化书写和减少行数，同时数据量较大的Array也很适合Flow模式，
+可以很好的减少行数。
+
+PS：其实Writer的目标就是尽可能和我们的书写格式一致。

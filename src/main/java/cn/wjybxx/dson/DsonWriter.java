@@ -110,7 +110,7 @@ public interface DsonWriter extends AutoCloseable {
      * 1.数组内元素没有名字，因此name传 null 即可
      *
      * <pre>{@code
-     *      writer.writeStartArray(name);
+     *      writer.writeStartArray(name, ObjectStyle.INDENT);
      *      for (String coderName: coderNames) {
      *          writer.writeString(null, coderName);
      *      }
@@ -125,7 +125,7 @@ public interface DsonWriter extends AutoCloseable {
     /**
      * 开始写一个普通对象
      * <pre>{@code
-     *      writer.writeStartObject(name);
+     *      writer.writeStartObject(name, ObjectStyle.INDENT);
      *      writer.writeString("name", "wjybxx")
      *      writer.writeInt32("age", 28)
      *      writer.writeEndObject();

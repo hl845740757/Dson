@@ -17,6 +17,7 @@
 package cn.wjybxx.dson;
 
 import cn.wjybxx.dson.text.*;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.StringWriter;
@@ -92,8 +93,8 @@ public class DsonTextReaderTest {
     @Test
     void testRef() {
         DsonRepository repository = DsonRepository.fromDson(dsonString, true);
-        System.out.println(repository.find("10001"));
-        System.out.println(repository.find("17630eb4f916148b"));
+        Assertions.assertInstanceOf(DsonArray.class, repository.find("10001"));
+        Assertions.assertInstanceOf(DsonArray.class, repository.find("17630eb4f916148b"));
     }
 
 }

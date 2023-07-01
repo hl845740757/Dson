@@ -139,11 +139,6 @@ public class DsonScanner implements AutoCloseable {
         return buffer.getPosition();
     }
 
-    private int getPositionAndUnread() {
-        int position = buffer.getPosition();
-        buffer.unread();
-        return position;
-    }
     // endregion
 
     // region header

@@ -16,7 +16,6 @@
 
 package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.internal.BinaryUtils;
 import cn.wjybxx.dson.io.Chunk;
 import cn.wjybxx.dson.io.DsonIOException;
 import cn.wjybxx.dson.io.DsonInput;
@@ -55,7 +54,7 @@ public class DsonReaderUtils {
     public static DsonBinary readDsonBinary(DsonInput input) {
         int size = input.readFixed32();
         return new DsonBinary(
-                BinaryUtils.toUint8(input.readRawByte()),
+                input.readUint8(),
                 input.readRawBytes(size - 1));
     }
 
@@ -133,7 +132,7 @@ public class DsonReaderUtils {
     public static <T> T readMessage(DsonInput input, int binaryType, Parser<T> parser) {
         int size = input.readFixed32();
         int oldLimit = input.pushLimit(size);
-        byte subType = input.readRawByte();
+        int subType = input.readUint8();
         if (subType != binaryType) {
             throw DsonIOException.unexpectedSubType(binaryType, subType);
         }
@@ -159,6 +158,25 @@ public class DsonReaderUtils {
             size = input.readFixed32();
         }
         return input.readRawBytes(size);
+    }
+
+    public static void skipToEndOfObject(DsonInput input) {
+        int size = input.getBytesUntilLimit();
+        if (size > 0) {
+            input.skipRawBytes(size);
+        }
+    }
+
+    public static void checkReadValueAsBytes(DsonType dsonType) {
+        if (!VALUE_BYTES_TYPES.contains(dsonType)) {
+            throw DsonIOException.invalidDsonType(VALUE_BYTES_TYPES, dsonType);
+        }
+    }
+
+    public static void checkWriteValueAsBytes(DsonType dsonType) {
+        if (!VALUE_BYTES_TYPES.contains(dsonType)) {
+            throw DsonIOException.invalidDsonType(VALUE_BYTES_TYPES, dsonType);
+        }
     }
 
     public static void skipValue(DsonInput input,
@@ -223,25 +241,6 @@ public class DsonReaderUtils {
         }
         if (skip > 0) {
             input.skipRawBytes(skip);
-        }
-    }
-
-    public static void skipToEndOfObject(DsonInput input) {
-        int size = input.getBytesUntilLimit();
-        if (size > 0) {
-            input.skipRawBytes(size);
-        }
-    }
-
-    public static void checkReadValueAsBytes(DsonType dsonType) {
-        if (!VALUE_BYTES_TYPES.contains(dsonType)) {
-            throw DsonIOException.invalidDsonType(VALUE_BYTES_TYPES, dsonType);
-        }
-    }
-
-    public static void checkWriteValueAsBytes(DsonType dsonType) {
-        if (!VALUE_BYTES_TYPES.contains(dsonType)) {
-            throw DsonIOException.invalidDsonType(VALUE_BYTES_TYPES, dsonType);
         }
     }
 

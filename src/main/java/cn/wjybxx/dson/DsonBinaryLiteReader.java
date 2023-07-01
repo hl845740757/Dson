@@ -16,7 +16,6 @@
 
 package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.internal.BinaryUtils;
 import cn.wjybxx.dson.io.DsonIOException;
 import cn.wjybxx.dson.io.DsonInput;
 import cn.wjybxx.dson.types.ObjectRef;
@@ -63,7 +62,7 @@ public class DsonBinaryLiteReader extends AbstractDsonLiteReader {
         Context context = this.getContext();
         checkReadDsonTypeState(context);
 
-        final int fullType = input.isAtEnd() ? 0 : BinaryUtils.toUint8(input.readRawByte());
+        final int fullType = input.isAtEnd() ? 0 : input.readUint8();
         DsonType dsonType = DsonType.forNumber(Dsons.dsonTypeOfFullType(fullType));
         WireType wireType = WireType.forNumber(Dsons.wireTypeOfFullType(fullType));
         this.currentDsonType = dsonType;

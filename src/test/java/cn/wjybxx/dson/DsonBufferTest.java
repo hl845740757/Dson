@@ -34,20 +34,36 @@ import java.util.stream.Collectors;
  * @author wjybxx
  * date - 2023/6/3
  */
-public class DsonTokenTest {
+public class DsonBufferTest {
 
     @Test
     void test() {
         String x = """
                 - pos: {@Vector3 x: 0.5, y: 0.5, z: 0.5}
-                - posArray: [@{clsName:LinkedList,compClsName:Vector3} {x: 0.1, y: 0.1, z: 0.1}, {x: 0.2, y: 0.2, z: 0.2}]
                 -
+                - posArray: [@{clsName:LinkedList,compClsName:Vector3}
+                - {x: 0.1, y: 0.1, z: 0.1},
+                - {x: 0.2, y: 0.2, z: 0.2}
+                - ]
+                -
+                - {
+                - k1: @i 1,
+                - k2: @L 987654321,
+                - k3: @f 1.05f,
+                - k4: 1.0000001,
+                - k5: @b true,
+                - k6: @b 1,
+                - k7: @N null,
+                - k8: null,
+                - k9: wjybxx
+                - }
                 - [@bin 1, FFFA]
                 - [@ei 1, 10010]
                 - [@eL 1, 10010]
                 - [@es 1, 10010]
+                -
                 - @ss intro:
-                |   salkjlxaaslkhalkhsal,anxksjah\\n
+                |   salkjlxaaslkhalkhsal,anxksjah
                 | xalsjalkjlkalhjalskhalhslahlsanlkanclxa
                 | salkhaslkanlnlkhsjlanx,nalkxanla
                 - lsaljsaljsalsaajsal

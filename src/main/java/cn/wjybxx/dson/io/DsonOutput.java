@@ -28,11 +28,11 @@ import com.google.protobuf.MessageLite;
  */
 public interface DsonOutput extends AutoCloseable {
 
+    void writeRawByte(byte value);
+
     default void writeRawByte(int value) {
         writeRawByte((byte) value);
     }
-
-    void writeRawByte(byte value);
 
     //
     void writeInt32(int value);

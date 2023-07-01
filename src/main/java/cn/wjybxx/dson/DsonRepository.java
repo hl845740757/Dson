@@ -17,16 +17,16 @@ public class DsonRepository {
     private final Map<String, DsonValue> indexMap = new HashMap<>();
     private final List<DsonValue> valueList = new ArrayList<>();
 
+    public List<DsonValue> getValues() {
+        return Collections.unmodifiableList(valueList);
+    }
+
     public int size() {
         return valueList.size();
     }
 
-    public DsonValue getAt(int idx) {
+    public DsonValue get(int idx) {
         return valueList.get(idx);
-    }
-
-    public List<DsonValue> getValues() {
-        return Collections.unmodifiableList(valueList);
     }
 
     public DsonRepository add(DsonValue value) {
@@ -45,6 +45,25 @@ public class DsonRepository {
         return this;
     }
 
+    public DsonValue remove(int idx) {
+        DsonValue dsonValue = valueList.remove(idx);
+        String localId = getLocalId(dsonValue);
+        if (localId != null) {
+            indexMap.remove(localId);
+        }
+        return dsonValue;
+    }
+
+    public boolean remove(DsonValue dsonValue) {
+        int idx = CollectionUtils.indexOfRef(valueList, dsonValue);
+        if (idx >= 0) {
+            remove(idx);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public DsonValue remove(String localId) {
         Objects.requireNonNull(localId);
         DsonValue exist = indexMap.remove(localId);
@@ -52,17 +71,6 @@ public class DsonRepository {
             CollectionUtils.removeRef(valueList, exist);
         }
         return exist;
-    }
-
-    public boolean remove(DsonValue dsonValue) {
-        if (CollectionUtils.removeRef(valueList, dsonValue)) {
-            String localId = getLocalId(dsonValue);
-            if (localId != null) {
-                indexMap.remove(localId);
-            }
-            return true;
-        }
-        return false;
     }
 
     public DsonValue find(String localId) {

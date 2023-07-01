@@ -112,7 +112,7 @@ public interface DsonLiteWriter extends AutoCloseable {
      * 2.数组内元素没有名字，因此name传 0 即可
      *
      * <pre>{@code
-     *      writer.writeStartArray(name);
+     *      writer.writeStartArray(name, ObjectStyle.INDENT);
      *      for (String coderName: coderNames) {
      *          writer.writeString(0, coderName);
      *      }
@@ -129,7 +129,7 @@ public interface DsonLiteWriter extends AutoCloseable {
      * 1.可以写入header
      *
      * <pre>{@code
-     *      writer.writeStartObject(name);
+     *      writer.writeStartObject(name, ObjectStyle.INDENT);
      *      writer.writeString("name", "wjybxx")
      *      writer.writeInt32("age", 28)
      *      writer.writeEndObject();

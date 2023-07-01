@@ -52,18 +52,18 @@ public class DsonOutputs {
         int codedOutputStreamOffset;
 
         @Override
-        public void writeRawByte(int value) {
+        public void writeRawByte(byte value) {
             try {
-                codedOutputStream.writeRawByte((byte) value);
+                codedOutputStream.writeRawByte(value);
             } catch (IOException e) {
                 throw DsonIOException.wrap(e);
             }
         }
 
         @Override
-        public void writeRawByte(byte value) {
+        public void writeRawByte(int value) {
             try {
-                codedOutputStream.writeRawByte(value);
+                codedOutputStream.writeRawByte((byte) value);
             } catch (IOException e) {
                 throw DsonIOException.wrap(e);
             }

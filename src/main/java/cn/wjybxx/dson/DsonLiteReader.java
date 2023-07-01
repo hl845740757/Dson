@@ -175,6 +175,7 @@ public interface DsonLiteReader extends AutoCloseable {
     /**
      * 跳过当前容器对象(Array、Object、Header)的剩余内容
      * 调用该方法后，{@link #getCurrentDsonType()}将返回{@link DsonType#END_OF_OBJECT}
+     * 也就是说，调用该方法后应立即调用 readEnd 相关方法
      */
     void skipToEndOfObject();
 

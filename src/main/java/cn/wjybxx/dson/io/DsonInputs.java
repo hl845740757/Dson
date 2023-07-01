@@ -66,6 +66,15 @@ public class DsonInputs {
         }
 
         @Override
+        public int readUint8() {
+            try {
+                return codedInputStream.readRawByte() & 0XFF;
+            } catch (IOException e) {
+                throw DsonIOException.wrap(e);
+            }
+        }
+
+        @Override
         public int readInt32() {
             try {
                 return codedInputStream.readInt32();

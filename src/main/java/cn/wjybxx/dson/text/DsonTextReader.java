@@ -330,7 +330,7 @@ public class DsonTextReader extends AbstractDsonReader {
     /** 处理内置结构体的语法糖 */
     private DsonType parseBeginObjectToken(Context context, final DsonToken valueToken) {
         DsonToken headerToken;
-        if (valueToken.lastChar() == '@') {
+        if (valueToken.lastChar() == '@') { // {@
             headerToken = popToken();
             verifyTokenType(getContext(), headerToken, TokenType.HEADER);
         } else {
@@ -359,7 +359,7 @@ public class DsonTextReader extends AbstractDsonReader {
     /** 需要处理内置二元组 */
     private DsonType parseBeginArrayToken(Context context, final DsonToken valueToken) {
         DsonToken headerToken;
-        if (valueToken.lastChar() == '@') {
+        if (valueToken.lastChar() == '@') { // {@
             headerToken = popToken();
             verifyTokenType(getContext(), headerToken, TokenType.HEADER);
         } else {
@@ -728,17 +728,14 @@ public class DsonTextReader extends AbstractDsonReader {
     @Override
     protected void doSkipValue() {
         popNextValue();
-        int stack = 0;
         switch (currentDsonType) {
-            case HEADER, OBJECT, ARRAY -> stack = 1;
+            case HEADER, OBJECT, ARRAY -> skipStack(1);
         }
-        skipStack(stack);
     }
 
     @Override
     protected void doSkipToEndOfObject() {
-        int stack = 1;
-        skipStack(stack);
+        skipStack(1);
         // 避免计数导致readDsonType异常
         getContext().count++;
         getContext().headerCount++;
