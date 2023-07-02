@@ -51,11 +51,22 @@ public final class DsonPrinter implements AutoCloseable {
         return column;
     }
 
+    /** 如果当前行尚未打印行首，则返回null */
     public String getHeadLabel() {
         return headLabel;
     }
 
-    // region 纯文本
+    /** 当前行是否有内容 */
+    public boolean hasContent() {
+        return getContentLength() > 0;
+    }
+
+    /** 当前行内容的长度 */
+    public int getContentLength() {
+        return headLabel == null ? 0 : column - headLabel.length() - 1;
+    }
+
+    // region 普通打印
 
     public void print(char c) {
         try {
@@ -112,8 +123,101 @@ public final class DsonPrinter implements AutoCloseable {
     }
     // endregion
 
-    // region 转义字符串
+    // region dson
 
+    /** 打印行首 */
+    public void printLhead(LheadType lheadType) {
+        printLhead(lheadType.label);
+    }
+
+    /** 打印行首 */
+    public void printLhead(String label) {
+        try {
+            builder.append(label);
+            builder.append(' ');
+            column += label.length() + 1;
+            headLabel = label;
+        } catch (Exception e) {
+            ExceptionUtils.rethrow(e);
+        }
+    }
+
+    public void printBeginObject() {
+        try {
+            builder.append('{');
+            column += 1;
+        } catch (Exception e) {
+            ExceptionUtils.rethrow(e);
+        }
+    }
+
+    public void printEndObject() {
+        try {
+            builder.append('}');
+            column += 1;
+        } catch (Exception e) {
+            ExceptionUtils.rethrow(e);
+        }
+    }
+
+    public void printBeginArray() {
+        try {
+            builder.append('[');
+            column += 1;
+        } catch (Exception e) {
+            ExceptionUtils.rethrow(e);
+        }
+    }
+
+    public void printEndArray() {
+        try {
+            builder.append(']');
+            column += 1;
+        } catch (Exception e) {
+            ExceptionUtils.rethrow(e);
+        }
+    }
+
+    public void printBeginHeader() {
+        try {
+            builder.append("@{");
+            column += 2;
+        } catch (Exception e) {
+            ExceptionUtils.rethrow(e);
+        }
+    }
+
+    /** 打印冒号 */
+    public void printColon() {
+        try {
+            builder.append(':');
+            column += 1;
+        } catch (Exception e) {
+            ExceptionUtils.rethrow(e);
+        }
+    }
+
+    /** 打印冒号和空格 */
+    public void printColonAndSpace() {
+        try {
+            builder.append(": ");
+            column += 2;
+        } catch (Exception e) {
+            ExceptionUtils.rethrow(e);
+        }
+    }
+
+    /** 打印逗号 */
+    public void printComma() {
+        try {
+            builder.append(',');
+            column += 1;
+        } catch (Exception e) {
+            ExceptionUtils.rethrow(e);
+        }
+    }
+
+    /** 打印可能需要转义的字符 */
     public void printEscaped(char c, boolean unicodeChar) {
         switch (c) {
             case '\"' -> print("\\\"");
@@ -136,36 +240,6 @@ public final class DsonPrinter implements AutoCloseable {
 
     // endregion
 
-    // region io
-
-    public void flush() {
-        try {
-            StringBuilder builder = this.builder;
-            if (builder.length() > 0) {
-                // 显式转cBuffer，避免toString的额外开销
-                char[] cBuffer = new char[builder.length()];
-                builder.getChars(0, cBuffer.length, cBuffer, 0);
-
-                writer.write(cBuffer, 0, cBuffer.length);
-                builder.setLength(0);
-            }
-            writer.flush();
-        } catch (Exception e) {
-            ExceptionUtils.rethrow(e);
-        }
-    }
-
-    @Override
-    public void close() {
-        try {
-            flush();
-            writer.close();
-        } catch (Exception e) {
-            ExceptionUtils.rethrow(e);
-        }
-    }
-    // endregion
-
     // region 缩进
 
     /** 换行 */
@@ -174,23 +248,7 @@ public final class DsonPrinter implements AutoCloseable {
             builder.append(lineSeparator);
             flush();
             column = 0;
-        } catch (Exception e) {
-            ExceptionUtils.rethrow(e);
-        }
-    }
-
-    /** 打印行首 */
-    public void printLhead(LheadType lheadType) {
-        printLhead(lheadType.label);
-    }
-
-    /** 打印行首 */
-    public void printLhead(String label) {
-        try {
-            builder.append(label);
-            builder.append(' ');
-            column += label.length() + 1;
-            headLabel = label;
+            headLabel = null;
         } catch (Exception e) {
             ExceptionUtils.rethrow(e);
         }
@@ -249,6 +307,36 @@ public final class DsonPrinter implements AutoCloseable {
         if (indent > indentionArray.length) {
             indentionArray = new char[indent];
             Arrays.fill(indentionArray, ' ');
+        }
+    }
+    // endregion
+
+    // region io
+
+    public void flush() {
+        try {
+            StringBuilder builder = this.builder;
+            if (builder.length() > 0) {
+                // 显式转cBuffer，避免toString的额外开销
+                char[] cBuffer = new char[builder.length()];
+                builder.getChars(0, cBuffer.length, cBuffer, 0);
+
+                writer.write(cBuffer, 0, cBuffer.length);
+                builder.setLength(0);
+            }
+            writer.flush();
+        } catch (Exception e) {
+            ExceptionUtils.rethrow(e);
+        }
+    }
+
+    @Override
+    public void close() {
+        try {
+            flush();
+            writer.close();
+        } catch (Exception e) {
+            ExceptionUtils.rethrow(e);
         }
     }
     // endregion

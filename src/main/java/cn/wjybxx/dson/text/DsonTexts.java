@@ -105,8 +105,8 @@ public class DsonTexts {
      * 其实并不建议底层默认判断是否可以不加引号，用户可以根据自己的数据决定是否加引号，比如；guid可能就是可以不加引号的
      * 这里的计算是保守的，保守一些不容易出错，因为情况太多，否则既难以保证正确性，性能也差
      */
-    public static boolean canUnquoteString(String value) {
-        if (value.isEmpty() || value.length() > 32) { // 长字符串都加引号，避免不必要的计算
+    public static boolean canUnquoteString(String value, int maxLengthOfUnquoteString) {
+        if (value.isEmpty() || value.length() > maxLengthOfUnquoteString) { // 长字符串都加引号，避免不必要的计算
             return false;
         }
         if (PARSABLE_STRINGS.contains(value)) { // 特殊字符串值

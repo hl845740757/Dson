@@ -25,7 +25,7 @@ public class DsonTextReaderTest2 {
             | 你可以通过github联系到我。
             -   thanks
             ~   , url: @ss https://www.github.com/hl845740757
-            ~   , time: {@dt date: 2023-06-17, time: 18:37:00,  millis: 100, offset: +08:00}
+            ~   , time: {@dt date: 2023-06-17, time: 18:37:00, millis: 100, offset: +08:00}
             - }
             """;
 

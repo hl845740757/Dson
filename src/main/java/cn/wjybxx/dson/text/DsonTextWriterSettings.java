@@ -31,14 +31,16 @@ public class DsonTextWriterSettings {
     public final boolean enableText;
     public final float lengthFactorOfText;
     public final boolean unicodeChar;
+    public final int maxLengthOfUnquoteString;
     public final boolean disableSci;
 
     private DsonTextWriterSettings(Builder builder) {
         this.lineSeparator = Objects.requireNonNull(builder.lineSeparator);
         this.softLineLength = Math.max(8, builder.softLineLength);
-        this.unicodeChar = builder.unicodeChar;
         this.enableText = builder.enableText;
         this.lengthFactorOfText = builder.lengthFactorOfText;
+        this.unicodeChar = builder.unicodeChar;
+        this.maxLengthOfUnquoteString = builder.maxLengthOfUnquoteString;
         this.disableSci = builder.disableSci;
     }
 
@@ -72,6 +74,10 @@ public class DsonTextWriterSettings {
          * 通常用于非UTF8文本的移植
          */
         private boolean unicodeChar = false;
+        /**
+         * 自动模式下无引号字符串的最大长度
+         */
+        private int maxLengthOfUnquoteString = 66;
         /**
          * 是否禁用科学计数法输出
          */
@@ -126,6 +132,15 @@ public class DsonTextWriterSettings {
 
         public Builder setLengthFactorOfText(float lengthFactorOfText) {
             this.lengthFactorOfText = lengthFactorOfText;
+            return this;
+        }
+
+        public int getMaxLengthOfUnquoteString() {
+            return maxLengthOfUnquoteString;
+        }
+
+        public Builder setMaxLengthOfUnquoteString(int maxLengthOfUnquoteString) {
+            this.maxLengthOfUnquoteString = maxLengthOfUnquoteString;
             return this;
         }
 

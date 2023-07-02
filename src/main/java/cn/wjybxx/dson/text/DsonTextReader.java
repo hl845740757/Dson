@@ -633,10 +633,10 @@ public class DsonTextReader extends AbstractDsonReader {
         // 将header中的特殊属性记录下来
         Context context = getContext();
         if (context.contextType == DsonContextType.HEADER) {
-            if (context.compClsNameToken == null && DsonHeader.NAMES_COMP_CLASS_NAME.equals(currentName)) {
+            if (DsonHeader.NAMES_COMP_CLASS_NAME.equals(currentName)) {
                 context.compClsNameToken = new DsonToken(TokenType.CLASS_NAME, nextValue, -1);
             }
-            // 其它属性
+            // else 其它属性
         }
     }
 
@@ -782,10 +782,6 @@ public class DsonTextReader extends AbstractDsonReader {
             };
         }
         pushToken(endToken);
-
-        // 避免计数导致readDsonType异常
-        getContext().count++;
-        getContext().headerCount++;
     }
 
     /** @return 触发结束的token */

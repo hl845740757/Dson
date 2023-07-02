@@ -82,12 +82,14 @@ public class DsonTextReaderTest {
                 .setUnicodeChar(false)
                 .build();
 
-        DsonValue topObj = topObjects.get(0);
+        DsonValue fileHeaderObj = topObjects.get(0);
         try (DsonTextWriter writer = new DsonTextWriter(16, stringWriter, settings)) {
-            Dsons.writeTopDsonValue(writer, topObj, ObjectStyle.INDENT);
+            Dsons.writeTopDsonValue(writer, fileHeaderObj, ObjectStyle.INDENT);
             writer.flush();
         }
-        System.out.println(stringWriter.toString());
+        String fileHeaderString = stringWriter.toString();
+        Assertions.assertEquals(fileHeaderObj, Dsons.fromDson(fileHeaderString));
+        System.out.println(fileHeaderString);
     }
 
     @Test
