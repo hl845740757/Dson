@@ -47,10 +47,12 @@ import java.util.Objects;
 public class DsonTextReader extends AbstractDsonReader {
 
     private static final List<TokenType> VALUE_SEPARATOR_TOKENS = List.of(TokenType.COMMA, TokenType.END_OBJECT, TokenType.END_ARRAY);
-    private static final DsonToken TOKEN_START_HEADER = new DsonToken(TokenType.HEADER, "@{", -1);
-    private static final DsonToken TOKEN_END_OBJECT = new DsonToken(TokenType.END_OBJECT, "}", -1);
-    private static final DsonToken TOKEN_COLON = new DsonToken(TokenType.COLON, ":", -1);
+    private static final List<TokenType> HEADER_TOKENS = List.of(TokenType.BEGIN_HEADER, TokenType.CLASS_NAME);
+
+    private static final DsonToken TOKEN_BEGIN_HEADER = new DsonToken(TokenType.BEGIN_HEADER, "@{", -1);
     private static final DsonToken TOKEN_CLASSNAME = new DsonToken(TokenType.UNQUOTE_STRING, DsonHeader.NAMES_CLASS_NAME, -1);
+    private static final DsonToken TOKEN_COLON = new DsonToken(TokenType.COLON, ":", -1);
+    private static final DsonToken TOKEN_END_OBJECT = new DsonToken(TokenType.END_OBJECT, "}", -1);
 
     private DsonScanner scanner;
     private final ArrayDeque<DsonToken> pushedTokenQueue = new ArrayDeque<>(6);
@@ -160,16 +162,8 @@ public class DsonTextReader extends AbstractDsonReader {
         popNextValue();
 
         Context context = getContext();
-        if (context.count == 0) {
-            // object和array可以有一个修饰自己的header，其合法性在读取到{和[时验证
-            if (context.headerCount == 0 && context.contextType.isContainer() && context.beginToken.lastChar() == '@') {
-                DsonToken headerToken = popToken();
-                verifyTokenType(context, headerToken, TokenType.HEADER);
-                pushNextValue(headerToken);
-                return DsonType.HEADER;
-            }
-        } else {
-            // 统一处理 逗号 分隔符，顶层对象之间可不写分隔符
+        // 统一处理逗号分隔符，顶层对象之间可不写分隔符
+        if (context.count > 0) {
             DsonToken nextToken = popToken();
             if (context.contextType != DsonContextType.TOP_LEVEL) {
                 verifyTokenType(context, nextToken, VALUE_SEPARATOR_TOKENS);
@@ -179,18 +173,28 @@ public class DsonTextReader extends AbstractDsonReader {
             }
         }
 
-        // object/header 需要先读取 name 和 冒号
+        // object/header 需要先读取 name和冒号，但object可能出现header
         if (context.contextType == DsonContextType.OBJECT || context.contextType == DsonContextType.HEADER) {
             DsonToken nameToken = popToken();
             switch (nameToken.getType()) {
                 case STRING, UNQUOTE_STRING -> {
                     pushNextName(nameToken.castAsString());
                 }
+                case BEGIN_HEADER -> {
+                    if (context.contextType == DsonContextType.HEADER) {
+                        throw DsonIOException.containsHeaderDirectly(nameToken);
+                    }
+                    ensureCountIsZero(context, nameToken);
+                    pushNextValue(nameToken);
+                    return DsonType.HEADER;
+                }
                 case END_OBJECT -> {
                     return DsonType.END_OF_OBJECT;
                 }
-                default -> throw DsonIOException.invalidTokenType(context.contextType, nameToken,
-                        List.of(TokenType.STRING, TokenType.UNQUOTE_STRING, TokenType.END_OBJECT));
+                default -> {
+                    throw DsonIOException.invalidTokenType(context.contextType, nameToken,
+                            List.of(TokenType.STRING, TokenType.UNQUOTE_STRING, TokenType.END_OBJECT));
+                }
             }
             // 下一个应该是冒号
             DsonToken colonToken = popToken();
@@ -228,12 +232,21 @@ public class DsonTextReader extends AbstractDsonReader {
                 pushNextValue(DsonNull.INSTANCE);
                 yield DsonType.NULL;
             }
-            case BEGIN_ARRAY -> parseBeginArrayToken(context, valueToken);
-            case BEGIN_OBJECT -> parseBeginObjectToken(context, valueToken);
             case UNQUOTE_STRING -> parseUnquoteStringToken(context, valueToken);
-            case HEADER -> parseHeaderToken(context, valueToken);
+            case BEGIN_OBJECT -> parseBeginObjectToken(context, valueToken);
+            case BEGIN_ARRAY -> parseBeginArrayToken(context, valueToken);
+            case CLASS_NAME -> parseClassNameToken(context, valueToken);
+            case BEGIN_HEADER -> {
+                // object的header已经处理，这里只有topLevel和array可以再出现header
+                if (context.contextType.isLikeObject()) {
+                    throw DsonIOException.invalidTokenType(context.contextType, valueToken);
+                }
+                ensureCountIsZero(context, valueToken);
+                pushNextValue(valueToken);
+                yield DsonType.HEADER;
+            }
             case END_ARRAY -> {
-                // Array必须在读取下一个值的时候结束；而Object必须在下次读取name的时候结束
+                // endArray 只能在数组上下文出现；Array是在读取下一个值的时候结束；而Object必须在读取下一个name的时候结束
                 if (context.contextType == DsonContextType.ARRAY) {
                     yield DsonType.END_OF_OBJECT;
                 }
@@ -277,6 +290,10 @@ public class DsonTextReader extends AbstractDsonReader {
                     pushNextValue(DsonTexts.parseBool(unquotedString));
                     return DsonType.BOOLEAN;
                 }
+                case DsonTexts.LABEL_STRING -> {
+                    pushNextValue(unquotedString);
+                    return DsonType.STRING;
+                }
             }
         }
         // 处理header的特殊属性依赖
@@ -307,8 +324,14 @@ public class DsonTextReader extends AbstractDsonReader {
         return DsonType.STRING;
     }
 
-    /** 处理内置结构体的语法糖 */
-    private DsonType parseHeaderToken(Context context, final DsonToken valueToken) {
+    /** 处理内置结构体的单值语法糖 */
+    private DsonType parseClassNameToken(Context context, final DsonToken valueToken) {
+        // 1.className不能出现在topLevel，topLevel只能出现header结构体 @{}
+        if (context.contextType == DsonContextType.TOP_LEVEL) {
+            throw DsonIOException.invalidTokenType(context.contextType, valueToken);
+        }
+        // 2.object和array的className会在beginObject和beginArray的时候转换为结构体 @{}
+        // 因此这里只能出现内置结构体的简写形式
         String clsName = valueToken.castAsString();
         if (DsonTexts.LABEL_REFERENCE.equals(clsName)) {// @ref localId
             DsonToken nextToken = popToken();
@@ -316,24 +339,19 @@ public class DsonTextReader extends AbstractDsonReader {
             pushNextValue(new ObjectRef(null, nextToken.castAsString()));
             return DsonType.REFERENCE;
         }
-        // 对象的header只在beginObject和beginArray可能产生，其它时候都不能出现
-        if (context.contextType != DsonContextType.TOP_LEVEL) {
-            throw DsonIOException.invalidTokenType(context.contextType, valueToken);
-        }
-        // 允许顶层出现header方便未来扩展
-        escapeHeaderAndPush(valueToken);
-        pushNextValue(popToken());
-        return DsonType.HEADER;
+        throw DsonIOException.invalidTokenType(context.contextType, valueToken);
     }
 
-    /** 处理内置结构体的语法糖 */
+    /** 处理内置结构体 */
     private DsonType parseBeginObjectToken(Context context, final DsonToken valueToken) {
         DsonToken headerToken;
         if (valueToken.lastChar() == '@') { // {@
             headerToken = popToken();
-            verifyTokenType(getContext(), headerToken, TokenType.HEADER);
-        } else {
+            ensureHeadersToken(context, headerToken);
+        } else if (context.contextType != DsonContextType.HEADER) {
             headerToken = context.compClsNameToken;
+        } else {
+            headerToken = null;
         }
         if (headerToken == null) {
             pushNextValue(valueToken);
@@ -359,20 +377,21 @@ public class DsonTextReader extends AbstractDsonReader {
         };
     }
 
-    /** 需要处理内置二元组 */
+    /** 处理内置二元组 */
     private DsonType parseBeginArrayToken(Context context, final DsonToken valueToken) {
         DsonToken headerToken;
         if (valueToken.lastChar() == '@') { // [@
             headerToken = popToken();
-            verifyTokenType(getContext(), headerToken, TokenType.HEADER);
-        } else {
+            ensureHeadersToken(context, headerToken);
+        } else if (context.contextType != DsonContextType.HEADER) {
             headerToken = context.compClsNameToken;
+        } else {
+            headerToken = null;
         }
         if (headerToken == null) {
             pushNextValue(valueToken);
             return DsonType.ARRAY;
         }
-
         // 内置元组
         return switch (headerToken.castAsString()) {
             case DsonTexts.LABEL_BINARY -> {
@@ -405,6 +424,21 @@ public class DsonTextReader extends AbstractDsonReader {
             }
         };
     }
+
+    private void escapeHeaderAndPush(DsonToken headerToken) {
+        // 如果header不是结构体，则封装为结构体，注意...要反序压栈
+        if (headerToken.getType() == TokenType.BEGIN_HEADER) {
+            pushToken(headerToken);
+        } else {
+            pushToken(TOKEN_END_OBJECT);
+            pushToken(new DsonToken(TokenType.STRING, headerToken.castAsString(), -1));
+            pushToken(TOKEN_COLON);
+            pushToken(TOKEN_CLASSNAME);
+            pushToken(TOKEN_BEGIN_HEADER);
+        }
+    }
+
+    // region 内置结构体语法
 
     private ObjectRef scanRef(Context context) {
         String namespace = null;
@@ -518,6 +552,19 @@ public class DsonTextReader extends AbstractDsonReader {
         }
     }
 
+    private void checkSeparator(Context context) {
+        // 每读取一个值，判断下分隔符，尾部最多只允许一个逗号 -- 这里在尾部更容易处理
+        DsonToken keyToken;
+        if ((keyToken = popToken()).getType() == TokenType.COMMA
+                && (keyToken = popToken()).getType() == TokenType.COMMA) {
+            throw DsonIOException.invalidTokenType(context.contextType, keyToken);
+        } else {
+            pushToken(keyToken);
+        }
+    }
+    // endregion
+
+    // region 内置元组语法
     private Tuple2 scanTuple2(Context context) {
         // beginArray已读取
         DsonToken nextToken = popToken();
@@ -546,34 +593,25 @@ public class DsonTextReader extends AbstractDsonReader {
             this.value = value;
         }
     }
+    // endregion
 
-    private void checkSeparator(Context context) {
-        // 每读取一个值，判断下分隔符，尾部最多只允许一个逗号 -- 这里在尾部更容易处理
-        DsonToken keyToken;
-        if ((keyToken = popToken()).getType() == TokenType.COMMA
-                && (keyToken = popToken()).getType() == TokenType.COMMA) {
-            throw DsonIOException.invalidTokenType(context.contextType, keyToken);
-        } else {
-            pushToken(keyToken);
-        }
-    }
-
-    private void escapeHeaderAndPush(DsonToken headerToken) {
-        // 如果header不是结构体，则封装为结构体，注意...要反序压栈
-        if (headerToken.firstChar() != '{') {
-            pushToken(TOKEN_END_OBJECT);
-            pushToken(new DsonToken(TokenType.STRING, headerToken.castAsString(), -1));
-            pushToken(TOKEN_COLON);
-            pushToken(TOKEN_CLASSNAME);
-            pushToken(TOKEN_START_HEADER);
-        } else {
-            pushToken(headerToken);
+    /** header不可以在中途出现 */
+    private static void ensureCountIsZero(Context context, DsonToken headerToken) {
+        if (context.count > 0) {
+            throw DsonIOException.invalidTokenType(context.contextType, headerToken,
+                    List.of(TokenType.STRING, TokenType.UNQUOTE_STRING, TokenType.END_OBJECT));
         }
     }
 
     private static void ensureStringsToken(Context context, DsonToken token) {
         if (token.getType() != TokenType.STRING && token.getType() != TokenType.UNQUOTE_STRING) {
             throw DsonIOException.invalidTokenType(context.contextType, token, List.of(TokenType.STRING, TokenType.UNQUOTE_STRING));
+        }
+    }
+
+    private static void ensureHeadersToken(Context context, DsonToken token) {
+        if (token.getType() != TokenType.BEGIN_HEADER && token.getType() != TokenType.CLASS_NAME) {
+            throw DsonIOException.invalidTokenType(context.contextType, token, List.of(TokenType.BEGIN_HEADER, TokenType.CLASS_NAME));
         }
     }
 
@@ -596,7 +634,7 @@ public class DsonTextReader extends AbstractDsonReader {
         Context context = getContext();
         if (context.contextType == DsonContextType.HEADER) {
             if (context.compClsNameToken == null && DsonHeader.NAMES_COMP_CLASS_NAME.equals(currentName)) {
-                context.compClsNameToken = new DsonToken(TokenType.HEADER, nextValue, -1);
+                context.compClsNameToken = new DsonToken(TokenType.CLASS_NAME, nextValue, -1);
             }
             // 其它属性
         }
@@ -755,12 +793,7 @@ public class DsonTextReader extends AbstractDsonReader {
         while (stack > 0) {
             DsonToken token = popToken();
             switch (token.getType()) {
-                case BEGIN_ARRAY, BEGIN_OBJECT -> stack++;
-                case HEADER -> {
-                    if (token.lastChar() == '{') { // @{
-                        stack++;
-                    }
-                }
+                case BEGIN_ARRAY, BEGIN_OBJECT, BEGIN_HEADER -> stack++;
                 case END_ARRAY, END_OBJECT -> {
                     if (--stack == 0) {
                         return token;
@@ -818,7 +851,7 @@ public class DsonTextReader extends AbstractDsonReader {
         int headerCount = 0;
         /** 元素计数，判断冒号 */
         int count;
-        /** 数组/Object成员的类型 - token类型可直接复用 */
+        /** 数组/Object成员的类型 - token类型可直接复用；header的该属性是用于注释外层对象的 */
         DsonToken compClsNameToken;
 
         public Context() {

@@ -35,6 +35,11 @@ public enum TokenType {
     /** 数组结束符，']' */
     END_ARRAY,
 
+    /** 对象头开始符 '@{' */
+    BEGIN_HEADER,
+    /** Header的简写形式 '@clsName' -- clsName不是基础类型 */
+    CLASS_NAME,
+
     /** KV分隔符，冒号 ':' */
     COLON,
     /** 元素分隔符，英文逗号 ',' */
@@ -55,9 +60,6 @@ public enum TokenType {
     /** 显式声明 '@N' */
     NULL,
 
-    /** 对象的头信息，'@clsName' 或 '@{...}' */
-    HEADER,
     /** 无引号字符串，scan的时候不解析，使得返回后可以根据上下文推断其类型 */
     UNQUOTE_STRING,
-
 }

@@ -126,8 +126,8 @@ public class DsonScanner implements AutoCloseable {
         return new DsonParseException(String.format("Invalid escape sequence. Position: %d. Character: '\\%c'.", position, c));
     }
 
-    private static DsonParseException spaceRequired(int c, int position) {
-        return new DsonParseException(String.format("Space is required. Position: %d. Character: '%c'.", position, c));
+    private static DsonParseException spaceRequired(int position) {
+        return new DsonParseException(String.format("Space is required. Position: %d.", position));
     }
 
     private StringBuilder allocStringBuilder() {
@@ -146,6 +146,9 @@ public class DsonScanner implements AutoCloseable {
     private DsonToken parseHeaderToken() {
         try {
             String className = scanClassName();
+            if (className.equals("{")) {
+                return new DsonToken(TokenType.BEGIN_HEADER, "@{", getPosition());
+            }
             return onReadClassName(className);
         } catch (Exception e) {
             throw DsonParseException.wrap(e);
@@ -154,19 +157,19 @@ public class DsonScanner implements AutoCloseable {
 
     private String scanClassName() {
         int firstChar = buffer.readSlowly();
-        if (firstChar < 0) {
-            throw invalidClassName("", getPosition());
-        }
         // header是结构体
         if (firstChar == '{') {
             return "{";
         }
         // header是 '@clsName' 简写形式
+        if (firstChar < 0 || DsonTexts.isUnsafeStringChar(firstChar)) {
+            throw spaceRequired(getPosition());
+        }
         String className;
         if (firstChar == '"') {
             className = scanString((char) firstChar);
         } else {
-            // 非双引号模式下，不支持换行，且clsName后必须换行，或必须是空格
+            // 非双引号模式下，不支持换行继续输入，且clsName后必须换行，或必须是空格
             DsonBuffer buffer = this.buffer;
             StringBuilder sb = allocStringBuilder();
             sb.append((char) firstChar);
@@ -180,7 +183,7 @@ public class DsonScanner implements AutoCloseable {
             if (c == -2) {
                 buffer.unread();
             } else if (c != ' ') {
-                throw spaceRequired(c, getPosition());
+                throw spaceRequired(getPosition());
             }
             className = sb.toString();
         }
@@ -224,11 +227,16 @@ public class DsonScanner implements AutoCloseable {
                 DsonTexts.checkNullString(nextToken.castAsString());
                 return new DsonToken(TokenType.NULL, null, getPosition());
             }
+            case DsonTexts.LABEL_STRING -> {
+                DsonToken nextToken = nextToken();
+                checkToken(STRING_TOKEN_TYPES, nextToken.getType(), position);
+                return new DsonToken(TokenType.STRING, nextToken.castAsString(), getPosition());
+            }
             case DsonTexts.LABEL_TEXT -> {
                 return new DsonToken(TokenType.STRING, scanText(), getPosition());
             }
         }
-        return new DsonToken(TokenType.HEADER, className, getPosition());
+        return new DsonToken(TokenType.CLASS_NAME, className, getPosition());
     }
 
     // endregion

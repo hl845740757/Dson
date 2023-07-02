@@ -20,7 +20,7 @@ public class DsonTextReaderTest2 {
             -     beijing,
             -     chengdu
             -   ],
-            -   intro: @ss\s
+            -   intro: @ss
             |   我是wjybxx，是一个游戏开发者，Dson是我设计的文档型数据表达法，
             | 你可以通过github联系到我。
             -   thanks

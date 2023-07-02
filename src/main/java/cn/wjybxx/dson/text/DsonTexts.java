@@ -38,7 +38,7 @@ public class DsonTexts {
     public static final String LABEL_FLOAT = "f";
     public static final String LABEL_DOUBLE = "d";
     public static final String LABEL_BOOL = "b";
-    private static final String LABEL_STRING = "s";
+    public static final String LABEL_STRING = "s";
     public static final String LABEL_NULL = "N";
     /** 长文本，字符串不需要加引号，不对内容进行转义，可直接换行 */
     public static final String LABEL_TEXT = "ss";
@@ -270,30 +270,25 @@ public class DsonTexts {
 
     static byte[] decodeHex(char[] data) {
         byte[] out = new byte[data.length >> 1];
-        decodeHex(data, out, 0);
-        return out;
-    }
-
-    private static int decodeHex(final char[] data, final byte[] out, final int outOffset) {
         final int len = data.length;
         if ((len & 0x01) != 0) {
             throw new DsonIOException("Odd number of characters.");
         }
 
         final int outLen = len >> 1;
-        if (out.length - outOffset < outLen) {
+        if (out.length < outLen) {
             throw new DsonIOException("Output array is not large enough to accommodate decoded data.");
         }
 
         // two characters form the hex value.
-        for (int i = outOffset, j = 0; j < len; i++) {
+        for (int i = 0, j = 0; j < len; i++) {
             int f = toDigit(data[j], j) << 4;
             j++;
             f = f | toDigit(data[j], j);
             j++;
             out[i] = (byte) (f & 0xFF);
         }
-        return outLen;
+        return out;
     }
 
     private static int toDigit(final char ch, final int index) {

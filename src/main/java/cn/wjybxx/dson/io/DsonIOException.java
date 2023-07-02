@@ -108,6 +108,10 @@ public class DsonIOException extends RuntimeException {
         return new DsonIOException("bytes remain " + bytesUntilLimit);
     }
 
+    public static DsonIOException containsHeaderDirectly(DsonToken token) {
+        return new DsonIOException(String.format("header contains another header directly, token %s.", token));
+    }
+
     public static DsonIOException invalidTokenType(DsonContextType contextType, DsonToken token) {
         return new DsonIOException(String.format("invalid token, contextType %s, token %s.", contextType, token));
     }
