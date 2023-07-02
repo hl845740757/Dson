@@ -75,18 +75,19 @@ public class DsonTextWriter extends AbstractDsonWriter {
 
     private void writeCurrentName(DsonPrinter printer, DsonType dsonType) {
         Context context = getContext();
-        if (context.contextType == DsonContextType.TOP_LEVEL) {
-            if (printer.getHeadLabel() == null) {
-                printer.printLhead(LheadType.APPEND_LINE);
-            }
-        } else if (context.count > 0) {
-            assert dsonType != DsonType.HEADER;
-            printer.print(",");
+        // 打印元素前先检查是否打印了行首
+        if (printer.getHeadLabel() == null) {
+            printer.printLhead(LheadType.APPEND_LINE);
         }
-        // 首个header和外层对象之间不能有空格 -- 未保持很简单易维护，所有的header都与外层对象连续
+        // header与外层对象无缩进，且是匿名属性 -- 如果打印多个header，将保持连续
         if (dsonType == DsonType.HEADER) {
+            assert context.count == 0;
             context.headerCount++;
             return;
+        }
+        // 处理value之间分隔符
+        if (context.count > 0) {
+            printer.print(",");
         }
         // 先处理长度超出，再处理缩进
         if (printer.getColumn() >= settings.softLineLength) {
@@ -94,11 +95,11 @@ public class DsonTextWriter extends AbstractDsonWriter {
             printer.printLhead(LheadType.APPEND_LINE);
         }
         if (context.style == ObjectStyle.INDENT) {
-            if (printer.getContentLength() < printer.indentLength()) {
-                // 当前字符数小于缩进，不换行
+            if (context.count > 0 && printer.getContentLength() < printer.indentLength()) {
+                // 当前字符数小于缩进也不换行，但首个字段需要换行
                 printer.printIndent(printer.getContentLength());
-            } else {
-                // 换行缩进
+            } else if (printer.hasContent()){
+                // 当前行有内容了才换行缩进
                 printer.println();
                 printer.printLhead(LheadType.APPEND_LINE);
                 printer.printIndent();
@@ -506,7 +507,7 @@ public class DsonTextWriter extends AbstractDsonWriter {
 
         printer.print(contextType.startSymbol);
         if (style == ObjectStyle.INDENT) {
-            printer.indent();
+            printer.indent(); // 调整缩进
         }
 
         setContext(newContext);
@@ -519,7 +520,7 @@ public class DsonTextWriter extends AbstractDsonWriter {
         DsonPrinter printer = this.printer;
 
         if (context.style == ObjectStyle.INDENT) {
-            printer.retract();
+            printer.retract(); // 恢复缩进
             // 打印了内容的情况下才换行结束
             if (printer.hasContent() && (context.headerCount > 0 || context.count > 0)) {
                 printer.println();

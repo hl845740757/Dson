@@ -16,13 +16,14 @@
 
 package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.text.DsonBuffer;
-import cn.wjybxx.dson.text.DsonScanner;
-import cn.wjybxx.dson.text.DsonTextReader;
-import cn.wjybxx.dson.text.DsonTexts;
+import cn.wjybxx.dson.text.*;
+import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -69,6 +70,17 @@ public class Json2DsonTest {
                 .map(e -> DsonTexts.LHEAD_APPEND + " " + e)
                 .collect(Collectors.toList());
         return DsonBuffer.newLinesBuffer(lines);
+    }
+
+    private static void testBigFile() throws IOException {
+        String jsonFilePath = "D:\\github-mine\\Dson\\testres\\test.json";
+        String dsonFilePath = "D:\\github-mine\\Dson\\testres\\testout.dson";
+        DsonValue jsonObject = Dsons.fromJson(FileUtils.readFileToString(new File(jsonFilePath), StandardCharsets.UTF_8));
+        FileUtils.writeStringToFile(new File(dsonFilePath), Dsons.toDson(jsonObject, ObjectStyle.INDENT), StandardCharsets.UTF_8);
+    }
+
+    public static void main(String[] args) throws IOException {
+        testBigFile();
     }
 
 }

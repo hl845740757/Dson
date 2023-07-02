@@ -53,6 +53,7 @@
         <jsr305.version>3.0.2</jsr305.version>
 
         <commons-lang3.version>3.12.0</commons-lang3.version>
+        <commons-io.version>2.13.0</commons-io.version>
         <pb.version>3.23.3</pb.version>
     </properties>
 
@@ -77,6 +78,13 @@
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons-io.version}</version>
             <scope>test</scope>
         </dependency>
 

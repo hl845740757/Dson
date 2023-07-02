@@ -297,14 +297,20 @@ public final class Dsons {
             throw new IllegalArgumentException("invalid dsonType " + dsonValue.getDsonType());
         }
         StringWriter stringWriter = new StringWriter(1024);
-        try (DsonTextWriter writer = new DsonTextWriter(16, stringWriter, settings)) {
+        try (DsonTextWriter writer = new DsonTextWriter(32, stringWriter, settings)) {
             writeTopDsonValue(writer, dsonValue, style);
         }
         return stringWriter.toString();
     }
 
     public static DsonValue fromDson(String dsonString) {
-        try (DsonTextReader reader = new DsonTextReader(16, dsonString)) {
+        try (DsonTextReader reader = new DsonTextReader(32, dsonString)) {
+            return readTopDsonValue(reader);
+        }
+    }
+
+    public static DsonValue fromJson(String jsonString) {
+        try (DsonTextReader reader = new DsonTextReader(32, new DsonScanner(DsonBuffer.newJsonBuffer(jsonString)))) {
             return readTopDsonValue(reader);
         }
     }
