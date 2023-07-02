@@ -24,6 +24,7 @@ import java.util.Objects;
 
 /**
  * 该接口与{@link DsonScanner}对应
+ * Printer和Scanner一样是非结构化的，由外层来实现结构化；
  *
  * @author wjybxx
  * date - 2023/6/5
@@ -37,6 +38,8 @@ public final class DsonPrinter implements AutoCloseable {
     private final StringBuilder builder = new StringBuilder(150);
     private char[] indentionArray = new char[0];
     private int indent = 0;
+
+    private String headLabel;
     private int column;
 
     public DsonPrinter(Writer writer, String lineSeparator) {
@@ -48,48 +51,11 @@ public final class DsonPrinter implements AutoCloseable {
         return column;
     }
 
-    /** 换行 */
-    public void println() {
-        try {
-            builder.append(lineSeparator);
-            flush();
-            column = 0;
-        } catch (Exception e) {
-            ExceptionUtils.rethrow(e);
-        }
+    public String getHeadLabel() {
+        return headLabel;
     }
 
-    /** 打印行首 */
-    public void printLhead(LheadType lheadType) {
-        try {
-            builder.append(lheadType.label);
-            builder.append(' ');
-            column += lheadType.label.length() + 1;
-        } catch (Exception e) {
-            ExceptionUtils.rethrow(e);
-        }
-    }
-
-    /** 打印缩进 */
-    public void printIndent() {
-        try {
-            builder.append(indentionArray, 0, indent);
-            column += indent;
-        } catch (Exception e) {
-            ExceptionUtils.rethrow(e);
-        }
-    }
-
-    /** 打印缩进，可指定一个偏移量 */
-    public void printIndent(int offset) {
-        try {
-            int len = indent - offset;
-            builder.append(indentionArray, offset, len);
-            column += len;
-        } catch (Exception e) {
-            ExceptionUtils.rethrow(e);
-        }
-    }
+    // region 纯文本
 
     public void print(char c) {
         try {
@@ -118,7 +84,6 @@ public final class DsonPrinter implements AutoCloseable {
         }
     }
 
-    /** @param text 纯文本 */
     public void print(String text) {
         try {
             builder.append(text);
@@ -132,7 +97,7 @@ public final class DsonPrinter implements AutoCloseable {
      * @param start the starting index of the subsequence to be appended.
      * @param end   the end index of the subsequence to be appended.
      */
-    public void printSubRange(String text, int start, int end) {
+    public void printRange(String text, int start, int end) {
         try {
             builder.append(text, start, end);
             column += (end - start);
@@ -145,6 +110,33 @@ public final class DsonPrinter implements AutoCloseable {
         print(text);
         println();
     }
+    // endregion
+
+    // region 转义字符串
+
+    public void printEscaped(char c, boolean unicodeChar) {
+        switch (c) {
+            case '\"' -> print("\\\"");
+            case '\\' -> print("\\\\");
+            case '\b' -> print("\\b");
+            case '\f' -> print("\\f");
+            case '\n' -> print("\\n");
+            case '\r' -> print("\\r");
+            case '\t' -> print("\\t");
+            default -> {
+                if (unicodeChar && (c < 32 || c > 126)) {
+                    print("\\u");
+                    printRange(Integer.toHexString(0x10000 + (int) c), 1, 5);
+                } else {
+                    print(c);
+                }
+            }
+        }
+    }
+
+    // endregion
+
+    // region io
 
     public void flush() {
         try {
@@ -168,6 +160,68 @@ public final class DsonPrinter implements AutoCloseable {
         try {
             flush();
             writer.close();
+        } catch (Exception e) {
+            ExceptionUtils.rethrow(e);
+        }
+    }
+    // endregion
+
+    // region 缩进
+
+    /** 换行 */
+    public void println() {
+        try {
+            builder.append(lineSeparator);
+            flush();
+            column = 0;
+        } catch (Exception e) {
+            ExceptionUtils.rethrow(e);
+        }
+    }
+
+    /** 打印行首 */
+    public void printLhead(LheadType lheadType) {
+        printLhead(lheadType.label);
+    }
+
+    /** 打印行首 */
+    public void printLhead(String label) {
+        try {
+            builder.append(label);
+            builder.append(' ');
+            column += label.length() + 1;
+            headLabel = label;
+        } catch (Exception e) {
+            ExceptionUtils.rethrow(e);
+        }
+    }
+
+    /** 打印缩进 */
+    public void printIndent() {
+        try {
+            builder.append(indentionArray, 0, indent);
+            column += indent;
+        } catch (Exception e) {
+            ExceptionUtils.rethrow(e);
+        }
+    }
+
+    /** 打印缩进，可指定一个偏移量 */
+    public void printIndent(int offset) {
+        try {
+            int len = indent - offset;
+            builder.append(indentionArray, offset, len);
+            column += len;
+        } catch (Exception e) {
+            ExceptionUtils.rethrow(e);
+        }
+    }
+
+    /** 打印一个空格 */
+    public void printSpace() {
+        try {
+            builder.append(' ');
+            column += 1;
         } catch (Exception e) {
             ExceptionUtils.rethrow(e);
         }

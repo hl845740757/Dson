@@ -40,6 +40,8 @@ public class DsonTexts {
     public static final String LABEL_BOOL = "b";
     private static final String LABEL_STRING = "s";
     public static final String LABEL_NULL = "N";
+    /** 长文本，字符串不需要加引号，不对内容进行转义，可直接换行 */
+    public static final String LABEL_TEXT = "ss";
 
     public static final String LABEL_BINARY = "bin";
     public static final String LABEL_EXTINT32 = "ei";
@@ -48,17 +50,11 @@ public class DsonTexts {
     public static final String LABEL_REFERENCE = "ref";
     public static final String LABEL_DATETIME = "dt";
 
-    /** 长文本，字符串不需要加引号，不对内容进行转义，可直接换行 */
-    public static final String LABEL_TEXT = "ss";
-    public static final String LABEL_ARRAY = "[";
-    public static final String LABEL_OBJECT = "{";
-
-    private static final Set<String> LABEL_SET = Set.of(
-            LABEL_INT32, LABEL_INT64, LABEL_FLOAT, LABEL_DOUBLE,
-            LABEL_BOOL, LABEL_NULL, LABEL_BINARY,
-            LABEL_EXTINT32, LABEL_EXTINT64, LABEL_EXTSTRING,
-            LABEL_REFERENCE, LABEL_DATETIME,
-            LABEL_TEXT, LABEL_ARRAY, LABEL_OBJECT);
+    public static final String LABEL_BEGIN_OBJECT = "{";
+    public static final String LABEL_END_OBJECT = "}";
+    public static final String LABEL_BEGIN_ARRAY = "[";
+    public static final String LABEL_END_ARRAY = "]";
+    public static final String LABEL_BEGIN_HEADER = "@{";
 
     // 行首标签
     public static final String LHEAD_COMMENT = "#";
@@ -151,40 +147,62 @@ public class DsonTexts {
         throw new IllegalArgumentException("invalid bool str: " + str);
     }
 
-    public static int parseInt(String str) {
+    public static int parseInt(String rawStr) {
+        String str = rawStr;
         if (str.indexOf('_') >= 0) {
             str = deleteUnderline(str);
         }
-        if (str.startsWith("0x")) {
-            return Integer.parseInt(str, 2, str.length(), 16);
+        if (str.isEmpty()) {
+            throw new NumberFormatException(rawStr);
         }
-        if (str.startsWith("-0x")) {
-            return Integer.parseInt(str, 3, str.length(), 16);
+        int lookOffset;
+        int sign;
+        char firstChar = str.charAt(0);
+        if (firstChar == '+') {
+            sign = 1;
+            lookOffset = 1;
+        } else if (firstChar == '-') {
+            sign = -1;
+            lookOffset = 1;
+        } else {
+            sign = 1;
+            lookOffset = 0;
         }
-        if (str.startsWith("0b")) {
-            return Integer.parseInt(str, 2, str.length(), 2);
+        if (str.startsWith("0x", lookOffset) || str.startsWith("0X", lookOffset)) {
+            return sign * Integer.parseInt(str, 2, str.length(), 16);
         }
-        if (str.startsWith("-0b")) {
-            return Integer.parseInt(str, 3, str.length(), 2);
+        if (str.startsWith("0b", lookOffset) || str.startsWith("0B", lookOffset)) {
+            return sign * Integer.parseInt(str, 3, str.length(), 2);
         }
         return Integer.parseInt(str);
     }
 
-    public static long parseLong(String str) {
+    public static long parseLong(final String rawStr) {
+        String str = rawStr;
         if (str.indexOf('_') >= 0) {
             str = deleteUnderline(str);
         }
-        if (str.startsWith("0x")) {
-            return Long.parseLong(str, 2, str.length(), 16);
+        if (str.isEmpty()) {
+            throw new NumberFormatException(rawStr);
         }
-        if (str.startsWith("-0x")) {
-            return Long.parseLong(str, 3, str.length(), 16);
+        int lookOffset;
+        int sign;
+        char firstChar = str.charAt(0);
+        if (firstChar == '+') {
+            sign = 1;
+            lookOffset = 1;
+        } else if (firstChar == '-') {
+            sign = -1;
+            lookOffset = 1;
+        } else {
+            sign = 1;
+            lookOffset = 0;
         }
-        if (str.startsWith("0b")) {
-            return Long.parseLong(str, 2, str.length(), 2);
+        if (str.startsWith("0x", lookOffset) || str.startsWith("0X", lookOffset)) {
+            return sign * Long.parseLong(str, 2, str.length(), 16);
         }
-        if (str.startsWith("-0b")) {
-            return Long.parseLong(str, 3, str.length(), 2);
+        if (str.startsWith("0b", lookOffset) || str.startsWith("0B", lookOffset)) {
+            return sign * Long.parseLong(str, 3, str.length(), 2);
         }
         return Long.parseLong(str);
     }

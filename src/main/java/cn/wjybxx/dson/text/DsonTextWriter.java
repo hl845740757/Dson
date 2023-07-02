@@ -155,33 +155,13 @@ public class DsonTextWriter extends AbstractDsonWriter {
         DsonPrinter printer = this.printer;
         printer.print('"');
         for (int i = 0, length = text.length(); i < length; i++) {
-            printEscaped(text.charAt(i), printer, unicodeChar);
+            printer.printEscaped(text.charAt(i), unicodeChar);
             if (printer.getColumn() >= softLineLength) {
                 printer.println();
                 printer.printLhead(LheadType.APPEND);
             }
         }
         printer.print('"');
-    }
-
-    private static void printEscaped(char c, DsonPrinter printer, boolean unicodeChar) {
-        switch (c) {
-            case '\"' -> printer.print("\\\"");
-            case '\\' -> printer.print("\\\\");
-            case '\b' -> printer.print("\\b");
-            case '\f' -> printer.print("\\f");
-            case '\n' -> printer.print("\\n");
-            case '\r' -> printer.print("\\r");
-            case '\t' -> printer.print("\\t");
-            default -> {
-                if ((c < 32 || c > 126) && unicodeChar) {
-                    printer.print("\\u");
-                    printer.printSubRange(Integer.toHexString(0x10000 + (int) c), 1, 5);
-                    return;
-                }
-                printer.print(c);
-            }
-        }
     }
 
     /** 纯文本模式打印，要执行换行符 */

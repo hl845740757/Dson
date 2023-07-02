@@ -340,25 +340,29 @@ public class DsonTextReader extends AbstractDsonReader {
             return DsonType.OBJECT;
         }
 
+        // 内置结构体
         String clsName = headerToken.castAsString();
-        if (DsonTexts.LABEL_REFERENCE.equals(clsName)) {
-            pushNextValue(scanRef(context));
-            return DsonType.REFERENCE;
-        }
-        if (DsonTexts.LABEL_DATETIME.equals(clsName)) {
-            pushNextValue(scanTimestamp(context));
-            return DsonType.TIMESTAMP;
-        }
-
-        escapeHeaderAndPush(headerToken);
-        pushNextValue(valueToken); // push以供context保存
-        return DsonType.OBJECT;
+        return switch (clsName) {
+            case DsonTexts.LABEL_REFERENCE -> {
+                pushNextValue(scanRef(context));
+                yield DsonType.REFERENCE;
+            }
+            case DsonTexts.LABEL_DATETIME -> {
+                pushNextValue(scanTimestamp(context));
+                yield DsonType.TIMESTAMP;
+            }
+            default -> {
+                escapeHeaderAndPush(headerToken);
+                pushNextValue(valueToken); // push以供context保存
+                yield DsonType.OBJECT;
+            }
+        };
     }
 
     /** 需要处理内置二元组 */
     private DsonType parseBeginArrayToken(Context context, final DsonToken valueToken) {
         DsonToken headerToken;
-        if (valueToken.lastChar() == '@') { // {@
+        if (valueToken.lastChar() == '@') { // [@
             headerToken = popToken();
             verifyTokenType(getContext(), headerToken, TokenType.HEADER);
         } else {
@@ -369,6 +373,7 @@ public class DsonTextReader extends AbstractDsonReader {
             return DsonType.ARRAY;
         }
 
+        // 内置元组
         return switch (headerToken.castAsString()) {
             case DsonTexts.LABEL_BINARY -> {
                 Tuple2 tuple2 = scanTuple2(context);
