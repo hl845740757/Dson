@@ -16,7 +16,7 @@
 
 package cn.wjybxx.dson.text;
 
-import java.util.List;
+import java.io.Reader;
 
 /**
  * Dson是按照行解析的，缓存是也是基于行
@@ -46,7 +46,7 @@ public interface DsonBuffer extends AutoCloseable {
     /**
      * 1.首次读也会产生换行，换行时当前位置处于行首。
      * 2.空行和注释行会被跳过
-     * 3.position不一定是加 1
+     * 3.position不一定是加 1 (行首前空白字符)
      *
      * @return 1.如果到达文件尾部，则返回 -1；
      * 2.如果产生换行，则返回 -2
@@ -55,7 +55,7 @@ public interface DsonBuffer extends AutoCloseable {
 
     /**
      * 回退一次读
-     * 1.position不一定是减少1
+     * 1.position不一定是减少1（行首前空白字符，回退到上一行）
      * 2.回退可能是有限制的 -- 节省开销
      */
     void unread();
@@ -102,21 +102,29 @@ public interface DsonBuffer extends AutoCloseable {
      * @param dsonString 由多行构成
      */
     static DsonBuffer newStringBuffer(CharSequence dsonString) {
-        return new DsonStringBuffer(dsonString);
+        return new DsonStringBuffer(dsonString, false);
     }
 
     /**
-     * 通过Dson标准行创建Buffer
+     * 如果没有行首，每一行都被当做append行，可以用于解析json和无行首的单行dson字符串
      *
-     * @param originLines 不可以再包含换行符
+     * @param jsonLike 是否像json一样没有行首
      */
-    static DsonBuffer newLinesBuffer(List<String> originLines) {
-        return new DsonLinesBuffer(originLines);
+    static DsonBuffer newStringBuffer(CharSequence dsonString, boolean jsonLike) {
+        return new DsonStringBuffer(dsonString, jsonLike);
     }
 
     /** 通过标准的json字符串创建dson的buffer */
     static DsonBuffer newJsonBuffer(String json) {
-        return new JsonBuffer(json);
+        return new DsonStringBuffer(json, true);
+    }
+
+    static DsonBuffer newStreamBuffer(Reader reader) {
+        return new DsonStreamBuffer(reader, false);
+    }
+
+    static DsonBuffer newStreamBuffer(Reader reader, boolean jsonLike, int bufferPerLine) {
+        return new DsonStreamBuffer(reader, jsonLike, bufferPerLine);
     }
 
     // endregion

@@ -19,7 +19,9 @@ package cn.wjybxx.dson.text;
 import cn.wjybxx.dson.internal.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.Reader;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author wjybxx
@@ -30,11 +32,11 @@ public class DsonScanner implements AutoCloseable {
     private static final List<TokenType> STRING_TOKEN_TYPES = List.of(TokenType.STRING, TokenType.UNQUOTE_STRING);
 
     private DsonBuffer buffer;
-    private StringBuilder sbBuffer = new StringBuilder(256);
+    private StringBuilder pooldStringBuilder = new StringBuilder(64);
     private final char[] hexBuffer = new char[4];
 
     public DsonScanner(DsonBuffer buffer) {
-        this.buffer = buffer;
+        this.buffer = Objects.requireNonNull(buffer);
     }
 
     @Override
@@ -43,13 +45,13 @@ public class DsonScanner implements AutoCloseable {
             buffer.close();
             buffer = null;
         }
-        if (sbBuffer != null) {
-            sbBuffer = null;
+        if (pooldStringBuilder != null) {
+            pooldStringBuilder = null;
         }
     }
 
     public DsonToken nextToken() {
-        if (sbBuffer == null) {
+        if (buffer == null) {
             throw new DsonParseException("Scanner closed");
         }
         int c = skipWhitespace();
@@ -131,8 +133,8 @@ public class DsonScanner implements AutoCloseable {
     }
 
     private StringBuilder allocStringBuilder() {
-        sbBuffer.setLength(0);
-        return sbBuffer;
+        pooldStringBuilder.setLength(0);
+        return pooldStringBuilder;
     }
 
     private int getPosition() {
@@ -169,7 +171,7 @@ public class DsonScanner implements AutoCloseable {
         if (firstChar == '"') {
             className = scanString((char) firstChar);
         } else {
-            // 非双引号模式下，不支持换行继续输入，且clsName后必须换行，或必须是空格
+            // 非双引号模式下，不支持换行继续输入，且clsName后必须是空格或换行符
             DsonBuffer buffer = this.buffer;
             StringBuilder sb = allocStringBuilder();
             sb.append((char) firstChar);

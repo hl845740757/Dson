@@ -97,4 +97,10 @@ public class InternalUtils {
 
     // endregion
 
+    public static void recoveryInterrupt(Throwable ex) {
+        if (ex instanceof InterruptedException) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
 }

@@ -1,9 +1,12 @@
 package cn.wjybxx.dson;
 
+import cn.wjybxx.dson.text.DsonTextReader;
 import cn.wjybxx.dson.text.DsonTextWriterSettings;
 import cn.wjybxx.dson.text.ObjectStyle;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import java.io.StringReader;
 
 /**
  * @author wjybxx
@@ -38,8 +41,12 @@ public class DsonTextReaderTest2 {
                 .build());
         System.out.println(dsonString2);
 
-        DsonValue dsonObject2 = Dsons.fromDson(dsonString2);
-        Assertions.assertEquals(dsonObject, dsonObject2);
+        try (DsonTextReader reader = new DsonTextReader(16, Dsons.newStreamScanner(new StringReader(dsonString2)))) {
+            DsonValue dsonObject2 = Dsons.fromDson(dsonString2);
+            DsonValue dsonObject3 = Dsons.readTopDsonValue(reader);
+            Assertions.assertEquals(dsonObject, dsonObject2);
+            Assertions.assertEquals(dsonObject, dsonObject3);
+        }
     }
 
 }

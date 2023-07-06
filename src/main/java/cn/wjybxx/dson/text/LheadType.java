@@ -17,6 +17,8 @@
 package cn.wjybxx.dson.text;
 
 /**
+ * 行首类型
+ *
  * @author wjybxx
  * date - 2023/6/2
  */

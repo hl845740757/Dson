@@ -34,6 +34,20 @@ public class CollectionUtils {
 
     // region list扩展
 
+    public static <E> E firstOrDefault(List<E> elements, E def) {
+        if (elements == null || elements.isEmpty()) {
+            return def;
+        }
+        return elements.get(0);
+    }
+
+    public static <E> E lastOrDefault(List<E> elements, E def) {
+        if (elements == null || elements.isEmpty()) {
+            return def;
+        }
+        return elements.get(elements.size() - 1);
+    }
+
     /**
      * 删除指定位置的元素，可以选择是否保持列表中元素的顺序，当不需要保持顺序时可以对删除性能进行优化
      * 注意：应当小心使用该特性，能够使用该特性的场景不多，应当慎之又慎。

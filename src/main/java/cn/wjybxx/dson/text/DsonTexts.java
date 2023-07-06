@@ -69,6 +69,14 @@ public class DsonTexts {
             "null", "undefine",
             "NaN", "Infinity", "-Infinity");
 
+    // 正则的性能不好
+    private static final Pattern number_rule = Pattern.compile("^([+-]?\\d+\\.\\d+)|([+-]?\\d+)|([+-]?\\.\\d+)$");
+    private static final Pattern scientific_rule = Pattern.compile("^[+-]?((\\d+\\.?\\d*)|(\\.\\d+))[Ee][+-]?\\d+$");
+
+    private static final char[] DIGITS_UPPER = {
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+            'A', 'B', 'C', 'D', 'E', 'F'};
+
     /**
      * 规定哪些不安全较为容易，规定哪些安全反而不容易
      * 这些字符都是128内，使用bitset很快，还可以避免第三方依赖
@@ -133,18 +141,19 @@ public class DsonTexts {
         }
         return true;
     }
+    //
+
+    public static Object parseBool(String str) {
+        if (str.equals("true") || str.equals("1")) return true;
+        if (str.equals("false") || str.equals("0")) return false;
+        throw new IllegalArgumentException("invalid bool str: " + str);
+    }
 
     public static void checkNullString(String str) {
         if ("null".equals(str)) {
             return;
         }
         throw new IllegalArgumentException("invalid null str: " + str);
-    }
-
-    public static Object parseBool(String str) {
-        if (str.equals("true") || str.equals("1")) return true;
-        if (str.equals("false") || str.equals("0")) return false;
-        throw new IllegalArgumentException("invalid bool str: " + str);
     }
 
     public static int parseInt(String rawStr) {
@@ -241,10 +250,6 @@ public class DsonTexts {
         return sb.toString();
     }
 
-    // 正则的性能不好
-    private static final Pattern number_rule = Pattern.compile("^([+-]?\\d+\\.\\d+)|([+-]?\\d+)|([+-]?\\.\\d+)$");
-    private static final Pattern scientific_rule = Pattern.compile("^[+-]?((\\d+\\.?\\d*)|(\\.\\d+))[Ee][+-]?\\d+$");
-
     public static boolean isParsable(String str) {
         int length = str.length();
         if (length == 0 || length > 66) { // 最长也不应该比二进制格式长
@@ -254,13 +259,8 @@ public class DsonTexts {
     }
 
     // 修改自commons-codec，避免引入依赖
-
-    private static final char[] DIGITS_UPPER = {
-            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-            'A', 'B', 'C', 'D', 'E', 'F'};
-
-    static void encodeHex(final byte[] data, final int dataOffset, final int dataLen,
-                          final char[] out, final int outOffset) {
+    public static void encodeHex(final byte[] data, final int dataOffset, final int dataLen,
+                                 final char[] out, final int outOffset) {
         char[] toDigits = DIGITS_UPPER;
         for (int i = dataOffset, j = outOffset; i < dataOffset + dataLen; i++) {
             out[j++] = toDigits[(0xF0 & data[i]) >>> 4];
@@ -268,7 +268,7 @@ public class DsonTexts {
         }
     }
 
-    static byte[] decodeHex(char[] data) {
+    public static byte[] decodeHex(char[] data) {
         byte[] out = new byte[data.length >> 1];
         final int len = data.length;
         if ((len & 0x01) != 0) {
@@ -300,8 +300,6 @@ public class DsonTexts {
         return digit;
     }
 
-    //
-
     /**
      * 测试是否是换行符
      * 现在操作系统的换行符只有: \r\n (windows) 和 \n (unix, mac)
@@ -314,6 +312,55 @@ public class DsonTexts {
     /** @return 换行符的长度 */
     static int lengthCRLF(char c) {
         return c == '\r' ? 2 : 1;
+    }
+
+    /**
+     * 解析行首
+     * 1. 空白行 和 #开头的行 都认为是注释行，返回 #
+     * 2. 如果是约定的内容行行首，则返回行首标识
+     * 3. 其它情况下返回null
+     *
+     * @param begin inclusive 0-based
+     * @param end   exclusive 0-based - 换行符位置
+     */
+    public static LheadType parseLhead(final CharSequence line, final int begin, final int end) {
+        // 跳转至第一个非空字符，减少不必要的字符串切割
+        int startIndex = begin;
+        while (startIndex < end && Character.isWhitespace(line.charAt(startIndex))) {
+            startIndex++;
+        }
+        if (startIndex >= end || line.charAt(startIndex) == '#') {
+            return LheadType.COMMENT; // 空白行或注释行都看做注释行
+        }
+        // 跳转至第一个空字符
+        int endIndex = startIndex;
+        while (endIndex < end && !Character.isWhitespace(line.charAt(endIndex))) {
+            endIndex++;
+        }
+        // 检查第一个缩进字符必须是空格
+        if (endIndex < end && line.charAt(endIndex) != ' ') {
+            throw new DsonParseException(String.format("The first indent char must be a space, pos: %d, char: '%c' ", endIndex, line.charAt(endIndex)));
+        }
+        String lhead = line.subSequence(startIndex, endIndex).toString();
+        LheadType lheadType = LheadType.forLabel(lhead);
+        if (lheadType == null) {
+            throw new DsonParseException("Unknown head " + lhead);
+        }
+        return lheadType;
+    }
+
+    /**
+     * 索引内容的开始位置
+     *
+     * @param begin inclusive 0-based
+     * @param end   exclusive 0-based
+     */
+    public static int indexContentStart(CharSequence line, final int begin, final int end) {
+        int startIndex = begin;
+        while (startIndex < end && Character.isWhitespace(line.charAt(startIndex))) {
+            startIndex++;
+        }
+        return Math.min(end, startIndex + 2);
     }
 
 }

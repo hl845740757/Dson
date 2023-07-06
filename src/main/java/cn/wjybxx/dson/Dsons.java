@@ -20,6 +20,7 @@ import cn.wjybxx.dson.internal.InternalUtils;
 import cn.wjybxx.dson.text.*;
 
 import javax.annotation.Nullable;
+import java.io.Reader;
 import java.io.StringWriter;
 import java.util.Properties;
 
@@ -313,6 +314,14 @@ public final class Dsons {
         try (DsonTextReader reader = new DsonTextReader(32, new DsonScanner(DsonBuffer.newJsonBuffer(jsonString)))) {
             return readTopDsonValue(reader);
         }
+    }
+
+    public static DsonScanner newStreamScanner(Reader reader) {
+        return new DsonScanner(DsonBuffer.newStreamBuffer(reader));
+    }
+
+    public static DsonScanner newStreamScanner(Reader reader, boolean jsonLike, int bufferPerLine) {
+        return new DsonScanner(DsonBuffer.newStreamBuffer(reader, jsonLike, bufferPerLine));
     }
 
     // endregion

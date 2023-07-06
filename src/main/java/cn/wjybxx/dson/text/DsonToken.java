@@ -67,7 +67,15 @@ public class DsonToken {
         return value.charAt(value.length() - 1);
     }
 
-    //
+    /** 忽略位置的相等 -- 通常是由于换行符的问题 */
+    public boolean equalsIgnorePos(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        DsonToken token = (DsonToken) o;
+        if (type != token.type) return false;
+        return Objects.equals(value, token.value);
+    }
 
     @Override
     public boolean equals(Object o) {

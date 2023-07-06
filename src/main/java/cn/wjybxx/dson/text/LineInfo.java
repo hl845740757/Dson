@@ -17,33 +17,41 @@
 package cn.wjybxx.dson.text;
 
 /**
+ * 换行一定的行信息可以有效避免unread时反向扫描整行
+ *
  * @author wjybxx
  * date - 2023/6/3
  */
 class LineInfo {
 
-    /** 行全局起始位置，包含行首，与上一行只差包含换行符 */
-    final int startPos;
-    /** 行全局结束位置，包含换行符 -- start和end相等时表示空行 */
-    final int endPos;
-    /** 内容全局起始位置，可能 -1，表示该行没有内容 */
-    final int contentStartPos;
-    /** 行首类型 */
-    final LheadType lheadType;
-
     /** 行号 */
     final int ln;
-    /** 行信息在数组中索引 */
-    final int index;
+    /** 行全局起始位置，包含行首 */
+    final int startPos;
+    /**
+     * 行结束位置（全局） -- 有效输入的结束。
+     * 1.如果换行符是\r\n，则是\r的位置；
+     * 2.如果换行符是\n，则是\n的位置；
+     * 3.eof的情况下，是最后一个字符+1；即：内容始终不包含该位置。
+     * 4.start和end相等时表示空行；
+     */
+    int endPos;
 
-    public LineInfo(int startPos, int endPos, int contentStartPos, LheadType lheadType,
-                    int ln, int index) {
+    /** 行首类型 */
+    final LheadType lheadType;
+    /** 内容全局起始位置 */
+    final int contentStartPos;
+
+    public LineInfo(int ln, int startPos, int endPos, LheadType lheadType, int contentStartPos) {
+        this.ln = ln;
         this.startPos = startPos;
         this.endPos = endPos;
-        this.contentStartPos = contentStartPos;
         this.lheadType = lheadType;
-        this.ln = ln;
-        this.index = index;
+        this.contentStartPos = contentStartPos;
+    }
+
+    public boolean hasContent() {
+        return contentStartPos < endPos;
     }
 
     @Override

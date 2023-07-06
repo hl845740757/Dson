@@ -64,8 +64,8 @@ public class DsonTextReader extends AbstractDsonReader {
         this(recursionLimit, new DsonScanner(DsonBuffer.newStringBuffer(dson)));
     }
 
-    public DsonTextReader(int recursionLimit, List<String> dsonLines) {
-        this(recursionLimit, new DsonScanner(DsonBuffer.newLinesBuffer(dsonLines)));
+    public DsonTextReader(int recursionLimit, DsonBuffer buffer) {
+        this(recursionLimit, new DsonScanner(buffer));
     }
 
     public DsonTextReader(int recursionLimit, DsonScanner scanner) {

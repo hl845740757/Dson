@@ -23,13 +23,12 @@ import cn.wjybxx.dson.text.TokenType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
- * 验证{@link DsonBuffer#newLinesBuffer(List)}
- * 和{@link  DsonBuffer#newStringBuffer(CharSequence)}实现的相等性
+ * 验证{@link DsonBuffer}实现之间的相等性
  *
  * @author wjybxx
  * date - 2023/6/3
@@ -72,15 +71,19 @@ public class DsonBufferTest {
                 ~
                 """;
 
-        List<DsonToken> tokenList1 = new ArrayList<>(64);
-        List<DsonToken> tokenList2 = new ArrayList<>(64);
-        pullToList(new DsonScanner(DsonBuffer.newLinesBuffer(toLines(x))), tokenList1);
-        pullToList(new DsonScanner(DsonBuffer.newStringBuffer(x)), tokenList2);
-        Assertions.assertEquals(tokenList1, tokenList2);
-    }
+        List<DsonToken> tokenList1 = new ArrayList<>(120);
+        List<DsonToken> tokenList3 = new ArrayList<>(120);
+        pullToList(new DsonScanner(DsonBuffer.newStringBuffer(x)), tokenList1);
+        pullToList(new DsonScanner(DsonBuffer.newStreamBuffer(new StringReader(x))), tokenList3);
+        Assertions.assertEquals(tokenList1.size(), tokenList3.size());
 
-    private static List<String> toLines(String x) {
-        return x.lines().collect(Collectors.toList());
+        // 换行符的可能导致pos的差异
+        int size = tokenList1.size();
+        for (int i = 0; i < size; i++) {
+            DsonToken dsonToken1 = tokenList1.get(i);
+            DsonToken dsonToken3 = tokenList3.get(i);
+            Assertions.assertTrue(dsonToken1.equalsIgnorePos(dsonToken3));
+        }
     }
 
     private static void pullToList(DsonScanner scanner, List<DsonToken> outList) {
@@ -92,4 +95,5 @@ public class DsonBufferTest {
             outList.add(nextToken);
         }
     }
+
 }

@@ -16,16 +16,18 @@
 
 package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.text.*;
+import cn.wjybxx.dson.text.DsonBuffer;
+import cn.wjybxx.dson.text.DsonScanner;
+import cn.wjybxx.dson.text.DsonTextReader;
+import cn.wjybxx.dson.text.ObjectStyle;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 验证{@link DsonBuffer#newJsonBuffer(String)}的正确性
@@ -51,32 +53,23 @@ public class Json2DsonTest {
     @Test
     void test() {
         DsonValue dsonValue;
-        try (DsonTextReader reader = new DsonTextReader(16, new DsonScanner(createLinesBuffer(jsonString)))) {
+        try (DsonTextReader reader = new DsonTextReader(16, new DsonScanner(DsonBuffer.newJsonBuffer(jsonString)))) {
             dsonValue = Dsons.readTopDsonValue(reader);
             Assertions.assertInstanceOf(DsonObject.class, dsonValue);
         }
-
-        DsonValue dsonValue2;
-        try (DsonTextReader reader = new DsonTextReader(16, new DsonScanner(DsonBuffer.newJsonBuffer(jsonString)))) {
-            dsonValue2 = Dsons.readTopDsonValue(reader);
-            Assertions.assertInstanceOf(DsonObject.class, dsonValue);
-        }
-        Assertions.assertEquals(dsonValue, dsonValue2);
-    }
-
-    /** 用于验证{@code JsonBuffer}的正确性 */
-    private static DsonBuffer createLinesBuffer(String json) {
-        List<String> lines = json.lines()
-                .map(e -> DsonTexts.LHEAD_APPEND + " " + e)
-                .collect(Collectors.toList());
-        return DsonBuffer.newLinesBuffer(lines);
     }
 
     private static void testBigFile() throws IOException {
         String jsonFilePath = "D:\\github-mine\\Dson\\testres\\test.json";
         String dsonFilePath = "D:\\github-mine\\Dson\\testres\\testout.dson";
-        DsonValue jsonObject = Dsons.fromJson(FileUtils.readFileToString(new File(jsonFilePath), StandardCharsets.UTF_8));
-        FileUtils.writeStringToFile(new File(dsonFilePath), Dsons.toDson(jsonObject, ObjectStyle.INDENT), StandardCharsets.UTF_8);
+
+        try (DsonScanner scanner = new DsonScanner(DsonBuffer.newStreamBuffer(new FileReader(jsonFilePath), true, 64));
+             DsonTextReader reader = new DsonTextReader(16, scanner)) {
+            DsonValue jsonObject = Dsons.readTopDsonValue(reader);
+            DsonValue jsonObject2 = Dsons.fromJson(FileUtils.readFileToString(new File(jsonFilePath), StandardCharsets.UTF_8));
+            Assertions.assertEquals(jsonObject, jsonObject2);
+            FileUtils.writeStringToFile(new File(dsonFilePath), Dsons.toDson(jsonObject, ObjectStyle.INDENT), StandardCharsets.UTF_8);
+        }
     }
 
     public static void main(String[] args) throws IOException {
