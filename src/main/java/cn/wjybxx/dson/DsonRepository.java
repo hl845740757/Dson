@@ -20,6 +20,10 @@ public class DsonRepository {
     public DsonRepository() {
     }
 
+    public Map<String, DsonValue> getIndexMap() {
+        return Collections.unmodifiableMap(indexMap);
+    }
+
     public List<DsonValue> getValues() {
         return Collections.unmodifiableList(valueList);
     }

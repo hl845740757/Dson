@@ -76,10 +76,10 @@ public abstract class AbstractCharStream implements DsonCharStream {
                 return onReadEndOfLine(curLine);
             }
         } else {
-            if (!readingContent) {
-                readingContent = true;
-            } else {
+            if (readingContent) {
                 position++;
+            } else {
+                readingContent = true;
             }
         }
         return charAt(curLine, position);
@@ -116,6 +116,7 @@ public abstract class AbstractCharStream implements DsonCharStream {
     }
 
     private void onBackToPreLine(LineInfo preLine) {
+        assert preLine.isScanCompleted();
         this.curLine = preLine;
         if (preLine.hasContent()) {
             // 有内容的情况下，需要回退到上一行最后一个字符的位置，否则继续unread会出错
@@ -148,12 +149,16 @@ public abstract class AbstractCharStream implements DsonCharStream {
             }
             return 0;
         }
-        // 尝试回退到上一行
+        // 尝试回退到上一行，需要检测上一行的最后一个可读字符是否溢出
         int index = CollectionUtils.lastIndexOfRef(lines, curLine);
         if (index > 0) {
-            curLine = lines.get(index - 1);
-            checkUnreadOverFlow(curLine, curLine.endPos);
-            onBackToPreLine(curLine);
+            LineInfo preLine = lines.get(index - 1);
+            if (preLine.hasContent()) {
+                checkUnreadOverFlow(preLine, preLine.lastReadablePosition());
+            } else {
+                checkUnreadOverFlow(preLine, preLine.startPos);
+            }
+            onBackToPreLine(preLine);
             return -2;
         } else {
             if (curLine.ln != getStartLn()) {

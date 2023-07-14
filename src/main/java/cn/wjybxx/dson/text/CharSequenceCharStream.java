@@ -55,7 +55,7 @@ final class CharSequenceCharStream extends AbstractCharStream {
 
     @Override
     protected void scanMoreChars(LineInfo line) {
-        assert line.isScanCompleted();
+
     }
 
     @Override
