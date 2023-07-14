@@ -61,6 +61,7 @@ public abstract class AbstractCharStream implements DsonCharStream {
         // 到达当前扫描部分的尾部，扫描更多的字符 - 不测试readingContent也没问题
         if (position == curLine.endPos && !curLine.isScanCompleted()) {
             scanMoreChars(curLine); // 要么读取到一个输入，要么行扫描完毕
+            assert position < curLine.endPos || curLine.isScanCompleted();
         }
         if (curLine.isScanCompleted()) {
             if (readingContent) {
@@ -75,7 +76,6 @@ public abstract class AbstractCharStream implements DsonCharStream {
                 return onReadEndOfLine(curLine);
             }
         } else {
-            assert curLine.hasContent();
             if (!readingContent) {
                 readingContent = true;
             } else {
@@ -104,14 +104,14 @@ public abstract class AbstractCharStream implements DsonCharStream {
         return -2;
     }
 
-    private void onReadNextLine(LineInfo curLine) {
-        assert curLine.isScanCompleted() || curLine.hasContent();
-        this.curLine = curLine;
+    private void onReadNextLine(LineInfo nextLine) {
+        assert nextLine.isScanCompleted() || nextLine.hasContent();
+        this.curLine = nextLine;
         this.readingContent = false;
-        if (curLine.hasContent()) {
-            this.position = curLine.contentStartPos;
+        if (nextLine.hasContent()) {
+            this.position = nextLine.contentStartPos;
         } else {
-            this.position = curLine.startPos;
+            this.position = nextLine.startPos;
         }
     }
 

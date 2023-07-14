@@ -249,27 +249,29 @@ final class BufferedCharStream extends AbstractCharStream {
             }
             break;
         }
-        if (headPos == -1) {
-            assert tempLine.isScanCompleted();
-            tempLine = new LineInfo(ln, startPos, tempLine.endPos, LheadType.COMMENT, -1);
-        } else {
+
+        int state = tempLine.state; // 可能已完成，也可能未完成
+        int lastReadablePos = tempLine.lastReadablePosition();
+        if (headPos >= startPos && headPos <= lastReadablePos) {
             String label = Character.toString(buffer.charAt(headPos - bufferStartPos));
             LheadType lheadType = LheadType.forLabel(label);
             if (lheadType == null) {
                 throw new DsonParseException("Unknown head %s, pos: %d".formatted(label, headPos));
             }
             // 检查缩进
-            if (headPos + 1 <= tempLine.lastReadablePosition() && buffer.charAt(headPos + 1 - bufferStartPos) != ' ') {
+            if (headPos + 1 <= lastReadablePos && buffer.charAt(headPos + 1 - bufferStartPos) != ' ') {
                 throw new DsonParseException("space is required, head %s, pos: %d".formatted(label, headPos));
             }
             // 确定内容开始位置
             int contentStartPos = -1;
-            if (headPos + 2 <= tempLine.lastReadablePosition()) {
+            if (headPos + 2 <= lastReadablePos) {
                 contentStartPos = headPos + 2;
             }
-
-            int state = tempLine.state; // 可能已完成，也可能未完成
             tempLine = new LineInfo(ln, tempLine.startPos, tempLine.endPos, lheadType, contentStartPos);
+            tempLine.state = state;
+        } else {
+            assert tempLine.isScanCompleted();
+            tempLine = new LineInfo(ln, startPos, tempLine.endPos, LheadType.COMMENT, -1);
             tempLine.state = state;
         }
         addLine(tempLine);

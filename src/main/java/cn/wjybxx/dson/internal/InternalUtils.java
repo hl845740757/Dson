@@ -42,10 +42,6 @@ public class InternalUtils {
         return obj == null ? def : obj;
     }
 
-    public static String toStringIfNotNull(Object object) {
-        return object == null ? null : object.toString();
-    }
-
     // region properties
 
     public static int getInt(Properties properties, String key, int def) {

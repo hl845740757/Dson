@@ -74,7 +74,7 @@ public class LineInfo {
         return lastReadablePosition(state, endPos);
     }
 
-    /** 最后一个可读取的位置 -- 不包含换行符 */
+    /** 最后一个可读取的位置 -- 不包含换行符；可能小于startPos */
     public static int lastReadablePosition(int state, int endPos) {
         if (state == STATE_LF) {
             return endPos - 1;

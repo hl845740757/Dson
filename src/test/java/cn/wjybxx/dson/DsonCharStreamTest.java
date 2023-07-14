@@ -72,13 +72,16 @@ public class DsonCharStreamTest {
     void testCharStreamEqualsTokenString() {
         StringBuilder sb = new StringBuilder(tokenString.length());
         int c1;
-        try (DsonCharStream charStream = DsonCharStream.newCharStream(tokenString)) {
+        try (DsonCharStream charStream = DsonCharStream.newBufferedCharStream(new StringReader(tokenString))) {
             while ((c1 = charStream.read()) != -1) {
                 if (c1 == -2) {
                     if (charStream.getLn() > 1) {
                         sb.append('\n');
                     }
-                    sb.append(charStream.getCurLine().lheadType.label);
+                    LineInfo curLine = charStream.getCurLine();
+                    if (curLine.startPos < curLine.endPos) {
+                        sb.append(curLine.lheadType.label);
+                    }
                 } else {
                     if (charStream.getPosition() - charStream.getCurLine().startPos == 2) {
                         sb.append(' ');
