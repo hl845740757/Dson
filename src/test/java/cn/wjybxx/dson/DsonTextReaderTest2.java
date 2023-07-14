@@ -1,5 +1,6 @@
 package cn.wjybxx.dson;
 
+import cn.wjybxx.dson.text.DsonScanner;
 import cn.wjybxx.dson.text.DsonTextReader;
 import cn.wjybxx.dson.text.DsonTextWriterSettings;
 import cn.wjybxx.dson.text.ObjectStyle;
@@ -41,7 +42,8 @@ public class DsonTextReaderTest2 {
                 .build());
         System.out.println(dsonString2);
 
-        try (DsonTextReader reader = new DsonTextReader(16, Dsons.newStreamScanner(new StringReader(dsonString2)))) {
+        DsonScanner scanner = Dsons.newStreamScanner(new StringReader(dsonString2));
+        try (DsonTextReader reader = new DsonTextReader(16, scanner)) {
             DsonValue dsonObject2 = Dsons.fromDson(dsonString2);
             DsonValue dsonObject3 = Dsons.readTopDsonValue(reader);
             Assertions.assertEquals(dsonObject, dsonObject2);

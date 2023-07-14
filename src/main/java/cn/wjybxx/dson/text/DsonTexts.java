@@ -62,7 +62,6 @@ public class DsonTexts {
     public static final String LHEAD_APPEND = "|";
     public static final String LHEAD_SWITCH_MODE = "^";
     public static final String LHEAD_END_OF_TEXT = "~";
-    public static final int CONTENT_LHEAD_LENGTH = 1;
 
     /** 有特殊含义的字符串 */
     private static final Set<String> PARSABLE_STRINGS = Set.of("true", "false",
@@ -141,6 +140,7 @@ public class DsonTexts {
         }
         return true;
     }
+
     //
 
     public static Object parseBool(String str) {
@@ -291,13 +291,60 @@ public class DsonTexts {
         return out;
     }
 
-    private static int toDigit(final char ch, final int index) {
-        // 相当于Switch-case 字符，返回对应的数字
-        final int digit = Character.digit(ch, 16);
-        if (digit == -1) {
-            throw new DsonIOException("Illegal hexadecimal character " + ch + " at index " + index);
+    private static int toDigit(final char c, final int index) {
+        switch (c) {
+            case '0' -> {
+                return 0;
+            }
+            case '1' -> {
+                return 1;
+            }
+            case '2' -> {
+                return 2;
+            }
+            case '3' -> {
+                return 3;
+            }
+            case '4' -> {
+                return 4;
+            }
+            case '5' -> {
+                return 5;
+            }
+            case '6' -> {
+                return 6;
+            }
+            case '7' -> {
+                return 7;
+            }
+            case '8' -> {
+                return 8;
+            }
+            case '9' -> {
+                return 9;
+            }
+            case 'a', 'A' -> {
+                return 10;
+            }
+            case 'b', 'B' -> {
+                return 11;
+            }
+            case 'c', 'C' -> {
+                return 12;
+            }
+            case 'd', 'D' -> {
+                return 13;
+            }
+            case 'e', 'E' -> {
+                return 14;
+            }
+            case 'f', 'F' -> {
+                return 15;
+            }
+            default -> {
+                throw new DsonIOException("Illegal hexadecimal character " + c + " at index " + index);
+            }
         }
-        return digit;
     }
 
     /**
@@ -314,53 +361,9 @@ public class DsonTexts {
         return c == '\r' ? 2 : 1;
     }
 
-    /**
-     * 解析行首
-     * 1. 空白行 和 #开头的行 都认为是注释行，返回 #
-     * 2. 如果是约定的内容行行首，则返回行首标识
-     * 3. 其它情况下返回null
-     *
-     * @param begin inclusive 0-based
-     * @param end   exclusive 0-based - 换行符位置
-     */
-    public static LheadType parseLhead(final CharSequence line, final int begin, final int end) {
-        // 跳转至第一个非空字符，减少不必要的字符串切割
-        int startIndex = begin;
-        while (startIndex < end && Character.isWhitespace(line.charAt(startIndex))) {
-            startIndex++;
-        }
-        if (startIndex >= end || line.charAt(startIndex) == '#') {
-            return LheadType.COMMENT; // 空白行或注释行都看做注释行
-        }
-        // 跳转至第一个空字符
-        int endIndex = startIndex;
-        while (endIndex < end && !Character.isWhitespace(line.charAt(endIndex))) {
-            endIndex++;
-        }
-        // 检查第一个缩进字符必须是空格
-        if (endIndex < end && line.charAt(endIndex) != ' ') {
-            throw new DsonParseException(String.format("The first indent char must be a space, pos: %d, char: '%c' ", endIndex, line.charAt(endIndex)));
-        }
-        String lhead = line.subSequence(startIndex, endIndex).toString();
-        LheadType lheadType = LheadType.forLabel(lhead);
-        if (lheadType == null) {
-            throw new DsonParseException("Unknown head " + lhead);
-        }
-        return lheadType;
-    }
-
-    /**
-     * 索引内容的开始位置
-     *
-     * @param begin inclusive 0-based
-     * @param end   exclusive 0-based
-     */
-    public static int indexContentStart(CharSequence line, final int begin, final int end) {
-        int startIndex = begin;
-        while (startIndex < end && Character.isWhitespace(line.charAt(startIndex))) {
-            startIndex++;
-        }
-        return Math.min(end, startIndex + 2);
+    /** 是否是缩进字符 */
+    static boolean isIndentChar(int c) {
+        return c == ' ' || c == '\t';
     }
 
 }

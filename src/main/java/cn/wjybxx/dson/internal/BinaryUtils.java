@@ -27,14 +27,19 @@ public class BinaryUtils {
     private BinaryUtils() {
     }
 
-    /**
-     * @param offset 数据的起始索引
-     * @param length 数据的长度
-     */
     public static void checkBuffer(byte[] buffer, int offset, int length) {
-        if ((offset | length | (buffer.length - (offset + length))) < 0) {
+        checkBuffer(buffer.length, offset, length);
+    }
+
+    /**
+     * @param bufferLength buffer数组的长度
+     * @param offset       数据的起始索引
+     * @param length       数据的长度
+     */
+    public static void checkBuffer(int bufferLength, int offset, int length) {
+        if ((offset | length | (bufferLength - (offset + length))) < 0) {
             throw new IllegalArgumentException(String.format("Array range is invalid. Buffer.length=%d, offset=%d, length=%d",
-                    buffer.length, offset, length));
+                    bufferLength, offset, length));
         }
     }
 

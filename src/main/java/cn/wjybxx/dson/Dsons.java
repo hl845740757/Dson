@@ -53,6 +53,7 @@ import java.util.Properties;
  * @author wjybxx
  * date - 2023/4/19
  */
+@SuppressWarnings("unused")
 public final class Dsons {
 
     /** {@link DsonType}的最大类型编号 */
@@ -194,7 +195,7 @@ public final class Dsons {
     }
 
     public static DsonArray<String> readArray(DsonReader reader) {
-        DsonArray<String> dsonArray = new DsonArray<>(8);
+        DsonArray<String> dsonArray = new DsonArray<>();
         DsonType dsonType;
         DsonValue value;
         reader.readStartArray();
@@ -304,24 +305,41 @@ public final class Dsons {
         return stringWriter.toString();
     }
 
-    public static DsonValue fromDson(String dsonString) {
+    public static DsonValue fromDson(CharSequence dsonString) {
         try (DsonTextReader reader = new DsonTextReader(32, dsonString)) {
             return readTopDsonValue(reader);
         }
     }
 
-    public static DsonValue fromJson(String jsonString) {
-        try (DsonTextReader reader = new DsonTextReader(32, new DsonScanner(DsonBuffer.newJsonBuffer(jsonString)))) {
+    public static DsonValue fromJson(CharSequence jsonString) {
+        try (DsonTextReader reader = new DsonTextReader(32, newJsonScanner(jsonString))) {
             return readTopDsonValue(reader);
         }
     }
 
-    public static DsonScanner newStreamScanner(Reader reader) {
-        return new DsonScanner(DsonBuffer.newStreamBuffer(reader));
+    public static DsonScanner newStringScanner(CharSequence dsonString) {
+        return new DsonScanner(DsonCharStream.newCharStream(dsonString, false));
     }
 
-    public static DsonScanner newStreamScanner(Reader reader, boolean jsonLike, int bufferPerLine) {
-        return new DsonScanner(DsonBuffer.newStreamBuffer(reader, jsonLike, bufferPerLine));
+    /**
+     * 如果没有行首，每一行都被当做append行，可以用于解析json和无行首的dson字符串
+     *
+     * @param jsonLike 是否像json一样没有行首
+     */
+    public static DsonScanner newStringScanner(String dsonString, boolean jsonLike) {
+        return new DsonScanner(DsonCharStream.newCharStream(dsonString, jsonLike));
+    }
+
+    public static DsonScanner newJsonScanner(CharSequence jsonString) {
+        return new DsonScanner(DsonCharStream.newCharStream(jsonString, true));
+    }
+
+    public static DsonScanner newStreamScanner(Reader reader) {
+        return new DsonScanner(DsonCharStream.newBufferedCharStream(reader));
+    }
+
+    public static DsonScanner newStreamScanner(Reader reader, int bufferSize, boolean jsonLike) {
+        return new DsonScanner(DsonCharStream.newBufferedCharStream(reader, bufferSize, jsonLike));
     }
 
     // endregion

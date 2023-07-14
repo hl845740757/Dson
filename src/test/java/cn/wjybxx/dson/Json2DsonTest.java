@@ -16,7 +16,6 @@
 
 package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.text.DsonBuffer;
 import cn.wjybxx.dson.text.DsonScanner;
 import cn.wjybxx.dson.text.DsonTextReader;
 import cn.wjybxx.dson.text.ObjectStyle;
@@ -30,8 +29,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 /**
- * 验证{@link DsonBuffer#newJsonBuffer(String)}的正确性
- *
  * @author wjybxx
  * date - 2023/6/5
  */
@@ -53,7 +50,7 @@ public class Json2DsonTest {
     @Test
     void test() {
         DsonValue dsonValue;
-        try (DsonTextReader reader = new DsonTextReader(16, new DsonScanner(DsonBuffer.newJsonBuffer(jsonString)))) {
+        try (DsonTextReader reader = new DsonTextReader(16, Dsons.newJsonScanner(jsonString))) {
             dsonValue = Dsons.readTopDsonValue(reader);
             Assertions.assertInstanceOf(DsonObject.class, dsonValue);
         }
@@ -63,7 +60,7 @@ public class Json2DsonTest {
         String jsonFilePath = "D:\\github-mine\\Dson\\testres\\test.json";
         String dsonFilePath = "D:\\github-mine\\Dson\\testres\\testout.dson";
 
-        try (DsonScanner scanner = new DsonScanner(DsonBuffer.newStreamBuffer(new FileReader(jsonFilePath), true, 64));
+        try (DsonScanner scanner = Dsons.newStreamScanner(new FileReader(jsonFilePath), 64, true);
              DsonTextReader reader = new DsonTextReader(16, scanner)) {
             DsonValue jsonObject = Dsons.readTopDsonValue(reader);
             DsonValue jsonObject2 = Dsons.fromJson(FileUtils.readFileToString(new File(jsonFilePath), StandardCharsets.UTF_8));

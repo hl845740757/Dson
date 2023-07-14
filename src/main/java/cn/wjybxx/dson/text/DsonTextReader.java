@@ -60,12 +60,8 @@ public class DsonTextReader extends AbstractDsonReader {
     /** 未声明为DsonValue，避免再拆装箱 */
     private Object nextValue;
 
-    public DsonTextReader(int recursionLimit, String dson) {
-        this(recursionLimit, new DsonScanner(DsonBuffer.newStringBuffer(dson)));
-    }
-
-    public DsonTextReader(int recursionLimit, DsonBuffer buffer) {
-        this(recursionLimit, new DsonScanner(buffer));
+    public DsonTextReader(int recursionLimit, CharSequence dson) {
+        this(recursionLimit, new DsonScanner(DsonCharStream.newCharStream(dson)));
     }
 
     public DsonTextReader(int recursionLimit, DsonScanner scanner) {
@@ -268,7 +264,7 @@ public class DsonTextReader extends AbstractDsonReader {
     /** 字符串默认解析规则 */
     private DsonType parseUnquoteStringToken(Context context, DsonToken valueToken) {
         String unquotedString = valueToken.castAsString();
-        if (context.compClsNameToken != null) {
+        if (context.contextType != DsonContextType.HEADER && context.compClsNameToken != null) {
             switch (context.compClsNameToken.castAsString()) {
                 case DsonTexts.LABEL_INT32 -> {
                     pushNextValue(DsonTexts.parseInt(unquotedString));
@@ -518,12 +514,13 @@ public class DsonTextReader extends AbstractDsonReader {
                     DsonToken valueToken = popToken();
                     ensureStringsToken(context, valueToken);
                     nanos = DsonTexts.parseInt(valueToken.castAsString());
+                    enables |= OffsetTimestamp.MASK_NANOS;
                 }
                 case OffsetTimestamp.NAMES_MILLIS -> {
                     DsonToken valueToken = popToken();
                     ensureStringsToken(context, valueToken);
-                    int millis = DsonTexts.parseInt(valueToken.castAsString());
-                    nanos = millis * 1000_000;
+                    nanos = DsonTexts.parseInt(valueToken.castAsString()) * 1000_000;
+                    enables |= OffsetTimestamp.MASK_NANOS;
                 }
                 default -> {
                     throw new DsonIOException("invalid datetime fieldName: " + keyToken.castAsString());
@@ -544,6 +541,9 @@ public class DsonTextReader extends AbstractDsonReader {
                 case COMMA, END_OBJECT, END_ARRAY -> {
                     pushToken(valueToken);
                     return sb.toString();
+                }
+                case EOF -> {
+                    throw DsonIOException.invalidTokenType(getContextType(), valueToken);
                 }
                 default -> {
                     sb.append(valueToken.castAsString());

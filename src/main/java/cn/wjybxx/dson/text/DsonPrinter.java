@@ -16,6 +16,7 @@
 
 package cn.wjybxx.dson.text;
 
+import cn.wjybxx.dson.internal.BinaryUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.io.Writer;
@@ -47,6 +48,7 @@ public final class DsonPrinter implements AutoCloseable {
         this.lineSeparator = Objects.requireNonNull(lineSeparator);
     }
 
+    /** 当前列数 */
     public int getColumn() {
         return column;
     }
@@ -63,44 +65,44 @@ public final class DsonPrinter implements AutoCloseable {
 
     /** 当前行内容的长度 */
     public int getContentLength() {
-        return headLabel == null ? 0 : column - headLabel.length() - 1;
+        return headLabel == null ? column : column - headLabel.length() - 1;
     }
 
     // region 普通打印
 
+    /**
+     * @apiNote tab增加的列不是固定的...所以其它打印字符串的方法都必须调用该方法，一定程度上降低了性能，不能批量拷贝
+     */
     public void print(char c) {
         try {
             builder.append(c);
-            column += 1;
+            if (c == '\t') {
+                column--;
+                column += (4 - (column % 4));
+            } else {
+                column += 1;
+            }
         } catch (Exception e) {
             ExceptionUtils.rethrow(e);
         }
     }
 
     public void print(char[] cBuffer) {
-        try {
-            builder.append(cBuffer);
-            column += cBuffer.length;
-        } catch (Exception e) {
-            ExceptionUtils.rethrow(e);
+        for (char c : cBuffer) {
+            print(c);
         }
     }
 
     public void print(char[] cBuffer, int offset, int len) {
-        try {
-            builder.append(cBuffer, offset, len);
-            column += len;
-        } catch (Exception e) {
-            ExceptionUtils.rethrow(e);
+        BinaryUtils.checkBuffer(cBuffer.length, offset, len);
+        for (int idx = offset, end = offset + len; idx < end; idx++) {
+            print(cBuffer[idx]);
         }
     }
 
     public void print(String text) {
-        try {
-            builder.append(text);
-            column += text.length();
-        } catch (Exception e) {
-            ExceptionUtils.rethrow(e);
+        for (int idx = 0, end = text.length(); idx < end; idx++) {
+            print(text.charAt(idx));
         }
     }
 
@@ -109,11 +111,16 @@ public final class DsonPrinter implements AutoCloseable {
      * @param end   the end index of the subsequence to be appended.
      */
     public void printRange(String text, int start, int end) {
-        try {
-            builder.append(text, start, end);
-            column += (end - start);
-        } catch (Exception e) {
-            ExceptionUtils.rethrow(e);
+        checkRange(start, end, text.length());
+        for (int idx = start; idx < end; idx++) {
+            print(text.charAt(idx));
+        }
+    }
+
+    private static void checkRange(int start, int end, int len) {
+        if (start < 0 || start > end || end > len) {
+            throw new IndexOutOfBoundsException(
+                    "start " + start + ", end " + end + ", length " + len);
         }
     }
 
@@ -121,6 +128,7 @@ public final class DsonPrinter implements AutoCloseable {
         print(text);
         println();
     }
+
     // endregion
 
     // region dson
@@ -132,6 +140,9 @@ public final class DsonPrinter implements AutoCloseable {
 
     /** 打印行首 */
     public void printLhead(String label) {
+        if (headLabel != null) {
+            throw new IllegalStateException();
+        }
         try {
             builder.append(label);
             builder.append(' ');
@@ -197,16 +208,6 @@ public final class DsonPrinter implements AutoCloseable {
         }
     }
 
-    /** 打印冒号和空格 */
-    public void printColonAndSpace() {
-        try {
-            builder.append(": ");
-            column += 2;
-        } catch (Exception e) {
-            ExceptionUtils.rethrow(e);
-        }
-    }
-
     /** 打印逗号 */
     public void printComma() {
         try {
@@ -266,8 +267,11 @@ public final class DsonPrinter implements AutoCloseable {
 
     /** 打印缩进，可指定一个偏移量 */
     public void printIndent(int offset) {
+        int len = indent - offset;
+        if (len <= 0) {
+            throw new IllegalArgumentException("invalid offset, indent: %d, offset: %d".formatted(indent, offset));
+        }
         try {
-            int len = indent - offset;
             builder.append(indentionArray, offset, len);
             column += len;
         } catch (Exception e) {

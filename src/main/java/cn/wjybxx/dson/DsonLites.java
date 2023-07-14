@@ -148,7 +148,7 @@ public class DsonLites {
     }
 
     public static DsonArray<FieldNumber> readArray(DsonLiteReader reader) {
-        DsonArray<FieldNumber> dsonArray = new DsonArray<>(8);
+        DsonArray<FieldNumber> dsonArray = new DsonArray<>();
         DsonType dsonType;
         DsonValue value;
         reader.readStartArray();

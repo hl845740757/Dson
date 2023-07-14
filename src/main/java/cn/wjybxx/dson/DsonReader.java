@@ -178,6 +178,8 @@ public interface DsonReader extends AutoCloseable {
     /**
      * 读取一个protobuf消息
      * 只有当前数据是Binary的时候才合法
+     *
+     * @param binaryType 期望的二进制子类型
      */
     <T> T readMessage(String name, int binaryType, @Nonnull Parser<T> parser);
 

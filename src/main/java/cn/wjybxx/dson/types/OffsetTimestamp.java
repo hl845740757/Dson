@@ -18,6 +18,7 @@ public final class OffsetTimestamp {
     public static final int MASK_DATE = 1 << 3;
     public static final int MASK_TIME = 1 << 2;
     public static final int MASK_OFFSET = 1 << 1;
+    public static final int MASK_NANOS = 1;
 
     public static final int MASK_DATETIME = MASK_DATE | MASK_TIME;
     public static final int MASK_OFFSET_DATETIME = MASK_DATE | MASK_TIME | MASK_OFFSET;
@@ -82,6 +83,10 @@ public final class OffsetTimestamp {
 
     public boolean hasOffset() {
         return isEnabled(MASK_OFFSET, enables);
+    }
+
+    public boolean hasNanos() {
+        return isEnabled(MASK_NANOS, enables);
     }
 
     public boolean hasFields(int mask) {

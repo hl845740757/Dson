@@ -67,33 +67,37 @@ public class DsonToken {
         return value.charAt(value.length() - 1);
     }
 
-    /** 忽略位置的相等 -- 通常是由于换行符的问题 */
-    public boolean equalsIgnorePos(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    //
 
-        DsonToken token = (DsonToken) o;
-        if (type != token.type) return false;
-        return Objects.equals(value, token.value);
+    public boolean fullEquals(DsonToken dsonToken) {
+        if (this == dsonToken) {
+            return true;
+        }
+        if (pos != dsonToken.pos) return false;
+        if (type != dsonToken.type) return false;
+        return Objects.equals(value, dsonToken.value);
     }
 
+    /**
+     * 默认忽略pos的差异 -- 通常是由于换行符的问题。
+     * 由于动态生成的token的pos都是-1，因此即使比较pos，对于动态生成的token之间也是无意义的，
+     * 既然动态生成的token之间的相等性是忽略了pos的，那么正常的token也需要忽略pos。
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        DsonToken token = (DsonToken) o;
+        DsonToken dsonToken = (DsonToken) o;
 
-        if (pos != token.pos) return false;
-        if (type != token.type) return false;
-        return Objects.equals(value, token.value);
+        if (type != dsonToken.type) return false;
+        return Objects.equals(value, dsonToken.value);
     }
 
     @Override
     public int hashCode() {
         int result = type.hashCode();
         result = 31 * result + (value != null ? value.hashCode() : 0);
-        result = 31 * result + pos;
         return result;
     }
 

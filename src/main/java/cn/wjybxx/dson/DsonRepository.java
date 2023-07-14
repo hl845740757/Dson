@@ -17,6 +17,9 @@ public class DsonRepository {
     private final Map<String, DsonValue> indexMap = new HashMap<>();
     private final List<DsonValue> valueList = new ArrayList<>();
 
+    public DsonRepository() {
+    }
+
     public List<DsonValue> getValues() {
         return Collections.unmodifiableList(valueList);
     }

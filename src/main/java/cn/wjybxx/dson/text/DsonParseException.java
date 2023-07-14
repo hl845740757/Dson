@@ -16,11 +16,13 @@
 
 package cn.wjybxx.dson.text;
 
+import cn.wjybxx.dson.io.DsonIOException;
+
 /**
  * @author wjybxx
  * date - 2023/6/2
  */
-public class DsonParseException extends RuntimeException {
+public class DsonParseException extends DsonIOException {
 
     public DsonParseException() {
     }
