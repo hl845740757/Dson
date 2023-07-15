@@ -15,8 +15,6 @@
  */
 package cn.wjybxx.dson.text;
 
-import cn.wjybxx.dson.internal.CollectionUtils;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -91,16 +89,13 @@ public abstract class AbstractCharStream implements DsonCharStream {
             eof = true;
             return -1;
         }
-        int index = CollectionUtils.lastIndexOfRef(lines, curLine);
+        int index = indexOfCurLine(lines, curLine);
         if (index + 1 == lines.size() && !scanNextLine()) {
             eof = true;
             return -1;
         }
         curLine = lines.get(index + 1);
         onReadNextLine(curLine);
-        if (lines.size() >= 10) { // 清除部分缓存
-            lines.subList(0, 5).clear();
-        }
         return -2;
     }
 
@@ -113,6 +108,7 @@ public abstract class AbstractCharStream implements DsonCharStream {
         } else {
             this.position = nextLine.startPos;
         }
+        discardReadLines(lines, nextLine); // 清除部分缓存
     }
 
     private void onBackToPreLine(LineInfo preLine) {
@@ -150,7 +146,7 @@ public abstract class AbstractCharStream implements DsonCharStream {
             return 0;
         }
         // 尝试回退到上一行，需要检测上一行的最后一个可读字符是否溢出
-        int index = CollectionUtils.lastIndexOfRef(lines, curLine);
+        int index = indexOfCurLine(lines, curLine);
         if (index > 0) {
             LineInfo preLine = lines.get(index - 1);
             if (preLine.hasContent()) {
@@ -168,7 +164,7 @@ public abstract class AbstractCharStream implements DsonCharStream {
             this.curLine = null;
             this.readingContent = false;
             this.position = -1;
-            return -1;
+            return 0;
         }
     }
 
@@ -198,6 +194,10 @@ public abstract class AbstractCharStream implements DsonCharStream {
 
     //
 
+    protected static int indexOfCurLine(List<LineInfo> lines, LineInfo curLine) {
+        return curLine.ln - lines.get(0).ln;
+    }
+
     protected static DsonParseException bufferOverFlow(int position) {
         return new DsonParseException("BufferOverFlow, caused by unread, pos: " + position);
     }
@@ -206,10 +206,26 @@ public abstract class AbstractCharStream implements DsonCharStream {
         return readingContent;
     }
 
+    protected boolean isEof() {
+        return eof;
+    }
+
     protected int getStartLn() {
         return 1;
     }
 
+    /** 丢弃部分已读的行，减少内存占用 */
+    protected void discardReadLines(List<LineInfo> lines, LineInfo curLine) {
+        if (curLine == null) {
+            return;
+        }
+        int idx = indexOfCurLine(lines, curLine);
+        if (idx >= 10) {
+            lines.subList(0, 5).clear();
+        }
+    }
+
+    /** 当前流是否已处于关闭状态 */
     protected abstract boolean isClosed();
 
     /** 获取指定全局位置的字符 */

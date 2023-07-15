@@ -437,7 +437,7 @@ Dson主要解决的问题有三个：
       # java maven坐标
       <groupId>cn.wjybxx.dson</groupId>
       <artifactId>dson-core</artifactId>
-      <version>1.0-rc-2</version>
+      <version>1.0.1</version>
    ```  
 2. C#
 
