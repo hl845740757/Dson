@@ -32,7 +32,6 @@ public class DsonTextWriterSettings {
     public final float lengthFactorOfText;
     public final boolean unicodeChar;
     public final int maxLengthOfUnquoteString;
-    public final boolean disableSci;
 
     private DsonTextWriterSettings(Builder builder) {
         this.lineSeparator = Objects.requireNonNull(builder.lineSeparator);
@@ -41,7 +40,6 @@ public class DsonTextWriterSettings {
         this.lengthFactorOfText = builder.lengthFactorOfText;
         this.unicodeChar = builder.unicodeChar;
         this.maxLengthOfUnquoteString = builder.maxLengthOfUnquoteString;
-        this.disableSci = builder.disableSci;
     }
 
     public static Builder newBuilder() {
@@ -78,10 +76,6 @@ public class DsonTextWriterSettings {
          * 自动模式下无引号字符串的最大长度
          */
         private int maxLengthOfUnquoteString = 66;
-        /**
-         * 是否禁用科学计数法输出
-         */
-        private boolean disableSci = false;
 
         private Builder() {
         }
@@ -144,14 +138,6 @@ public class DsonTextWriterSettings {
             return this;
         }
 
-        public boolean isDisableSci() {
-            return disableSci;
-        }
-
-        public Builder setDisableSci(boolean disableSci) {
-            this.disableSci = disableSci;
-            return this;
-        }
     }
 
 }

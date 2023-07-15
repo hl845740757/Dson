@@ -1,7 +1,7 @@
 package cn.wjybxx.dson;
 
 import cn.wjybxx.dson.io.Chunk;
-import cn.wjybxx.dson.text.NumberStyle;
+import cn.wjybxx.dson.text.INumberStyle;
 import cn.wjybxx.dson.text.ObjectStyle;
 import cn.wjybxx.dson.text.StringStyle;
 import cn.wjybxx.dson.types.ObjectRef;
@@ -42,22 +42,22 @@ public class DsonObjectWriter extends AbstractDsonWriter {
     //
 
     @Override
-    protected void doWriteInt32(int value, WireType wireType, NumberStyle style) {
+    protected void doWriteInt32(int value, WireType wireType, INumberStyle style) {
         getContext().add(new DsonInt32(value));
     }
 
     @Override
-    protected void doWriteInt64(long value, WireType wireType, NumberStyle style) {
+    protected void doWriteInt64(long value, WireType wireType, INumberStyle style) {
         getContext().add(new DsonInt64(value));
     }
 
     @Override
-    protected void doWriteFloat(float value, NumberStyle style) {
+    protected void doWriteFloat(float value, INumberStyle style) {
         getContext().add(new DsonFloat(value));
     }
 
     @Override
-    protected void doWriteDouble(double value, NumberStyle style) {
+    protected void doWriteDouble(double value, INumberStyle style) {
         getContext().add(new DsonDouble(value));
     }
 
@@ -87,12 +87,12 @@ public class DsonObjectWriter extends AbstractDsonWriter {
     }
 
     @Override
-    protected void doWriteExtInt32(DsonExtInt32 value, WireType wireType, NumberStyle style) {
+    protected void doWriteExtInt32(DsonExtInt32 value, WireType wireType, INumberStyle style) {
         getContext().add(value); // 不可变对象
     }
 
     @Override
-    protected void doWriteExtInt64(DsonExtInt64 value, WireType wireType, NumberStyle style) {
+    protected void doWriteExtInt64(DsonExtInt64 value, WireType wireType, INumberStyle style) {
         getContext().add(value);
     }
 

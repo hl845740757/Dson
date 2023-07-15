@@ -183,7 +183,6 @@ public abstract class AbstractCharStream implements DsonCharStream {
         if (curLine.hasContent()) {
             readingContent = true;
             position = curLine.lastReadablePosition();
-            discardReadChars(position);
         }
     }
 

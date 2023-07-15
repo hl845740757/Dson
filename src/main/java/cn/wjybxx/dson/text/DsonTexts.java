@@ -177,11 +177,12 @@ public class DsonTexts {
             sign = 1;
             lookOffset = 0;
         }
+        // 需要使用 Unsigned 解析方法，否则MIN_VALUE无法解析...
         if (str.startsWith("0x", lookOffset) || str.startsWith("0X", lookOffset)) {
-            return sign * Integer.parseInt(str, 2, str.length(), 16);
+            return sign * Integer.parseUnsignedInt(str, lookOffset + 2, str.length(), 16);
         }
         if (str.startsWith("0b", lookOffset) || str.startsWith("0B", lookOffset)) {
-            return sign * Integer.parseInt(str, 3, str.length(), 2);
+            return sign * Integer.parseUnsignedInt(str, lookOffset + 2, str.length(), 2);
         }
         return Integer.parseInt(str);
     }
@@ -208,10 +209,10 @@ public class DsonTexts {
             lookOffset = 0;
         }
         if (str.startsWith("0x", lookOffset) || str.startsWith("0X", lookOffset)) {
-            return sign * Long.parseLong(str, 2, str.length(), 16);
+            return sign * Long.parseUnsignedLong(str, lookOffset + 2, str.length(), 16);
         }
         if (str.startsWith("0b", lookOffset) || str.startsWith("0B", lookOffset)) {
-            return sign * Long.parseLong(str, 3, str.length(), 2);
+            return sign * Long.parseUnsignedLong(str, lookOffset + 2, str.length(), 2);
         }
         return Long.parseLong(str);
     }

@@ -18,7 +18,7 @@ package cn.wjybxx.dson;
 
 import cn.wjybxx.dson.io.Chunk;
 import cn.wjybxx.dson.io.DsonOutput;
-import cn.wjybxx.dson.text.NumberStyle;
+import cn.wjybxx.dson.text.INumberStyle;
 import cn.wjybxx.dson.text.ObjectStyle;
 import cn.wjybxx.dson.text.StringStyle;
 import cn.wjybxx.dson.types.ObjectRef;
@@ -87,28 +87,28 @@ public class DsonBinaryLiteWriter extends AbstractDsonLiteWriter {
     // region 简单值
 
     @Override
-    protected void doWriteInt32(int value, WireType wireType, NumberStyle style) {
+    protected void doWriteInt32(int value, WireType wireType, INumberStyle style) {
         DsonOutput output = this.output;
         writeFullTypeAndCurrentName(output, DsonType.INT32, wireType);
         wireType.writeInt32(output, value);
     }
 
     @Override
-    protected void doWriteInt64(long value, WireType wireType, NumberStyle style) {
+    protected void doWriteInt64(long value, WireType wireType, INumberStyle style) {
         DsonOutput output = this.output;
         writeFullTypeAndCurrentName(output, DsonType.INT64, wireType);
         wireType.writeInt64(output, value);
     }
 
     @Override
-    protected void doWriteFloat(float value, NumberStyle style) {
+    protected void doWriteFloat(float value, INumberStyle style) {
         DsonOutput output = this.output;
         writeFullTypeAndCurrentName(output, DsonType.FLOAT, null);
         output.writeFloat(value);
     }
 
     @Override
-    protected void doWriteDouble(double value, NumberStyle style) {
+    protected void doWriteDouble(double value, INumberStyle style) {
         DsonOutput output = this.output;
         writeFullTypeAndCurrentName(output, DsonType.DOUBLE, null);
         output.writeDouble(value);
@@ -156,14 +156,14 @@ public class DsonBinaryLiteWriter extends AbstractDsonLiteWriter {
     }
 
     @Override
-    protected void doWriteExtInt32(DsonExtInt32 value, WireType wireType, NumberStyle style) {
+    protected void doWriteExtInt32(DsonExtInt32 value, WireType wireType, INumberStyle style) {
         DsonOutput output = this.output;
         writeFullTypeAndCurrentName(output, DsonType.EXT_INT32, wireType);
         DsonReaderUtils.writeExtInt32(output, value, wireType);
     }
 
     @Override
-    protected void doWriteExtInt64(DsonExtInt64 value, WireType wireType, NumberStyle style) {
+    protected void doWriteExtInt64(DsonExtInt64 value, WireType wireType, INumberStyle style) {
         DsonOutput output = this.output;
         writeFullTypeAndCurrentName(output, DsonType.EXT_INT64, wireType);
         DsonReaderUtils.writeExtInt64(output, value, wireType);

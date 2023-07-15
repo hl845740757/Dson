@@ -55,7 +55,7 @@ public enum TokenType {
     DOUBLE,
     /** 显式声明 '@b' */
     BOOL,
-    /** 字符串， 使用了双引号 或 '@ss' 标签 */
+    /** 显式声明 双引号 或 '@s' 或 '@ss' */
     STRING,
     /** 显式声明 '@N' */
     NULL,

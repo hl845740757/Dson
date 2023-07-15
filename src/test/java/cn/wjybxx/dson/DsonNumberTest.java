@@ -1,9 +1,11 @@
 package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.text.DsonTextWriterSettings;
-import cn.wjybxx.dson.text.ObjectStyle;
+import cn.wjybxx.dson.text.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import java.io.StringWriter;
+import java.util.List;
 
 /**
  * @author wjybxx
@@ -21,25 +23,56 @@ public class DsonNumberTest {
             - value6: @d 1.05E-15,
             - value7: @d Infinity,
             - value8: @d NaN,
+            - value9: @i -0xFF,
+            - value10: @i -0b10010001,
             - }
             """;
 
     @Test
     void testNumber() {
-        DsonValue value = Dsons.fromDson(numberString);
+        Assertions.assertEquals(Integer.MIN_VALUE, DsonTexts.parseInt("0x" + Integer.toHexString(Integer.MIN_VALUE)));
 
-        String dsonString1 = Dsons.toDson(value, ObjectStyle.INDENT);
-        System.out.println();
-        System.out.println(dsonString1);
+        DsonObject<String> value = Dsons.fromDson(numberString).asObject();
+        for (NumberStyle style : List.of(NumberStyle.TYPED, NumberStyle.TYPED_NO_SCI, NumberStyle.HEX, NumberStyle.BINARY)) {
+            StringWriter stringWriter = new StringWriter(120);
+            try (DsonTextWriter writer = new DsonTextWriter(16, stringWriter, DsonTextWriterSettings.newBuilder().build())) {
+                writer.writeStartObject(ObjectStyle.INDENT);
 
-        String dsonString2 = Dsons.toDson(value, ObjectStyle.INDENT, DsonTextWriterSettings.newBuilder()
-                .setDisableSci(true)
-                .build());
-        System.out.println();
-        System.out.println(dsonString2);
-
-        Assertions.assertEquals(value, Dsons.fromDson(dsonString1));
-        Assertions.assertEquals(value, Dsons.fromDson(dsonString2));
+                if (style != NumberStyle.BINARY) {
+                    for (int i = 1; i <= value.size(); i++) {
+                        String name = "value" + i;
+                        DsonNumber dsonNumber = value.get(name).asNumber();
+                        if (dsonNumber == null) {
+                            break;
+                        }
+                        switch (dsonNumber.getDsonType()) {
+                            case INT32 -> writer.writeInt32(name, dsonNumber.intValue(), WireType.VARINT, style);
+                            case INT64 -> writer.writeInt64(name, dsonNumber.longValue(), WireType.VARINT, style);
+                            case FLOAT -> writer.writeFloat(name, dsonNumber.floatValue(), style);
+                            case DOUBLE -> writer.writeDouble(name, dsonNumber.doubleValue(), style);
+                        }
+                    }
+                } else {
+                    for (int i = 1; i <= value.size(); i++) {
+                        String name = "value" + i;
+                        DsonNumber dsonNumber = value.get(name).asNumber();
+                        if (dsonNumber == null) {
+                            break;
+                        }
+                        switch (dsonNumber.getDsonType()) {
+                            case INT32 -> writer.writeInt32(name, dsonNumber.intValue(), WireType.VARINT, style);
+                            case INT64 -> writer.writeInt64(name, dsonNumber.longValue(), WireType.VARINT, style);
+                            case FLOAT -> writer.writeFloat(name, dsonNumber.floatValue(), NumberStyle.SIMPLE);
+                            case DOUBLE -> writer.writeDouble(name, dsonNumber.doubleValue(), NumberStyle.SIMPLE);
+                        }
+                    }
+                }
+                writer.writeEndObject();
+            }
+            String dsonString1 = stringWriter.toString();
+//            System.out.println(dsonString1);
+            Assertions.assertEquals(value, Dsons.fromDson(dsonString1));
+        }
     }
 
 }

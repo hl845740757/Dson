@@ -175,6 +175,8 @@ ps: 我去除了顶层不能是header的限制，因此可以用顶层的header�
    - value6: @d 1.0E-6,
    - value7: @d Infinity,
    - value8: @d NaN,
+   - value9: @i -0xFF,
+   - value10: @i -0b10010001,   
    - }
 ```
 

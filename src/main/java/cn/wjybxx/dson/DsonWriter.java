@@ -17,7 +17,7 @@
 package cn.wjybxx.dson;
 
 import cn.wjybxx.dson.io.Chunk;
-import cn.wjybxx.dson.text.NumberStyle;
+import cn.wjybxx.dson.text.INumberStyle;
 import cn.wjybxx.dson.text.ObjectStyle;
 import cn.wjybxx.dson.text.StringStyle;
 import cn.wjybxx.dson.types.ObjectRef;
@@ -56,19 +56,13 @@ public interface DsonWriter extends AutoCloseable {
 
     // region 简单值
 
-    void writeInt32(String name, int value, WireType wireType, NumberStyle style);
+    void writeInt32(String name, int value, WireType wireType, INumberStyle style);
 
-    void writeInt64(String name, long value, WireType wireType, NumberStyle style);
+    void writeInt64(String name, long value, WireType wireType, INumberStyle style);
 
-    /**
-     * @param style 浮点数不支持{@link NumberStyle#BINARY}
-     */
-    void writeFloat(String name, float value, NumberStyle style);
+    void writeFloat(String name, float value, INumberStyle style);
 
-    /**
-     * @param style 浮点数不支持{@link NumberStyle#BINARY}
-     */
-    void writeDouble(String name, double value, NumberStyle style);
+    void writeDouble(String name, double value, INumberStyle style);
 
     void writeBoolean(String name, boolean value);
 
@@ -81,9 +75,9 @@ public interface DsonWriter extends AutoCloseable {
     /** @param chunk 写入chunk的length区域 */
     void writeBinary(String name, int type, Chunk chunk);
 
-    void writeExtInt32(String name, DsonExtInt32 value, WireType wireType, NumberStyle style);
+    void writeExtInt32(String name, DsonExtInt32 value, WireType wireType, INumberStyle style);
 
-    void writeExtInt64(String name, DsonExtInt64 value, WireType wireType, NumberStyle style);
+    void writeExtInt64(String name, DsonExtInt64 value, WireType wireType, INumberStyle style);
 
     void writeExtString(String name, DsonExtString value, StringStyle style);
 
