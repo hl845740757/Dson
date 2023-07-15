@@ -100,7 +100,7 @@ public final class DsonPrinter implements AutoCloseable {
         }
     }
 
-    public void print(String text) {
+    public void print(CharSequence text) {
         for (int idx = 0, end = text.length(); idx < end; idx++) {
             print(text.charAt(idx));
         }
@@ -110,7 +110,7 @@ public final class DsonPrinter implements AutoCloseable {
      * @param start the starting index of the subsequence to be appended.
      * @param end   the end index of the subsequence to be appended.
      */
-    public void printRange(String text, int start, int end) {
+    public void printRange(CharSequence text, int start, int end) {
         checkRange(start, end, text.length());
         for (int idx = start; idx < end; idx++) {
             print(text.charAt(idx));
@@ -124,9 +124,44 @@ public final class DsonPrinter implements AutoCloseable {
         }
     }
 
-    public void println(String text) {
-        print(text);
-        println();
+    /** @param cBuffer 内容中无tab字符 */
+    public void printFastPath(char[] cBuffer) {
+        try {
+            builder.append(cBuffer);
+            column += cBuffer.length;
+        } catch (Exception e) {
+            ExceptionUtils.rethrow(e);
+        }
+    }
+
+    /** @param cBuffer 内容中无tab字符 */
+    public void printFastPath(char[] cBuffer, int offset, int len) {
+        try {
+            builder.append(cBuffer, offset, len);
+            column += len;
+        } catch (Exception e) {
+            ExceptionUtils.rethrow(e);
+        }
+    }
+
+    /** @param text 内容中无tab字符 */
+    public void printFastPath(CharSequence text) {
+        try {
+            builder.append(text);
+            column += text.length();
+        } catch (Exception e) {
+            ExceptionUtils.rethrow(e);
+        }
+    }
+
+    /** @param text 内容中无tab字符 */
+    public void printRangeFastPath(CharSequence text, int start, int end) {
+        try {
+            builder.append(text, start, end);
+            column += (end - start);
+        } catch (Exception e) {
+            ExceptionUtils.rethrow(e);
+        }
     }
 
     // endregion
@@ -221,17 +256,17 @@ public final class DsonPrinter implements AutoCloseable {
     /** 打印可能需要转义的字符 */
     public void printEscaped(char c, boolean unicodeChar) {
         switch (c) {
-            case '\"' -> print("\\\"");
-            case '\\' -> print("\\\\");
-            case '\b' -> print("\\b");
-            case '\f' -> print("\\f");
-            case '\n' -> print("\\n");
-            case '\r' -> print("\\r");
-            case '\t' -> print("\\t");
+            case '\"' -> printFastPath("\\\"");
+            case '\\' -> printFastPath("\\\\");
+            case '\b' -> printFastPath("\\b");
+            case '\f' -> printFastPath("\\f");
+            case '\n' -> printFastPath("\\n");
+            case '\r' -> printFastPath("\\r");
+            case '\t' -> printFastPath("\\t");
             default -> {
                 if (unicodeChar && (c < 32 || c > 126)) {
-                    print("\\u");
-                    printRange(Integer.toHexString(0x10000 + (int) c), 1, 5);
+                    printFastPath("\\u");
+                    printRangeFastPath(Integer.toHexString(0x10000 + (int) c), 1, 5);
                 } else {
                     print(c);
                 }
