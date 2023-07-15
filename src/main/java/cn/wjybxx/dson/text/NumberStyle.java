@@ -193,8 +193,34 @@ public enum NumberStyle implements INumberStyle {
         }
     },
 
+    HEX_RAW(6) {
+        @Override
+        public void toString(int value, StyleOut styleOut) {
+            styleOut.setTyped(true)
+                    .setValue("0x" + Integer.toHexString(value));
+        }
+
+        @Override
+        public void toString(long value, StyleOut styleOut) {
+            styleOut.setTyped(true)
+                    .setValue("0x" + Long.toHexString(value));
+        }
+
+        @Override
+        public void toString(float value, StyleOut styleOut) {
+            styleOut.setTyped(true)
+                    .setValue(Float.toHexString(value));
+        }
+
+        @Override
+        public void toString(double value, StyleOut styleOut) {
+            styleOut.setTyped(true)
+                    .setValue(Double.toHexString(value));
+        }
+    },
+
     /** 二进制 -- 一定有标签，不支持浮点数 */
-    BINARY(6) {
+    BINARY(7) {
         @Override
         public void toString(int value, StyleOut styleOut) {
             styleOut.setTyped(true);
@@ -213,6 +239,30 @@ public enum NumberStyle implements INumberStyle {
             } else {
                 styleOut.setValue("0b" + Long.toBinaryString(value));
             }
+        }
+
+        @Override
+        public void toString(float value, StyleOut styleOut) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void toString(double value, StyleOut styleOut) {
+            throw new UnsupportedOperationException();
+        }
+    },
+
+    BINARY_RAW(8) {
+        @Override
+        public void toString(int value, StyleOut styleOut) {
+            styleOut.setTyped(true)
+                    .setValue("0b" + Integer.toBinaryString(value));
+        }
+
+        @Override
+        public void toString(long value, StyleOut styleOut) {
+            styleOut.setTyped(true)
+                    .setValue("0b" + Long.toBinaryString(value));
         }
 
         @Override
@@ -245,7 +295,9 @@ public enum NumberStyle implements INumberStyle {
             case 3 -> TYPED;
             case 4 -> TYPED_NO_SCI;
             case 5 -> HEX;
-            case 6 -> BINARY;
+            case 6 -> HEX_RAW;
+            case 7 -> BINARY;
+            case 8 -> BINARY_RAW;
             default -> throw new IllegalArgumentException("invalid number " + number);
         };
     }

@@ -25,20 +25,23 @@ public class DsonNumberTest {
             - value8: @d NaN,
             - value9: @i -0xFF,
             - value10: @i -0b10010001,
+            - value11: @d -1.05E-15,
             - }
             """;
 
     @Test
     void testNumber() {
-        Assertions.assertEquals(Integer.MIN_VALUE, DsonTexts.parseInt("0x" + Integer.toHexString(Integer.MIN_VALUE)));
-
         DsonObject<String> value = Dsons.fromDson(numberString).asObject();
-        for (NumberStyle style : List.of(NumberStyle.TYPED, NumberStyle.TYPED_NO_SCI, NumberStyle.HEX, NumberStyle.BINARY)) {
+        List<NumberStyle> styleList = List.of(NumberStyle.TYPED, NumberStyle.TYPED_NO_SCI,
+                NumberStyle.HEX, NumberStyle.HEX_RAW,
+                NumberStyle.BINARY, NumberStyle.BINARY_RAW);
+
+        for (NumberStyle style : styleList) {
             StringWriter stringWriter = new StringWriter(120);
             try (DsonTextWriter writer = new DsonTextWriter(16, stringWriter, DsonTextWriterSettings.newBuilder().build())) {
                 writer.writeStartObject(ObjectStyle.INDENT);
 
-                if (style != NumberStyle.BINARY) {
+                if (style != NumberStyle.BINARY && style != NumberStyle.BINARY_RAW) {
                     for (int i = 1; i <= value.size(); i++) {
                         String name = "value" + i;
                         DsonNumber dsonNumber = value.get(name).asNumber();
