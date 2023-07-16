@@ -76,6 +76,11 @@ public final class Dsons {
     /** 内联数的offset -- 最小值映射为1 */
     public static final int FLOAT_INLINE_OFFSET = 1 - FLOAT_INLINE_MIN;
 
+    /** 二进制类型内联的最小值 -- 由于binary的type为小数值的情况占大部分情况，因此将其内联是有意义的 */
+    public static final int BINARY_INLINE_MIN = 0;
+    /** 二进制类型内联的最大值 */
+    public static final int BINARY_INLINE_MAX = 6;
+
     /**
      * 在文档数据解码中是否启用 字段字符串池化
      * 启用池化在大量相同字段名时可能很好地降低内存占用，默认开启

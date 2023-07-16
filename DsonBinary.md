@@ -22,7 +22,7 @@ Dson提供了两个版本的二进制格式，从整体上看他们是一样的�
 1. 字段的类型由 DsonType和 *WireType(数字编码类型)* 构成，共1个字节。
 2. WireType分为：VarInt、UINT、SINT、FIXED -- 可参考ProtocolBuffer。
 3. int32和int64数字的编码类型会随着数字序列化，以确保对方正确的解码。
-4. WireType的比特位用于非数字类型时可以表达其它信息 -- 比如标记null字段。
+4. **WireType的比特位用于非数字类型时可以表达其它信息** -- 比如标记null字段。
 
 ### number区域
 
@@ -42,15 +42,23 @@ Dson提供了两个版本的二进制格式，从整体上看他们是一样的�
 ### wireType比特位的特殊使用
 
 1. bool使用wireType记录了其值；wireType为1表示true，0表示false
-2. Float和Double使用wireType内联了 \[-3, ~3] 区间的整数值，即当浮点数是整数，且在区间时，其值将存储在wireType中。
+2. Float和Double使用wireType内联了 \[-3, 3] 区间的整数值，即当浮点数是整数，且在区间时，其值将存储在wireType中。
     1. 000 表示没有内联值，其它时候表示进行了内联。
     2. 被内联的最小值映射为001，最大值映射为111，计算真实值时减4即可。
     3. 这种方式比通过标记位表示是否进行了内联效果更好。
-3. extString用wireType的bits标记了type和value是否存在，只有存在时才会写入。
+
+3. Binary使用wireType内联了\[0, 6]区间的subType值；由于binary多数情况下subType为0或其它小数值，内联可省掉多数情况下的开销。
+    1. 与浮点数的算法类似， 000 表示没有内联值，其它时候可进行了内联。、
+    2. 在内联的情况下，计算真实值值由wireType减1即可。
+    3. 在没有进行内联时，subType使用uint32编码。
+    4. data的长度为binary的总长度减去subType占用的动态字节数(0~5)。
+
+4. extString用wireType的bits标记了type和value是否存在，只有存在时才会写入。
     1. 001 用于标记type
     2. 010 用于标记value
     3. 编码顺序为 type, value，其中type为uint32编码
-4. ref使用wireType标记了namespace、type、policy是否存在，只有存在时才写入；localId总是写入。
+
+5. ref使用wireType标记了namespace、type、policy是否存在，只有存在时才写入；localId总是写入。
     1. 001 用于标记namespace
     2. 010 用于标记type
     3. 100 用于标记policy
@@ -59,9 +67,8 @@ Dson提供了两个版本的二进制格式，从整体上看他们是一样的�
 
 ### 其它
 
-1. binary的subType现固定1个Byte，以减小复杂度和节省开销。
-2. string采用utf8编码
-3. header是object/array的一个匿名属性，在object中是没有字段id但有类型的值。
+1. string采用utf8编码
+2. header是object/array的一个匿名属性，在object中是没有字段id但有类型的值。
 
 ## string映射字段方案
 

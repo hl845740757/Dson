@@ -18,7 +18,6 @@ package cn.wjybxx.dson;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
-import java.util.Objects;
 
 /**
  * 你通常不应该修改data中的数据。
@@ -29,6 +28,9 @@ import java.util.Objects;
  * date - 2023/4/19
  */
 public class DsonBinary extends DsonValue {
+
+    /** 数据的最大长度 */
+    public static final int MAX_DATA_LENGTH = Integer.MAX_VALUE - 5;
 
     private final int type;
     private final byte[] data;
@@ -41,9 +43,10 @@ public class DsonBinary extends DsonValue {
      * @param type 为避免开销和降低编解码复杂度，暂限定为单个字节范围 [0, 255]
      */
     public DsonBinary(int type, byte[] data) {
-        checksSubType(type);
+        checkSubType(type);
+        checkDataLength(data.length); // 顺带NPE
         this.type = type;
-        this.data = Objects.requireNonNull(data);
+        this.data = data;
     }
 
     /** 默认采取拷贝的方式，保证安全性 */
@@ -52,9 +55,16 @@ public class DsonBinary extends DsonValue {
         this.data = src.data.clone();
     }
 
-    public static void checksSubType(int type) {
-        if (type < 0 || type > 255) {
-            throw new IllegalArgumentException("the type of binary must between[0, 255], but found: " + type);
+    public static void checkSubType(int type) {
+        if (type < 0) {
+            throw new IllegalArgumentException("the type of binary must between[0, ~], but found: " + type);
+        }
+    }
+
+    public static void checkDataLength(int length) {
+        if (length > MAX_DATA_LENGTH) {
+            throw new IllegalArgumentException("the length of data must between[0, %d], but found: %d"
+                    .formatted(MAX_DATA_LENGTH, length));
         }
     }
 

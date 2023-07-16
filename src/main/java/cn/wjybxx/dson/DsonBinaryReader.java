@@ -121,7 +121,7 @@ public class DsonBinaryReader extends AbstractDsonReader {
 
     @Override
     protected DsonBinary doReadBinary() {
-        return DsonReaderUtils.readDsonBinary(input);
+        return DsonReaderUtils.readDsonBinary(input, currentWireTypeBits);
     }
 
     @Override

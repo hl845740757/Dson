@@ -228,7 +228,7 @@ ps: 我去除了顶层不能是header的限制，因此可以用顶层的header�
 ### 二进制
 
 1. 配置格式限定二元组 \[type, data]
-2. type限定 0~255
+2. type限定为int32，且非负
 3. data部分使用 **16进制** 编码，且不可以为null
 
 ### ei、eL、es

@@ -23,6 +23,7 @@ import cn.wjybxx.dson.io.DsonInput;
 import cn.wjybxx.dson.io.DsonOutput;
 import cn.wjybxx.dson.types.ObjectRef;
 import cn.wjybxx.dson.types.OffsetTimestamp;
+import com.google.protobuf.CodedOutputStream;
 import com.google.protobuf.MessageLite;
 import com.google.protobuf.Parser;
 
@@ -82,23 +83,44 @@ public class DsonReaderUtils {
         throw new DsonIOException("invalid wireType of bool");
     }
 
+    public static int wireTypeOfBinary(int type) {
+        if (type <= Dsons.BINARY_INLINE_MAX) {
+            return type + 1;
+        }
+        return 0;
+    }
+
+    public static int computeSizeOfBinaryType(int type) {
+        if (type <= Dsons.BINARY_INLINE_MAX) {
+            return 0;
+        }
+        return CodedOutputStream.computeUInt32SizeNoTag(type);
+    }
+
     public static void writeBinary(DsonOutput output, DsonBinary binary) {
-        output.writeFixed32(1 + binary.getData().length);
-        output.writeRawByte(binary.getType());
+        int sizeOfBinaryType = computeSizeOfBinaryType(binary.getType());
+        output.writeFixed32(sizeOfBinaryType + binary.getData().length);
+        if (sizeOfBinaryType > 0) {
+            output.writeUint32(binary.getType());
+        }
         output.writeRawBytes(binary.getData());
     }
 
     public static void writeBinary(DsonOutput output, int type, Chunk chunk) {
-        output.writeFixed32(1 + chunk.getLength());
-        output.writeRawByte(type);
+        int sizeOfBinaryType = computeSizeOfBinaryType(type);
+        output.writeFixed32(sizeOfBinaryType + chunk.getLength());
+        if (sizeOfBinaryType > 0) {
+            output.writeUint32(type);
+        }
         output.writeRawBytes(chunk.getBuffer(), chunk.getOffset(), chunk.getLength());
     }
 
-    public static DsonBinary readDsonBinary(DsonInput input) {
+    public static DsonBinary readDsonBinary(DsonInput input, int currentWireTypeBits) {
         int size = input.readFixed32();
-        return new DsonBinary(
-                input.readUint8(),
-                input.readRawBytes(size - 1));
+        int type = currentWireTypeBits > 0 ? currentWireTypeBits - 1 : input.readUint32();
+        int dataLength = size - computeSizeOfBinaryType(type);
+        return new DsonBinary(type,
+                input.readRawBytes(dataLength));
     }
 
     public static void writeExtInt32(DsonOutput output, DsonExtInt32 extInt32, WireType wireType) {
