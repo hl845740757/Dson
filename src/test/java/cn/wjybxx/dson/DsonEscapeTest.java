@@ -12,7 +12,7 @@ public class DsonEscapeTest {
 
     private static final String regExp = "^[\\u4e00-\\u9fa5_a-zA-Z0-9]+$";
 
-    private static final String dsonString = """
+    static final String dsonString = """
             - {
             #   @ss 纯文本模式下输入正则表达式
             -   reg1: [@es 10, @ss ^[\\u4e00-\\u9fa5_a-zA-Z0-9]+$

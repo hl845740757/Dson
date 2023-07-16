@@ -163,8 +163,8 @@ final class BufferedCharStream extends AbstractCharStream {
                     return;
                 }
             }
-        } catch (Exception e) {
-            InternalUtils.recoveryInterrupt(e);
+        } catch (IOException e) {
+            InternalUtils.recoveryInterrupt(e.getCause());
             ExceptionUtils.rethrow(e);
         }
     }

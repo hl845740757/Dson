@@ -348,22 +348,8 @@ public class DsonTexts {
         }
     }
 
-    /**
-     * 测试是否是换行符
-     * 现在操作系统的换行符只有: \r\n (windows) 和 \n (unix, mac)
-     */
-    static boolean isCRLF(char c, CharSequence buffer, int pos) {
-        if (c == '\n') return true;
-        return c == '\r' && (pos + 1 < buffer.length() && buffer.charAt(pos + 1) == '\n');
-    }
-
-    /** @return 换行符的长度 */
-    static int lengthCRLF(char c) {
-        return c == '\r' ? 2 : 1;
-    }
-
     /** 是否是缩进字符 */
-    static boolean isIndentChar(int c) {
+    public static boolean isIndentChar(int c) {
         return c == ' ' || c == '\t';
     }
 

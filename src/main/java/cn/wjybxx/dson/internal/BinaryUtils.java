@@ -48,10 +48,6 @@ public class BinaryUtils {
         byteBuffer.position(newOffset);
     }
 
-    public static int toUint8(byte value) {
-        return (value & 0XFF);
-    }
-
     // region 大端编码
 
     public static byte getByte(byte[] buffer, int index) {

@@ -59,7 +59,6 @@ public class Json2DsonTest {
     private static void testBigFile() throws IOException {
         String jsonFilePath = "D:\\github-mine\\Dson\\testres\\test.json";
         String dsonFilePath = "D:\\github-mine\\Dson\\testres\\testout.dson";
-
         try (DsonScanner scanner = Dsons.newStreamScanner(new FileReader(jsonFilePath), 64, true);
              DsonTextReader reader = new DsonTextReader(16, scanner)) {
             DsonValue jsonObject = Dsons.readTopDsonValue(reader);

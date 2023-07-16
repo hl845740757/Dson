@@ -56,6 +56,8 @@ public class DsonCodecTest {
         repository.remove(0); // 文件头
         obj1.append("wrapped1", repository.toDsonArray());
         obj1.append("wrapped2", Dsons.fromDson(DsonTextReaderTest2.dsonString));
+        obj1.append("wrapped3", Dsons.fromDson(DsonNumberTest.numberString));
+        obj1.append("wrapped4", Dsons.fromDson(DsonEscapeTest.dsonString));
 
         // 测试基础数字
         for (int j = 0; j < 8; j++) {

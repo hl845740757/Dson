@@ -117,32 +117,31 @@ public class DsonTextWriter extends AbstractDsonWriter {
     }
 
     private void printStringNoSS(DsonPrinter printer, String text) {
-        if (canPrintDirectly(text, settings)) {
+        if (canPrintAsUnquote(text, settings)) {
             printer.printFastPath(text);
         } else {
             printEscaped(text);
         }
     }
 
-    private static boolean canPrintDirectly(String text, DsonTextWriterSettings settings) {
-        return DsonTexts.canUnquoteString(text, settings.maxLengthOfUnquoteString)
-                && (!settings.unicodeChar || DsonTexts.isASCIIText(text));
-    }
-
     private void printString(DsonPrinter printer, String value, StringStyle style) {
         final DsonTextWriterSettings settings = this.settings;
         switch (style) {
             case AUTO -> {
-                if (canPrintDirectly(value, settings)) {
+                if (canPrintAsUnquote(value, settings)) {
                     printer.printFastPath(value);
-                } else if (!settings.enableText || value.length() < settings.softLineLength * settings.lengthFactorOfText) {
-                    printEscaped(value);
-                } else {
+                } else if (canPrintAsText(value, settings)) {
                     printText(value);
+                } else {
+                    printEscaped(value);
                 }
             }
-            case QUOTE -> printEscaped(value);
-            case UNQUOTE -> printer.printFastPath(value);
+            case QUOTE -> {
+                printEscaped(value);
+            }
+            case UNQUOTE -> {
+                printer.printFastPath(value);
+            }
             case TEXT -> {
                 if (settings.enableText) {
                     printText(value);
@@ -153,6 +152,15 @@ public class DsonTextWriter extends AbstractDsonWriter {
         }
     }
 
+    private static boolean canPrintAsUnquote(String text, DsonTextWriterSettings settings) {
+        return DsonTexts.canUnquoteString(text, settings.maxLengthOfUnquoteString)
+                && (!settings.unicodeChar || DsonTexts.isASCIIText(text));
+    }
+
+    private static boolean canPrintAsText(String value, DsonTextWriterSettings settings) {
+        return settings.enableText && (value.length() > settings.softLineLength * settings.lengthFactorOfText);
+    }
+
     /** 打印双引号String */
     private void printEscaped(String text) {
         boolean unicodeChar = settings.unicodeChar;
@@ -161,7 +169,7 @@ public class DsonTextWriter extends AbstractDsonWriter {
         printer.print('"');
         for (int i = 0, length = text.length(); i < length; i++) {
             printer.printEscaped(text.charAt(i), unicodeChar);
-            if (printer.getColumn() >= softLineLength) {
+            if (printer.getColumn() >= softLineLength && (i + 1 < length)) {
                 printer.println();
                 printer.printLhead(LheadType.APPEND);
             }
@@ -177,14 +185,19 @@ public class DsonTextWriter extends AbstractDsonWriter {
         for (int i = 0, length = text.length(); i < length; i++) {
             char c = text.charAt(i);
             // 要执行文本中的换行符
-            if (DsonTexts.isCRLF(c, text, i)) {
+            if (c == '\n') {
                 printer.println();
                 printer.printLhead(LheadType.APPEND_LINE);
-                i += DsonTexts.lengthCRLF(c) - 1; // for循环+1
+                continue;
+            }
+            if (c == '\r' && (i + 1 < length && text.charAt(i + 1) == '\n')) {
+                printer.println();
+                printer.printLhead(LheadType.APPEND_LINE);
+                i++;
                 continue;
             }
             printer.print(c);
-            if (printer.getColumn() > softLineLength) {
+            if (printer.getColumn() > softLineLength && (i + 1 < length)) {
                 printer.println();
                 printer.printLhead(LheadType.APPEND);
             }
@@ -194,29 +207,27 @@ public class DsonTextWriter extends AbstractDsonWriter {
     }
 
     private void printBinary(byte[] buffer, int offset, int length) {
-        int softLineLength = settings.softLineLength;
         DsonPrinter printer = this.printer;
+        int softLineLength = this.settings.softLineLength;
         // 使用小buffer多次编码代替大的buffer，一方面节省内存，一方面控制行长度
         int segment = 8;
         char[] cBuffer = new char[segment * 2];
         int loop = length / segment;
         for (int i = 0; i < loop; i++) {
+            checkLineLength(printer, softLineLength, LheadType.APPEND_LINE);
             DsonTexts.encodeHex(buffer, offset + i * segment, segment, cBuffer, 0);
             printer.printFastPath(cBuffer, 0, cBuffer.length);
-            if (printer.getColumn() >= softLineLength) {
-                printer.println();
-                printer.printLhead(LheadType.APPEND);
-            }
         }
         int remain = length - loop * segment;
         if (remain > 0) {
+            checkLineLength(printer, softLineLength, LheadType.APPEND_LINE);
             DsonTexts.encodeHex(buffer, offset + loop * segment, remain, cBuffer, 0);
             printer.printFastPath(cBuffer, 0, remain * 2);
         }
     }
 
-    private void checkLineLength(DsonPrinter printer, LheadType lheadType) {
-        if (printer.getColumn() >= settings.softLineLength) {
+    private void checkLineLength(DsonPrinter printer, int softLineLength, LheadType lheadType) {
+        if (printer.getColumn() >= softLineLength) {
             printer.println();
             printer.printLhead(lheadType);
         }
@@ -359,6 +370,7 @@ public class DsonTextWriter extends AbstractDsonWriter {
     @Override
     protected void doWriteRef(ObjectRef objectRef) {
         DsonPrinter printer = this.printer;
+        int softLineLength = this.settings.softLineLength;
         writeCurrentName(printer, DsonType.REFERENCE);
         if (StringUtils.isBlank(objectRef.getNamespace())
                 && objectRef.getType() == 0 && objectRef.getPolicy() == 0) {
@@ -377,21 +389,21 @@ public class DsonTextWriter extends AbstractDsonWriter {
         }
         if (objectRef.hasLocalId()) {
             if (count++ > 0) printer.printFastPath(", ");
-            checkLineLength(printer, LheadType.APPEND_LINE);
+            checkLineLength(printer, softLineLength, LheadType.APPEND_LINE);
             printer.printFastPath(ObjectRef.NAMES_LOCAL_ID);
             printer.printFastPath(": ");
             printStringNoSS(printer, objectRef.getLocalId());
         }
         if (objectRef.getType() != 0) {
             if (count++ > 0) printer.printFastPath(", ");
-            checkLineLength(printer, LheadType.APPEND_LINE);
+            checkLineLength(printer, softLineLength, LheadType.APPEND_LINE);
             printer.printFastPath(ObjectRef.NAMES_TYPE);
             printer.printFastPath(": ");
             printer.printFastPath(Integer.toString(objectRef.getType()));
         }
         if (objectRef.getPolicy() != 0) {
             if (count > 0) printer.printFastPath(", ");
-            checkLineLength(printer, LheadType.APPEND_LINE);
+            checkLineLength(printer, softLineLength, LheadType.APPEND_LINE);
             printer.printFastPath(ObjectRef.NAMES_POLICY);
             printer.printFastPath(": ");
             printer.printFastPath(Integer.toString(objectRef.getPolicy()));
@@ -402,6 +414,7 @@ public class DsonTextWriter extends AbstractDsonWriter {
     @Override
     protected void doWriteTimestamp(OffsetTimestamp timestamp) {
         DsonPrinter printer = this.printer;
+        int softLineLength = this.settings.softLineLength;
         writeCurrentName(printer, DsonType.TIMESTAMP);
         printer.printFastPath("{@dt ");
         if (timestamp.hasDate()) {
@@ -411,14 +424,14 @@ public class DsonTextWriter extends AbstractDsonWriter {
         }
         if (timestamp.hasTime()) {
             if (timestamp.hasDate()) printer.printFastPath(", ");
-            checkLineLength(printer, LheadType.APPEND_LINE);
+            checkLineLength(printer, softLineLength, LheadType.APPEND_LINE);
             printer.printFastPath(OffsetTimestamp.NAMES_TIME);
             printer.printFastPath(": ");
             printer.printFastPath(OffsetTimestamp.formatTime(timestamp.getSeconds()));
         }
         if (timestamp.getNanos() > 0) {
             printer.printFastPath(", ");
-            checkLineLength(printer, LheadType.APPEND_LINE);
+            checkLineLength(printer, softLineLength, LheadType.APPEND_LINE);
             if (timestamp.canConvertNanosToMillis()) {
                 printer.printFastPath(OffsetTimestamp.NAMES_MILLIS);
                 printer.printFastPath(": ");
@@ -431,7 +444,7 @@ public class DsonTextWriter extends AbstractDsonWriter {
         }
         if (timestamp.hasOffset()) {
             printer.printFastPath(", ");
-            checkLineLength(printer, LheadType.APPEND_LINE);
+            checkLineLength(printer, softLineLength, LheadType.APPEND_LINE);
             printer.printFastPath(OffsetTimestamp.NAMES_OFFSET);
             printer.printFastPath(": ");
             printer.printFastPath(OffsetTimestamp.formatOffset(timestamp.getOffset()));

@@ -20,7 +20,11 @@ Dson提供了两个版本的二进制格式，从整体上看他们是一样的�
 ### 类型区域
 
 1. 字段的类型由 DsonType和 *WireType(数字编码类型)* 构成，共1个字节。
-2. WireType分为：VarInt、UINT、SINT、FIXED -- 可参考ProtocolBuffer。
+2. WireType分为：VARINT(0)、UINT(1)、SINT(2)、FIXED(3)、BYTE(4)、UBYTE(5)。
+    1. VARINT,UINT,SINT,FIXED可参考ProtocolBuffer。
+    2. BYTE和UBYTE都只写入int32或int64的末尾8位（1个字节）
+    3. BYTE读取时直接返回读取的字节，因此是有符号的。
+    4. UBYTE读取时将读取的字节转为正整数返回，因此是无符号的。
 3. int32和int64数字的编码类型会随着数字序列化，以确保对方正确的解码。
 4. **WireType的比特位用于非数字类型时可以表达其它信息** -- 比如标记null字段。
 

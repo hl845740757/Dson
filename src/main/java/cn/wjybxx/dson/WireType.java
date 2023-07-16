@@ -29,7 +29,11 @@ import java.util.List;
  */
 public enum WireType {
 
-    /** 默认编码方式 */
+    /**
+     * 简单变长编码
+     * 1.该编码对于int32的负数数据而言，将固定占用10个字节，正数时等同于UINT编码；
+     * 1.该编码对于int64的负数数据而言，也固定占用10个字节，正数时等同于UINT编码；
+     */
     VARINT(0) {
         @Override
         public void writeInt32(DsonOutput output, int value) {
@@ -52,7 +56,11 @@ public enum WireType {
         }
     },
 
-    /** 按照无符号格式优化编码 */
+    /**
+     * 按照无符号格式优化编码
+     * 1.该编码对于int32的负数数据而言，将固定占用5个字节；
+     * 1.该编码对于int64的负数数据而言，将固定占用10个字节；
+     */
     UINT(1) {
         @Override
         public void writeInt32(DsonOutput output, int value) {
@@ -75,7 +83,9 @@ public enum WireType {
         }
     },
 
-    /** 按照有符号数格式优化编码 */
+    /**
+     * 按照有符号数格式优化编码
+     */
     SINT(2) {
         @Override
         public void writeInt32(DsonOutput output, int value) {
