@@ -63,10 +63,12 @@ public class DsonBinaryLiteReader extends AbstractDsonLiteReader {
         checkReadDsonTypeState(context);
 
         final int fullType = input.isAtEnd() ? 0 : input.readUint8();
+        final int wreTypeBits = Dsons.wireTypeOfFullType(fullType);
         DsonType dsonType = DsonType.forNumber(Dsons.dsonTypeOfFullType(fullType));
-        WireType wireType = WireType.forNumber(Dsons.wireTypeOfFullType(fullType));
+        WireType wireType = dsonType.hasWireType() ? WireType.forNumber(wreTypeBits) : WireType.VARINT;
         this.currentDsonType = dsonType;
         this.currentWireType = wireType;
+        this.currentWireTypeBits = wreTypeBits;
         this.currentName = INVALID_NAME;
 
         onReadDsonType(context, dsonType);
@@ -94,17 +96,17 @@ public class DsonBinaryLiteReader extends AbstractDsonLiteReader {
 
     @Override
     protected float doReadFloat() {
-        return input.readFloat();
+        return DsonReaderUtils.readFloat(input, currentWireTypeBits);
     }
 
     @Override
     protected double doReadDouble() {
-        return input.readDouble();
+        return DsonReaderUtils.readDouble(input, currentWireTypeBits);
     }
 
     @Override
     protected boolean doReadBool() {
-        return input.readBool();
+        return DsonReaderUtils.readBool(input, currentWireTypeBits);
     }
 
     @Override
@@ -124,7 +126,7 @@ public class DsonBinaryLiteReader extends AbstractDsonLiteReader {
 
     @Override
     protected DsonExtString doReadExtString() {
-        return DsonReaderUtils.readDsonExtString(input);
+        return DsonReaderUtils.readDsonExtString(input, currentWireTypeBits);
     }
 
     @Override
@@ -139,7 +141,7 @@ public class DsonBinaryLiteReader extends AbstractDsonLiteReader {
 
     @Override
     protected ObjectRef doReadRef() {
-        return DsonReaderUtils.readRef(input);
+        return DsonReaderUtils.readRef(input, currentWireTypeBits);
     }
 
     @Override
@@ -187,7 +189,7 @@ public class DsonBinaryLiteReader extends AbstractDsonLiteReader {
 
     @Override
     protected void doSkipValue() {
-        DsonReaderUtils.skipValue(input, getContextType(), currentDsonType, currentWireType);
+        DsonReaderUtils.skipValue(input, getContextType(), currentDsonType, currentWireType, currentWireTypeBits);
     }
 
     @Override

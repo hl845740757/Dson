@@ -20,7 +20,7 @@ package cn.wjybxx.dson.text;
  * @author wjybxx
  * date - 2023/6/6
  */
-public enum ObjectStyle {
+public enum ObjectStyle implements IStyle {
 
     /** 缩进模式 */
     INDENT,

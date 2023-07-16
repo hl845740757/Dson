@@ -1,9 +1,13 @@
 package cn.wjybxx.dson.types;
 
 import cn.wjybxx.dson.DsonLites;
+import cn.wjybxx.dson.internal.InternalUtils;
 
 import javax.annotation.concurrent.Immutable;
-import java.time.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
 /**
@@ -15,10 +19,10 @@ import java.time.format.DateTimeFormatter;
 @Immutable
 public final class OffsetTimestamp {
 
-    public static final int MASK_DATE = 1 << 3;
-    public static final int MASK_TIME = 1 << 2;
-    public static final int MASK_OFFSET = 1 << 1;
-    public static final int MASK_NANOS = 1;
+    public static final int MASK_DATE = 1;
+    public static final int MASK_TIME = 1 << 1;
+    public static final int MASK_OFFSET = 1 << 2;
+    public static final int MASK_NANOS = 1 << 3;
 
     public static final int MASK_DATETIME = MASK_DATE | MASK_TIME;
     public static final int MASK_OFFSET_DATETIME = MASK_DATE | MASK_TIME | MASK_OFFSET;
@@ -39,11 +43,12 @@ public final class OffsetTimestamp {
      * @param enables 哪些字段有效
      */
     public OffsetTimestamp(long seconds, int nanos, int offset, int enables) {
-        if (!isEnabled(MASK_DATE, enables) && !isEnabled(MASK_TIME, enables)) {
+        if (!InternalUtils.isEnabled(enables, MASK_DATE)
+                && !InternalUtils.isEnabled(enables, MASK_TIME)) {
             throw new IllegalArgumentException("date and time are disabled");
         }
-        if (offset != 0 && !isEnabled(MASK_OFFSET, enables)) {
-            throw new IllegalArgumentException("offset is disable, but the value is not 0");
+        if (offset != 0 && !InternalUtils.isEnabled(enables, MASK_OFFSET)) {
+            throw new IllegalArgumentException("offset is disabled, but the value is not 0");
         }
         if (nanos > 999_999_999 || nanos < 0) {
             throw new IllegalArgumentException("nanos > 999999999 or < 0");
@@ -74,27 +79,23 @@ public final class OffsetTimestamp {
     // region
 
     public boolean hasDate() {
-        return isEnabled(MASK_DATE, enables);
+        return InternalUtils.isEnabled(enables, MASK_DATE);
     }
 
     public boolean hasTime() {
-        return isEnabled(MASK_TIME, enables);
+        return InternalUtils.isEnabled(enables, MASK_TIME);
     }
 
     public boolean hasOffset() {
-        return isEnabled(MASK_OFFSET, enables);
+        return InternalUtils.isEnabled(enables, MASK_OFFSET);
     }
 
     public boolean hasNanos() {
-        return isEnabled(MASK_NANOS, enables);
+        return InternalUtils.isEnabled(enables, MASK_NANOS);
     }
 
     public boolean hasFields(int mask) {
-        return (mask & enables) == mask;
-    }
-
-    private static boolean isEnabled(int mask, int value) {
-        return (mask & value) == mask;
+        return InternalUtils.isEnabled(enables, mask);
     }
 
     public boolean canConvertNanosToMillis() {
@@ -103,11 +104,6 @@ public final class OffsetTimestamp {
 
     public int getMillisOfNanos() {
         return nanos / 1000_000;
-    }
-
-    public OffsetDateTime toOffsetDateTime() {
-        return OffsetDateTime.ofInstant(Instant.ofEpochSecond(seconds, nanos),
-                ZoneOffset.ofTotalSeconds(offset));
     }
 
     /** @return 固定格式 yyyy-MM-dd */
@@ -158,7 +154,6 @@ public final class OffsetTimestamp {
      * +HH:mm:ss
      */
     public static int parseOffset(String offsetString) {
-        //
         return switch (offsetString.length()) {
             case 1, 2, 3, 6, 9 -> ZoneOffset.of(offsetString).getTotalSeconds();
             default -> throw new IllegalArgumentException("invalid offset string " + offsetString);

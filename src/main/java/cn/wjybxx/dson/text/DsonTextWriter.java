@@ -299,57 +299,61 @@ public class DsonTextWriter extends AbstractDsonWriter {
     protected void doWriteBinary(DsonBinary binary) {
         DsonPrinter printer = this.printer;
         writeCurrentName(printer, DsonType.BINARY);
-        printer.printFastPath("{@bin ");
+        printer.printFastPath("[@bin ");
         printer.printFastPath(Integer.toString(binary.getType()));
         printer.printFastPath(", ");
         printBinary(binary.getData(), 0, binary.getData().length);
-        printer.print('}');
+        printer.print(']');
     }
 
     @Override
     protected void doWriteBinary(int type, Chunk chunk) {
         DsonPrinter printer = this.printer;
         writeCurrentName(printer, DsonType.BINARY);
-        printer.printFastPath("{@bin ");
+        printer.printFastPath("[@bin ");
         printer.printFastPath(Integer.toString(type));
         printer.printFastPath(", ");
         printBinary(chunk.getBuffer(), chunk.getOffset(), chunk.getLength());
-        printer.print('}');
+        printer.print(']');
     }
 
     @Override
     protected void doWriteExtInt32(DsonExtInt32 value, WireType wireType, INumberStyle style) {
         DsonPrinter printer = this.printer;
         writeCurrentName(printer, DsonType.EXT_INT32);
-        printer.printFastPath("{@ei ");
+        printer.printFastPath("[@ei ");
         printer.printFastPath(Integer.toString(value.getType()));
         printer.printFastPath(", ");
         style.toString(value.getValue(), styleOut.reset());
         printer.printFastPath(styleOut.getValue());
-        printer.print('}');
+        printer.print(']');
     }
 
     @Override
     protected void doWriteExtInt64(DsonExtInt64 value, WireType wireType, INumberStyle style) {
         DsonPrinter printer = this.printer;
         writeCurrentName(printer, DsonType.EXT_INT64);
-        printer.printFastPath("{@eL ");
+        printer.printFastPath("[@eL ");
         printer.printFastPath(Integer.toString(value.getType()));
         printer.printFastPath(", ");
         style.toString(value.getValue(), styleOut.reset());
         printer.printFastPath(styleOut.getValue());
-        printer.print('}');
+        printer.print(']');
     }
 
     @Override
     protected void doWriteExtString(DsonExtString value, StringStyle style) {
         DsonPrinter printer = this.printer;
         writeCurrentName(printer, DsonType.EXT_STRING);
-        printer.printFastPath("{@es ");
+        printer.printFastPath("[@es ");
         printer.printFastPath(Integer.toString(value.getType()));
         printer.printFastPath(", ");
-        printString(printer, value.getValue(), style);
-        printer.print('}');
+        if (value.hasValue()) {
+            printString(printer, value.getValue(), style);
+        } else {
+            printer.printFastPath("null");
+        }
+        printer.print(']');
     }
 
     @Override

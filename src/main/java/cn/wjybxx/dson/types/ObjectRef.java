@@ -17,6 +17,7 @@
 package cn.wjybxx.dson.types;
 
 import cn.wjybxx.dson.DsonLites;
+import cn.wjybxx.dson.internal.InternalUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.concurrent.Immutable;
@@ -31,35 +32,44 @@ import java.util.Objects;
 @Immutable
 public final class ObjectRef {
 
-    /** 引用对象所属的命名空间 */
-    private final String namespace;
+    public static final int MASK_NAMESPACE = 1;
+    public static final int MASK_TYPE = 1 << 1;
+    public static final int MASK_POLICY = 1 << 2;
+
     /** 引用对象的本地id - 如果目标对象是容器中的一员，该值是其容器内编号 */
     private final String localId;
+    /** 引用对象所属的命名空间 */
+    private final String namespace;
     /** 引用的对象的大类型 - 给业务使用的，用于快速引用分析 */
     private final int type;
     /** 引用的解析策略 - 0：默认 1：解析为引用 2：内联复制，3：不解析 */
     private final int policy;
 
-    public ObjectRef(String namespace, String localId) {
-        this(namespace, localId, 0, 0);
+    public ObjectRef(String localId) {
+        this(localId, null, 0, 0);
     }
 
-    public ObjectRef(String namespace, String localId, int type, int policy) {
-        if (StringUtils.isBlank(namespace) && StringUtils.isBlank(localId)) {
-            throw new IllegalArgumentException("both namespace and localId are blank");
-        }
-        this.localId = localId;
+    public ObjectRef(String localId, String namespace) {
+        this(localId, namespace, 0, 0);
+    }
+
+    public ObjectRef(String localId, String namespace, int type, int policy) {
+        this.localId = InternalUtils.nullToDef(localId, "");
         this.namespace = namespace;
         this.type = type;
         this.policy = policy;
     }
 
-    public boolean hasNamespace() {
-        return !StringUtils.isBlank(namespace);
+    public boolean isEmpty() {
+        return StringUtils.isBlank(namespace) && StringUtils.isBlank(localId);
     }
 
     public boolean hasLocalId() {
         return !StringUtils.isBlank(localId);
+    }
+
+    public boolean hasNamespace() {
+        return !StringUtils.isBlank(namespace);
     }
 
     public String getLocalId() {

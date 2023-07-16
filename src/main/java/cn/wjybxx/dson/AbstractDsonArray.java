@@ -24,6 +24,11 @@ public abstract class AbstractDsonArray extends DsonValue implements List<DsonVa
         return Collections.unmodifiableList(values);
     }
 
+    public AbstractDsonArray append(DsonValue dsonValue) {
+        add(dsonValue);
+        return this;
+    }
+
     // region equals
     // equals默认只比较values
 

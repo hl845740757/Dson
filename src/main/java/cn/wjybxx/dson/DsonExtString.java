@@ -27,12 +27,15 @@ import java.util.Objects;
  */
 public class DsonExtString extends DsonValue implements Comparable<DsonExtString> {
 
+    public static final int MASK_TYPE = 1;
+    public static final int MASK_VALUE = 1 << 1;
+
     private final int type;
     private final String value;
 
     public DsonExtString(int type, String value) {
         this.type = type;
-        this.value = Objects.requireNonNull(value);
+        this.value = value;
     }
 
     public int getType() {
@@ -41,6 +44,10 @@ public class DsonExtString extends DsonValue implements Comparable<DsonExtString
 
     public String getValue() {
         return value;
+    }
+
+    public boolean hasValue() {
+        return value != null;
     }
 
     @Nonnull
@@ -56,7 +63,14 @@ public class DsonExtString extends DsonValue implements Comparable<DsonExtString
         if (r != 0) {
             return r;
         }
-        return value.compareTo(that.value);
+        if (value != null && that.value != null) {
+            return value.compareTo(that.value);
+        }
+        if (value == null) {
+            return -1;
+        } else {
+            return 1;
+        }
     }
 
     @Override
@@ -67,13 +81,13 @@ public class DsonExtString extends DsonValue implements Comparable<DsonExtString
         DsonExtString that = (DsonExtString) o;
 
         if (type != that.type) return false;
-        return value.equals(that.value);
+        return Objects.equals(value, that.value);
     }
 
     @Override
     public int hashCode() {
         int result = type;
-        result = 31 * result + value.hashCode();
+        result = 31 * result + (value != null ? value.hashCode() : 0);
         return result;
     }
 

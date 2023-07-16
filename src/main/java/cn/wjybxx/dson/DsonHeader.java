@@ -29,6 +29,7 @@ import java.util.Map;
  * @author wjybxx
  * date - 2023/5/27
  */
+@SuppressWarnings("unused")
 public class DsonHeader<K> extends AbstractDsonObject<K> {
 
     public DsonHeader() {
@@ -53,16 +54,17 @@ public class DsonHeader<K> extends AbstractDsonObject<K> {
 
     //
 
-    /** @return this */
-    public DsonHeader<K> append(K key, DsonValue value) {
-        put(key, value);
-        return this;
-    }
-
     @Nonnull
     @Override
     public final DsonType getDsonType() {
         return DsonType.HEADER;
+    }
+
+    /** @return this */
+    @Override
+    public DsonHeader<K> append(K key, DsonValue value) {
+        put(key, value);
+        return this;
     }
 
     //

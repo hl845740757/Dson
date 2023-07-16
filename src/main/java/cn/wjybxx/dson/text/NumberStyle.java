@@ -193,7 +193,8 @@ public enum NumberStyle implements INumberStyle {
         }
     },
 
-    HEX_RAW(6) {
+    /** 对于整数来说，无符号的16进制输出不带负号 */
+    UNSIGNED_HEX(6) {
         @Override
         public void toString(int value, StyleOut styleOut) {
             styleOut.setTyped(true)
@@ -252,7 +253,8 @@ public enum NumberStyle implements INumberStyle {
         }
     },
 
-    BINARY_RAW(8) {
+    /** 对于整数来说，无符号的2进制输出不带负号 */
+    UNSIGNED_BINARY(8) {
         @Override
         public void toString(int value, StyleOut styleOut) {
             styleOut.setTyped(true)
@@ -274,7 +276,58 @@ public enum NumberStyle implements INumberStyle {
         public void toString(double value, StyleOut styleOut) {
             throw new UnsupportedOperationException();
         }
-    };
+    },
+
+    /** 对于整数来说，固定输出为32位或64位 */
+    FIXED_BINARY(9) {
+        @Override
+        public void toString(int value, StyleOut styleOut) {
+            styleOut.setTyped(true);
+            String binaryString = Integer.toBinaryString(value);
+            if (binaryString.length() < 32) {
+                StringBuilder sb = new StringBuilder(34);
+                sb.append("0b");
+                pending(sb, 32 - binaryString.length());
+                sb.append(binaryString);
+                styleOut.setValue(sb.toString());
+            } else {
+                styleOut.setValue("0b" + binaryString);
+            }
+        }
+
+        @Override
+        public void toString(long value, StyleOut styleOut) {
+            styleOut.setTyped(true);
+            String binaryString = Long.toBinaryString(value);
+            if (binaryString.length() < 64) {
+                StringBuilder sb = new StringBuilder(66);
+                sb.append("0b");
+                pending(sb, 64 - binaryString.length());
+                sb.append(binaryString);
+                styleOut.setValue(sb.toString());
+            } else {
+                styleOut.setValue("0b" + binaryString);
+            }
+        }
+
+        private void pending(StringBuilder sb, int count) {
+            if (count <= 0) {
+                return;
+            }
+            sb.append("0".repeat(count));
+        }
+
+        @Override
+        public void toString(float value, StyleOut styleOut) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void toString(double value, StyleOut styleOut) {
+            throw new UnsupportedOperationException();
+        }
+    },
+    ;
 
     public final int number;
 
@@ -286,6 +339,14 @@ public enum NumberStyle implements INumberStyle {
         return number;
     }
 
+    /** 是否支持浮点数 */
+    public boolean supportFloat() {
+        return switch (this) {
+            case BINARY, UNSIGNED_BINARY, FIXED_BINARY -> false;
+            default -> true;
+        };
+    }
+
     public static final List<NumberStyle> LOOK_TABLE = List.of(values());
 
     public static NumberStyle forNumber(int number) {
@@ -295,9 +356,10 @@ public enum NumberStyle implements INumberStyle {
             case 3 -> TYPED;
             case 4 -> TYPED_NO_SCI;
             case 5 -> HEX;
-            case 6 -> HEX_RAW;
+            case 6 -> UNSIGNED_HEX;
             case 7 -> BINARY;
-            case 8 -> BINARY_RAW;
+            case 8 -> UNSIGNED_BINARY;
+            case 9 -> FIXED_BINARY;
             default -> throw new IllegalArgumentException("invalid number " + number);
         };
     }

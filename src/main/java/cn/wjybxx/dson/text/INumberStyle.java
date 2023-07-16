@@ -28,7 +28,7 @@ package cn.wjybxx.dson.text;
  * @author wjybxx
  * date - 2023/7/15
  */
-public interface INumberStyle {
+public interface INumberStyle extends IStyle {
 
     void toString(int value, StyleOut styleOut);
 

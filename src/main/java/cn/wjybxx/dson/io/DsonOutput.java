@@ -71,7 +71,7 @@ public interface DsonOutput extends AutoCloseable {
     void writeMessageNoSize(MessageLite value);
 
     /** 当前写索引位置 - 已写字节数 */
-    int position();
+    int getPosition();
 
     /** 设置写索引位置 */
     void setPosition(final int writerIndex);
@@ -81,7 +81,7 @@ public interface DsonOutput extends AutoCloseable {
      * 相比先{@link #setPosition(int)}再{@link #writeFixed32(int)}的方式，该接口更容易优化实现。
      */
     default void setFixedInt32(final int writerIndex, int value) {
-        int oldPosition = position();
+        int oldPosition = getPosition();
         setPosition(writerIndex);
         writeFixed32(value);
         setPosition(oldPosition);

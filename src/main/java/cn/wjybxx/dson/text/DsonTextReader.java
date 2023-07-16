@@ -197,7 +197,7 @@ public class DsonTextReader extends AbstractDsonReader {
             verifyTokenType(context, colonToken, TokenType.COLON);
         }
 
-        // 走到这里，表示 top/object/header/array 读值
+        // 走到这里，表示 top/object/header/array 读值uco
         DsonToken valueToken = popToken();
         return switch (valueToken.getType()) {
             case INT32 -> {
@@ -332,7 +332,7 @@ public class DsonTextReader extends AbstractDsonReader {
         if (DsonTexts.LABEL_REFERENCE.equals(clsName)) {// @ref localId
             DsonToken nextToken = popToken();
             ensureStringsToken(context, nextToken);
-            pushNextValue(new ObjectRef(null, nextToken.castAsString()));
+            pushNextValue(new ObjectRef(nextToken.castAsString()));
             return DsonType.REFERENCE;
         }
         throw DsonIOException.invalidTokenType(context.contextType, valueToken);
@@ -410,7 +410,8 @@ public class DsonTextReader extends AbstractDsonReader {
             }
             case DsonTexts.LABEL_EXTSTRING -> {
                 Tuple2 tuple2 = scanTuple2(context);
-                pushNextValue(new DsonExtString(tuple2.type, tuple2.value));
+                String value = tuple2.isUnquoteNullString() ? null : tuple2.value;
+                pushNextValue(new DsonExtString(tuple2.type, value));
                 yield DsonType.EXT_STRING;
             }
             default -> {
@@ -475,7 +476,7 @@ public class DsonTextReader extends AbstractDsonReader {
             }
             checkSeparator(context);
         }
-        return new ObjectRef(namespace, localId, type, policy);
+        return new ObjectRef(localId, namespace, type, policy);
     }
 
     private OffsetTimestamp scanTimestamp(Context context) {
@@ -577,20 +578,27 @@ public class DsonTextReader extends AbstractDsonReader {
         nextToken = popToken();
         ensureStringsToken(context, nextToken);
         String value = nextToken.castAsString();
+        TokenType valueTokenType = nextToken.getType();
 
         nextToken = popToken();
         verifyTokenType(context, nextToken, TokenType.END_ARRAY);
-        return new Tuple2(type, value);
+        return new Tuple2(type, value, valueTokenType);
     }
 
     private static class Tuple2 {
 
         int type;
         String value;
+        TokenType tokenType;
 
-        public Tuple2(int type, String value) {
+        public Tuple2(int type, String value, TokenType tokenType) {
             this.type = type;
             this.value = value;
+            this.tokenType = tokenType;
+        }
+
+        boolean isUnquoteNullString() {
+            return tokenType == TokenType.UNQUOTE_STRING && "null".equals(value);
         }
     }
     // endregion

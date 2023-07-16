@@ -19,6 +19,8 @@ package cn.wjybxx.dson;
 import cn.wjybxx.dson.io.DsonInput;
 import cn.wjybxx.dson.io.DsonOutput;
 
+import java.util.List;
+
 /**
  * 数字类型字段的编码方式
  *
@@ -117,6 +119,52 @@ public enum WireType {
         public long readInt64(DsonInput input) {
             return input.readFixed64();
         }
+    },
+
+    /** 按照8位有符号整数编码 */
+    BYTE(4) {
+        @Override
+        public void writeInt32(DsonOutput output, int value) {
+            output.writeRawByte((byte) value);
+        }
+
+        @Override
+        public int readInt32(DsonInput input) {
+            return input.readRawByte();
+        }
+
+        @Override
+        public void writeInt64(DsonOutput output, long value) {
+            output.writeRawByte((byte) value);
+        }
+
+        @Override
+        public long readInt64(DsonInput input) {
+            return input.readRawByte();
+        }
+    },
+
+    /** 按照8位无符号整数编码 */
+    UBYTE(5) {
+        @Override
+        public void writeInt32(DsonOutput output, int value) {
+            output.writeRawByte((byte) value);
+        }
+
+        @Override
+        public int readInt32(DsonInput input) {
+            return input.readUint8();
+        }
+
+        @Override
+        public void writeInt64(DsonOutput output, long value) {
+            output.writeRawByte((byte) value);
+        }
+
+        @Override
+        public long readInt64(DsonInput input) {
+            return input.readUint8();
+        }
     };
 
     private final int number;
@@ -129,12 +177,16 @@ public enum WireType {
         return number;
     }
 
+    public static final List<WireType> LOOK_TABLE = List.of(values());
+
     public static WireType forNumber(int number) {
         return switch (number) {
             case 0 -> VARINT;
             case 1 -> UINT;
             case 2 -> SINT;
             case 3 -> FIXED;
+            case 4 -> BYTE;
+            case 5 -> UBYTE;
             default -> throw new IllegalArgumentException("invalid wireType " + number);
         };
     }

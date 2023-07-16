@@ -25,8 +25,6 @@ import cn.wjybxx.dson.types.ObjectRef;
 import cn.wjybxx.dson.types.OffsetTimestamp;
 import com.google.protobuf.MessageLite;
 
-import javax.annotation.Nullable;
-
 /**
  * @author wjybxx
  * date - 2023/4/21
@@ -68,12 +66,8 @@ public class DsonBinaryLiteWriter extends AbstractDsonLiteWriter {
 
     // region state
 
-    private void writeFullTypeAndCurrentName(DsonOutput output, DsonType dsonType, @Nullable WireType wireType) {
-        if (wireType == null) {
-            output.writeRawByte((byte) Dsons.makeFullType(dsonType.getNumber(), 0));
-        } else {
-            output.writeRawByte((byte) Dsons.makeFullType(dsonType.getNumber(), wireType.getNumber()));
-        }
+    private void writeFullTypeAndCurrentName(DsonOutput output, DsonType dsonType, int wireType) {
+        output.writeRawByte((byte) Dsons.makeFullType(dsonType.getNumber(), wireType));
         if (dsonType != DsonType.HEADER) { // header是匿名属性
             Context context = getContext();
             if (context.contextType == DsonContextType.OBJECT
@@ -82,6 +76,7 @@ public class DsonBinaryLiteWriter extends AbstractDsonLiteWriter {
             }
         }
     }
+
     // endregion
 
     // region 简单值
@@ -89,97 +84,102 @@ public class DsonBinaryLiteWriter extends AbstractDsonLiteWriter {
     @Override
     protected void doWriteInt32(int value, WireType wireType, INumberStyle style) {
         DsonOutput output = this.output;
-        writeFullTypeAndCurrentName(output, DsonType.INT32, wireType);
+        writeFullTypeAndCurrentName(output, DsonType.INT32, wireType.getNumber());
         wireType.writeInt32(output, value);
     }
 
     @Override
     protected void doWriteInt64(long value, WireType wireType, INumberStyle style) {
         DsonOutput output = this.output;
-        writeFullTypeAndCurrentName(output, DsonType.INT64, wireType);
+        writeFullTypeAndCurrentName(output, DsonType.INT64, wireType.getNumber());
         wireType.writeInt64(output, value);
     }
 
     @Override
     protected void doWriteFloat(float value, INumberStyle style) {
+        int wireType = DsonReaderUtils.wireTypeOfFloat(value);
         DsonOutput output = this.output;
-        writeFullTypeAndCurrentName(output, DsonType.FLOAT, null);
-        output.writeFloat(value);
+        writeFullTypeAndCurrentName(output, DsonType.FLOAT, wireType);
+        if (wireType == 0) {
+            output.writeFloat(value);
+        }
     }
 
     @Override
     protected void doWriteDouble(double value, INumberStyle style) {
+        int wireType = DsonReaderUtils.wireTypeOfDouble(value);
         DsonOutput output = this.output;
-        writeFullTypeAndCurrentName(output, DsonType.DOUBLE, null);
-        output.writeDouble(value);
+        writeFullTypeAndCurrentName(output, DsonType.DOUBLE, wireType);
+        if (wireType == 0) {
+            output.writeDouble(value);
+        }
     }
 
     @Override
     protected void doWriteBool(boolean value) {
         DsonOutput output = this.output;
-        writeFullTypeAndCurrentName(output, DsonType.BOOLEAN, null);
-        output.writeBool(value);
+        writeFullTypeAndCurrentName(output, DsonType.BOOLEAN, value ? 1 : 0);
     }
 
     @Override
     protected void doWriteString(String value, StringStyle style) {
         DsonOutput output = this.output;
-        writeFullTypeAndCurrentName(output, DsonType.STRING, null);
+        writeFullTypeAndCurrentName(output, DsonType.STRING, 0);
         output.writeString(value);
     }
 
     @Override
     protected void doWriteNull() {
         DsonOutput output = this.output;
-        writeFullTypeAndCurrentName(output, DsonType.NULL, null);
+        writeFullTypeAndCurrentName(output, DsonType.NULL, 0);
     }
 
     @Override
     protected void doWriteBinary(DsonBinary binary) {
         DsonOutput output = this.output;
-        writeFullTypeAndCurrentName(output, DsonType.BINARY, null);
+        writeFullTypeAndCurrentName(output, DsonType.BINARY, 0);
         DsonReaderUtils.writeBinary(output, binary);
     }
 
     @Override
     protected void doWriteBinary(int type, Chunk chunk) {
         DsonOutput output = this.output;
-        writeFullTypeAndCurrentName(output, DsonType.BINARY, null);
+        writeFullTypeAndCurrentName(output, DsonType.BINARY, 0);
         DsonReaderUtils.writeBinary(output, type, chunk);
-    }
-
-    @Override
-    protected void doWriteExtString(DsonExtString value, StringStyle style) {
-        DsonOutput output = this.output;
-        writeFullTypeAndCurrentName(output, DsonType.EXT_STRING, null);
-        DsonReaderUtils.writeExtString(output, value);
     }
 
     @Override
     protected void doWriteExtInt32(DsonExtInt32 value, WireType wireType, INumberStyle style) {
         DsonOutput output = this.output;
-        writeFullTypeAndCurrentName(output, DsonType.EXT_INT32, wireType);
+        writeFullTypeAndCurrentName(output, DsonType.EXT_INT32, wireType.getNumber());
         DsonReaderUtils.writeExtInt32(output, value, wireType);
     }
 
     @Override
     protected void doWriteExtInt64(DsonExtInt64 value, WireType wireType, INumberStyle style) {
         DsonOutput output = this.output;
-        writeFullTypeAndCurrentName(output, DsonType.EXT_INT64, wireType);
+        writeFullTypeAndCurrentName(output, DsonType.EXT_INT64, wireType.getNumber());
         DsonReaderUtils.writeExtInt64(output, value, wireType);
+    }
+
+    @Override
+    protected void doWriteExtString(DsonExtString value, StringStyle style) {
+        DsonOutput output = this.output;
+        writeFullTypeAndCurrentName(output, DsonType.EXT_STRING, DsonReaderUtils.wireTypeOfExtString(value));
+        DsonReaderUtils.writeExtString(output, value);
     }
 
     @Override
     protected void doWriteRef(ObjectRef objectRef) {
         DsonOutput output = this.output;
-        writeFullTypeAndCurrentName(output, DsonType.REFERENCE, null);
+        writeFullTypeAndCurrentName(output, DsonType.REFERENCE, DsonReaderUtils.wireTypeOfRef(objectRef));
         DsonReaderUtils.writeRef(output, objectRef);
     }
 
     @Override
     protected void doWriteTimestamp(OffsetTimestamp timestamp) {
         DsonOutput output = this.output;
-        writeFullTypeAndCurrentName(output, DsonType.TIMESTAMP, null);
+        writeFullTypeAndCurrentName(output, DsonType.TIMESTAMP, 0);
         DsonReaderUtils.writeTimestamp(output, timestamp);
     }
 
@@ -190,10 +190,10 @@ public class DsonBinaryLiteWriter extends AbstractDsonLiteWriter {
     @Override
     protected void doWriteStartContainer(DsonContextType contextType, DsonType dsonType, ObjectStyle style) {
         DsonOutput output = this.output;
-        writeFullTypeAndCurrentName(output, dsonType, null);
+        writeFullTypeAndCurrentName(output, dsonType, 0);
 
         Context newContext = newContext(getContext(), contextType, dsonType);
-        newContext.preWritten = output.position();
+        newContext.preWritten = output.getPosition();
         output.writeFixed32(0);
 
         setContext(newContext);
@@ -205,7 +205,7 @@ public class DsonBinaryLiteWriter extends AbstractDsonLiteWriter {
         // 记录preWritten在写length之前，最后的size要减4
         Context context = getContext();
         int preWritten = context.preWritten;
-        output.setFixedInt32(preWritten, output.position() - preWritten - 4);
+        output.setFixedInt32(preWritten, output.getPosition() - preWritten - 4);
 
         this.recursionDepth--;
         setContext(context.parent);
@@ -219,14 +219,14 @@ public class DsonBinaryLiteWriter extends AbstractDsonLiteWriter {
     @Override
     protected void doWriteMessage(int binaryType, MessageLite messageLite) {
         DsonOutput output = this.output;
-        writeFullTypeAndCurrentName(output, DsonType.BINARY, null);
+        writeFullTypeAndCurrentName(output, DsonType.BINARY, 0);
         DsonReaderUtils.writeMessage(output, binaryType, messageLite);
     }
 
     @Override
     protected void doWriteValueBytes(DsonType type, byte[] data) {
         DsonOutput output = this.output;
-        writeFullTypeAndCurrentName(output, type, null);
+        writeFullTypeAndCurrentName(output, type, 0);
         DsonReaderUtils.writeValueBytes(output, type, data);
     }
 

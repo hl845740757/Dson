@@ -74,15 +74,16 @@ public class DsonObject<K> extends AbstractDsonObject<K> {
         return header;
     }
 
-    /** @return this */
-    public DsonObject<K> append(K key, DsonValue value) {
-        put(key, value);
-        return this;
-    }
-
     @Nonnull
     @Override
     public final DsonType getDsonType() {
         return DsonType.OBJECT;
+    }
+
+    /** @return this */
+    @Override
+    public DsonObject<K> append(K key, DsonValue value) {
+        put(key, value);
+        return this;
     }
 }

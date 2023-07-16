@@ -33,7 +33,7 @@ import java.util.List;
  */
 public class DsonTextReaderTest {
 
-    private static final String dsonString = """
+    static final String dsonString = """
             - @{clsName: FileHeader, intro: 预留设计，允许定义文件头}
             -
             - {@MyStruct\s
@@ -58,6 +58,7 @@ public class DsonTextReaderTest {
             -  [@ei 1, 10010],
             -  [@eL 1, 10010],
             -  [@es 1, 10010],
+            -  [@es 1, null],
             - ]
             -
             - [@{compClsName : ei, localId: 17630eb4f916148b}

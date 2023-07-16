@@ -99,4 +99,8 @@ public class InternalUtils {
         }
     }
 
+    public static boolean isEnabled(int value, int mask) {
+        return (value & mask) == mask;
+    }
+
 }

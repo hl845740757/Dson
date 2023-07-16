@@ -61,6 +61,12 @@ ei、eL、es中的type就是来标记我们的业务目的，因此你可以通d
 
 es对于扩展很有帮助，也许会出现真香定律：**es真香！！！**
 
+Q：为什么要支持 es 的value为null？  
+A：最初提供ExtString时没有考虑这个问题，禁止了value为null；但在实现codec的时候发现一个问题：
+如果禁止value为null，那么业务层想表达value为null时，只能让ExtString整个对象为null，
+但这样会导致信息丢失，ExtString的type丢失了，因此底层需要支持value为null。  
+PS：普通的String不存在这个问题，因为不存在额外的信息。
+
 <br>
 
 Q：为什么日期时间（DateTime）不直接支持 ISO8601格式的字符串？  

@@ -245,14 +245,14 @@ public class DsonOutputs {
         }
 
         @Override
-        public int position() {
+        public int getPosition() {
             return (codedOutputStreamOffset - offset) + codedOutputStream.getTotalBytesWritten();
         }
 
         @Override
         public void setPosition(int writerIndex) {
             Objects.checkIndex(writerIndex, limit - offset);
-            if (position() == writerIndex) {
+            if (getPosition() == writerIndex) {
                 return;
             }
             try {
@@ -282,7 +282,7 @@ public class DsonOutputs {
                     ", limit=" + limit +
                     ", codedOutputStreamOffset=" + codedOutputStreamOffset +
                     ", codedOutputStreamTotalBytesWritten=" + codedOutputStream.getTotalBytesWritten() +
-                    ", totalBytesWritten=" + position() +
+                    ", totalBytesWritten=" + getPosition() +
                     '}';
         }
     }
@@ -301,14 +301,14 @@ public class DsonOutputs {
         }
 
         @Override
-        public int position() {
+        public int getPosition() {
             return (codedOutputStreamOffset - offset) + codedOutputStream.getTotalBytesWritten();
         }
 
         @Override
         public void setPosition(int writerIndex) {
             Objects.checkIndex(writerIndex, byteBuffer.limit() - offset);
-            if (position() == writerIndex) {
+            if (getPosition() == writerIndex) {
                 return;
             }
             try {

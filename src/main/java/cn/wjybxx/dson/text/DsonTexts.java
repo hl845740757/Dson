@@ -177,7 +177,7 @@ public class DsonTexts {
             sign = 1;
             lookOffset = 0;
         }
-        // 需要使用 Unsigned 解析方法，否则MIN_VALUE无法解析...
+        // 需要使用 Unsigned 解析方法，否则MIN_VALUE无法解析... toHexString有提到需要使用parseUnsignedInt
         if (str.startsWith("0x", lookOffset) || str.startsWith("0X", lookOffset)) {
             return sign * Integer.parseUnsignedInt(str, lookOffset + 2, str.length(), 16);
         }
@@ -253,7 +253,7 @@ public class DsonTexts {
 
     public static boolean isParsable(String str) {
         int length = str.length();
-        if (length == 0 || length > 66) { // 最长也不应该比二进制格式长
+        if (length == 0 || length > 67 + 16) { // 最长也不应该比二进制格式长，16是下划线预留
             return false;
         }
         return NumberUtils.isParsable(str);

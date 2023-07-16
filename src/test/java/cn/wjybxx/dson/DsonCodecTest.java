@@ -39,37 +39,57 @@ import java.util.List;
  * @author wjybxx
  * date - 2023/6/3
  */
-public class DsonReaderWriterTest {
+public class DsonCodecTest {
 
     private static final int loop = 3;
     private List<DsonObject<String>> srcList;
-    private static final String dsonString = DsonTextReaderTest2.dsonString;
+
+    static DsonObject<String> genRandObject() {
+        DsonObject<String> obj1 = new DsonObject<>(64);
+        obj1.append("name", new DsonString("wjybxx"))
+                .append("age", new DsonInt32(RandomUtils.nextInt(28, 32)))
+                .append("url", new DsonString("http://www.wjybxx.cn"))
+                .append("time", new DsonInt64(System.currentTimeMillis() + RandomUtils.nextLong(1, 1000)));
+
+
+        DsonRepository repository = DsonRepository.fromDson(DsonTextReaderTest.dsonString);
+        repository.remove(0); // 文件头
+        obj1.append("wrapped1", repository.toDsonArray());
+        obj1.append("wrapped2", Dsons.fromDson(DsonTextReaderTest2.dsonString));
+
+        // 测试基础数字
+        for (int j = 0; j < 8; j++) {
+            obj1.put("iv" + j, new DsonInt32(RandomUtils.nextInt()));
+            obj1.put("lv" + j, new DsonInt64(RandomUtils.nextLong()));
+            obj1.put("fv" + j, new DsonFloat(RandomUtils.nextFloat()));
+            obj1.put("dv" + j, new DsonDouble(RandomUtils.nextDouble()));
+        }
+        // 测试浮点数内联
+        for (int j = 0; j < 7; j++) {
+            obj1.put("ifv" + j, new DsonFloat(j + Dsons.FLOAT_INLINE_MIN));
+        }
+        return obj1;
+    }
 
     @BeforeEach
-    void initSrcList() throws InterruptedException {
+    void initSrcList() {
         srcList = new ArrayList<>(loop);
         for (int i = 0; i < loop; i++) {
-            DsonObject<String> obj1 = new DsonObject<String>(6);
-            obj1.append("name", new DsonString("wjybxx"))
-                    .append("age", new DsonInt32(RandomUtils.nextInt(28, 32)))
-                    .append("url", new DsonString("http://www.wjybxx.cn"))
-                    .append("time", new DsonInt64(System.currentTimeMillis()))
-                    .append("wrapped", Dsons.fromDson(dsonString));
+            DsonObject<String> obj1 = genRandObject();
             srcList.add(obj1);
-            Thread.sleep(50);// 让数值有所不同
         }
     }
 
     @Test
-    void test() throws InterruptedException {
-        final byte[] buffer = new byte[4096];
+    void test() {
+        final byte[] buffer = new byte[8192];
         int totalBytesWritten;
         try (DsonOutput dsonOutput = DsonOutputs.newInstance(buffer)) {
             DsonWriter writer = new DsonBinaryWriter(16, dsonOutput);
             for (DsonObject<String> dsonObject : srcList) {
                 Dsons.writeObject(writer, dsonObject, ObjectStyle.INDENT);
             }
-            totalBytesWritten = dsonOutput.position();
+            totalBytesWritten = dsonOutput.getPosition();
         }
         List<DsonObject<String>> copiedList = new ArrayList<>(loop);
         try (DsonInput dsonInput = DsonInputs.newInstance(buffer, 0, totalBytesWritten)) {
@@ -101,7 +121,28 @@ public class DsonReaderWriterTest {
     }
 
     @Test
-    void testLite() throws InterruptedException {
+    void testText() {
+        DsonTextWriterSettings settings = DsonTextWriterSettings.newBuilder().build();
+        StringWriter stringWriter = new StringWriter();
+        try (DsonTextWriter writer = new DsonTextWriter(16, stringWriter, settings)) {
+            for (DsonObject<String> dsonObject : srcList) {
+                Dsons.writeObject(writer, dsonObject, ObjectStyle.INDENT);
+            }
+        }
+        String dsonString = stringWriter.toString();
+//        System.out.println(dsonString);
+        List<DsonObject<String>> copiedList = new ArrayList<>(loop);
+        try (DsonTextReader reader = new DsonTextReader(16, dsonString)) {
+            DsonValue dsonValue;
+            while ((dsonValue = Dsons.readTopDsonValue(reader)) != null) {
+                copiedList.add(dsonValue.asObject());
+            }
+        }
+        Assertions.assertEquals(srcList, copiedList);
+    }
+
+    @Test
+    void testLite() {
         final byte[] buffer = new byte[4096];
         final int loop = 3;
 
@@ -116,13 +157,11 @@ public class DsonReaderWriterTest {
                 obj1.append(FieldNumber.ofLnumber(0), new DsonString("wjybxx"))
                         .append(FieldNumber.ofLnumber(1), new DsonInt32(RandomUtils.nextInt(28, 32)))
                         .append(FieldNumber.ofLnumber(2), new DsonString("www.wjybxx.cn"))
-                        .append(FieldNumber.ofLnumber(3), new DsonInt64(System.currentTimeMillis()));
+                        .append(FieldNumber.ofLnumber(3), new DsonInt64(System.currentTimeMillis() + RandomUtils.nextLong(0, 1000)));
                 srcList.add(obj1);
-
                 DsonLites.writeObject(writer, obj1, ObjectStyle.INDENT);
-                Thread.sleep(50); // 让数值有所不同
             }
-            totalBytesWritten = dsonOutput.position();
+            totalBytesWritten = dsonOutput.getPosition();
         }
 
         try (DsonInput dsonInput = DsonInputs.newInstance(buffer, 0, totalBytesWritten)) {
@@ -130,28 +169,6 @@ public class DsonReaderWriterTest {
             DsonValue dsonValue;
             while ((dsonValue = DsonLites.readTopDsonValue(reader)) != null) {
                 copiedList.add(dsonValue.asObjectLite());
-            }
-        }
-
-        Assertions.assertEquals(srcList, copiedList);
-    }
-
-    @Test
-    void testText() {
-        DsonTextWriterSettings settings = DsonTextWriterSettings.newBuilder().build();
-        StringWriter stringWriter = new StringWriter();
-        try (DsonTextWriter writer = new DsonTextWriter(16, stringWriter, settings)) {
-            for (DsonObject<String> dsonObject : srcList) {
-                Dsons.writeObject(writer, dsonObject, ObjectStyle.INDENT);
-            }
-        }
-        String dsonString = stringWriter.toString();
-
-        List<DsonObject<String>> copiedList = new ArrayList<>(loop);
-        try (DsonTextReader reader = new DsonTextReader(16, dsonString)) {
-            DsonValue dsonValue;
-            while ((dsonValue = Dsons.readTopDsonValue(reader)) != null) {
-                copiedList.add(dsonValue.asObject());
             }
         }
         Assertions.assertEquals(srcList, copiedList);

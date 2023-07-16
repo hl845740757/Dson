@@ -18,25 +18,8 @@ package cn.wjybxx.dson.text;
 
 /**
  * @author wjybxx
- * date - 2023/6/5
+ * date - 2023/7/15
  */
-public enum StringStyle implements IStyle {
-
-    /**
-     * 自动判别
-     * 1.当内容较短且无特殊字符，且不是特殊值（tre/false/数字）时不加引号
-     * 2.当内容长度中等时，打印为双引号字符串
-     * 3.当内容较长时，打印为文本模式
-     */
-    AUTO,
-
-    /** 双引号模式 -- 内容可能包含特殊字符，且想保持流式输入 */
-    QUOTE,
-
-    /** 无引号模式 -- 内容不包含特殊字符，且内容较短；要小心使用 */
-    UNQUOTE,
-
-    /** 纯文本模式 -- 内容可能包含特殊字符，或内容较长 */
-    TEXT,
+public interface IStyle {
 
 }

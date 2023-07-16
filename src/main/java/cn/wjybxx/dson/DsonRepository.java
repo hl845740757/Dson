@@ -28,6 +28,12 @@ public class DsonRepository {
         return Collections.unmodifiableList(valueList);
     }
 
+    public DsonArray<String> toDsonArray() {
+        DsonArray<String> dsonArray = new DsonArray<>(valueList.size());
+        dsonArray.addAll(valueList);
+        return dsonArray;
+    }
+
     public int size() {
         return valueList.size();
     }

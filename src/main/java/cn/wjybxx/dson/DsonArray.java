@@ -78,4 +78,10 @@ public class DsonArray<K> extends AbstractDsonArray implements RandomAccess {
         return DsonType.ARRAY;
     }
 
+    @Override
+    public DsonArray<K> append(DsonValue dsonValue) {
+        add(dsonValue);
+        return this;
+    }
+
 }

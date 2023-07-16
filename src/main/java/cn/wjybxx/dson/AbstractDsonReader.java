@@ -45,6 +45,7 @@ public abstract class AbstractDsonReader implements DsonReader {
     protected int recursionDepth;
     protected DsonType currentDsonType;
     protected WireType currentWireType;
+    protected int currentWireTypeBits;
     protected String currentName = INVALID_NAME;
 
     public AbstractDsonReader(int recursionLimit) {
@@ -422,6 +423,7 @@ public abstract class AbstractDsonReader implements DsonReader {
     protected void recoverDsonType(Context context) {
         this.currentDsonType = Objects.requireNonNull(context.dsonType);
         this.currentWireType = WireType.VARINT;
+        this.currentWireTypeBits = 0;
         this.currentName = context.name;
     }
 

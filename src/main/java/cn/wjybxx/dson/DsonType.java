@@ -105,6 +105,24 @@ public enum DsonType {
         return number >= 1 && number <= 6;
     }
 
+    public boolean isNumber() {
+        switch (this) {
+            case INT32, INT64, FLOAT, DOUBLE:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    public boolean hasWireType() {
+        switch (this) {
+            case INT32, INT64, EXT_INT32, EXT_INT64:
+                return true;
+            default:
+                return false;
+        }
+    }
+
     /** header不属于普通意义上的容器 */
     public boolean isContainer() {
         return this == OBJECT || this == ARRAY;

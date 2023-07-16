@@ -1,6 +1,9 @@
 package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.text.*;
+import cn.wjybxx.dson.text.DsonTextWriter;
+import cn.wjybxx.dson.text.DsonTextWriterSettings;
+import cn.wjybxx.dson.text.NumberStyle;
+import cn.wjybxx.dson.text.ObjectStyle;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -33,15 +36,14 @@ public class DsonNumberTest {
     void testNumber() {
         DsonObject<String> value = Dsons.fromDson(numberString).asObject();
         List<NumberStyle> styleList = List.of(NumberStyle.TYPED, NumberStyle.TYPED_NO_SCI,
-                NumberStyle.HEX, NumberStyle.HEX_RAW,
-                NumberStyle.BINARY, NumberStyle.BINARY_RAW);
+                NumberStyle.HEX, NumberStyle.UNSIGNED_HEX,
+                NumberStyle.BINARY, NumberStyle.UNSIGNED_BINARY, NumberStyle.FIXED_BINARY);
 
         for (NumberStyle style : styleList) {
             StringWriter stringWriter = new StringWriter(120);
             try (DsonTextWriter writer = new DsonTextWriter(16, stringWriter, DsonTextWriterSettings.newBuilder().build())) {
                 writer.writeStartObject(ObjectStyle.INDENT);
-
-                if (style != NumberStyle.BINARY && style != NumberStyle.BINARY_RAW) {
+                if (style.supportFloat()) {
                     for (int i = 1; i <= value.size(); i++) {
                         String name = "value" + i;
                         DsonNumber dsonNumber = value.get(name).asNumber();

@@ -242,6 +242,7 @@ public class DsonObjectLiteReader extends AbstractDsonLiteReader {
     @Override
     protected void doSkipToEndOfObject() {
         Context context = getContext();
+        context.header = null;
         if (context.arrayIterator != null) {
             context.arrayIterator.forEachRemaining(dsonValue -> {
             });

@@ -54,7 +54,7 @@ final class BufferedCharStream extends AbstractCharStream {
 
         this.reader = reader;
         this.buffer = new CharBuffer(new char[bufferSize]);
-        this.nextBuffer = new CharBuffer(new char[MIN_BUFFER_SIZE]);
+        this.nextBuffer = new CharBuffer(new char[64]);
     }
 
     @Override

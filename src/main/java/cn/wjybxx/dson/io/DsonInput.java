@@ -38,7 +38,7 @@ public interface DsonInput extends AutoCloseable {
      * @implNote 子类实现必须与默认实现等价
      */
     default int readUint8() {
-        return readRawByte() & 0XFF;
+        return Byte.toUnsignedInt(readRawByte());
     }
 
     //
@@ -78,7 +78,7 @@ public interface DsonInput extends AutoCloseable {
     <T> T readMessageNoSize(@Nonnull Parser<T> parser);
 
     /** 当前读索引位置 - 已读字节数 */
-    int position();
+    int getPosition();
 
     /** 设置读索引位置 */
     void setPosition(int readerIndex);
@@ -88,7 +88,7 @@ public interface DsonInput extends AutoCloseable {
      * 相比先{@link #setPosition(int)}再{@link #readFixed32()}的方式，该接口更容易优化实现
      */
     default int getFixed32(int readerIndex) {
-        int oldPosition = position();
+        int oldPosition = getPosition();
         setPosition(readerIndex);
         int value = readFixed32();
         setPosition(oldPosition);

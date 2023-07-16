@@ -68,7 +68,7 @@ public class DsonInputs {
         @Override
         public int readUint8() {
             try {
-                return codedInputStream.readRawByte() & 0XFF;
+                return Byte.toUnsignedInt(codedInputStream.readRawByte());
             } catch (IOException e) {
                 throw DsonIOException.wrap(e);
             }
@@ -265,14 +265,14 @@ public class DsonInputs {
         }
 
         @Override
-        public int position() {
+        public int getPosition() {
             return (codedInputStreamOffset - offset) + codedInputStream.getTotalBytesRead();
         }
 
         @Override
         public void setPosition(int readerIndex) {
             Objects.checkIndex(readerIndex, limit - offset);
-            if (readerIndex == position()) {
+            if (readerIndex == getPosition()) {
                 return;
             }
             int newOffset = offset + readerIndex;
@@ -302,14 +302,14 @@ public class DsonInputs {
         }
 
         @Override
-        public int position() {
+        public int getPosition() {
             return (codedInputStreamOffset - offset) + codedInputStream.getTotalBytesRead();
         }
 
         @Override
         public void setPosition(int readerIndex) {
             Objects.checkIndex(readerIndex, byteBuffer.limit() - offset);
-            if (position() == readerIndex) {
+            if (getPosition() == readerIndex) {
                 return;
             }
             codedInputStream.resetSizeCounter();

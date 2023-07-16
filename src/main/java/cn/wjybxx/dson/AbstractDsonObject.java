@@ -74,6 +74,11 @@ public abstract class AbstractDsonObject<K> extends DsonValue implements Map<K, 
         }
     }
 
+    public AbstractDsonObject<K> append(K key, DsonValue value) {
+        put(key, value);
+        return this;
+    }
+
     // region equals
     // 默认只比较valueMap
 

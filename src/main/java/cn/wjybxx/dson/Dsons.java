@@ -59,15 +59,22 @@ public final class Dsons {
     /** {@link DsonType}的最大类型编号 */
     public static final int DSON_TYPE_MAX_VALUE = 31;
     /** {@link DsonType}占用的比特位 */
-    private static final int DSON_TYPE_BITES = 5;
+    public static final int DSON_TYPE_BITES = 5;
 
     /** {@link WireType}占位的比特位数 */
-    static final int WIRETYPE_BITS = 3;
-    static final int WIRETYPE_MASK = (1 << WIRETYPE_BITS) - 1;
+    public static final int WIRETYPE_BITS = 3;
+    public static final int WIRETYPE_MASK = (1 << WIRETYPE_BITS) - 1;
 
     /** 完整类型信息占用的比特位数 */
-    private static final int FULL_TYPE_BITS = DSON_TYPE_BITES + WIRETYPE_BITS;
-    private static final int FULL_TYPE_MASK = (1 << FULL_TYPE_BITS) - 1;
+    public static final int FULL_TYPE_BITS = DSON_TYPE_BITES + WIRETYPE_BITS;
+    public static final int FULL_TYPE_MASK = (1 << FULL_TYPE_BITS) - 1;
+
+    /** 可内联的最小数 */
+    public static final int FLOAT_INLINE_MIN = -3;
+    /** 可内联的最大数 -- 可内联7个数 */
+    public static final int FLOAT_INLINE_MAX = FLOAT_INLINE_MIN + 6;
+    /** 内联数的offset -- 最小值映射为1 */
+    public static final int FLOAT_INLINE_OFFSET = 1 - FLOAT_INLINE_MIN;
 
     /**
      * 在文档数据解码中是否启用 字段字符串池化

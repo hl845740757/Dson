@@ -56,6 +56,7 @@ public class DsonCharStreamTest {
             - [@ei 1, 10010]
             - [@eL 1, 10010]
             - [@es 1, 10010]
+            - [@es 1, null],
             -
             - @ss intro:
             |   salkjlxaaslkhalkhsal,anxksjah
