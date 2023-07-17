@@ -100,9 +100,7 @@ public class DsonBinaryLiteWriter extends AbstractDsonLiteWriter {
         int wireType = DsonReaderUtils.wireTypeOfFloat(value);
         DsonOutput output = this.output;
         writeFullTypeAndCurrentName(output, DsonType.FLOAT, wireType);
-        if (wireType == 0) {
-            output.writeFloat(value);
-        }
+        DsonReaderUtils.writeFloat(output, value, wireType);
     }
 
     @Override
@@ -110,9 +108,7 @@ public class DsonBinaryLiteWriter extends AbstractDsonLiteWriter {
         int wireType = DsonReaderUtils.wireTypeOfDouble(value);
         DsonOutput output = this.output;
         writeFullTypeAndCurrentName(output, DsonType.DOUBLE, wireType);
-        if (wireType == 0) {
-            output.writeDouble(value);
-        }
+        DsonReaderUtils.writeDouble(output, value, wireType);
     }
 
     @Override

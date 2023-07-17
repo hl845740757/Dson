@@ -36,41 +36,79 @@ import java.util.List;
 public class DsonReaderUtils {
 
     /** 支持读取为bytes和直接写入bytes的数据类型 -- 这些类型不可以存储额外数据在WireType上 */
-    private static final List<DsonType> VALUE_BYTES_TYPES = List.of(DsonType.STRING,
-            DsonType.BINARY, DsonType.ARRAY, DsonType.OBJECT);
+    public static final List<DsonType> VALUE_BYTES_TYPES = List.of(DsonType.STRING,
+            DsonType.BINARY, DsonType.ARRAY, DsonType.OBJECT, DsonType.HEADER);
 
     // region number
 
+    /**
+     * 浮点数的前16位固定写入，后两个字节进行统计即可
+     * wireType表示后导0对应的字节数
+     */
     public static int wireTypeOfFloat(float value) {
-        int iv = (int) value;
-        if (iv == value &&
-                (iv >= Dsons.FLOAT_INLINE_MIN && iv <= Dsons.FLOAT_INLINE_MAX)) {
-            return iv + Dsons.FLOAT_INLINE_OFFSET;
+        int rawBits = Float.floatToRawIntBits(value);
+        if ((rawBits & 0xFF) != 0) {
+            return 0;
         }
-        return 0;
+        if ((rawBits & 0xFF00) != 0) {
+            return 1;
+        }
+        return 2;
     }
 
-    public static float readFloat(DsonInput input, int wireTypeBits) {
-        if (wireTypeBits == 0) {
-            return input.readFloat();
+    /** 小端编码，从末尾非0开始写入 */
+    public static void writeFloat(DsonOutput output, float value, int wireType) {
+        int rawBits = Float.floatToRawIntBits(value);
+        for (int i = 0; i < wireType; i++) {
+            rawBits = rawBits >>> 8;
         }
-        return wireTypeBits - Dsons.FLOAT_INLINE_OFFSET;
+        for (int i = wireType; i < 4; i++) {
+            output.writeRawByte((byte) rawBits);
+            rawBits = rawBits >>> 8;
+        }
     }
 
+    public static float readFloat(DsonInput input, int wireType) {
+        int rawBits = 0;
+        for (int i = wireType; i < 4; i++) {
+            rawBits |= (input.readRawByte() & 0XFF) << (8 * i);
+        }
+        return Float.intBitsToFloat(rawBits);
+    }
+
+    /**
+     * 浮点数的前16位固定写入，后两个字节进行统计即可
+     * wireType表示后导0对应的字节数
+     */
     public static int wireTypeOfDouble(double value) {
-        int iv = (int) value;
-        if (iv == value &&
-                (iv >= Dsons.FLOAT_INLINE_MIN && iv <= Dsons.FLOAT_INLINE_MAX)) {
-            return iv + Dsons.FLOAT_INLINE_OFFSET;
+        long rawBits = Double.doubleToRawLongBits(value);
+        for (int i = 0; i < 6; i++) {
+            byte v = (byte) rawBits;
+            if (v != 0) {
+                return i;
+            }
+            rawBits = rawBits >>> 8;
         }
-        return 0;
+        return 6;
     }
 
-    public static double readDouble(DsonInput input, int wireTypeBits) {
-        if (wireTypeBits == 0) {
-            return input.readDouble();
+    public static void writeDouble(DsonOutput output, double value, int wireType) {
+        long rawBits = Double.doubleToRawLongBits(value);
+        for (int i = 0; i < wireType; i++) {
+            rawBits = rawBits >>> 8;
         }
-        return wireTypeBits - Dsons.FLOAT_INLINE_OFFSET;
+        for (int i = wireType; i < 8; i++) {
+            output.writeRawByte((byte) rawBits);
+            rawBits = rawBits >>> 8;
+        }
+    }
+
+    public static double readDouble(DsonInput input, int wireType) {
+        long rawBits = 0;
+        for (int i = wireType; i < 8; i++) {
+            rawBits |= (input.readRawByte() & 0XFFL) << (8 * i);
+        }
+        return Double.longBitsToDouble(rawBits);
     }
 
     public static boolean readBool(DsonInput input, int wireTypeBits) {
@@ -274,16 +312,10 @@ public class DsonReaderUtils {
         int skip;
         switch (dsonType) {
             case FLOAT -> {
-                if (wireTypeBits != 0) {
-                    return;
-                }
-                skip = 4;
+                skip = 4 - wireTypeBits;
             }
             case DOUBLE -> {
-                if (wireTypeBits != 0) {
-                    return;
-                }
-                skip = 8;
+                skip = 8 - wireTypeBits;
             }
             case BOOLEAN, NULL -> {
                 return;

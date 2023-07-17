@@ -1,5 +1,8 @@
 package cn.wjybxx.dson;
 
+import cn.wjybxx.dson.text.NumberStyle;
+import cn.wjybxx.dson.text.StyleOut;
+
 import java.util.List;
 import java.util.Map;
 
@@ -38,6 +41,30 @@ public class TestUtils {
         } else {
             throw new IllegalArgumentException("unsupported type " + object.getClass());
         }
+    }
+
+    public static String toRawBinaryString(float v) {
+        StyleOut styleOut = new StyleOut();
+        NumberStyle.FIXED_BINARY.toString(Float.floatToRawIntBits(v), styleOut);
+        StringBuilder sb = new StringBuilder(styleOut.getValue().substring(2));
+        sb.insert(24, '_');
+        sb.insert(16, '_');
+        sb.insert(8, '_');
+        return sb.toString();
+    }
+
+    public static String toRawBinaryString(double v) {
+        StyleOut styleOut = new StyleOut();
+        NumberStyle.FIXED_BINARY.toString(Double.doubleToRawLongBits(v), styleOut);
+        StringBuilder sb = new StringBuilder(styleOut.getValue().substring(2));
+        sb.insert(56, '_');
+        sb.insert(48, '_');
+        sb.insert(40, '_');
+        sb.insert(32, '_');
+        sb.insert(24, '_');
+        sb.insert(16, '_');
+        sb.insert(8, '_');
+        return sb.toString();
     }
 
 }

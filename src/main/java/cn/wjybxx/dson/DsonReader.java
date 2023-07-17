@@ -184,7 +184,7 @@ public interface DsonReader extends AutoCloseable {
 
     /**
      * 将value的值读取为字节数组
-     * 1.支持类型：String、Binary、Array、Object
+     * 1.支持类型：String、Binary、Array、Object、Header
      * 2.返回的bytes中去除了value的length信息，
      * 3.只在二进制流下生效。
      * <p>
