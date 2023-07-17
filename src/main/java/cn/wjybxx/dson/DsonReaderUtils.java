@@ -113,11 +113,10 @@ public class DsonReaderUtils {
     }
 
     public static void writeMessage(DsonOutput output, int binaryType, MessageLite messageLite) {
-        int preWritten = output.getPosition();
-        output.writeFixed32(0);
+        int sizeOfBinaryType = computeSizeOfBinaryType(binaryType);
+        output.writeFixed32(sizeOfBinaryType + messageLite.getSerializedSize()); // getSerializedSize总是会执行，因此这里调用不会增加开销
         output.writeUint32(binaryType);
         output.writeMessageNoSize(messageLite);
-        output.setFixedInt32(preWritten, output.getPosition() - preWritten - 4);
     }
 
     public static <T> T readMessage(DsonInput input, int binaryType, Parser<T> parser) {
