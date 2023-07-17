@@ -136,17 +136,15 @@ public class DsonBinaryLiteWriter extends AbstractDsonLiteWriter {
 
     @Override
     protected void doWriteBinary(DsonBinary binary) {
-        int wireType = DsonReaderUtils.wireTypeOfBinary(binary.getType());
         DsonOutput output = this.output;
-        writeFullTypeAndCurrentName(output, DsonType.BINARY, wireType);
+        writeFullTypeAndCurrentName(output, DsonType.BINARY, 0);
         DsonReaderUtils.writeBinary(output, binary);
     }
 
     @Override
     protected void doWriteBinary(int type, Chunk chunk) {
-        int wireType = DsonReaderUtils.wireTypeOfBinary(type);
         DsonOutput output = this.output;
-        writeFullTypeAndCurrentName(output, DsonType.BINARY, wireType);
+        writeFullTypeAndCurrentName(output, DsonType.BINARY, 0);
         DsonReaderUtils.writeBinary(output, type, chunk);
     }
 

@@ -190,8 +190,8 @@ public interface DsonReader extends AutoCloseable {
      * <p>
      * 该方法主要用于避免中间编解码过程，eg：
      * <pre>
-     * A端：             B端         C端
-     * object->bytes  bytes->bytes bytes->object
+     * A端：             B端            C端
+     * object->bytes  bytes->bytes  bytes->object
      * </pre>
      */
     byte[] readValueAsBytes(String name);

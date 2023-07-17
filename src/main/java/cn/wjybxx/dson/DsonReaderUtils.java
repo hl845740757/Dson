@@ -35,22 +35,13 @@ import java.util.List;
  */
 public class DsonReaderUtils {
 
-    /** 支持读取为bytes和直接写入bytes的数据类型 */
+    /** 支持读取为bytes和直接写入bytes的数据类型 -- 这些类型不可以存储额外数据在WireType上 */
     private static final List<DsonType> VALUE_BYTES_TYPES = List.of(DsonType.STRING,
             DsonType.BINARY, DsonType.ARRAY, DsonType.OBJECT);
 
-    // region 字节流
+    // region number
 
     public static int wireTypeOfFloat(float value) {
-        int iv = (int) value;
-        if (iv == value &&
-                (iv >= Dsons.FLOAT_INLINE_MIN && iv <= Dsons.FLOAT_INLINE_MAX)) {
-            return iv + Dsons.FLOAT_INLINE_OFFSET;
-        }
-        return 0;
-    }
-
-    public static int wireTypeOfDouble(double value) {
         int iv = (int) value;
         if (iv == value &&
                 (iv >= Dsons.FLOAT_INLINE_MIN && iv <= Dsons.FLOAT_INLINE_MAX)) {
@@ -64,6 +55,15 @@ public class DsonReaderUtils {
             return input.readFloat();
         }
         return wireTypeBits - Dsons.FLOAT_INLINE_OFFSET;
+    }
+
+    public static int wireTypeOfDouble(double value) {
+        int iv = (int) value;
+        if (iv == value &&
+                (iv >= Dsons.FLOAT_INLINE_MIN && iv <= Dsons.FLOAT_INLINE_MAX)) {
+            return iv + Dsons.FLOAT_INLINE_OFFSET;
+        }
+        return 0;
     }
 
     public static double readDouble(DsonInput input, int wireTypeBits) {
@@ -82,49 +82,57 @@ public class DsonReaderUtils {
         }
         throw new DsonIOException("invalid wireType for bool, bits: " + wireTypeBits);
     }
+    // endregion
 
-    public static int wireTypeOfBinary(int type) {
-        if (type <= Dsons.BINARY_INLINE_MAX) {
-            return type + 1;
-        }
-        return 0;
-    }
+    // region binary
 
     public static int computeSizeOfBinaryType(int type) {
-        if (type <= Dsons.BINARY_INLINE_MAX) {
-            return 0;
-        }
         return CodedOutputStream.computeUInt32SizeNoTag(type);
     }
 
     public static void writeBinary(DsonOutput output, DsonBinary binary) {
         int sizeOfBinaryType = computeSizeOfBinaryType(binary.getType());
         output.writeFixed32(sizeOfBinaryType + binary.getData().length);
-        if (sizeOfBinaryType > 0) {
-            output.writeUint32(binary.getType());
-        }
+        output.writeUint32(binary.getType());
         output.writeRawBytes(binary.getData());
     }
 
     public static void writeBinary(DsonOutput output, int type, Chunk chunk) {
         int sizeOfBinaryType = computeSizeOfBinaryType(type);
         output.writeFixed32(sizeOfBinaryType + chunk.getLength());
-        if (sizeOfBinaryType > 0) {
-            output.writeUint32(type);
-        }
+        output.writeUint32(type);
         output.writeRawBytes(chunk.getBuffer(), chunk.getOffset(), chunk.getLength());
     }
 
-    public static DsonBinary readDsonBinary(DsonInput input, int wireTypeBits) {
-        if (wireTypeBits > Dsons.WIRETYPE_MAX_VALUE) {
-            throw new DsonIOException("invalid wireType for binary, bits " + wireTypeBits);
-        }
+    public static DsonBinary readDsonBinary(DsonInput input) {
         int size = input.readFixed32();
-        int type = wireTypeBits > 0 ? wireTypeBits - 1 : input.readUint32();
+        int type = input.readUint32();
         int dataLength = size - computeSizeOfBinaryType(type);
         return new DsonBinary(type,
                 input.readRawBytes(dataLength));
     }
+
+    public static void writeMessage(DsonOutput output, int binaryType, MessageLite messageLite) {
+        int preWritten = output.getPosition();
+        output.writeFixed32(0);
+        output.writeUint32(binaryType);
+        output.writeMessageNoSize(messageLite);
+        output.setFixedInt32(preWritten, output.getPosition() - preWritten - 4);
+    }
+
+    public static <T> T readMessage(DsonInput input, int binaryType, Parser<T> parser) {
+        int size = input.readFixed32();
+        int oldLimit = input.pushLimit(size);
+        int type = input.readUint32();
+        if (type != binaryType) {
+            throw DsonIOException.unexpectedSubType(binaryType, type);
+        }
+        T value = input.readMessageNoSize(parser);
+        input.popLimit(oldLimit);
+        return value;
+    }
+
+    // endregion
 
     public static void writeExtInt32(DsonOutput output, DsonExtInt32 extInt32, WireType wireType) {
         output.writeUint32(extInt32.getType());
@@ -224,26 +232,6 @@ public class DsonReaderUtils {
                 input.readUint32());
     }
 
-    public static void writeMessage(DsonOutput output, int binaryType, MessageLite messageLite) {
-        int preWritten = output.getPosition();
-        output.writeFixed32(0);
-        output.writeRawByte(binaryType);
-        output.writeMessageNoSize(messageLite);
-        output.setFixedInt32(preWritten, output.getPosition() - preWritten - 4);
-    }
-
-    public static <T> T readMessage(DsonInput input, int binaryType, Parser<T> parser) {
-        int size = input.readFixed32();
-        int oldLimit = input.pushLimit(size);
-        int subType = input.readUint8();
-        if (subType != binaryType) {
-            throw DsonIOException.unexpectedSubType(binaryType, subType);
-        }
-        T value = input.readMessageNoSize(parser);
-        input.popLimit(oldLimit);
-        return value;
-    }
-
     public static void writeValueBytes(DsonOutput output, DsonType type, byte[] data) {
         if (type == DsonType.STRING) {
             output.writeUint32(data.length);
@@ -309,6 +297,9 @@ public class DsonReaderUtils {
                 wireType.readInt64(input);
                 return;
             }
+            case STRING -> {
+                skip = input.readUint32();  // string长度
+            }
             case EXT_INT32 -> {
                 input.readUint32(); // 子类型
                 wireType.readInt32(input);
@@ -319,18 +310,15 @@ public class DsonReaderUtils {
                 wireType.readInt64(input);
                 return;
             }
-            case STRING -> {
-                skip = input.readUint32();  // string长度
-            }
             case EXT_STRING -> {
                 if (InternalUtils.isEnabled(wireTypeBits, DsonExtString.MASK_TYPE)) {
                     input.readUint32(); // 子类型
                 }
                 if (InternalUtils.isEnabled(wireTypeBits, DsonExtString.MASK_VALUE)) {
                     skip = input.readUint32(); // string长度
-                } else {
-                    skip = 0;
+                    input.skipRawBytes(skip);
                 }
+                return;
             }
             case REFERENCE -> {
                 skip = input.readUint32(); // localId
@@ -355,7 +343,6 @@ public class DsonReaderUtils {
                 input.readUint32();
                 return;
             }
-
             case BINARY, ARRAY, OBJECT, HEADER -> {
                 skip = input.readFixed32();
             }
@@ -405,5 +392,4 @@ public class DsonReaderUtils {
         }
     }
 
-    // endregion
 }

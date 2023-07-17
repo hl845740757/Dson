@@ -163,5 +163,8 @@ A：默认情况下int32/int64/float都是需要打印类型以确保精确解�
 
 Q: 为什么Binary的Length使用Fixed32编码，而不是Uint32？  
 A：一方面是为了减少复杂度；另一方面是对转发数据需求的考虑，保持Binary和Object/Array的长度编码一致，这有利于中间节点对数据进行截取和转发。
-另外，这种方式允许Binary的数据和Object/Array的数据互相替换， 有更好的扩展性。
-PS:如果是变长的length字段，将对网络中的所有节点都实现相同的算法。
+
+PS:
+
+1. 如果是变长的length字段，将对网络中的所有节点都实现相同的算法。
+2. 我还在Writer和Reader为转发设计了特殊的接口：readValueAsBytes、writeValueBytes。

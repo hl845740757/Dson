@@ -20,11 +20,9 @@ Dson提供了两个版本的二进制格式，从整体上看他们是一样的�
 ### 类型区域
 
 1. 字段的类型由 DsonType和 *WireType(数字编码类型)* 构成，共1个字节。
-2. WireType分为：VARINT(0)、UINT(1)、SINT(2)、FIXED(3)、BYTE(4)、UBYTE(5)。
+2. WireType分为：VARINT(0)、UINT(1)、SINT(2)、FIXED(3)、BYTE(4)。
     1. VARINT,UINT,SINT,FIXED可参考ProtocolBuffer。
-    2. BYTE和UBYTE都只写入int32或int64的末尾8位（1个字节）
-    3. BYTE读取时直接返回读取的字节，因此是有符号的。
-    4. UBYTE读取时将读取的字节转为正整数返回，因此是无符号的。
+    2. BYTE只写入int32或int64的末尾8位（1个字节），读取时直接返回读取的字节，因此是有符号的。
 3. int32和int64数字的编码类型会随着数字序列化，以确保对方正确的解码。
 4. **WireType的比特位用于非数字类型时可以表达其它信息** -- 比如标记null字段。
 
@@ -41,7 +39,8 @@ Dson提供了两个版本的二进制格式，从整体上看他们是一样的�
 3. 数字没有length字段。
 4. **string的length是uint32变长编码**，以节省开销 —— 只有最上面提到4种数据的length是fixed32。
 5. extInt32、extInt64都是两个简单值的连续写入，subType采用uint32编码，value采用对应wireType的编码。
-6. timestamp为 seconds、nanos、offset、enables 4个值的连续写入，编码格式：uint64,uint32,sint32,uint32
+6. binary的subType使用uint32编码，data的长度为binary的总长度减去subType占用的动态字节数(1~5)。
+7. timestamp为 seconds、nanos、offset、enables 4个值的连续写入，编码格式：uint64,uint32,sint32,uint32
 
 ### wireType比特位的特殊使用
 
@@ -51,18 +50,12 @@ Dson提供了两个版本的二进制格式，从整体上看他们是一样的�
     2. 被内联的最小值映射为001，最大值映射为111，计算真实值时减4即可。
     3. 这种方式比通过标记位表示是否进行了内联效果更好。
 
-3. Binary使用wireType内联了\[0, 6]区间的subType值；由于binary多数情况下subType为0或其它小数值，内联可省掉多数情况下的开销。
-    1. 与浮点数的算法类似， 000 表示没有内联值，其它时候可进行了内联。、
-    2. 在内联的情况下，计算真实值值由wireType减1即可。
-    3. 在没有进行内联时，subType使用uint32编码。
-    4. data的长度为binary的总长度减去subType占用的动态字节数(0~5)。
-
-4. extString用wireType的bits标记了type和value是否存在，只有存在时才会写入。
+3. extString用wireType的bits标记了type和value是否存在，只有存在时才会写入。
     1. 001 用于标记type
     2. 010 用于标记value
     3. 编码顺序为 type, value，其中type为uint32编码
 
-5. ref使用wireType标记了namespace、type、policy是否存在，只有存在时才写入；localId总是写入。
+4. ref使用wireType标记了namespace、type、policy是否存在，只有存在时才写入；localId总是写入。
     1. 001 用于标记namespace
     2. 010 用于标记type
     3. 100 用于标记policy
