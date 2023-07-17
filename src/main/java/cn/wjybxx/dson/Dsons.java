@@ -56,14 +56,16 @@ import java.util.Properties;
 @SuppressWarnings("unused")
 public final class Dsons {
 
-    /** {@link DsonType}的最大类型编号 */
-    public static final int DSON_TYPE_MAX_VALUE = 31;
     /** {@link DsonType}占用的比特位 */
     public static final int DSON_TYPE_BITES = 5;
+    /** {@link DsonType}的最大类型编号 */
+    public static final int DSON_TYPE_MAX_VALUE = 31;
 
     /** {@link WireType}占位的比特位数 */
     public static final int WIRETYPE_BITS = 3;
     public static final int WIRETYPE_MASK = (1 << WIRETYPE_BITS) - 1;
+    /** wireType看做数值时的最大值 */
+    public static final int WIRETYPE_MAX_VALUE = 7;
 
     /** 完整类型信息占用的比特位数 */
     public static final int FULL_TYPE_BITS = DSON_TYPE_BITES + WIRETYPE_BITS;

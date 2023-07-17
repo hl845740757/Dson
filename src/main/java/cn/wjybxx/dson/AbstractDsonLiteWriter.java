@@ -187,7 +187,7 @@ public abstract class AbstractDsonLiteWriter implements DsonLiteWriter {
     @Override
     public void writeBinary(int name, int type, Chunk chunk) {
         Objects.requireNonNull(chunk);
-        DsonBinary.checkSubType(type);
+        DsonBinary.checkType(type);
         DsonBinary.checkDataLength(chunk.getLength());
         advanceToValueState(name);
         doWriteBinary(type, chunk);
@@ -346,7 +346,7 @@ public abstract class AbstractDsonLiteWriter implements DsonLiteWriter {
 
     @Override
     public void writeMessage(int name, int binaryType, MessageLite messageLite) {
-        DsonBinary.checkSubType(binaryType);
+        DsonBinary.checkType(binaryType);
         advanceToValueState(name);
         doWriteMessage(binaryType, messageLite);
         setNextState();

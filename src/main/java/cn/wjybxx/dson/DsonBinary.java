@@ -43,7 +43,7 @@ public class DsonBinary extends DsonValue {
      * @param type 为避免开销和降低编解码复杂度，暂限定为单个字节范围 [0, 255]
      */
     public DsonBinary(int type, byte[] data) {
-        checkSubType(type);
+        checkType(type);
         checkDataLength(data.length); // 顺带NPE
         this.type = type;
         this.data = data;
@@ -55,9 +55,9 @@ public class DsonBinary extends DsonValue {
         this.data = src.data.clone();
     }
 
-    public static void checkSubType(int type) {
+    public static void checkType(int type) {
         if (type < 0) {
-            throw new IllegalArgumentException("the type of binary must between[0, ~], but found: " + type);
+            throw new IllegalArgumentException("type cant be negative");
         }
     }
 

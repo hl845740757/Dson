@@ -80,7 +80,7 @@ public class DsonReaderUtils {
         if (wireTypeBits == 0) {
             return false;
         }
-        throw new DsonIOException("invalid wireType of bool");
+        throw new DsonIOException("invalid wireType for bool, bits: " + wireTypeBits);
     }
 
     public static int wireTypeOfBinary(int type) {
@@ -115,9 +115,12 @@ public class DsonReaderUtils {
         output.writeRawBytes(chunk.getBuffer(), chunk.getOffset(), chunk.getLength());
     }
 
-    public static DsonBinary readDsonBinary(DsonInput input, int currentWireTypeBits) {
+    public static DsonBinary readDsonBinary(DsonInput input, int wireTypeBits) {
+        if (wireTypeBits > Dsons.WIRETYPE_MAX_VALUE) {
+            throw new DsonIOException("invalid wireType for binary, bits " + wireTypeBits);
+        }
         int size = input.readFixed32();
-        int type = currentWireTypeBits > 0 ? currentWireTypeBits - 1 : input.readUint32();
+        int type = wireTypeBits > 0 ? wireTypeBits - 1 : input.readUint32();
         int dataLength = size - computeSizeOfBinaryType(type);
         return new DsonBinary(type,
                 input.readRawBytes(dataLength));
