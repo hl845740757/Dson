@@ -42,7 +42,7 @@ public class DsonReaderUtils {
     // region number
 
     /**
-     * 浮点数的前16位固定写入，后两个字节进行统计即可
+     * 浮点数的前16位固定写入，因此只统计后16位
      * wireType表示后导0对应的字节数
      */
     public static int wireTypeOfFloat(float value) {
@@ -77,7 +77,7 @@ public class DsonReaderUtils {
     }
 
     /**
-     * 浮点数的前16位固定写入，后两个字节进行统计即可
+     * 浮点数的前16位固定写入，因此只统计后48位
      * wireType表示后导0对应的字节数
      */
     public static int wireTypeOfDouble(double value) {

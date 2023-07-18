@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
  */
 public class FloatCompressTest {
 
-    private static final int COUNT = 10000;
+    private static final int COUNT = 100000;
     /**
      * delta如果是不能2进制精确表达的，那么是不能节省字节的；
      * delta如果是能2进制精确表达的，才可以节省存储空间。
