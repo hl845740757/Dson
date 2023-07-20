@@ -17,9 +17,6 @@
 package cn.wjybxx.dson;
 
 import cn.wjybxx.dson.io.Chunk;
-import cn.wjybxx.dson.text.INumberStyle;
-import cn.wjybxx.dson.text.ObjectStyle;
-import cn.wjybxx.dson.text.StringStyle;
 import cn.wjybxx.dson.types.ObjectRef;
 import cn.wjybxx.dson.types.OffsetTimestamp;
 import com.google.protobuf.MessageLite;
@@ -58,17 +55,17 @@ public interface DsonLiteWriter extends AutoCloseable {
 
     // region 简单值
 
-    void writeInt32(int name, int value, WireType wireType, INumberStyle style);
+    void writeInt32(int name, int value, WireType wireType);
 
-    void writeInt64(int name, long value, WireType wireType, INumberStyle style);
+    void writeInt64(int name, long value, WireType wireType);
 
-    void writeFloat(int name, float value, INumberStyle style);
+    void writeFloat(int name, float value);
 
-    void writeDouble(int name, double value, INumberStyle style);
+    void writeDouble(int name, double value);
 
     void writeBoolean(int name, boolean value);
 
-    void writeString(int name, String value, StringStyle style);
+    void writeString(int name, String value);
 
     void writeNull(int name);
 
@@ -77,11 +74,11 @@ public interface DsonLiteWriter extends AutoCloseable {
     /** @param chunk 写入chunk的length区域 */
     void writeBinary(int name, int type, Chunk chunk);
 
-    void writeExtInt32(int name, DsonExtInt32 value, WireType wireType, INumberStyle style);
+    void writeExtInt32(int name, DsonExtInt32 value, WireType wireType);
 
-    void writeExtInt64(int name, DsonExtInt64 value, WireType wireType, INumberStyle style);
+    void writeExtInt64(int name, DsonExtInt64 value, WireType wireType);
 
-    void writeExtString(int name, DsonExtString value, StringStyle style);
+    void writeExtString(int name, DsonExtString value);
 
     void writeRef(int name, ObjectRef objectRef);
 
@@ -91,15 +88,15 @@ public interface DsonLiteWriter extends AutoCloseable {
 
     // region 容器
 
-    void writeStartArray(ObjectStyle style);
+    void writeStartArray();
 
     void writeEndArray();
 
-    void writeStartObject(ObjectStyle style);
+    void writeStartObject();
 
     void writeEndObject();
 
-    void writeStartHeader(ObjectStyle style);
+    void writeStartHeader();
 
     void writeEndHeader();
 
@@ -109,16 +106,16 @@ public interface DsonLiteWriter extends AutoCloseable {
      * 2.数组内元素没有名字，因此name传 0 即可
      *
      * <pre>{@code
-     *      writer.writeStartArray(name, ObjectStyle.INDENT);
+     *      writer.writeStartArray(name);
      *      for (String coderName: coderNames) {
      *          writer.writeString(0, coderName);
      *      }
      *      writer.writeEndArray();
      * }</pre>
      */
-    default void writeStartArray(int name, ObjectStyle style) {
+    default void writeStartArray(int name) {
         writeName(name);
-        writeStartArray(style);
+        writeStartArray();
     }
 
     /**
@@ -126,15 +123,15 @@ public interface DsonLiteWriter extends AutoCloseable {
      * 1.可以写入header
      *
      * <pre>{@code
-     *      writer.writeStartObject(name, ObjectStyle.INDENT);
+     *      writer.writeStartObject(name);
      *      writer.writeString("name", "wjybxx")
      *      writer.writeInt32("age", 28)
      *      writer.writeEndObject();
      * }</pre>
      */
-    default void writeStartObject(int name, ObjectStyle style) {
+    default void writeStartObject(int name) {
         writeName(name);
-        writeStartObject(style);
+        writeStartObject();
     }
     // endregion
 

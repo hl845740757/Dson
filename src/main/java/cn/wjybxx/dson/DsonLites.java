@@ -1,8 +1,6 @@
 package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.text.NumberStyle;
 import cn.wjybxx.dson.text.ObjectStyle;
-import cn.wjybxx.dson.text.StringStyle;
 
 import javax.annotation.Nullable;
 
@@ -108,7 +106,7 @@ public class DsonLites {
 
     /** 如果需要写入名字，外部写入 */
     public static void writeObject(DsonLiteWriter writer, DsonObject<FieldNumber> dsonObject, ObjectStyle style) {
-        writer.writeStartObject(style);
+        writer.writeStartObject();
         if (!dsonObject.getHeader().isEmpty()) {
             writeHeader(writer, dsonObject.getHeader());
         }
@@ -137,7 +135,7 @@ public class DsonLites {
 
     /** 如果需要写入名字，外部写入 */
     public static void writeArray(DsonLiteWriter writer, DsonArray<FieldNumber> dsonArray, ObjectStyle style) {
-        writer.writeStartArray(style);
+        writer.writeStartArray();
         if (!dsonArray.getHeader().isEmpty()) {
             writeHeader(writer, dsonArray.getHeader());
         }
@@ -165,7 +163,7 @@ public class DsonLites {
     }
 
     public static void writeHeader(DsonLiteWriter writer, DsonHeader<FieldNumber> header) {
-        writer.writeStartHeader(ObjectStyle.FLOW);
+        writer.writeStartHeader();
         header.getValueMap().forEach((key, value) -> writeDsonValue(writer, value, key.getFullNumber()));
         writer.writeEndHeader();
     }
@@ -191,17 +189,17 @@ public class DsonLites {
             writer.writeName(name);
         }
         switch (dsonValue.getDsonType()) {
-            case INT32 -> writer.writeInt32(name, dsonValue.asInt32().getValue(), WireType.VARINT, NumberStyle.TYPED);
-            case INT64 -> writer.writeInt64(name, dsonValue.asInt64().getValue(), WireType.VARINT, NumberStyle.TYPED);
-            case FLOAT -> writer.writeFloat(name, dsonValue.asFloat().getValue(), NumberStyle.TYPED);
-            case DOUBLE -> writer.writeDouble(name, dsonValue.asDouble().getValue(), NumberStyle.SIMPLE);
+            case INT32 -> writer.writeInt32(name, dsonValue.asInt32().getValue(), WireType.VARINT);
+            case INT64 -> writer.writeInt64(name, dsonValue.asInt64().getValue(), WireType.VARINT);
+            case FLOAT -> writer.writeFloat(name, dsonValue.asFloat().getValue());
+            case DOUBLE -> writer.writeDouble(name, dsonValue.asDouble().getValue());
             case BOOLEAN -> writer.writeBoolean(name, dsonValue.asBoolean().getValue());
-            case STRING -> writer.writeString(name, dsonValue.asString().getValue(), StringStyle.AUTO);
+            case STRING -> writer.writeString(name, dsonValue.asString().getValue());
             case NULL -> writer.writeNull(name);
             case BINARY -> writer.writeBinary(name, dsonValue.asBinary());
-            case EXT_INT32 -> writer.writeExtInt32(name, dsonValue.asExtInt32(), WireType.VARINT, NumberStyle.SIMPLE);
-            case EXT_INT64 -> writer.writeExtInt64(name, dsonValue.asExtInt64(), WireType.VARINT, NumberStyle.SIMPLE);
-            case EXT_STRING -> writer.writeExtString(name, dsonValue.asExtString(), StringStyle.AUTO);
+            case EXT_INT32 -> writer.writeExtInt32(name, dsonValue.asExtInt32(), WireType.VARINT);
+            case EXT_INT64 -> writer.writeExtInt64(name, dsonValue.asExtInt64(), WireType.VARINT);
+            case EXT_STRING -> writer.writeExtString(name, dsonValue.asExtString());
             case REFERENCE -> writer.writeRef(name, dsonValue.asReference().getValue());
             case TIMESTAMP -> writer.writeTimestamp(name, dsonValue.asTimestamp().getValue());
             case HEADER -> writeHeader(writer, dsonValue.asHeaderLite());

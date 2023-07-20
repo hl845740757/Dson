@@ -18,9 +18,6 @@ package cn.wjybxx.dson;
 
 import cn.wjybxx.dson.io.Chunk;
 import cn.wjybxx.dson.io.DsonOutput;
-import cn.wjybxx.dson.text.INumberStyle;
-import cn.wjybxx.dson.text.ObjectStyle;
-import cn.wjybxx.dson.text.StringStyle;
 import cn.wjybxx.dson.types.ObjectRef;
 import cn.wjybxx.dson.types.OffsetTimestamp;
 import com.google.protobuf.MessageLite;
@@ -82,21 +79,21 @@ public class DsonBinaryLiteWriter extends AbstractDsonLiteWriter {
     // region 简单值
 
     @Override
-    protected void doWriteInt32(int value, WireType wireType, INumberStyle style) {
+    protected void doWriteInt32(int value, WireType wireType) {
         DsonOutput output = this.output;
         writeFullTypeAndCurrentName(output, DsonType.INT32, wireType.getNumber());
         wireType.writeInt32(output, value);
     }
 
     @Override
-    protected void doWriteInt64(long value, WireType wireType, INumberStyle style) {
+    protected void doWriteInt64(long value, WireType wireType) {
         DsonOutput output = this.output;
         writeFullTypeAndCurrentName(output, DsonType.INT64, wireType.getNumber());
         wireType.writeInt64(output, value);
     }
 
     @Override
-    protected void doWriteFloat(float value, INumberStyle style) {
+    protected void doWriteFloat(float value) {
         int wireType = DsonReaderUtils.wireTypeOfFloat(value);
         DsonOutput output = this.output;
         writeFullTypeAndCurrentName(output, DsonType.FLOAT, wireType);
@@ -104,7 +101,7 @@ public class DsonBinaryLiteWriter extends AbstractDsonLiteWriter {
     }
 
     @Override
-    protected void doWriteDouble(double value, INumberStyle style) {
+    protected void doWriteDouble(double value) {
         int wireType = DsonReaderUtils.wireTypeOfDouble(value);
         DsonOutput output = this.output;
         writeFullTypeAndCurrentName(output, DsonType.DOUBLE, wireType);
@@ -118,7 +115,7 @@ public class DsonBinaryLiteWriter extends AbstractDsonLiteWriter {
     }
 
     @Override
-    protected void doWriteString(String value, StringStyle style) {
+    protected void doWriteString(String value) {
         DsonOutput output = this.output;
         writeFullTypeAndCurrentName(output, DsonType.STRING, 0);
         output.writeString(value);
@@ -145,21 +142,21 @@ public class DsonBinaryLiteWriter extends AbstractDsonLiteWriter {
     }
 
     @Override
-    protected void doWriteExtInt32(DsonExtInt32 value, WireType wireType, INumberStyle style) {
+    protected void doWriteExtInt32(DsonExtInt32 value, WireType wireType) {
         DsonOutput output = this.output;
         writeFullTypeAndCurrentName(output, DsonType.EXT_INT32, wireType.getNumber());
         DsonReaderUtils.writeExtInt32(output, value, wireType);
     }
 
     @Override
-    protected void doWriteExtInt64(DsonExtInt64 value, WireType wireType, INumberStyle style) {
+    protected void doWriteExtInt64(DsonExtInt64 value, WireType wireType) {
         DsonOutput output = this.output;
         writeFullTypeAndCurrentName(output, DsonType.EXT_INT64, wireType.getNumber());
         DsonReaderUtils.writeExtInt64(output, value, wireType);
     }
 
     @Override
-    protected void doWriteExtString(DsonExtString value, StringStyle style) {
+    protected void doWriteExtString(DsonExtString value) {
         DsonOutput output = this.output;
         writeFullTypeAndCurrentName(output, DsonType.EXT_STRING, DsonReaderUtils.wireTypeOfExtString(value));
         DsonReaderUtils.writeExtString(output, value);
@@ -184,7 +181,7 @@ public class DsonBinaryLiteWriter extends AbstractDsonLiteWriter {
     // region 容器
 
     @Override
-    protected void doWriteStartContainer(DsonContextType contextType, DsonType dsonType, ObjectStyle style) {
+    protected void doWriteStartContainer(DsonContextType contextType, DsonType dsonType) {
         DsonOutput output = this.output;
         writeFullTypeAndCurrentName(output, dsonType, 0);
 

@@ -1,9 +1,6 @@
 package cn.wjybxx.dson;
 
 import cn.wjybxx.dson.io.Chunk;
-import cn.wjybxx.dson.text.INumberStyle;
-import cn.wjybxx.dson.text.ObjectStyle;
-import cn.wjybxx.dson.text.StringStyle;
 import cn.wjybxx.dson.types.ObjectRef;
 import cn.wjybxx.dson.types.OffsetTimestamp;
 import com.google.protobuf.MessageLite;
@@ -42,22 +39,22 @@ public class DsonObjectLiteWriter extends AbstractDsonLiteWriter {
     //
 
     @Override
-    protected void doWriteInt32(int value, WireType wireType, INumberStyle style) {
+    protected void doWriteInt32(int value, WireType wireType) {
         getContext().add(new DsonInt32(value));
     }
 
     @Override
-    protected void doWriteInt64(long value, WireType wireType, INumberStyle style) {
+    protected void doWriteInt64(long value, WireType wireType) {
         getContext().add(new DsonInt64(value));
     }
 
     @Override
-    protected void doWriteFloat(float value, INumberStyle style) {
+    protected void doWriteFloat(float value) {
         getContext().add(new DsonFloat(value));
     }
 
     @Override
-    protected void doWriteDouble(double value, INumberStyle style) {
+    protected void doWriteDouble(double value) {
         getContext().add(new DsonDouble(value));
     }
 
@@ -67,7 +64,7 @@ public class DsonObjectLiteWriter extends AbstractDsonLiteWriter {
     }
 
     @Override
-    protected void doWriteString(String value, StringStyle style) {
+    protected void doWriteString(String value) {
         getContext().add(new DsonString(value));
     }
 
@@ -87,17 +84,17 @@ public class DsonObjectLiteWriter extends AbstractDsonLiteWriter {
     }
 
     @Override
-    protected void doWriteExtInt32(DsonExtInt32 value, WireType wireType, INumberStyle style) {
+    protected void doWriteExtInt32(DsonExtInt32 value, WireType wireType) {
         getContext().add(value); // 不可变对象
     }
 
     @Override
-    protected void doWriteExtInt64(DsonExtInt64 value, WireType wireType, INumberStyle style) {
+    protected void doWriteExtInt64(DsonExtInt64 value, WireType wireType) {
         getContext().add(value);
     }
 
     @Override
-    protected void doWriteExtString(DsonExtString value, StringStyle style) {
+    protected void doWriteExtString(DsonExtString value) {
         getContext().add(value);
     }
 
@@ -112,7 +109,7 @@ public class DsonObjectLiteWriter extends AbstractDsonLiteWriter {
     }
 
     @Override
-    protected void doWriteStartContainer(DsonContextType contextType, DsonType dsonType, ObjectStyle style) {
+    protected void doWriteStartContainer(DsonContextType contextType, DsonType dsonType) {
         Context parent = getContext();
         Context newContext = newContext(parent, contextType, dsonType);
         newContext.container = switch (contextType) {

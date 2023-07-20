@@ -815,6 +815,9 @@ public class DsonTextReader extends AbstractDsonReader {
     protected <T> T doReadMessage(int binaryType, Parser<T> parser) {
         DsonBinary dsonBinary = (DsonBinary) popNextValue();
         Objects.requireNonNull(dsonBinary);
+        if (dsonBinary.getType() != binaryType) {
+            throw DsonIOException.unexpectedSubType(binaryType, dsonBinary.getType());
+        }
         try {
             return parser.parseFrom(dsonBinary.getData());
         } catch (Exception e) {

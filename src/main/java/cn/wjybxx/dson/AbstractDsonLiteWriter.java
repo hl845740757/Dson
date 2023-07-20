@@ -18,9 +18,6 @@ package cn.wjybxx.dson;
 
 import cn.wjybxx.dson.io.Chunk;
 import cn.wjybxx.dson.io.DsonIOException;
-import cn.wjybxx.dson.text.INumberStyle;
-import cn.wjybxx.dson.text.ObjectStyle;
-import cn.wjybxx.dson.text.StringStyle;
 import cn.wjybxx.dson.types.ObjectRef;
 import cn.wjybxx.dson.types.OffsetTimestamp;
 import com.google.protobuf.MessageLite;
@@ -127,30 +124,30 @@ public abstract class AbstractDsonLiteWriter implements DsonLiteWriter {
 
     // region 简单值
     @Override
-    public void writeInt32(int name, int value, WireType wireType, INumberStyle style) {
+    public void writeInt32(int name, int value, WireType wireType) {
         advanceToValueState(name);
-        doWriteInt32(value, wireType, style);
+        doWriteInt32(value, wireType);
         setNextState();
     }
 
     @Override
-    public void writeInt64(int name, long value, WireType wireType, INumberStyle style) {
+    public void writeInt64(int name, long value, WireType wireType) {
         advanceToValueState(name);
-        doWriteInt64(value, wireType, style);
+        doWriteInt64(value, wireType);
         setNextState();
     }
 
     @Override
-    public void writeFloat(int name, float value, INumberStyle style) {
+    public void writeFloat(int name, float value) {
         advanceToValueState(name);
-        doWriteFloat(value, style);
+        doWriteFloat(value);
         setNextState();
     }
 
     @Override
-    public void writeDouble(int name, double value, INumberStyle style) {
+    public void writeDouble(int name, double value) {
         advanceToValueState(name);
-        doWriteDouble(value, style);
+        doWriteDouble(value);
         setNextState();
     }
 
@@ -162,10 +159,10 @@ public abstract class AbstractDsonLiteWriter implements DsonLiteWriter {
     }
 
     @Override
-    public void writeString(int name, String value, StringStyle style) {
+    public void writeString(int name, String value) {
         Objects.requireNonNull(value);
         advanceToValueState(name);
-        doWriteString(value, style);
+        doWriteString(value);
         setNextState();
     }
 
@@ -195,26 +192,26 @@ public abstract class AbstractDsonLiteWriter implements DsonLiteWriter {
     }
 
     @Override
-    public void writeExtInt32(int name, DsonExtInt32 value, WireType wireType, INumberStyle style) {
+    public void writeExtInt32(int name, DsonExtInt32 value, WireType wireType) {
         Objects.requireNonNull(value);
         advanceToValueState(name);
-        doWriteExtInt32(value, wireType, style);
+        doWriteExtInt32(value, wireType);
         setNextState();
     }
 
     @Override
-    public void writeExtInt64(int name, DsonExtInt64 value, WireType wireType, INumberStyle style) {
+    public void writeExtInt64(int name, DsonExtInt64 value, WireType wireType) {
         Objects.requireNonNull(value);
         advanceToValueState(name);
-        doWriteExtInt64(value, wireType, style);
+        doWriteExtInt64(value, wireType);
         setNextState();
     }
 
     @Override
-    public void writeExtString(int name, DsonExtString value, StringStyle style) {
+    public void writeExtString(int name, DsonExtString value) {
         Objects.requireNonNull(value);
         advanceToValueState(name);
-        doWriteExtString(value, style);
+        doWriteExtString(value);
         setNextState();
     }
 
@@ -234,17 +231,17 @@ public abstract class AbstractDsonLiteWriter implements DsonLiteWriter {
         setNextState();
     }
 
-    protected abstract void doWriteInt32(int value, WireType wireType, INumberStyle style);
+    protected abstract void doWriteInt32(int value, WireType wireType);
 
-    protected abstract void doWriteInt64(long value, WireType wireType, INumberStyle style);
+    protected abstract void doWriteInt64(long value, WireType wireType);
 
-    protected abstract void doWriteFloat(float value, INumberStyle style);
+    protected abstract void doWriteFloat(float value);
 
-    protected abstract void doWriteDouble(double value, INumberStyle style);
+    protected abstract void doWriteDouble(double value);
 
     protected abstract void doWriteBool(boolean value);
 
-    protected abstract void doWriteString(String value, StringStyle style);
+    protected abstract void doWriteString(String value);
 
     protected abstract void doWriteNull();
 
@@ -252,11 +249,11 @@ public abstract class AbstractDsonLiteWriter implements DsonLiteWriter {
 
     protected abstract void doWriteBinary(int type, Chunk chunk);
 
-    protected abstract void doWriteExtInt32(DsonExtInt32 value, WireType wireType, INumberStyle style);
+    protected abstract void doWriteExtInt32(DsonExtInt32 value, WireType wireType);
 
-    protected abstract void doWriteExtInt64(DsonExtInt64 value, WireType wireType, INumberStyle style);
+    protected abstract void doWriteExtInt64(DsonExtInt64 value, WireType wireType);
 
-    protected abstract void doWriteExtString(DsonExtString value, StringStyle style);
+    protected abstract void doWriteExtString(DsonExtString value);
 
     protected abstract void doWriteRef(ObjectRef objectRef);
 
@@ -266,8 +263,8 @@ public abstract class AbstractDsonLiteWriter implements DsonLiteWriter {
 
     // region 容器
     @Override
-    public void writeStartArray(ObjectStyle style) {
-        writeStartContainer(DsonContextType.ARRAY, DsonType.ARRAY, style);
+    public void writeStartArray() {
+        writeStartContainer(DsonContextType.ARRAY, DsonType.ARRAY);
     }
 
     @Override
@@ -276,8 +273,8 @@ public abstract class AbstractDsonLiteWriter implements DsonLiteWriter {
     }
 
     @Override
-    public void writeStartObject(ObjectStyle style) {
-        writeStartContainer(DsonContextType.OBJECT, DsonType.OBJECT, style);
+    public void writeStartObject() {
+        writeStartContainer(DsonContextType.OBJECT, DsonType.OBJECT);
     }
 
     @Override
@@ -286,13 +283,13 @@ public abstract class AbstractDsonLiteWriter implements DsonLiteWriter {
     }
 
     @Override
-    public void writeStartHeader(ObjectStyle style) {
+    public void writeStartHeader() {
         // object下默认是name状态
         Context context = this.context;
         if (context.contextType == DsonContextType.OBJECT && context.state == DsonWriterState.NAME) {
             context.setState(DsonWriterState.VALUE);
         }
-        writeStartContainer(DsonContextType.HEADER, DsonType.HEADER, style);
+        writeStartContainer(DsonContextType.HEADER, DsonType.HEADER);
     }
 
     @Override
@@ -300,15 +297,14 @@ public abstract class AbstractDsonLiteWriter implements DsonLiteWriter {
         writeEndContainer(DsonContextType.HEADER, DsonWriterState.NAME);
     }
 
-    private void writeStartContainer(DsonContextType contextType, DsonType dsonType, ObjectStyle style) {
-        Objects.requireNonNull(style);
+    private void writeStartContainer(DsonContextType contextType, DsonType dsonType) {
         if (recursionDepth >= recursionLimit) {
             throw DsonIOException.recursionLimitExceeded();
         }
         Context context = this.context;
         autoStartTopLevel(context);
         ensureValueState(context);
-        doWriteStartContainer(contextType, dsonType, style);
+        doWriteStartContainer(contextType, dsonType);
         setNextState(); // 设置新上下文状态
     }
 
@@ -336,7 +332,7 @@ public abstract class AbstractDsonLiteWriter implements DsonLiteWriter {
     }
 
     /** 写入类型信息，创建新上下文，压入上下文 */
-    protected abstract void doWriteStartContainer(DsonContextType contextType, DsonType dsonType, ObjectStyle style);
+    protected abstract void doWriteStartContainer(DsonContextType contextType, DsonType dsonType);
 
     /** 弹出上下文 */
     protected abstract void doWriteEndContainer();
