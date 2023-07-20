@@ -25,30 +25,7 @@ import java.io.StringWriter;
 import java.util.Properties;
 
 /**
- * <h3>Object编码</h3>
- * Lite版本：
- * <pre>
- *  length  [dsonType + wireType] +  [number  +  idep] + [length] + [subType] + [data] ...
- *  4Bytes    5 bits     3 bits       1~13 bits  3 bits   4 Bytes    1 Byte     0~n Bytes
- *  数据长度     1 Byte(unit8)           1 ~ 3 Byte          int32
- * </pre>
- * 1. 数组元素没有fullNumber
- * 2. fullNumber为uint32类型，1~3个字节
- * 3. 固定长度的属性类型没有length字段
- * 4. 数字没有length字段
- * 5. string是length是uint32变长编码。
- * 6. extInt32、extInt64和extString都是两个简单值的连续写入，subType采用uint32编码，value采用对应值类型的编码，extString的length不包含subType。
- * 7. binary的subType现固定1个Byte，以减小复杂度和节省开销。
- * 8. binary/Object/Array/header的length为fixed32编码，以方便扩展 - binary的length包含subType。
- * 9. header是object/array的一个匿名属性，在object中是没有字段id但有类型的值。
- * <p>
- * 普通版：
- * <pre>
- *  length  [dsonType + wireType] +  [length + name] +  [length] + [subType] + [data] ...
- *  4Bytes    5 bits     3 bits           nBytes         4 Bytes    1 Byte    0~n Bytes
- *  数据长度     1 Byte(unit8)             string          int32
- * </pre>
- * 其实就一个区别：普通版字段id采用String类型，而Lite版编码采用number类型。
+ * dson的辅助工具类，二进制流工具类{@link DsonLites}
  *
  * @author wjybxx
  * date - 2023/4/19
@@ -330,6 +307,24 @@ public final class Dsons {
             return readTopDsonValue(reader);
         }
     }
+
+    /** 获取dsonValue的localId -- dson的约定之一 */
+    public static String getLocalId(DsonValue dsonValue) {
+        DsonHeader<?> header;
+        if (dsonValue instanceof DsonObject<?> dsonObject) {
+            header = dsonObject.getHeader();
+        } else if (dsonValue instanceof DsonArray<?> dsonArray) {
+            header = dsonArray.getHeader();
+        } else {
+            return null;
+        }
+        DsonValue wrapped = header.get(DsonHeader.NAMES_LOCAL_ID);
+        return wrapped instanceof DsonString dsonString ? dsonString.getValue() : null;
+    }
+
+    // endregion
+
+    // region 工厂方法
 
     public static DsonScanner newStringScanner(CharSequence dsonString) {
         return new DsonScanner(DsonCharStream.newCharStream(dsonString, false));

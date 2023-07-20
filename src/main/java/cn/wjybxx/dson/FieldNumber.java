@@ -38,7 +38,7 @@ public final class FieldNumber implements Comparable<FieldNumber> {
         if (idep < 0 || idep > DsonLites.IDEP_MAX_VALUE) {
             throw invalidArgs(idep, lnumber);
         }
-        if (lnumber < 0 || lnumber > DsonLites.LNUMBER_MAX_VALUE) {
+        if (lnumber < 0) {
             throw invalidArgs(idep, lnumber);
         }
         this.lnumber = lnumber;

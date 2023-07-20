@@ -48,7 +48,7 @@ public class DsonRepository {
         }
         valueList.add(value);
 
-        String localId = getLocalId(value);
+        String localId = Dsons.getLocalId(value);
         if (localId != null) {
             DsonValue exist = indexMap.put(localId, value);
             if (exist != null) {
@@ -60,7 +60,7 @@ public class DsonRepository {
 
     public DsonValue remove(int idx) {
         DsonValue dsonValue = valueList.remove(idx);
-        String localId = getLocalId(dsonValue);
+        String localId = Dsons.getLocalId(dsonValue);
         if (localId != null) {
             indexMap.remove(localId);
         }
@@ -128,19 +128,6 @@ public class DsonRepository {
     }
 
     //
-
-    private static String getLocalId(DsonValue dsonValue) {
-        DsonHeader<?> header;
-        if (dsonValue instanceof DsonObject<?> dsonObject) {
-            header = dsonObject.getHeader();
-        } else if (dsonValue instanceof DsonArray<?> dsonArray) {
-            header = dsonArray.getHeader();
-        } else {
-            return null;
-        }
-        DsonValue wrapped = header.get(DsonHeader.NAMES_LOCAL_ID);
-        return wrapped instanceof DsonString dsonString ? dsonString.getValue() : null;
-    }
 
     public static DsonRepository fromDson(String dsonString) {
         return fromDson(dsonString, false);

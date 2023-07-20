@@ -5,6 +5,8 @@ import cn.wjybxx.dson.text.ObjectStyle;
 import javax.annotation.Nullable;
 
 /**
+ * Dson二进制流工具类
+ *
  * @author wjybxx
  * date - 2023/6/15
  */
@@ -21,7 +23,7 @@ public class DsonLites {
     public static final int IDEP_MAX_VALUE = IDEP_MASK;
 
     /** 类字段最大number */
-    public static final short LNUMBER_MAX_VALUE = 8191;
+    private static final short LNUMBER_MAX_VALUE = 8191;
     /** 类字段占用的最大比特位数 - 暂不对外开放 */
     private static final int LNUMBER_MAX_BITS = 13;
 
