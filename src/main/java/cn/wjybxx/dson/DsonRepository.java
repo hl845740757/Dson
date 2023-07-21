@@ -147,4 +147,26 @@ public class DsonRepository {
         return repository;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        DsonRepository that = (DsonRepository) o;
+
+        return valueList.equals(that.valueList);
+    }
+
+    @Override
+    public int hashCode() {
+        return valueList.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "DsonRepository{" +
+                "valueList=" + valueList +
+                '}';
+    }
+
 }
