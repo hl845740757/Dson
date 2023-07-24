@@ -60,8 +60,11 @@ public interface DsonInput extends AutoCloseable {
     long readFixed64();
 
     //
+
+    /** 该接口默认序列化为4字节 */
     float readFloat();
 
+    /** 该接口默认序列化为8字节 */
     double readDouble();
 
     boolean readBool();
@@ -75,7 +78,7 @@ public interface DsonInput extends AutoCloseable {
     /**
      * 读取一个protoBuf消息，内容部分没有size
      */
-    <T> T readMessageNoSize(@Nonnull Parser<T> parser);
+    <T> T readMessage(@Nonnull Parser<T> parser);
 
     /** 当前读索引位置 - 已读字节数 */
     int getPosition();

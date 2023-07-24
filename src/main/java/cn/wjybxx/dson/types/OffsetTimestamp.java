@@ -189,14 +189,16 @@ public final class OffsetTimestamp {
         StringBuilder sb = new StringBuilder();
         sb.append("OffsetTimestamp{");
         if (hasDate()) {
-            sb.append("date: '").append(formatDate(seconds))
-                    .append("', ");
+            sb.append("date: '").append(formatDate(seconds));
         }
         if (hasTime()) {
-            sb.append("time: '").append(formatTime(seconds))
-                    .append("', ");
+            if (hasDate()) {
+                sb.append(", ");
+            }
+            sb.append("time: '").append(formatTime(seconds));
         }
         if (nanos != 0) {
+            sb.append(", ");
             if (canConvertNanosToMillis()) {
                 sb.append("millis: ").append(getMillisOfNanos());
             } else {

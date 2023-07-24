@@ -198,7 +198,7 @@ public class DsonOutputs {
         }
 
         @Override
-        public void writeMessageNoSize(MessageLite value) {
+        public void writeMessage(MessageLite value) {
             try {
                 value.writeTo(codedOutputStream);
             } catch (IOException e) {

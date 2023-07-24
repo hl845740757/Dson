@@ -67,8 +67,8 @@ public interface DsonOutput extends AutoCloseable {
 
     void writeRawBytes(byte[] value, int offset, int length);
 
-    /** 只写入message的内容部分，不写长度 */
-    void writeMessageNoSize(MessageLite value);
+    /** 只写入message的内容部分 */
+    void writeMessage(MessageLite value);
 
     /** 当前写索引位置 - 已写字节数 */
     int getPosition();

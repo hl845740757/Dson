@@ -124,19 +124,15 @@ public class DsonReaderUtils {
 
     // region binary
 
-    public static int computeSizeOfBinaryType(int type) {
-        return CodedOutputStream.computeUInt32SizeNoTag(type);
-    }
-
     public static void writeBinary(DsonOutput output, DsonBinary binary) {
-        int sizeOfBinaryType = computeSizeOfBinaryType(binary.getType());
+        int sizeOfBinaryType = CodedOutputStream.computeUInt32SizeNoTag(binary.getType());
         output.writeFixed32(sizeOfBinaryType + binary.getData().length);
         output.writeUint32(binary.getType());
         output.writeRawBytes(binary.getData());
     }
 
     public static void writeBinary(DsonOutput output, int type, Chunk chunk) {
-        int sizeOfBinaryType = computeSizeOfBinaryType(type);
+        int sizeOfBinaryType = CodedOutputStream.computeUInt32SizeNoTag(type);
         output.writeFixed32(sizeOfBinaryType + chunk.getLength());
         output.writeUint32(type);
         output.writeRawBytes(chunk.getBuffer(), chunk.getOffset(), chunk.getLength());
@@ -144,27 +140,33 @@ public class DsonReaderUtils {
 
     public static DsonBinary readDsonBinary(DsonInput input) {
         int size = input.readFixed32();
-        int type = input.readUint32();
-        int dataLength = size - computeSizeOfBinaryType(type);
-        return new DsonBinary(type,
-                input.readRawBytes(dataLength));
+        int oldLimit = input.pushLimit(size);
+        DsonBinary binary;
+        {
+            int type = input.readUint32();
+            int dataLength = input.getBytesUntilLimit();
+            binary = new DsonBinary(type, input.readRawBytes(dataLength));
+        }
+        input.popLimit(oldLimit);
+        return binary;
     }
 
     public static void writeMessage(DsonOutput output, int binaryType, MessageLite messageLite) {
-        int sizeOfBinaryType = computeSizeOfBinaryType(binaryType);
+        int sizeOfBinaryType = CodedOutputStream.computeUInt32SizeNoTag(binaryType);
         output.writeFixed32(sizeOfBinaryType + messageLite.getSerializedSize()); // getSerializedSize总是会执行，因此这里调用不会增加开销
         output.writeUint32(binaryType);
-        output.writeMessageNoSize(messageLite);
+        output.writeMessage(messageLite);
     }
 
     public static <T> T readMessage(DsonInput input, int binaryType, Parser<T> parser) {
         int size = input.readFixed32();
         int oldLimit = input.pushLimit(size);
-        int type = input.readUint32();
-        if (type != binaryType) {
-            throw DsonIOException.unexpectedSubType(binaryType, type);
+        T value;
+        {
+            int type = input.readUint32();
+            if (type != binaryType) throw DsonIOException.unexpectedSubType(binaryType, type);
+            value = input.readMessage(parser);
         }
-        T value = input.readMessageNoSize(parser);
         input.popLimit(oldLimit);
         return value;
     }

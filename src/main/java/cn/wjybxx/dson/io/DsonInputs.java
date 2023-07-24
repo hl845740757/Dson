@@ -201,7 +201,7 @@ public class DsonInputs {
         }
 
         @Override
-        public <T> T readMessageNoSize(@Nonnull Parser<T> parser) {
+        public <T> T readMessage(@Nonnull Parser<T> parser) {
             try {
                 return parser.parseFrom(codedInputStream, EMPTY_REGISTRY);
             } catch (InvalidProtocolBufferException e) {
