@@ -16,11 +16,11 @@
 
 package cn.wjybxx.dson.internal;
 
-import cn.wjybxx.dson.DsonValue;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
-import java.util.*;
+import java.util.Objects;
+import java.util.Properties;
 
 /**
  * 存放一些基础的工具方法，不想定义过多的小类，减少维护量
@@ -30,16 +30,18 @@ import java.util.*;
  */
 public class InternalUtils {
 
-    public static final int POLICY_DEFAULT = 0;
-    public static final int POLICY_COPY = 1;
-    public static final int POLICY_IMMUTABLE = 2;
-
     /**
      * 如果给定参数为null，则返回给定的默认值，否则返回值本身
      * {@link Objects#requireNonNullElse(Object, Object)}不允许def为null
      */
     public static <V> V nullToDef(V obj, V def) {
         return obj == null ? def : obj;
+    }
+
+    public static void recoveryInterrupt(Throwable ex) {
+        if (ex instanceof InterruptedException) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     // region properties
@@ -65,42 +67,11 @@ public class InternalUtils {
 
     // endregion
 
-    // region immutable
-
-    /** @param policy 策略：0.直接持有 1.可变拷贝 2.不可变拷贝 */
-    public static <K> Map<K, DsonValue> resolveMapPolicy(Map<K, DsonValue> valueMap, int policy) {
-        Objects.requireNonNull(valueMap, "valueMap");
-        if (policy == 1) {
-            return new LinkedHashMap<>(valueMap);
-        } else if (policy == 2) {
-            return Collections.unmodifiableMap(new LinkedHashMap<>(valueMap));
-        } else {
-            return valueMap;
-        }
-    }
-
-    /** @param policy 策略：0.直接持有 1.可变拷贝 2.不可变拷贝 */
-    public static List<DsonValue> resolveListPolicy(List<DsonValue> values, int policy) {
-        Objects.requireNonNull(values, "values");
-        if (policy == 1) {
-            return new ArrayList<>(values);
-        } else if (policy == 2) {
-            return List.copyOf(values);
-        } else {
-            return values;
-        }
-    }
-
-    // endregion
-
-    public static void recoveryInterrupt(Throwable ex) {
-        if (ex instanceof InterruptedException) {
-            Thread.currentThread().interrupt();
-        }
-    }
+    // region bits
 
     public static boolean isEnabled(int value, int mask) {
         return (value & mask) == mask;
     }
 
+    // endregion
 }

@@ -16,7 +16,7 @@
 
 package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.internal.InternalUtils;
+import cn.wjybxx.dson.internal.ValuesPolicy;
 
 import javax.annotation.Nonnull;
 import java.util.LinkedHashMap;
@@ -32,37 +32,35 @@ public class DsonObject<K> extends AbstractDsonObject<K> {
     private final DsonHeader<K> header;
 
     public DsonObject() {
-        this(new LinkedHashMap<>(8), InternalUtils.POLICY_DEFAULT, new DsonHeader<>());
+        this(new LinkedHashMap<>(8), ValuesPolicy.SOURCE, new DsonHeader<>());
     }
 
     public DsonObject(int expectedSize) {
-        this(new LinkedHashMap<>(expectedSize), InternalUtils.POLICY_DEFAULT, new DsonHeader<>());
+        this(new LinkedHashMap<>(expectedSize), ValuesPolicy.SOURCE, new DsonHeader<>());
     }
 
     public DsonObject(int expectedSize, DsonHeader<K> header) {
-        this(new LinkedHashMap<>(expectedSize), InternalUtils.POLICY_DEFAULT, header);
+        this(new LinkedHashMap<>(expectedSize), ValuesPolicy.SOURCE, header);
     }
 
     public DsonObject(DsonObject<K> src) {
-        this(src.valueMap, InternalUtils.POLICY_COPY, new DsonHeader<>(src.getHeader()));
+        this(src.valueMap, ValuesPolicy.COPY, new DsonHeader<>(src.getHeader()));
     }
 
-    private DsonObject(Map<K, DsonValue> valueMap, int policy, DsonHeader<K> header) {
+    private DsonObject(Map<K, DsonValue> valueMap, ValuesPolicy policy, DsonHeader<K> header) {
         super(valueMap, policy);
         this.header = Objects.requireNonNull(header);
     }
 
     //
-    private static final DsonObject<?> EMPTY = new DsonObject<>(Map.of(), InternalUtils.POLICY_IMMUTABLE,
-            DsonHeader.empty());
+    private static final DsonObject<?> EMPTY = new DsonObject<>(Map.of(), ValuesPolicy.IMMUTABLE, DsonHeader.empty());
 
     /**
      * 创建一个禁止修改的DsonObject
      * 暂时未实现为深度的不可变，存在一些困难，主要是相互引用的问题
      */
     public static <K> DsonObject<K> toImmutable(DsonObject<K> src) {
-        return new DsonObject<>(src.valueMap, InternalUtils.POLICY_IMMUTABLE,
-                DsonHeader.toImmutable(src.getHeader()));
+        return new DsonObject<>(src.valueMap, ValuesPolicy.IMMUTABLE, DsonHeader.toImmutable(src.getHeader()));
     }
 
     @SuppressWarnings("unchecked")

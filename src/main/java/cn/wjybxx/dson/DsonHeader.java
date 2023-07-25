@@ -16,7 +16,7 @@
 
 package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.internal.InternalUtils;
+import cn.wjybxx.dson.internal.ValuesPolicy;
 
 import javax.annotation.Nonnull;
 import java.util.LinkedHashMap;
@@ -33,23 +33,23 @@ import java.util.Map;
 public class DsonHeader<K> extends AbstractDsonObject<K> {
 
     public DsonHeader() {
-        super(new LinkedHashMap<>(4), InternalUtils.POLICY_DEFAULT);
+        super(new LinkedHashMap<>(4), ValuesPolicy.SOURCE);
     }
 
     public DsonHeader(Map<K, DsonValue> valueMap) {
-        super(valueMap, InternalUtils.POLICY_COPY);
+        super(valueMap, ValuesPolicy.COPY);
     }
 
-    private DsonHeader(Map<K, DsonValue> valueMap, int policy) {
+    private DsonHeader(Map<K, DsonValue> valueMap, ValuesPolicy policy) {
         super(valueMap, policy);
     }
 
     public static <K> DsonHeader<K> toImmutable(DsonHeader<K> src) {
-        return new DsonHeader<>(src.valueMap, InternalUtils.POLICY_IMMUTABLE);
+        return new DsonHeader<>(src.valueMap, ValuesPolicy.IMMUTABLE);
     }
 
     public static <K> DsonHeader<K> empty() {
-        return new DsonHeader<>(Map.of(), InternalUtils.POLICY_IMMUTABLE);
+        return new DsonHeader<>(Map.of(), ValuesPolicy.IMMUTABLE);
     }
 
     //

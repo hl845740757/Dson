@@ -16,7 +16,7 @@
 
 package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.internal.InternalUtils;
+import cn.wjybxx.dson.internal.ValuesPolicy;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -33,33 +33,31 @@ public class DsonArray<K> extends AbstractDsonArray implements RandomAccess {
     private final DsonHeader<K> header;
 
     public DsonArray() {
-        this(new ArrayList<>(), InternalUtils.POLICY_DEFAULT, new DsonHeader<>());
+        this(new ArrayList<>(), ValuesPolicy.SOURCE, new DsonHeader<>());
     }
 
     public DsonArray(int initCapacity) {
-        this(new ArrayList<>(initCapacity), InternalUtils.POLICY_DEFAULT, new DsonHeader<>());
+        this(new ArrayList<>(initCapacity), ValuesPolicy.SOURCE, new DsonHeader<>());
     }
 
     public DsonArray(int initCapacity, DsonHeader<K> header) {
-        this(new ArrayList<>(initCapacity), InternalUtils.POLICY_DEFAULT, header);
+        this(new ArrayList<>(initCapacity), ValuesPolicy.SOURCE, header);
     }
 
     public DsonArray(DsonArray<K> src) {
-        this(src.values, InternalUtils.POLICY_COPY, new DsonHeader<>(src.getHeader()));
+        this(src.values, ValuesPolicy.COPY, new DsonHeader<>(src.getHeader()));
     }
 
-    private DsonArray(List<DsonValue> values, int policy, DsonHeader<K> header) {
+    private DsonArray(List<DsonValue> values, ValuesPolicy policy, DsonHeader<K> header) {
         super(values, policy);
         this.header = Objects.requireNonNull(header);
     }
 
     //
-    private static final DsonArray<?> EMPTY = new DsonArray<>(List.of(), InternalUtils.POLICY_IMMUTABLE,
-            DsonHeader.empty());
+    private static final DsonArray<?> EMPTY = new DsonArray<>(List.of(), ValuesPolicy.IMMUTABLE, DsonHeader.empty());
 
     public static <K> DsonArray<K> toImmutable(DsonArray<K> src) {
-        return new DsonArray<>(src.values, InternalUtils.POLICY_IMMUTABLE,
-                DsonHeader.toImmutable(src.getHeader()));
+        return new DsonArray<>(src.values, ValuesPolicy.IMMUTABLE, DsonHeader.toImmutable(src.getHeader()));
     }
 
     @SuppressWarnings("unchecked")

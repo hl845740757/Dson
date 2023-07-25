@@ -43,17 +43,18 @@ public final class OffsetTimestamp {
      * @param enables 哪些字段有效
      */
     public OffsetTimestamp(long seconds, int nanos, int offset, int enables) {
-        if (!InternalUtils.isEnabled(enables, MASK_DATE)
-                && !InternalUtils.isEnabled(enables, MASK_TIME)) {
+        if (!InternalUtils.isEnabled(enables, MASK_DATE) && !InternalUtils.isEnabled(enables, MASK_TIME)) {
             throw new IllegalArgumentException("date and time are disabled");
         }
         if (offset != 0 && !InternalUtils.isEnabled(enables, MASK_OFFSET)) {
             throw new IllegalArgumentException("offset is disabled, but the value is not 0");
         }
+        if (nanos != 0 && InternalUtils.isEnabled(enables, MASK_NANOS)) {
+            throw new IllegalArgumentException("nanos is disabled, but the value is not 0");
+        }
         if (nanos > 999_999_999 || nanos < 0) {
             throw new IllegalArgumentException("nanos > 999999999 or < 0");
         }
-
         this.seconds = seconds;
         this.nanos = nanos;
         this.offset = offset;

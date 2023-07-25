@@ -1,7 +1,7 @@
 package cn.wjybxx.dson;
 
 import cn.wjybxx.dson.internal.CollectionUtils;
-import cn.wjybxx.dson.internal.InternalUtils;
+import cn.wjybxx.dson.internal.ValuesPolicy;
 
 import java.util.*;
 
@@ -13,8 +13,9 @@ public abstract class AbstractDsonObject<K> extends DsonValue implements Map<K, 
 
     final Map<K, DsonValue> valueMap;
 
-    AbstractDsonObject(Map<K, DsonValue> valueMap, int policy) {
-        this.valueMap = InternalUtils.resolveMapPolicy(valueMap, policy);
+    AbstractDsonObject(Map<K, DsonValue> valueMap, ValuesPolicy policy) {
+        Objects.requireNonNull(valueMap);
+        this.valueMap = policy.applyMap(valueMap);
     }
 
     public Map<K, DsonValue> getValueMap() {

@@ -1,6 +1,6 @@
 package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.internal.InternalUtils;
+import cn.wjybxx.dson.internal.ValuesPolicy;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -16,8 +16,9 @@ public abstract class AbstractDsonArray extends DsonValue implements List<DsonVa
 
     final List<DsonValue> values;
 
-    AbstractDsonArray(List<DsonValue> values, int policy) {
-        this.values = InternalUtils.resolveListPolicy(values, policy);
+    AbstractDsonArray(List<DsonValue> values, ValuesPolicy policy) {
+        Objects.requireNonNull(values);
+        this.values = policy.applyList(values);
     }
 
     public List<DsonValue> getValues() {
