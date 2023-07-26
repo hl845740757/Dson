@@ -244,11 +244,9 @@ public class DsonObjectLiteReader extends AbstractDsonLiteReader {
         Context context = getContext();
         context.header = null;
         if (context.arrayIterator != null) {
-            context.arrayIterator.forEachRemaining(dsonValue -> {
-            });
+            context.arrayIterator.forEachRemaining(dsonValue -> {});
         } else {
-            context.objectIterator.forEachRemaining(e -> {
-            });
+            context.objectIterator.forEachRemaining(e -> {});
         }
     }
 
@@ -306,13 +304,11 @@ public class DsonObjectLiteReader extends AbstractDsonLiteReader {
         }
 
         public DsonValue nextValue() {
-            return arrayIterator.hasNext()
-                    ? arrayIterator.next() : null;
+            return arrayIterator.hasNext() ? arrayIterator.next() : null;
         }
 
         public Map.Entry<FieldNumber, DsonValue> nextElement() {
-            return objectIterator.hasNext()
-                    ? objectIterator.next() : null;
+            return objectIterator.hasNext() ? objectIterator.next() : null;
         }
 
     }

@@ -73,5 +73,9 @@ public class InternalUtils {
         return (value & mask) == mask;
     }
 
+    public static boolean isDisabled(int value, int mask) {
+        return (value & mask) != mask;
+    }
+
     // endregion
 }

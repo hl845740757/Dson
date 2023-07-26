@@ -55,7 +55,7 @@ public final class ObjectRef {
 
     public ObjectRef(String localId, String namespace, int type, int policy) {
         this.localId = InternalUtils.nullToDef(localId, "");
-        this.namespace = namespace;
+        this.namespace = InternalUtils.nullToDef(namespace, "");
         this.type = type;
         this.policy = policy;
     }

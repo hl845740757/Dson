@@ -59,6 +59,7 @@ public interface DsonOutput extends AutoCloseable {
 
     void writeBool(boolean value);
 
+    /** 由output写入string的长度，且长度字段需要使用uint32编码 */
     void writeString(String value);
 
     default void writeRawBytes(byte[] value) {
@@ -67,7 +68,7 @@ public interface DsonOutput extends AutoCloseable {
 
     void writeRawBytes(byte[] value, int offset, int length);
 
-    /** 只写入message的内容部分 */
+    /** 只写入message的内容部分，不包含长度信息 */
     void writeMessage(MessageLite value);
 
     /** 当前写索引位置 - 已写字节数 */

@@ -42,8 +42,9 @@ public class DsonReaderUtils {
     // region number
 
     /**
-     * 浮点数的前16位固定写入，因此只统计后16位
-     * wireType表示后导0对应的字节数
+     * 1.浮点数的前16位固定写入，因此只统计后16位
+     * 2.wireType表示后导0对应的字节数
+     * 3.由于编码依赖了上层的wireType比特位，因此不能写在Output接口中
      */
     public static int wireTypeOfFloat(float value) {
         int rawBits = Float.floatToRawIntBits(value);
@@ -78,7 +79,6 @@ public class DsonReaderUtils {
 
     /**
      * 浮点数的前16位固定写入，因此只统计后48位
-     * wireType表示后导0对应的字节数
      */
     public static int wireTypeOfDouble(double value) {
         long rawBits = Double.doubleToRawLongBits(value);
