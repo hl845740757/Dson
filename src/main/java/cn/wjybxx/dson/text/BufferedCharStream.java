@@ -83,7 +83,7 @@ final class BufferedCharStream extends AbstractCharStream {
     }
 
     @Override
-    protected void checkUnreadOverFlow(LineInfo line, int position) {
+    protected void checkUnreadOverFlow(int position) {
         int ridx = position - bufferStartPos;
         if (ridx < 0 || ridx >= buffer.widx) {
             throw bufferOverFlow(position);

@@ -60,8 +60,15 @@ public class DsonTextReader extends AbstractDsonReader {
     /** 未声明为DsonValue，避免再拆装箱 */
     private Object nextValue;
 
+    private boolean marking;
+    private final ArrayDeque<DsonToken> markedTokenQueue = new ArrayDeque<>(6);
+
     public DsonTextReader(int recursionLimit, CharSequence dson) {
         this(recursionLimit, new DsonScanner(DsonCharStream.newCharStream(dson)));
+    }
+
+    public DsonTextReader(int recursionLimit, DsonCharStream charStream) {
+        this(recursionLimit, new DsonScanner(charStream));
     }
 
     public DsonTextReader(int recursionLimit, DsonScanner scanner) {
@@ -80,18 +87,22 @@ public class DsonTextReader extends AbstractDsonReader {
     }
 
     @Override
-    public Context getContext() {
+    protected Context getContext() {
         return (Context) super.getContext();
     }
 
     @Override
-    public Context getPooledContext() {
+    protected Context getPooledContext() {
         return (Context) super.getPooledContext();
     }
 
     private DsonToken popToken() {
         if (pushedTokenQueue.isEmpty()) {
-            return scanner.nextToken();
+            DsonToken dsonToken = scanner.nextToken();
+            if (marking) {
+                markedTokenQueue.addLast(dsonToken);
+            }
+            return dsonToken;
         } else {
             return pushedTokenQueue.pop();
         }
@@ -122,6 +133,14 @@ public class DsonTextReader extends AbstractDsonReader {
         return r;
     }
 
+    /**
+     * 用于动态指定成员数据类型
+     * 辅助方法见：{@link DsonTexts#clsNameTokenOfType(DsonType)}
+     */
+    public void setCompClsNameToken(DsonToken dsonToken) {
+        getContext().compClsNameToken = dsonToken;
+    }
+
     // region state
 
     @Override
@@ -140,6 +159,29 @@ public class DsonTextReader extends AbstractDsonReader {
         } else {
             context.count++;
         }
+        return dsonType;
+    }
+
+    @Override
+    public DsonType peekDsonType() {
+        Context context = this.getContext();
+        checkReadDsonTypeState(context);
+
+        ArrayDeque<DsonToken> pushedTokenQueue = this.pushedTokenQueue;
+        ArrayDeque<DsonToken> markedTokenQueue = this.markedTokenQueue;
+
+        marking = true;
+        markedTokenQueue.addAll(pushedTokenQueue); // 保存既有token
+
+        DsonType dsonType = readDsonTypeOfToken();
+        popNextName();
+        popNextValue();
+
+        pushedTokenQueue.clear();
+        pushedTokenQueue.addAll(markedTokenQueue);
+        markedTokenQueue.clear();
+        marking = false;
+
         return dsonType;
     }
 

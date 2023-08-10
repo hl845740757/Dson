@@ -30,6 +30,9 @@ public enum StringStyle implements IStyle {
      */
     AUTO,
 
+    /** 自动加引号模式 -- 优先无引号，如果不可以无引号则加引号 */
+    AUTO_QUOTE,
+
     /** 双引号模式 -- 内容可能包含特殊字符，且想保持流式输入 */
     QUOTE,
 

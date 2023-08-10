@@ -16,6 +16,7 @@
 
 package cn.wjybxx.dson.text;
 
+import cn.wjybxx.dson.DsonType;
 import cn.wjybxx.dson.io.DsonIOException;
 import org.apache.commons.lang3.math.NumberUtils;
 
@@ -353,4 +354,22 @@ public class DsonTexts {
         return c == ' ' || c == '\t';
     }
 
+    public static DsonToken clsNameTokenOfType(DsonType dsonType) {
+        return switch (dsonType) {
+            case INT32 -> new DsonToken(TokenType.CLASS_NAME, LABEL_INT32, -1);
+            case INT64 -> new DsonToken(TokenType.CLASS_NAME, LABEL_INT64, -1);
+            case FLOAT -> new DsonToken(TokenType.CLASS_NAME, LABEL_FLOAT, -1);
+            case DOUBLE -> new DsonToken(TokenType.CLASS_NAME, LABEL_DOUBLE, -1);
+            case BOOLEAN -> new DsonToken(TokenType.CLASS_NAME, LABEL_BOOL, -1);
+            case STRING -> new DsonToken(TokenType.CLASS_NAME, LABEL_STRING, -1);
+            case NULL -> new DsonToken(TokenType.CLASS_NAME, LABEL_NULL, -1);
+            case BINARY -> new DsonToken(TokenType.CLASS_NAME, LABEL_BINARY, -1);
+            case EXT_INT32 -> new DsonToken(TokenType.CLASS_NAME, LABEL_EXTINT32, -1);
+            case EXT_INT64 -> new DsonToken(TokenType.CLASS_NAME, LABEL_EXTINT64, -1);
+            case EXT_STRING -> new DsonToken(TokenType.CLASS_NAME, LABEL_EXTSTRING, -1);
+            case REFERENCE -> new DsonToken(TokenType.CLASS_NAME, LABEL_REFERENCE, -1);
+            case TIMESTAMP -> new DsonToken(TokenType.CLASS_NAME, LABEL_DATETIME, -1);
+            default -> throw new IllegalArgumentException();
+        };
+    }
 }

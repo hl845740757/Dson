@@ -37,12 +37,12 @@ public class DsonBinaryLiteWriter extends AbstractDsonLiteWriter {
     }
 
     @Override
-    public Context getContext() {
+    protected Context getContext() {
         return (Context) super.getContext();
     }
 
     @Override
-    public Context getPooledContext() {
+    protected Context getPooledContext() {
         return (Context) super.getPooledContext();
     }
 

@@ -53,6 +53,13 @@ public interface DsonReader extends AutoCloseable {
      */
     DsonType readDsonType();
 
+    /**
+     * 查看下一个值的类型
+     * 1.该方法对于解码很有帮助，最常见的作用是判断是否写入了header
+     * 2.不论是否支持mark和reset，定义该方法都是必要的，以允许实现类以最小的代价实现
+     */
+    DsonType peekDsonType();
+
     /** 当前是否处于应该读取name状态 */
     boolean isAtName();
 

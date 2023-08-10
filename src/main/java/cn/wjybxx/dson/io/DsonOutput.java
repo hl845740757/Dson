@@ -16,11 +16,10 @@
 
 package cn.wjybxx.dson.io;
 
-import com.google.protobuf.CodedOutputStream;
 import com.google.protobuf.MessageLite;
 
 /**
- * 对{@link CodedOutputStream}的封装，屏蔽转义一些接口，以及扩展功能。
+ * 接口约定以小端编码数字
  * 通过{@link DsonOutputs}的静态方法创建实例
  *
  * @author wjybxx
@@ -74,7 +73,11 @@ public interface DsonOutput extends AutoCloseable {
     /** 当前写索引位置 - 已写字节数 */
     int getPosition();
 
-    /** 设置写索引位置 */
+    /**
+     * 设置写索引位置
+     *
+     * @throws IllegalArgumentException 如果设置到目标位置
+     */
     void setPosition(final int writerIndex);
 
     /**

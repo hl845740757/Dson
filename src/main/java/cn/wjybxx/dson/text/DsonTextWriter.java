@@ -47,12 +47,12 @@ public class DsonTextWriter extends AbstractDsonWriter {
     }
 
     @Override
-    public Context getContext() {
+    protected Context getContext() {
         return (Context) super.getContext();
     }
 
     @Override
-    public Context getPooledContext() {
+    protected Context getPooledContext() {
         return (Context) super.getPooledContext();
     }
 
@@ -110,18 +110,10 @@ public class DsonTextWriter extends AbstractDsonWriter {
             printer.print(' ');
         }
         if (context.contextType.isLikeObject()) {
-            printStringNoSS(printer, context.curName);
+            printString(printer, context.curName, StringStyle.AUTO_QUOTE);
             printer.printFastPath(": ");
         }
         context.count++;
-    }
-
-    private void printStringNoSS(DsonPrinter printer, String text) {
-        if (canPrintAsUnquote(text, settings)) {
-            printer.printFastPath(text);
-        } else {
-            printEscaped(text);
-        }
     }
 
     private void printString(DsonPrinter printer, String value, StringStyle style) {
@@ -132,6 +124,13 @@ public class DsonTextWriter extends AbstractDsonWriter {
                     printer.printFastPath(value);
                 } else if (canPrintAsText(value, settings)) {
                     printText(value);
+                } else {
+                    printEscaped(value);
+                }
+            }
+            case AUTO_QUOTE -> {
+                if (canPrintAsUnquote(value, settings)) {
+                    printer.printFastPath(value);
                 } else {
                     printEscaped(value);
                 }
@@ -149,6 +148,7 @@ public class DsonTextWriter extends AbstractDsonWriter {
                     printEscaped(value);
                 }
             }
+            default -> throw new AssertionError(style);
         }
     }
 
@@ -375,7 +375,7 @@ public class DsonTextWriter extends AbstractDsonWriter {
         if (StringUtils.isBlank(objectRef.getNamespace())
                 && objectRef.getType() == 0 && objectRef.getPolicy() == 0) {
             printer.printFastPath("@ref ");
-            printStringNoSS(printer, objectRef.getLocalId());
+            printString(printer, objectRef.getLocalId(), StringStyle.AUTO_QUOTE);
             return;
         }
 
@@ -385,14 +385,14 @@ public class DsonTextWriter extends AbstractDsonWriter {
             count++;
             printer.printFastPath(ObjectRef.NAMES_NAMESPACE);
             printer.printFastPath(": ");
-            printStringNoSS(printer, objectRef.getNamespace());
+            printString(printer, objectRef.getNamespace(), StringStyle.AUTO_QUOTE);
         }
         if (objectRef.hasLocalId()) {
             if (count++ > 0) printer.printFastPath(", ");
             checkLineLength(printer, softLineLength, LheadType.APPEND_LINE);
             printer.printFastPath(ObjectRef.NAMES_LOCAL_ID);
             printer.printFastPath(": ");
-            printStringNoSS(printer, objectRef.getLocalId());
+            printString(printer, objectRef.getLocalId(), StringStyle.AUTO_QUOTE);
         }
         if (objectRef.getType() != 0) {
             if (count++ > 0) printer.printFastPath(", ");
@@ -497,6 +497,30 @@ public class DsonTextWriter extends AbstractDsonWriter {
     // endregion
 
     // region 特殊接口
+
+    @Override
+    public void writeSimpleHeader(String clsName) {
+        Context context = getContext();
+        if (!canPrintAsUnquote(clsName, settings)) {
+            super.writeSimpleHeader(clsName);
+            return;
+        }
+        if (context.contextType == DsonContextType.OBJECT && context.state == DsonWriterState.NAME) {
+            context.setState(DsonWriterState.VALUE);
+        }
+        autoStartTopLevel(context);
+        ensureValueState(context);
+
+        DsonPrinter printer = this.printer;
+        writeCurrentName(printer, DsonType.HEADER);
+
+        printer.print('@');
+        printer.printFastPath(clsName);
+        if (context.style != ObjectStyle.INDENT) {
+            printer.print(' ');
+        }
+        setNextState();
+    }
 
     @Override
     protected void doWriteMessage(int binaryType, MessageLite messageLite) {

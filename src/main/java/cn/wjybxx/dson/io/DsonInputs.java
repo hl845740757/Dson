@@ -281,6 +281,13 @@ public class DsonInputs {
         }
 
         @Override
+        public byte getByte(int readerIndex) {
+            int newOffset = offset + readerIndex;
+            BinaryUtils.checkBuffer(buffer, newOffset, 1);
+            return buffer[newOffset];
+        }
+
+        @Override
         public int getFixed32(int readerIndex) {
             int newOffset = offset + readerIndex;
             BinaryUtils.checkBuffer(buffer, newOffset, 4);
@@ -318,6 +325,12 @@ public class DsonInputs {
             BinaryUtils.position(byteBuffer, newOffset);
             codedInputStream = CodedInputStream.newInstance(byteBuffer);
             codedInputStreamOffset = newOffset;
+        }
+
+        @Override
+        public byte getByte(int readerIndex) {
+            int newOffset = offset + readerIndex;
+            return byteBuffer.get(newOffset);
         }
 
         @Override

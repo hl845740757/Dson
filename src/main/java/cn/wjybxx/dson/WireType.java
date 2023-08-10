@@ -129,29 +129,6 @@ public enum WireType {
         public long readInt64(DsonInput input) {
             return input.readFixed64();
         }
-    },
-
-    /** 按照8位有符号整数编码 */
-    BYTE(4) {
-        @Override
-        public void writeInt32(DsonOutput output, int value) {
-            output.writeRawByte((byte) value);
-        }
-
-        @Override
-        public int readInt32(DsonInput input) {
-            return input.readRawByte();
-        }
-
-        @Override
-        public void writeInt64(DsonOutput output, long value) {
-            output.writeRawByte((byte) value);
-        }
-
-        @Override
-        public long readInt64(DsonInput input) {
-            return input.readRawByte();
-        }
     };
 
     private final int number;
@@ -172,7 +149,6 @@ public enum WireType {
             case 1 -> UINT;
             case 2 -> SINT;
             case 3 -> FIXED;
-            case 4 -> BYTE;
             default -> throw new IllegalArgumentException("invalid wireType " + number);
         };
     }

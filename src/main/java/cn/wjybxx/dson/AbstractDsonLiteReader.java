@@ -52,19 +52,19 @@ public abstract class AbstractDsonLiteReader implements DsonLiteReader {
         this.recursionLimit = recursionLimit;
     }
 
-    public Context getContext() {
+    protected Context getContext() {
         return context;
     }
 
-    public void setContext(Context context) {
+    protected void setContext(Context context) {
         this.context = context;
     }
 
-    public Context getPooledContext() {
+    protected Context getPooledContext() {
         return pooledContext;
     }
 
-    public void setPooledContext(Context pooledContext) {
+    protected void setPooledContext(Context pooledContext) {
         this.pooledContext = pooledContext;
     }
 
@@ -175,14 +175,16 @@ public abstract class AbstractDsonLiteReader implements DsonLiteReader {
     /** 前进到读值状态 */
     protected void advanceToValueState(int name, @Nullable DsonType requiredType) {
         Context context = this.context;
-        if (context.state == DsonReaderState.TYPE) {
-            readDsonType();
-        }
-        if (context.state == DsonReaderState.NAME) {
-            readName(name);
-        }
         if (context.state != DsonReaderState.VALUE) {
-            throw invalidState(List.of(DsonReaderState.VALUE));
+            if (context.state == DsonReaderState.TYPE) {
+                readDsonType();
+            }
+            if (context.state == DsonReaderState.NAME) {
+                readName(name);
+            }
+            if (context.state != DsonReaderState.VALUE) {
+                throw invalidState(List.of(DsonReaderState.VALUE));
+            }
         }
         if (requiredType != null && currentDsonType != requiredType) {
             throw DsonIOException.dsonTypeMismatch(requiredType, currentDsonType);
@@ -419,6 +421,7 @@ public abstract class AbstractDsonLiteReader implements DsonLiteReader {
         }
     }
 
+    /** 限用于读取容器后恢复上下文 */
     protected void recoverDsonType(Context context) {
         this.currentDsonType = Objects.requireNonNull(context.dsonType);
         this.currentWireType = WireType.VARINT;

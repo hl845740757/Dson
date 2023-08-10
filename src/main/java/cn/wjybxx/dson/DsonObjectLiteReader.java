@@ -16,12 +16,12 @@
 
 package cn.wjybxx.dson;
 
+import cn.wjybxx.dson.internal.MarkableIterator;
 import cn.wjybxx.dson.types.ObjectRef;
 import cn.wjybxx.dson.types.OffsetTimestamp;
 import com.google.protobuf.Parser;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 
@@ -38,17 +38,17 @@ public class DsonObjectLiteReader extends AbstractDsonLiteReader {
         super(recursionLimit);
         Context context = new Context();
         context.init(null, DsonContextType.TOP_LEVEL, null);
-        context.arrayIterator = dsonArray.iterator();
+        context.arrayIterator = new MarkableIterator<>(dsonArray.iterator());
         setContext(context);
     }
 
     @Override
-    public Context getContext() {
+    protected Context getContext() {
         return (Context) super.getContext();
     }
 
     @Override
-    public Context getPooledContext() {
+    protected Context getPooledContext() {
         return (Context) super.getPooledContext();
     }
 
@@ -112,6 +112,30 @@ public class DsonObjectLiteReader extends AbstractDsonLiteReader {
 
         onReadDsonType(context, dsonType);
         return dsonType;
+    }
+
+    @Override
+    public DsonType peekDsonType() {
+        Context context = this.getContext();
+        checkReadDsonTypeState(context);
+
+        if (context.header != null) {
+            return DsonType.HEADER;
+        }
+        if (!context.hasNext()) {
+            return DsonType.END_OF_OBJECT;
+        }
+        if (context.contextType.isLikeArray()) {
+            context.markItr();
+            DsonValue nextValue = context.nextValue();
+            context.resetItr();
+            return nextValue.getDsonType();
+        } else {
+            context.markItr();
+            Map.Entry<FieldNumber, DsonValue> nextElement = context.nextElement();
+            context.resetItr();
+            return nextElement.getValue().getDsonType();
+        }
     }
 
     @Override
@@ -199,14 +223,14 @@ public class DsonObjectLiteReader extends AbstractDsonLiteReader {
         if (dsonValue.getDsonType() == DsonType.OBJECT) {
             DsonObject<FieldNumber> dsonObject = dsonValue.asObjectLite();
             newContext.header = dsonObject.getHeader();
-            newContext.objectIterator = dsonObject.entrySet().iterator();
+            newContext.objectIterator = new MarkableIterator<>(dsonObject.entrySet().iterator());
         } else if (dsonValue.getDsonType() == DsonType.ARRAY) {
             DsonArray<FieldNumber> dsonArray = dsonValue.asArrayLite();
             newContext.header = dsonArray.getHeader();
-            newContext.arrayIterator = dsonArray.iterator();
+            newContext.arrayIterator = new MarkableIterator<>(dsonArray.iterator());
         } else {
             // 其它内置结构体
-            newContext.objectIterator = dsonValue.asHeaderLite().entrySet().iterator();
+            newContext.objectIterator = new MarkableIterator<>(dsonValue.asHeaderLite().entrySet().iterator());
         }
         newContext.name = currentName;
 
@@ -290,8 +314,8 @@ public class DsonObjectLiteReader extends AbstractDsonLiteReader {
 
         /** 如果不为null，则表示需要先读取header */
         private DsonHeader<FieldNumber> header;
-        private Iterator<Map.Entry<FieldNumber, DsonValue>> objectIterator;
-        private Iterator<DsonValue> arrayIterator;
+        private MarkableIterator<Map.Entry<FieldNumber, DsonValue>> objectIterator;
+        private MarkableIterator<DsonValue> arrayIterator;
 
         public Context() {
         }
@@ -301,6 +325,30 @@ public class DsonObjectLiteReader extends AbstractDsonLiteReader {
             header = null;
             objectIterator = null;
             arrayIterator = null;
+        }
+
+        public boolean hasNext() {
+            if (objectIterator != null) {
+                return objectIterator.hasNext();
+            } else {
+                return arrayIterator.hasNext();
+            }
+        }
+
+        public void markItr() {
+            if (objectIterator != null) {
+                objectIterator.mark();
+            } else {
+                arrayIterator.mark();
+            }
+        }
+
+        public void resetItr() {
+            if (objectIterator != null) {
+                objectIterator.reset();
+            } else {
+                arrayIterator.reset();
+            }
         }
 
         public DsonValue nextValue() {

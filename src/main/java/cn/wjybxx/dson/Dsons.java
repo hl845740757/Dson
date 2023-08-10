@@ -48,18 +48,6 @@ public final class Dsons {
     public static final int FULL_TYPE_BITS = DSON_TYPE_BITES + WIRETYPE_BITS;
     public static final int FULL_TYPE_MASK = (1 << FULL_TYPE_BITS) - 1;
 
-    /** 可内联的最小数 */
-    public static final int FLOAT_INLINE_MIN = -3;
-    /** 可内联的最大数 -- 可内联7个数 */
-    public static final int FLOAT_INLINE_MAX = FLOAT_INLINE_MIN + 6;
-    /** 内联数的offset -- 最小值映射为1 */
-    public static final int FLOAT_INLINE_OFFSET = 1 - FLOAT_INLINE_MIN;
-
-    /** 二进制类型内联的最小值 -- 由于binary的type为小数值的情况占大部分情况，因此将其内联是有意义的 */
-    public static final int BINARY_INLINE_MIN = 0;
-    /** 二进制类型内联的最大值 */
-    public static final int BINARY_INLINE_MAX = 6;
-
     /**
      * 在文档数据解码中是否启用 字段字符串池化
      * 启用池化在大量相同字段名时可能很好地降低内存占用，默认开启
@@ -203,6 +191,13 @@ public final class Dsons {
     }
 
     public static void writeHeader(DsonWriter writer, DsonHeader<String> header) {
+        if (header.size() == 1) {
+            DsonValue clsName = header.get(DsonHeader.NAMES_CLASS_NAME);
+            if (clsName != null) {
+                writer.writeSimpleHeader(clsName.asString().getValue());
+                return;
+            }
+        }
         writer.writeStartHeader(ObjectStyle.FLOW);
         header.getValueMap().forEach((key, value) -> writeDsonValue(writer, value, key));
         writer.writeEndHeader();
@@ -335,7 +330,7 @@ public final class Dsons {
      *
      * @param jsonLike 是否像json一样没有行首
      */
-    public static DsonScanner newStringScanner(String dsonString, boolean jsonLike) {
+    public static DsonScanner newStringScanner(CharSequence dsonString, boolean jsonLike) {
         return new DsonScanner(DsonCharStream.newCharStream(dsonString, jsonLike));
     }
 

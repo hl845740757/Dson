@@ -39,10 +39,6 @@ public class DsonObject<K> extends AbstractDsonObject<K> {
         this(new LinkedHashMap<>(expectedSize), ValuesPolicy.SOURCE, new DsonHeader<>());
     }
 
-    public DsonObject(int expectedSize, DsonHeader<K> header) {
-        this(new LinkedHashMap<>(expectedSize), ValuesPolicy.SOURCE, header);
-    }
-
     public DsonObject(DsonObject<K> src) {
         this(src.valueMap, ValuesPolicy.COPY, new DsonHeader<>(src.getHeader()));
     }

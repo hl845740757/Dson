@@ -49,8 +49,10 @@ final class CharSequenceCharStream extends AbstractCharStream {
     }
 
     @Override
-    protected void checkUnreadOverFlow(LineInfo line, int position) {
-
+    protected void checkUnreadOverFlow(int position) {
+        if (position < 0 || position >= buffer.length()) {
+            throw bufferOverFlow(position);
+        }
     }
 
     @Override

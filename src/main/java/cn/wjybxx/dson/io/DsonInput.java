@@ -16,13 +16,11 @@
 
 package cn.wjybxx.dson.io;
 
-import com.google.protobuf.CodedInputStream;
 import com.google.protobuf.Parser;
 
 import javax.annotation.Nonnull;
 
 /**
- * {@link CodedInputStream}的封装，屏蔽转义一些接口。
  * 通过{@link DsonInputs}的静态方法创建实例
  *
  * @author wjybxx
@@ -32,11 +30,7 @@ public interface DsonInput extends AutoCloseable {
 
     byte readRawByte();
 
-    /**
-     * 将一个byte读取为正整数
-     *
-     * @implNote 子类实现必须与默认实现等价
-     */
+    /** 将一个byte读取为正整数 */
     default int readUint8() {
         return Byte.toUnsignedInt(readRawByte());
     }
@@ -83,8 +77,20 @@ public interface DsonInput extends AutoCloseable {
     /** 当前读索引位置 - 已读字节数 */
     int getPosition();
 
-    /** 设置读索引位置 */
+    /**
+     * 设置读索引位置
+     *
+     * @throws IllegalArgumentException 如果设置到目标位置
+     */
     void setPosition(int readerIndex);
+
+    default byte getByte(int readerIndex) {
+        int oldPosition = getPosition();
+        setPosition(readerIndex);
+        byte value = readRawByte();
+        setPosition(oldPosition);
+        return value;
+    }
 
     /**
      * 从指定位置读取一个fix32类型整数

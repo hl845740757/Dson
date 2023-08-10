@@ -74,7 +74,6 @@ public class DsonHeader<K> extends AbstractDsonObject<K> {
     public static final String NAMES_COMP_CLASS_NAME = "compClsName";
     public static final String NAMES_CLASS_ID = "clsId";
     public static final String NAMES_COMP_CLASS_ID = "compClsId";
-    public static final String NAMES_GUID = "guid";
     public static final String NAMES_LOCAL_ID = "localId";
     public static final String NAMES_TAGS = "tags";
 
@@ -82,8 +81,7 @@ public class DsonHeader<K> extends AbstractDsonObject<K> {
     public static final int NUMBERS_COMP_CLASS_NAME = DsonLites.makeFullNumberZeroIdep(1);
     public static final int NUMBERS_CLASS_ID = DsonLites.makeFullNumberZeroIdep(2);
     public static final int NUMBERS_COMP_CLASS_ID = DsonLites.makeFullNumberZeroIdep(3);
-    public static final int NUMBERS_GUID = DsonLites.makeFullNumberZeroIdep(4);
-    public static final int NUMBERS_LOCAL_ID = DsonLites.makeFullNumberZeroIdep(5);
-    public static final int NUMBERS_TAGS = DsonLites.makeFullNumberZeroIdep(6);
+    public static final int NUMBERS_LOCAL_ID = DsonLites.makeFullNumberZeroIdep(4);
+    public static final int NUMBERS_TAGS = DsonLites.makeFullNumberZeroIdep(5);
 
 }

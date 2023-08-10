@@ -27,7 +27,7 @@ package cn.wjybxx.dson;
  */
 public enum DsonWriterState {
 
-    /** 底层上下文初始状态 */
+    /** 顶层上下文初始状态 */
     INITIAL,
 
     /**

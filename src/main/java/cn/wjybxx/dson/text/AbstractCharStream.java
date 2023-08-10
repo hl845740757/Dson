@@ -138,7 +138,7 @@ public abstract class AbstractCharStream implements DsonCharStream {
         LineInfo curLine = this.curLine;
         if (readingContent) {
             if (position > curLine.contentStartPos) {
-                checkUnreadOverFlow(curLine, position - 1);
+                checkUnreadOverFlow(position - 1);
                 position--;
             } else {
                 readingContent = false;
@@ -150,9 +150,9 @@ public abstract class AbstractCharStream implements DsonCharStream {
         if (index > 0) {
             LineInfo preLine = lines.get(index - 1);
             if (preLine.hasContent()) {
-                checkUnreadOverFlow(preLine, preLine.lastReadablePosition());
+                checkUnreadOverFlow(preLine.lastReadablePosition());
             } else {
-                checkUnreadOverFlow(preLine, preLine.startPos);
+                checkUnreadOverFlow(preLine.startPos);
             }
             onBackToPreLine(preLine);
             return -2;
@@ -234,10 +234,9 @@ public abstract class AbstractCharStream implements DsonCharStream {
     /**
      * 检测是否可以回退到指定位置
      *
-     * @param line 当前行或前一行
      * @throws DsonParseException 如果不可回退到指定位置
      */
-    protected abstract void checkUnreadOverFlow(LineInfo line, int position);
+    protected abstract void checkUnreadOverFlow(int position);
 
     /**
      * @param line 要扫描的行，可能是当前行，也可能是下一行

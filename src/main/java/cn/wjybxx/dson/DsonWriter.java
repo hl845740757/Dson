@@ -24,6 +24,8 @@ import cn.wjybxx.dson.types.ObjectRef;
 import cn.wjybxx.dson.types.OffsetTimestamp;
 import com.google.protobuf.MessageLite;
 
+import java.util.Objects;
+
 /**
  * 1.写数组普通元素的时候，{@code name}传null，写嵌套对象时使用无name参数的start方法（实在不想定义太多的方法）
  * 2.double、boolean、null由于可以从无符号字符串精确解析得出，因此可以总是不输出类型标签，
@@ -135,6 +137,14 @@ public interface DsonWriter extends AutoCloseable {
     // endregion
 
     // region 特殊支持
+
+    /** 仅有一个clsName属性的header */
+    default void writeSimpleHeader(String clsName) {
+        Objects.requireNonNull(clsName, "clsName");
+        writeStartHeader(ObjectStyle.FLOW);
+        writeString(DsonHeader.NAMES_CLASS_NAME, clsName, StringStyle.AUTO_QUOTE);
+        writeEndHeader();
+    }
 
     /**
      * Message最终会写为Binary

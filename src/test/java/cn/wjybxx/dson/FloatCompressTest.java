@@ -62,7 +62,7 @@ public class FloatCompressTest {
                 Assertions.assertEquals(v, v2);
             }
         }
-        System.out.println("float totalSize: %d, saved: %d".formatted(totalSize, (4 * COUNT - totalSize)));
+        System.out.printf("float totalSize: %d, saved: %d%n", totalSize, (4 * COUNT - totalSize));
     }
 
     @Test
@@ -88,7 +88,7 @@ public class FloatCompressTest {
                 Assertions.assertEquals(v, v2);
             }
         }
-        System.out.println("double totalSize: %d, saved: %d".formatted(totalSize, (8 * COUNT - totalSize)));
+        System.out.printf("double totalSize: %d, saved: %d%n", totalSize, (8 * COUNT - totalSize));
     }
 
 }

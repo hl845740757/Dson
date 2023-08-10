@@ -40,10 +40,6 @@ public class DsonArray<K> extends AbstractDsonArray implements RandomAccess {
         this(new ArrayList<>(initCapacity), ValuesPolicy.SOURCE, new DsonHeader<>());
     }
 
-    public DsonArray(int initCapacity, DsonHeader<K> header) {
-        this(new ArrayList<>(initCapacity), ValuesPolicy.SOURCE, header);
-    }
-
     public DsonArray(DsonArray<K> src) {
         this(src.values, ValuesPolicy.COPY, new DsonHeader<>(src.getHeader()));
     }

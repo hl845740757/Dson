@@ -41,19 +41,19 @@ public abstract class AbstractDsonLiteWriter implements DsonLiteWriter {
         this.recursionLimit = recursionLimit;
     }
 
-    public Context getContext() {
+    protected Context getContext() {
         return context;
     }
 
-    public void setContext(Context context) {
+    protected void setContext(Context context) {
         this.context = context;
     }
 
-    public Context getPooledContext() {
+    protected Context getPooledContext() {
         return pooledContext;
     }
 
-    public void setPooledContext(Context pooledContext) {
+    protected void setPooledContext(Context pooledContext) {
         this.pooledContext = pooledContext;
     }
 
@@ -315,14 +315,14 @@ public abstract class AbstractDsonLiteWriter implements DsonLiteWriter {
         setNextState(); // parent前进一个状态
     }
 
-    private void autoStartTopLevel(Context context) {
+    protected void autoStartTopLevel(Context context) {
         if (context.contextType == DsonContextType.TOP_LEVEL
                 && context.state == DsonWriterState.INITIAL) {
             context.setState(DsonWriterState.VALUE);
         }
     }
 
-    private void checkEndContext(Context context, DsonContextType contextType, DsonWriterState state) {
+    protected void checkEndContext(Context context, DsonContextType contextType, DsonWriterState state) {
         if (context.contextType != contextType) {
             throw DsonIOException.contextError(contextType, context.contextType);
         }

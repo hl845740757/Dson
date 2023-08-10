@@ -66,10 +66,6 @@ public class DsonCodecTest {
             obj1.put("fv" + j, new DsonFloat(RandomUtils.nextFloat()));
             obj1.put("dv" + j, new DsonDouble(RandomUtils.nextDouble()));
         }
-        // 测试浮点数内联
-        for (int j = 0; j < 7; j++) {
-            obj1.put("ifv" + j, new DsonFloat(j + Dsons.FLOAT_INLINE_MIN));
-        }
         return obj1;
     }
 

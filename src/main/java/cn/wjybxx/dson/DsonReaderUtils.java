@@ -59,6 +59,11 @@ public class DsonReaderUtils {
 
     /** 小端编码，从末尾非0开始写入 */
     public static void writeFloat(DsonOutput output, float value, int wireType) {
+        if (wireType == 0) {
+            output.writeFloat(value);
+            return;
+        }
+
         int rawBits = Float.floatToRawIntBits(value);
         for (int i = 0; i < wireType; i++) {
             rawBits = rawBits >>> 8;
@@ -70,6 +75,10 @@ public class DsonReaderUtils {
     }
 
     public static float readFloat(DsonInput input, int wireType) {
+        if (wireType == 0) {
+            return input.readFloat();
+        }
+
         int rawBits = 0;
         for (int i = wireType; i < 4; i++) {
             rawBits |= (input.readRawByte() & 0XFF) << (8 * i);
@@ -93,6 +102,11 @@ public class DsonReaderUtils {
     }
 
     public static void writeDouble(DsonOutput output, double value, int wireType) {
+        if (wireType == 0) {
+            output.writeDouble(value);
+            return;
+        }
+
         long rawBits = Double.doubleToRawLongBits(value);
         for (int i = 0; i < wireType; i++) {
             rawBits = rawBits >>> 8;
@@ -104,6 +118,10 @@ public class DsonReaderUtils {
     }
 
     public static double readDouble(DsonInput input, int wireType) {
+        if (wireType == 0) {
+            return input.readDouble();
+        }
+
         long rawBits = 0;
         for (int i = wireType; i < 8; i++) {
             rawBits |= (input.readRawByte() & 0XFFL) << (8 * i);

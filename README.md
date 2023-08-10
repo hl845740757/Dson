@@ -60,7 +60,7 @@ PS：Dson的文本格式从设计到最终实现大概1个月时间，尝试了�
    - {@{clsName: MyClassInfo, guid: 10001, flags: 0}
    -   name: wjybxx,
    -   age: 28,
-   -   pos: {@{clsName: Vector3}
+   -   pos: {@Vector3
    -     x: 0,
    -     y: 0,
    -     z: 0
@@ -117,7 +117,7 @@ Dson支持的值类型和内置结构体包括：
 | es  | extString | 11 | *<b>带类型标签的string</b>* | {<br> int32 type;<br> string value <br>}                                             | 格式固定二元数组 \[@es type, value] <br> - \[@es 10, <br/>- @ss ^\[\\u4e00-\\u9fa5_a-zA-Z0-9]+$ <br/> ~ ]             |
 | ref | reference | 12 | 引用                    | {<br> string namespace;<br> string localId;<br> int32 type; <br> int32 policy; <br>} | 格式为单值 '@ref localId' 格式或 object格式 <br/> @ref abcdefg <br> {@ref namespace: wjybxx, localId: abcdefg, type: 0} |
 | dt  | datetime  | 13 | 日期时间                  | { <br>  int64 seconds; <br> int32 nanos;<br> int32 offset;<br> int32 enables; <br> } | 无需引号<br/> {@dt date: 2023-06-17, time: 18:37:00, offset: +08:00, millis: 100}                                 |
-|     | header    | 29 | 对象头                   |                                                                                      | 对象形式： @{ } <br/> 简写形式： @clsName                                                                               |
+|     | header    | 29 | 对象头                   |                                                                                      | 对象形式： @{clsName: Vector3 } <br/> 简写形式： @Vector3                                                               |
 |     | array     | 30 | 数组                    |                                                                                      | \[ 1, 2, 3, 4, 5 ]                                                                                            |
 |     | object    | 31 | 对象/结构体                |                                                                                      | { name: wjybxx, age: 28 }                                                                                     |
 
@@ -438,7 +438,7 @@ Dson主要解决的问题有三个：
       # java maven坐标
       <groupId>cn.wjybxx.dson</groupId>
       <artifactId>dson-core</artifactId>
-      <version>1.0.1</version>
+      <version>1.0.2</version>
    ```  
 2. C#
 

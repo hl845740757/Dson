@@ -46,12 +46,12 @@ public class DsonBinaryLiteReader extends AbstractDsonLiteReader {
     }
 
     @Override
-    public Context getContext() {
+    protected Context getContext() {
         return (Context) super.getContext();
     }
 
     @Override
-    public Context getPooledContext() {
+    protected Context getPooledContext() {
         return (Context) super.getPooledContext();
     }
 
@@ -62,7 +62,7 @@ public class DsonBinaryLiteReader extends AbstractDsonLiteReader {
         Context context = this.getContext();
         checkReadDsonTypeState(context);
 
-        final int fullType = input.isAtEnd() ? 0 : input.readUint8();
+        final int fullType = input.isAtEnd() ? 0 : Byte.toUnsignedInt(input.readRawByte());
         final int wreTypeBits = Dsons.wireTypeOfFullType(fullType);
         DsonType dsonType = DsonType.forNumber(Dsons.dsonTypeOfFullType(fullType));
         WireType wireType = dsonType.hasWireType() ? WireType.forNumber(wreTypeBits) : WireType.VARINT;
@@ -73,6 +73,15 @@ public class DsonBinaryLiteReader extends AbstractDsonLiteReader {
 
         onReadDsonType(context, dsonType);
         return dsonType;
+    }
+
+    @Override
+    public DsonType peekDsonType() {
+        Context context = this.getContext();
+        checkReadDsonTypeState(context);
+
+        final int fullType = input.isAtEnd() ? 0 : Byte.toUnsignedInt(input.getByte(input.getPosition()));
+        return DsonType.forNumber(Dsons.dsonTypeOfFullType(fullType));
     }
 
     @Override
