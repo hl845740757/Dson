@@ -277,7 +277,12 @@ public final class Dsons {
     }
 
     public static String toDson(DsonValue dsonValue, ObjectStyle style) {
-        return toDson(dsonValue, style, DsonTextWriterSettings.newBuilder().build());
+        return toDson(dsonValue, style, DsonTextWriterSettings.DEFAULT);
+    }
+
+    /** @param jsonLike 是否打印为类json模式（无行首） */
+    public static String toDson(DsonValue dsonValue, ObjectStyle style, boolean jsonLike) {
+        return toDson(dsonValue, style, jsonLike ? DsonTextWriterSettings.JSON_DEFAULT : DsonTextWriterSettings.DEFAULT);
     }
 
     public static String toDson(DsonValue dsonValue, ObjectStyle style, DsonTextWriterSettings settings) {
@@ -297,6 +302,7 @@ public final class Dsons {
         }
     }
 
+    /** @param jsonString json字符串或无行首的dson字符串 */
     public static DsonValue fromJson(CharSequence jsonString) {
         try (DsonTextReader reader = new DsonTextReader(32, newJsonScanner(jsonString))) {
             return readTopDsonValue(reader);

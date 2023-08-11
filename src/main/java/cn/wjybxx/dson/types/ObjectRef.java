@@ -123,7 +123,7 @@ public final class ObjectRef {
     }
 
     // ref常见属性名
-    public static final String NAMES_NAMESPACE = "namespace";
+    public static final String NAMES_NAMESPACE = "ns";
     public static final String NAMES_LOCAL_ID = "localId";
     public static final String NAMES_TYPE = "type";
     public static final String NAMES_POLICY = "policy";

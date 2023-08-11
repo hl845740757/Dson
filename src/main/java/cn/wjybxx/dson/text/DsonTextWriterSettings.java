@@ -26,8 +26,13 @@ import java.util.Objects;
 @Immutable
 public class DsonTextWriterSettings {
 
+    public static final DsonTextWriterSettings DEFAULT = DsonTextWriterSettings.newBuilder().build();
+    public static final DsonTextWriterSettings JSON_DEFAULT = DsonTextWriterSettings.newBuilder().setJsonLike(true).build();
+
     public final String lineSeparator;
     public final int softLineLength;
+    public final boolean jsonLike;
+
     public final boolean enableText;
     public final float lengthFactorOfText;
     public final boolean unicodeChar;
@@ -36,7 +41,9 @@ public class DsonTextWriterSettings {
     private DsonTextWriterSettings(Builder builder) {
         this.lineSeparator = Objects.requireNonNull(builder.lineSeparator);
         this.softLineLength = Math.max(8, builder.softLineLength);
-        this.enableText = builder.enableText;
+        this.jsonLike = builder.jsonLike;
+
+        this.enableText = !jsonLike && builder.enableText; // 启用类json模式下禁用文本模式
         this.lengthFactorOfText = builder.lengthFactorOfText;
         this.unicodeChar = builder.unicodeChar;
         this.maxLengthOfUnquoteString = builder.maxLengthOfUnquoteString;
@@ -57,6 +64,10 @@ public class DsonTextWriterSettings {
          * 另外，这个行长度是是码元计数，不是字符计数。
          */
         private int softLineLength = 120;
+        /**
+         * 是否打印为类json格式，即不支持行首
+         */
+        private boolean jsonLike = false;
         /**
          * 是否支持纯文本模式
          * 如果{@link #unicodeChar}为true，该值通常需要关闭，text模式不会执行转义，也就不会处理unicode字符
@@ -99,6 +110,15 @@ public class DsonTextWriterSettings {
 
         public Builder setSoftLineLength(int softLineLength) {
             this.softLineLength = softLineLength;
+            return this;
+        }
+
+        public boolean isJsonLike() {
+            return jsonLike;
+        }
+
+        public Builder setJsonLike(boolean jsonLike) {
+            this.jsonLike = jsonLike;
             return this;
         }
 
