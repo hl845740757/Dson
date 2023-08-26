@@ -41,6 +41,11 @@ public class DsonInt64 extends DsonNumber implements Comparable<DsonInt64> {
     }
 
     @Override
+    public Long number() {
+        return value;
+    }
+
+    @Override
     public int intValue() {
         return (int) value;
     }

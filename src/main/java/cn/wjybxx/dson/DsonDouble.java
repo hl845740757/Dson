@@ -41,6 +41,11 @@ public class DsonDouble extends DsonNumber implements Comparable<DsonDouble> {
     }
 
     @Override
+    public Double number() {
+        return value;
+    }
+
+    @Override
     public int intValue() {
         return (int) value;
     }

@@ -149,32 +149,32 @@ public class DsonObjectLiteReader extends AbstractDsonLiteReader {
 
     @Override
     protected int doReadInt32() {
-        return popNextValue().asInt32().getValue(); // as顺带null检查
+        return popNextValue().asInt32(); // as顺带null检查
     }
 
     @Override
     protected long doReadInt64() {
-        return popNextValue().asInt64().getValue();
+        return popNextValue().asInt64();
     }
 
     @Override
     protected float doReadFloat() {
-        return popNextValue().asFloat().getValue();
+        return popNextValue().asFloat();
     }
 
     @Override
     protected double doReadDouble() {
-        return popNextValue().asDouble().getValue();
+        return popNextValue().asDouble();
     }
 
     @Override
     protected boolean doReadBool() {
-        return popNextValue().asBoolean().getValue();
+        return popNextValue().asBool();
     }
 
     @Override
     protected String doReadString() {
-        return popNextValue().asString().getValue();
+        return popNextValue().asString();
     }
 
     @Override
@@ -204,12 +204,12 @@ public class DsonObjectLiteReader extends AbstractDsonLiteReader {
 
     @Override
     protected ObjectRef doReadRef() {
-        return popNextValue().asReference().getValue();
+        return popNextValue().asReference();
     }
 
     @Override
     protected OffsetTimestamp doReadTimestamp() {
-        return popNextValue().asTimestamp().getValue();
+        return popNextValue().asTimestamp();
     }
 
     // endregion

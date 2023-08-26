@@ -39,7 +39,7 @@ public class DsonEscapeTest {
         DsonExtString reg2 = value.asObject().get("reg2").asExtString();
         Assertions.assertEquals(regExp, reg2.getValue());
 
-        DsonString reg3 = value.asObject().get("reg3").asString();
+        DsonString reg3 = value.asObject().get("reg3").asDsonString();
         Assertions.assertEquals(regExp, reg3.getValue());
 
         System.out.println(Dsons.toDson(value, ObjectStyle.INDENT));

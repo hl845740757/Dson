@@ -1,5 +1,6 @@
 package cn.wjybxx.dson;
 
+import cn.wjybxx.dson.types.OffsetTimestamp;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -21,12 +22,12 @@ public class DsonTimeTest {
     @Test
     void test() {
         DsonArray<String> dsonArray = Dsons.fromDson(dsonString).asArray();
-        DsonTimestamp second = dsonArray.get(1).asTimestamp();
-        DsonTimestamp third = dsonArray.get(2).asTimestamp();
-        DsonTimestamp fourth = dsonArray.get(3).asTimestamp();
-        Assertions.assertEquals(second.getValue().getOffset(), third.getValue().getOffset());
-        Assertions.assertEquals(second.getValue().getOffset(), fourth.getValue().getOffset());
+        OffsetTimestamp second = dsonArray.get(1).asTimestamp();
+        OffsetTimestamp third = dsonArray.get(2).asTimestamp();
+        OffsetTimestamp fourth = dsonArray.get(3).asTimestamp();
+        Assertions.assertEquals(second.getOffset(), third.getOffset());
+        Assertions.assertEquals(second.getOffset(), fourth.getOffset());
         // 纳秒部分相同
-        Assertions.assertEquals(third.getValue().getNanos(), fourth.getValue().getNanos());
+        Assertions.assertEquals(third.getNanos(), fourth.getNanos());
     }
 }

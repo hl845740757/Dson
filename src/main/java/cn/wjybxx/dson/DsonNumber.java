@@ -22,6 +22,8 @@ package cn.wjybxx.dson;
  */
 public abstract class DsonNumber extends DsonValue {
 
+    public abstract Number number();
+
     public abstract int intValue();
 
     public abstract long longValue();

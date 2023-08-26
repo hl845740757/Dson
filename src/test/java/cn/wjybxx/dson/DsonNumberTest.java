@@ -46,7 +46,7 @@ public class DsonNumberTest {
                 if (style.supportFloat()) {
                     for (int i = 1; i <= value.size(); i++) {
                         String name = "value" + i;
-                        DsonNumber dsonNumber = value.get(name).asNumber();
+                        DsonNumber dsonNumber = value.get(name).asDsonNumber();
                         if (dsonNumber == null) {
                             break;
                         }
@@ -60,7 +60,7 @@ public class DsonNumberTest {
                 } else {
                     for (int i = 1; i <= value.size(); i++) {
                         String name = "value" + i;
-                        DsonNumber dsonNumber = value.get(name).asNumber();
+                        DsonNumber dsonNumber = value.get(name).asDsonNumber();
                         if (dsonNumber == null) {
                             break;
                         }

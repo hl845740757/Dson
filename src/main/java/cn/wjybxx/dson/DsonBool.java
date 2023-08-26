@@ -33,6 +33,10 @@ public class DsonBool extends DsonValue implements Comparable<DsonBool> {
         this.value = value;
     }
 
+    public static DsonBool valueOf(final boolean value) {
+        return value ? TRUE : FALSE;
+    }
+
     public boolean getValue() {
         return value;
     }
@@ -41,10 +45,6 @@ public class DsonBool extends DsonValue implements Comparable<DsonBool> {
     @Override
     public DsonType getDsonType() {
         return DsonType.BOOLEAN;
-    }
-
-    public static DsonBool valueOf(final boolean value) {
-        return value ? TRUE : FALSE;
     }
 
     //

@@ -16,6 +16,9 @@
 
 package cn.wjybxx.dson;
 
+import cn.wjybxx.dson.types.ObjectRef;
+import cn.wjybxx.dson.types.OffsetTimestamp;
+
 import javax.annotation.Nonnull;
 
 /**
@@ -27,36 +30,90 @@ public abstract class DsonValue {
     @Nonnull
     public abstract DsonType getDsonType();
 
-    public DsonInt32 asInt32() {
+    // region 拆箱类型
+    public int asInt32() {
+        return ((DsonInt32) this).intValue();
+    }
+
+    public long asInt64() {
+        return ((DsonInt64) this).longValue();
+    }
+
+    public float asFloat() {
+        return ((DsonFloat) this).floatValue();
+    }
+
+    public double asDouble() {
+        return ((DsonDouble) this).doubleValue();
+    }
+
+    public boolean asBool() {
+        return ((DsonBool) this).getValue();
+    }
+
+    public String asString() {
+        return ((DsonString) this).getValue();
+    }
+
+    /** {@link Number}不是接口导致需要额外的装箱 */
+    public Number asNumber() {
+        return ((DsonNumber) this).number();
+    }
+
+    public ObjectRef asReference() {
+        return ((DsonReference) this).getValue();
+    }
+
+    public OffsetTimestamp asTimestamp() {
+        return ((DsonTimestamp) this).getValue();
+    }
+
+    // endregion
+
+    // region 装箱类型
+
+    public DsonInt32 asDsonInt32() {
         return (DsonInt32) this;
     }
 
-    public DsonInt64 asInt64() {
+    public DsonInt64 asDsonInt64() {
         return (DsonInt64) this;
     }
 
-    public DsonFloat asFloat() {
+    public DsonFloat asDsonFloat() {
         return (DsonFloat) this;
     }
 
-    public DsonDouble asDouble() {
+    public DsonDouble asDsonDouble() {
         return (DsonDouble) this;
     }
 
-    public DsonBool asBoolean() {
+    public DsonBool asDsonBool() {
         return (DsonBool) this;
     }
 
-    public DsonString asString() {
+    public DsonString asDsonString() {
         return (DsonString) this;
     }
 
-    public DsonNull asNull() {
-        return (DsonNull) this;
+    public DsonNumber asDsonNumber() {
+        return (DsonNumber) this;
     }
 
-    public DsonNumber asNumber() {
-        return (DsonNumber) this;
+    public DsonReference asDsonReference() {
+        return (DsonReference) this;
+    }
+
+    public DsonTimestamp asDsonTimestamp() {
+        return (DsonTimestamp) this;
+    }
+
+    // endregion
+
+    // region Dson特定类型
+
+    public DsonNull asNull() {
+        return (DsonNull) this;
     }
 
     public DsonExtString asExtString() {
@@ -73,14 +130,6 @@ public abstract class DsonValue {
 
     public DsonBinary asBinary() {
         return (DsonBinary) this;
-    }
-
-    public DsonObjectRef asReference() {
-        return (DsonObjectRef) this;
-    }
-
-    public DsonTimestamp asTimestamp() {
-        return (DsonTimestamp) this;
     }
 
     @SuppressWarnings("unchecked")
@@ -113,5 +162,7 @@ public abstract class DsonValue {
     public DsonObject<FieldNumber> asObjectLite() {
         return (DsonObject<FieldNumber>) this;
     }
+
+    // endregion
 
 }

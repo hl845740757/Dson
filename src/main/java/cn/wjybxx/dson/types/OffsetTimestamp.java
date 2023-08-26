@@ -122,6 +122,11 @@ public final class OffsetTimestamp {
                 .substring(0, 8);
     }
 
+    /** @return 固定格式 yyyy-MM-dd'T'HH:mm:ss */
+    public static String formatDateTime(long seconds) {
+        return formatDate(seconds) + "T" + formatTime(seconds);
+    }
+
     /**
      * Z
      * +HH:mm
@@ -137,7 +142,7 @@ public final class OffsetTimestamp {
 
     /** @param dateString 限定格式 yyyy-MM-dd */
     public static LocalDate parseDate(String dateString) {
-        if (dateString.length() != 10) throw new IllegalArgumentException("invalid dateString " + dateString);
+//        if (dateString.length() != 10) throw new IllegalArgumentException("invalid dateString " + dateString);
         return LocalDate.parse(dateString, DateTimeFormatter.ISO_DATE);
     }
 
@@ -145,6 +150,11 @@ public final class OffsetTimestamp {
     public static LocalTime parseTime(String timeString) {
         if (timeString.length() != 8) throw new IllegalArgumentException("invalid timeString " + timeString);
         return LocalTime.parse(timeString, DateTimeFormatter.ISO_TIME);
+    }
+
+    /** @param timeString 限定格式 yyyy-MM-dd'T'HH:mm:ss */
+    public static LocalDateTime parseDateTime(String timeString) {
+        return LocalDateTime.parse(timeString, DateTimeFormatter.ISO_DATE_TIME);
     }
 
     /**

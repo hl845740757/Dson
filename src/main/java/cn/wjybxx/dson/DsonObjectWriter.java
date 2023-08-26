@@ -103,7 +103,7 @@ public class DsonObjectWriter extends AbstractDsonWriter {
 
     @Override
     protected void doWriteRef(ObjectRef objectRef) {
-        getContext().add(new DsonObjectRef(objectRef));
+        getContext().add(new DsonReference(objectRef));
     }
 
     @Override

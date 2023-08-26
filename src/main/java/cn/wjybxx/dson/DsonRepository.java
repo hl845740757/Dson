@@ -102,7 +102,7 @@ public class DsonRepository {
             for (Map.Entry<?, DsonValue> entry : dsonObject.entrySet()) {
                 DsonValue value = entry.getValue();
                 if (value.getDsonType() == DsonType.REFERENCE) {
-                    ObjectRef objectRef = value.asReference().getValue();
+                    ObjectRef objectRef = value.asReference();
                     DsonValue targetObj = indexMap.get(objectRef.getLocalId());
                     if (targetObj != null) {
                         entry.setValue(targetObj);
@@ -115,7 +115,7 @@ public class DsonRepository {
             for (int i = 0; i < dsonArray.size(); i++) {
                 DsonValue value = dsonArray.get(i);
                 if (value.getDsonType() == DsonType.REFERENCE) {
-                    ObjectRef objectRef = value.asReference().getValue();
+                    ObjectRef objectRef = value.asReference();
                     DsonValue targetObj = indexMap.get(objectRef.getLocalId());
                     if (targetObj != null) {
                         dsonArray.set(i, targetObj);

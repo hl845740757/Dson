@@ -191,19 +191,19 @@ public class DsonLites {
             writer.writeName(name);
         }
         switch (dsonValue.getDsonType()) {
-            case INT32 -> writer.writeInt32(name, dsonValue.asInt32().getValue(), WireType.VARINT);
-            case INT64 -> writer.writeInt64(name, dsonValue.asInt64().getValue(), WireType.VARINT);
-            case FLOAT -> writer.writeFloat(name, dsonValue.asFloat().getValue());
-            case DOUBLE -> writer.writeDouble(name, dsonValue.asDouble().getValue());
-            case BOOLEAN -> writer.writeBoolean(name, dsonValue.asBoolean().getValue());
-            case STRING -> writer.writeString(name, dsonValue.asString().getValue());
+            case INT32 -> writer.writeInt32(name, dsonValue.asInt32(), WireType.VARINT);
+            case INT64 -> writer.writeInt64(name, dsonValue.asInt64(), WireType.VARINT);
+            case FLOAT -> writer.writeFloat(name, dsonValue.asFloat());
+            case DOUBLE -> writer.writeDouble(name, dsonValue.asDouble());
+            case BOOLEAN -> writer.writeBoolean(name, dsonValue.asBool());
+            case STRING -> writer.writeString(name, dsonValue.asString());
             case NULL -> writer.writeNull(name);
             case BINARY -> writer.writeBinary(name, dsonValue.asBinary());
             case EXT_INT32 -> writer.writeExtInt32(name, dsonValue.asExtInt32(), WireType.VARINT);
             case EXT_INT64 -> writer.writeExtInt64(name, dsonValue.asExtInt64(), WireType.VARINT);
             case EXT_STRING -> writer.writeExtString(name, dsonValue.asExtString());
-            case REFERENCE -> writer.writeRef(name, dsonValue.asReference().getValue());
-            case TIMESTAMP -> writer.writeTimestamp(name, dsonValue.asTimestamp().getValue());
+            case REFERENCE -> writer.writeRef(name, dsonValue.asReference());
+            case TIMESTAMP -> writer.writeTimestamp(name, dsonValue.asTimestamp());
             case HEADER -> writeHeader(writer, dsonValue.asHeaderLite());
             case ARRAY -> writeArray(writer, dsonValue.asArrayLite(), ObjectStyle.INDENT);
             case OBJECT -> writeObject(writer, dsonValue.asObjectLite(), ObjectStyle.INDENT);
@@ -230,7 +230,7 @@ public class DsonLites {
             case EXT_INT32 -> reader.readExtInt32(name);
             case EXT_INT64 -> reader.readExtInt64(name);
             case EXT_STRING -> reader.readExtString(name);
-            case REFERENCE -> new DsonObjectRef(reader.readRef(name));
+            case REFERENCE -> new DsonReference(reader.readRef(name));
             case TIMESTAMP -> new DsonTimestamp(reader.readTimestamp(name));
             case HEADER -> {
                 DsonHeader<FieldNumber> header = new DsonHeader<>();

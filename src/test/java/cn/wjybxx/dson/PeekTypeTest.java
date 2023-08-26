@@ -209,7 +209,7 @@ public class PeekTypeTest {
             case EXT_INT32 -> reader.readExtInt32(name);
             case EXT_INT64 -> reader.readExtInt64(name);
             case EXT_STRING -> reader.readExtString(name);
-            case REFERENCE -> new DsonObjectRef(reader.readRef(name));
+            case REFERENCE -> new DsonReference(reader.readRef(name));
             case TIMESTAMP -> new DsonTimestamp(reader.readTimestamp(name));
             default -> throw new AssertionError();
         };

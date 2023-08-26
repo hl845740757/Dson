@@ -41,6 +41,11 @@ public class DsonFloat extends DsonNumber implements Comparable<DsonFloat> {
     }
 
     @Override
+    public Float number() {
+        return value;
+    }
+
+    @Override
     public int intValue() {
         return (int) value;
     }

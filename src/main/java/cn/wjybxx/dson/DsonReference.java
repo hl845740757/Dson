@@ -25,11 +25,11 @@ import java.util.Objects;
  * @author wjybxx
  * date - 2023/5/27
  */
-public class DsonObjectRef extends DsonValue {
+public class DsonReference extends DsonValue {
 
     private final ObjectRef value;
 
-    public DsonObjectRef(ObjectRef value) {
+    public DsonReference(ObjectRef value) {
         this.value = Objects.requireNonNull(value);
     }
 
@@ -48,7 +48,7 @@ public class DsonObjectRef extends DsonValue {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        DsonObjectRef that = (DsonObjectRef) o;
+        DsonReference that = (DsonReference) o;
 
         return value.equals(that.value);
     }
@@ -60,7 +60,7 @@ public class DsonObjectRef extends DsonValue {
 
     @Override
     public String toString() {
-        return "DsonObjectRef{" +
+        return "DsonReference{" +
                 "value=" + value +
                 '}';
     }

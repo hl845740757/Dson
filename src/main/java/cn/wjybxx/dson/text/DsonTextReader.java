@@ -585,11 +585,11 @@ public class DsonTextReader extends AbstractDsonReader {
                     pushToken(valueToken);
                     return sb.toString();
                 }
-                case EOF -> {
-                    throw DsonIOException.invalidTokenType(getContextType(), valueToken);
+                case STRING, UNQUOTE_STRING, COLON -> {
+                    sb.append(valueToken.castAsString());
                 }
                 default -> {
-                    sb.append(valueToken.castAsString());
+                    throw DsonIOException.invalidTokenType(getContextType(), valueToken);
                 }
             }
         }
