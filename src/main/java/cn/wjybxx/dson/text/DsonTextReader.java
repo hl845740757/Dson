@@ -377,6 +377,11 @@ public class DsonTextReader extends AbstractDsonReader {
             pushNextValue(new ObjectRef(nextToken.castAsString()));
             return DsonType.REFERENCE;
         }
+        if (DsonTexts.LABEL_DATETIME.equals(clsName)) { // @dt uuuu-MM-dd'T'HH:mm:ss
+            LocalDateTime dateTime = OffsetTimestamp.parseDateTime(scanStringUtilComma());
+            pushNextValue(new OffsetTimestamp(dateTime.toEpochSecond(ZoneOffset.UTC)));
+            return DsonType.TIMESTAMP;
+        }
         throw DsonIOException.invalidTokenType(context.contextType, valueToken);
     }
 

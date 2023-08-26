@@ -255,15 +255,17 @@ PS：对于配置文件，引用的最大作用是复用和减少嵌套。
 
 ### dt-日期时间
 
-1. dt只支持标准的结构体样式 {@dt date: yyyy-MM-dd, time: HH:mm:ss, offset: ±HH:mm:ss, millis: $millis, nanos: $nanos}
-2. date 部分为 "yyyy-MM-dd" 格式。
-3. time 部分为 "HH:mm:ss" 格式，不可省略秒部分。
-4. offset 部分为 "Z", "±H", "±HH", "±HH:mm" 或 "±HH:mm:ss" 格式，不可以省略正负号。
-5. millis 表示输入毫秒转纳秒。
-6. nanos 表示直接输入纳秒，millis 和 nanos通常只应该出现一个。
-7. date 和 time 至少输入一个，其它属性都是可选的，拼写错误将引发异常。
+1. dt支持两种范式 @dt datetime 和 {@dt date: yyyy-MM-dd, time: HH:mm:ss, offset: ±HH:mm:ss, millis: $millis, nanos: $nanos}
+2. @dt datetime 简写方式用于一般情况，datetime为 "yyyy-MM-ddTHH:mm:ss"格式，即ISO601格式
+3. date 部分为 "yyyy-MM-dd" 格式。
+4. time 部分为 "HH:mm:ss" 格式，不可省略秒部分。
+5. offset 部分为 "Z", "±H", "±HH", "±HH:mm" 或 "±HH:mm:ss" 格式，不可以省略正负号。
+6. millis 表示输入毫秒转纳秒。
+7. nanos 表示直接输入纳秒，millis 和 nanos通常只应该出现一个。
+8. date 和 time 至少输入一个，其它属性都是可选的，拼写错误将引发异常。
 
 ```
+    @dt 2023-06-17T18:37:00
     {@dt date: 2023-06-17, time: 18:37:00}
     {@dt date: 2023-06-17, time: 18:37:00, offset: +8}
     {@dt date: 2023-06-17, time: 18:37:00, offset: +08:00, millis: 100}
@@ -438,7 +440,7 @@ Dson主要解决的问题有三个：
       # java maven坐标
       <groupId>cn.wjybxx.dson</groupId>
       <artifactId>dson-core</artifactId>
-      <version>1.0.3</version>
+      <version>1.0.4</version>
    ```  
 2. C#
 

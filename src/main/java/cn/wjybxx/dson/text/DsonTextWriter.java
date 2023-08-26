@@ -422,6 +422,12 @@ public class DsonTextWriter extends AbstractDsonWriter {
         DsonPrinter printer = this.printer;
         int softLineLength = this.settings.softLineLength;
         writeCurrentName(printer, DsonType.TIMESTAMP);
+        if (timestamp.getEnables() == OffsetTimestamp.MASK_DATETIME) {
+            printer.printFastPath("@dt ");
+            printer.printFastPath(OffsetTimestamp.formatDateTime(timestamp.getSeconds()));
+            return;
+        }
+
         printer.printFastPath("{@dt ");
         if (timestamp.hasDate()) {
             printer.printFastPath(OffsetTimestamp.NAMES_DATE);
