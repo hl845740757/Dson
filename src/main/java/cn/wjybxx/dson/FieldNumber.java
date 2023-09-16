@@ -20,7 +20,9 @@ import javax.annotation.Nonnull;
 
 /**
  * 二进制编码下字段编号表示法
- * 注意：不能直接使用{@code fullNumber}比较两个字段在类继承体系中的顺序，应当使用{@link #compareTo(FieldNumber)}进行比较
+ * 注意：
+ * 1. 不能直接使用{@code fullNumber}比较两个字段在类继承体系中的顺序，应当使用{@link #compareTo(FieldNumber)}进行比较
+ * 2. 由于{@link FieldNumber}包含了类的继承信息和字段定义顺序，因此对于处理序列化数据的兼容十分有用。
  *
  * @author wjybxx
  * date - 2023/4/19
