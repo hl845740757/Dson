@@ -104,12 +104,17 @@ public abstract class AbstractDsonLiteReader implements DsonLiteReader {
             return true;
         }
         return context.contextType == DsonContextType.TOP_LEVEL
-                && context.state != DsonReaderState.VALUE; // INIT or DONE
+                && context.state == DsonReaderState.INITIAL;
     }
 
     @Override
     public boolean isAtName() {
         return context.state == DsonReaderState.NAME;
+    }
+
+    @Override
+    public boolean isAtValue() {
+        return context.state == DsonReaderState.VALUE;
     }
 
     @Override

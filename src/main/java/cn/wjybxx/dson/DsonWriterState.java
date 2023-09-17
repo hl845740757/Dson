@@ -17,8 +17,9 @@
 package cn.wjybxx.dson;
 
 /**
- * Object、Header循环： NAME-VALUE
- * 顶层上下文、Array循环： VALUE
+ * Object、Header上下文循环： [NAME-VALUE],[NAME-VALUE]...
+ * Array上下文循环： VALUE...
+ * 顶层上下文循环：INITIAL,VALUE,VALUE...
  * <p>
  * type总是和value同时写入，因此不需要额外的 TYPE 状态，但name和value可能分开写入，因此需要两个状态。
  *

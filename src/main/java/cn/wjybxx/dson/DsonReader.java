@@ -74,6 +74,9 @@ public interface DsonReader extends AutoCloseable {
      */
     void readName(String name);
 
+    /** 当前是否处于应该读取value状态 */
+    boolean isAtValue();
+
     /**
      * 获取当前的数据类型
      * 1.该值在调用任意的读方法后将变化

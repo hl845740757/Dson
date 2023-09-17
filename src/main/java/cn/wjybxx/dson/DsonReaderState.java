@@ -17,8 +17,9 @@
 package cn.wjybxx.dson;
 
 /**
- * Object、Header循环 TYPE-NAME-VALUE
- * 顶层上下文、Array循环 TYPE-VALUE
+ * Object、Header上下文循环 [TYPE-NAME-VALUE], [TYPE-NAME-VALUE]...
+ * Array上下文循环 [TYPE-VALUE], [TYPE-VALUE]...
+ * 顶层上下文循环 [INITIAL-VALUE], [TYPE-VALUE], [TYPE-VALUE]...END_OF_FILE
  * <p>
  * 由于type必须先读取，因此type需要独立的状态；又由于name可以单独读取，因此name也需要单独的转态，因此需要type-name-value三个状态。
  *
