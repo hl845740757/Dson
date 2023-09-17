@@ -356,6 +356,16 @@ public abstract class AbstractDsonLiteWriter implements DsonLiteWriter {
         setNextState();
     }
 
+    @Override
+    public Object attach(Object userData) {
+        return getContext().attach(userData);
+    }
+
+    @Override
+    public Object attachment() {
+        return getContext().userData;
+    }
+
     protected abstract void doWriteMessage(int binaryType, MessageLite messageLite);
 
     protected abstract void doWriteValueBytes(DsonType type, byte[] data);
@@ -371,6 +381,7 @@ public abstract class AbstractDsonLiteWriter implements DsonLiteWriter {
         public DsonType dsonType; // 用于在Object/Array模式下写入内置数据结构
         public DsonWriterState state = DsonWriterState.INITIAL;
         public int curName;
+        public Object userData;
 
         public Context() {
         }
@@ -388,6 +399,13 @@ public abstract class AbstractDsonLiteWriter implements DsonLiteWriter {
             dsonType = null;
             state = DsonWriterState.INITIAL;
             curName = 0;
+            userData = null;
+        }
+
+        public Object attach(Object userData) {
+            Object r = this.userData;
+            this.userData = userData;
+            return r;
         }
 
         /** 方便查看赋值的调用 */

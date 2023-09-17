@@ -207,6 +207,15 @@ public interface DsonLiteReader extends AutoCloseable {
      */
     byte[] readValueAsBytes(int name);
 
+    /**
+     * 附近一个数据到当前上下文
+     *
+     * @return 旧值
+     */
+    Object attach(Object userData);
+
+    Object attachment();
+
     DsonReaderGuide whatShouldIDo();
 
     // endregion

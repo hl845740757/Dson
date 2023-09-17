@@ -160,6 +160,15 @@ public interface DsonWriter extends AutoCloseable {
      */
     void writeValueBytes(String name, DsonType type, byte[] data);
 
+    /**
+     * 附近一个数据到当前上下文
+     *
+     * @return 旧值
+     */
+    Object attach(Object userData);
+
+    Object attachment();
+
     // endregion
 
 }

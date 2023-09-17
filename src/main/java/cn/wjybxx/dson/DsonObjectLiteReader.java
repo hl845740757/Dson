@@ -23,10 +23,7 @@ import cn.wjybxx.dson.types.OffsetTimestamp;
 import com.google.protobuf.Parser;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @author wjybxx
@@ -45,6 +42,16 @@ public class DsonObjectLiteReader extends AbstractDsonLiteReader {
         setContext(context);
     }
 
+    @Override
+    protected Context getContext() {
+        return (Context) super.getContext();
+    }
+
+    @Override
+    protected Context getPooledContext() {
+        return (Context) super.getPooledContext();
+    }
+
     /**
      * 设置key的迭代顺序
      *
@@ -60,14 +67,12 @@ public class DsonObjectLiteReader extends AbstractDsonLiteReader {
         context.setKeyItr(keyItr, defValue);
     }
 
-    @Override
-    protected Context getContext() {
-        return (Context) super.getContext();
-    }
-
-    @Override
-    protected Context getPooledContext() {
-        return (Context) super.getPooledContext();
+    public Set<FieldNumber> getkeySet() {
+        Context context = getContext();
+        if (context.dsonObject == null) {
+            throw DsonIOException.contextError(List.of(DsonContextType.OBJECT, DsonContextType.HEADER), context.contextType);
+        }
+        return context.dsonObject.keySet();
     }
 
     // region state

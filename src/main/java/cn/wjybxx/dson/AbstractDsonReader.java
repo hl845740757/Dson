@@ -340,6 +340,8 @@ public abstract class AbstractDsonReader implements DsonReader {
 
     protected abstract OffsetTimestamp doReadTimestamp();
 
+    // endregion
+
     // region 容器
 
     @Override
@@ -505,6 +507,16 @@ public abstract class AbstractDsonReader implements DsonReader {
     }
 
     @Override
+    public Object attach(Object userData) {
+        return getContext().attach(userData);
+    }
+
+    @Override
+    public Object attachment() {
+        return getContext().userData;
+    }
+
+    @Override
     public DsonReaderGuide whatShouldIDo() {
         return DsonReaderUtils.whatShouldIDo(context.contextType, context.state);
     }
@@ -530,6 +542,7 @@ public abstract class AbstractDsonReader implements DsonReader {
         public DsonType dsonType;
         public DsonReaderState state = DsonReaderState.INITIAL;
         public String name = INVALID_NAME;
+        public Object userData;
 
         public Context() {
         }
@@ -547,6 +560,13 @@ public abstract class AbstractDsonReader implements DsonReader {
             dsonType = null;
             state = DsonReaderState.INITIAL;
             name = INVALID_NAME;
+            userData = null;
+        }
+
+        public Object attach(Object userData) {
+            Object r = this.userData;
+            this.userData = userData;
+            return r;
         }
 
         /** 方便查看赋值的调用 */
