@@ -47,6 +47,10 @@ public class MarkableIterator<E> implements Iterator<E> {
         }
     }
 
+    public boolean isMarking() {
+        return marking;
+    }
+
     public void rewind() {
         curIndex = shiftIndex;
     }

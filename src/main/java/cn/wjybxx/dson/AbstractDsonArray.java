@@ -52,6 +52,45 @@ public abstract class AbstractDsonArray extends DsonValue implements List<DsonVa
     }
     // endregion
 
+    // region 安全检查
+    static void checkElement(DsonValue value) {
+        if (value == null) {
+            throw new IllegalArgumentException("value cant be null");
+        }
+    }
+
+    @Override
+    public DsonValue set(int index, DsonValue element) {
+        checkElement(element);
+        return values.set(index, element);
+    }
+
+    @Override
+    public void add(int index, DsonValue element) {
+        checkElement(element);
+        values.add(index, element);
+    }
+
+    @Override
+    public boolean add(DsonValue dsonValue) {
+        checkElement(dsonValue);
+        return values.add(dsonValue);
+    }
+
+    @Override
+    public boolean addAll(Collection<? extends DsonValue> c) {
+        c.forEach(AbstractDsonArray::checkElement);
+        return values.addAll(c);
+    }
+
+    @Override
+    public boolean addAll(int index, Collection<? extends DsonValue> c) {
+        c.forEach(AbstractDsonArray::checkElement);
+        return values.addAll(index, c);
+    }
+
+    // endregion
+
     // region 代理实现
 
     @Override
@@ -74,10 +113,6 @@ public abstract class AbstractDsonArray extends DsonValue implements List<DsonVa
         return values.toArray(a);
     }
 
-    @Override
-    public boolean add(DsonValue dsonValue) {
-        return values.add(dsonValue);
-    }
 
     @Override
     public boolean remove(Object o) {
@@ -87,16 +122,6 @@ public abstract class AbstractDsonArray extends DsonValue implements List<DsonVa
     @Override
     public boolean containsAll(Collection<?> c) {
         return values.containsAll(c);
-    }
-
-    @Override
-    public boolean addAll(Collection<? extends DsonValue> c) {
-        return values.addAll(c);
-    }
-
-    @Override
-    public boolean addAll(int index, Collection<? extends DsonValue> c) {
-        return values.addAll(index, c);
     }
 
     @Override
@@ -127,16 +152,6 @@ public abstract class AbstractDsonArray extends DsonValue implements List<DsonVa
     @Override
     public DsonValue get(int index) {
         return values.get(index);
-    }
-
-    @Override
-    public DsonValue set(int index, DsonValue element) {
-        return values.set(index, element);
-    }
-
-    @Override
-    public void add(int index, DsonValue element) {
-        values.add(index, element);
     }
 
     @Override

@@ -17,11 +17,13 @@
 package cn.wjybxx.dson;
 
 import cn.wjybxx.dson.internal.MarkableIterator;
+import cn.wjybxx.dson.io.DsonIOException;
 import cn.wjybxx.dson.types.ObjectRef;
 import cn.wjybxx.dson.types.OffsetTimestamp;
 import com.google.protobuf.Parser;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 
@@ -40,6 +42,21 @@ public class DsonObjectReader extends AbstractDsonReader {
         context.init(null, DsonContextType.TOP_LEVEL, null);
         context.arrayIterator = new MarkableIterator<>(dsonArray.iterator());
         setContext(context);
+    }
+
+    /**
+     * 设置key的迭代顺序
+     *
+     * @param defValue key不存在时的返回值；可选择{@link DsonNull#UNDEFINE}
+     */
+    public void setKeyItr(Iterator<String> keyItr, DsonValue defValue) {
+        Objects.requireNonNull(keyItr);
+        Objects.requireNonNull(defValue);
+        Context context = getContext();
+        if (context.dsonObject == null) {
+            throw DsonIOException.contextError(DsonContextType.OBJECT, context.contextType);
+        }
+        context.setKeyItr(keyItr, defValue);
     }
 
     @Override
@@ -222,14 +239,16 @@ public class DsonObjectReader extends AbstractDsonReader {
         DsonValue dsonValue = popNextValue();
         if (dsonValue.getDsonType() == DsonType.OBJECT) {
             DsonObject<String> dsonObject = dsonValue.asObject();
-            newContext.header = dsonObject.getHeader();
+            newContext.header = dsonObject.getHeader().size() > 0 ? dsonObject.getHeader() : null;
+            newContext.dsonObject = dsonObject;
             newContext.objectIterator = new MarkableIterator<>(dsonObject.entrySet().iterator());
         } else if (dsonValue.getDsonType() == DsonType.ARRAY) {
             DsonArray<String> dsonArray = dsonValue.asArray();
-            newContext.header = dsonArray.getHeader();
+            newContext.header = dsonArray.getHeader().size() > 0 ? dsonArray.getHeader() : null;
             newContext.arrayIterator = new MarkableIterator<>(dsonArray.iterator());
         } else {
             // 其它内置结构体
+            newContext.dsonObject = dsonValue.asHeader();
             newContext.objectIterator = new MarkableIterator<>(dsonValue.asHeader().entrySet().iterator());
         }
         newContext.name = currentName;
@@ -314,6 +333,7 @@ public class DsonObjectReader extends AbstractDsonReader {
 
         /** 如果不为null，则表示需要先读取header */
         private DsonHeader<String> header;
+        private AbstractDsonObject<String> dsonObject;
         private MarkableIterator<Map.Entry<String, DsonValue>> objectIterator;
         private MarkableIterator<DsonValue> arrayIterator;
 
@@ -323,8 +343,15 @@ public class DsonObjectReader extends AbstractDsonReader {
         public void reset() {
             super.reset();
             header = null;
+            dsonObject = null;
             objectIterator = null;
             arrayIterator = null;
+        }
+
+        public void setKeyItr(Iterator<String> keyItr, DsonValue defValue) {
+            if (dsonObject == null) throw new IllegalStateException();
+            if (objectIterator.isMarking()) throw new IllegalStateException("reader is in marking state");
+            objectIterator = new MarkableIterator<>(new KeyIterator(dsonObject, keyItr, defValue));
         }
 
         public boolean hasNext() {
@@ -359,6 +386,35 @@ public class DsonObjectReader extends AbstractDsonReader {
             return objectIterator.hasNext() ? objectIterator.next() : null;
         }
 
+    }
+
+    private static class KeyIterator implements Iterator<Map.Entry<String, DsonValue>> {
+
+        final AbstractDsonObject<String> dsonObject;
+        final Iterator<String> keyItr;
+        final DsonValue defValue;
+
+        public KeyIterator(AbstractDsonObject<String> dsonObject, Iterator<String> keyItr, DsonValue defValue) {
+            this.dsonObject = dsonObject;
+            this.keyItr = keyItr;
+            this.defValue = defValue;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return keyItr.hasNext();
+        }
+
+        @Override
+        public Map.Entry<String, DsonValue> next() {
+            String key = keyItr.next();
+            DsonValue dsonValue = dsonObject.get(key);
+            if (dsonValue == null) {
+                return Map.entry(key, defValue);
+            } else {
+                return Map.entry(key, dsonValue);
+            }
+        }
     }
 
     // endregion
