@@ -66,6 +66,10 @@ public class DsonIOException extends RuntimeException {
         return new DsonIOException(String.format("context error, expected %s, but found %s", expected, contextType));
     }
 
+    public static DsonIOException contextError(List<DsonContextType> expected, DsonContextType contextType) {
+        return new DsonIOException(String.format("context error, expected %s, but found %s", expected, contextType));
+    }
+
     public static DsonIOException contextErrorTopLevel() {
         return new DsonIOException("context error, current state is TopLevel");
     }

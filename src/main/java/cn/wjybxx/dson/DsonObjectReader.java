@@ -24,6 +24,7 @@ import com.google.protobuf.Parser;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -54,7 +55,7 @@ public class DsonObjectReader extends AbstractDsonReader {
         Objects.requireNonNull(defValue);
         Context context = getContext();
         if (context.dsonObject == null) {
-            throw DsonIOException.contextError(DsonContextType.OBJECT, context.contextType);
+            throw DsonIOException.contextError(List.of(DsonContextType.OBJECT, DsonContextType.HEADER), context.contextType);
         }
         context.setKeyItr(keyItr, defValue);
     }
