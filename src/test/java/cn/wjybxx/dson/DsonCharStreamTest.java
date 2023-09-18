@@ -73,7 +73,7 @@ public class DsonCharStreamTest {
     void testCharStreamEqualsTokenString() {
         StringBuilder sb = new StringBuilder(tokenString.length());
         int c1;
-        try (DsonCharStream charStream = DsonCharStream.newBufferedCharStream(new StringReader(tokenString))) {
+        try (DsonCharStream charStream = DsonCharStream.newBufferedCharStream(new StringReader(tokenString), DsonMode.STANDARD)) {
             while ((c1 = charStream.read()) != -1) {
                 if (c1 == -2) {
                     if (charStream.getLn() > 1) {
@@ -105,7 +105,7 @@ public class DsonCharStreamTest {
         boolean unread = false;
         int c3 = -1;
         try (DsonCharStream charStream = DsonCharStream.newCharStream(tokenString);
-             DsonCharStream bufferedCharStream = DsonCharStream.newBufferedCharStream(new StringReader(tokenString))) {
+             DsonCharStream bufferedCharStream = DsonCharStream.newBufferedCharStream(new StringReader(tokenString), DsonMode.STANDARD)) {
             while ((c1 = charStream.read()) != -1) {
                 c2 = bufferedCharStream.read();
                 Assertions.assertEquals(c1, c2);
@@ -133,7 +133,7 @@ public class DsonCharStreamTest {
         try (DsonCharStream charStream = DsonCharStream.newCharStream(tokenString)) {
             pullToList(charStream, stringLines);
         }
-        try (DsonCharStream charStream = DsonCharStream.newBufferedCharStream(new StringReader(tokenString))) {
+        try (DsonCharStream charStream = DsonCharStream.newBufferedCharStream(new StringReader(tokenString), DsonMode.STANDARD)) {
             pullToList(charStream, streamLines);
         }
         Assertions.assertEquals(stringLines.size(), streamLines.size());

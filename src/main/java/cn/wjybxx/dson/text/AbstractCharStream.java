@@ -25,15 +25,15 @@ import java.util.Objects;
  */
 public abstract class AbstractCharStream implements DsonCharStream {
 
-    protected final boolean jsonLike;
+    protected final DsonMode dsonMode;
     private final List<LineInfo> lines = new ArrayList<>();
     private LineInfo curLine;
     private boolean readingContent = false;
     private int position = -1;
     private boolean eof = false;
 
-    public AbstractCharStream(boolean jsonLike) {
-        this.jsonLike = jsonLike;
+    public AbstractCharStream(DsonMode dsonMode) {
+        this.dsonMode = dsonMode;
     }
 
     protected final void addLine(LineInfo lineInfo) {

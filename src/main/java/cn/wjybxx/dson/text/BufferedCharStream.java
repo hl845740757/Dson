@@ -34,6 +34,8 @@ final class BufferedCharStream extends AbstractCharStream {
     private static final int MAX_BUFFER_SIZE = 1024;
 
     private Reader reader;
+    private final boolean autoClose;
+
     private CharBuffer buffer;
     /** reader批量读取数据到该buffer，然后再读取到当前buffer -- 缓冲的缓冲，减少io操作 */
     private CharBuffer nextBuffer;
@@ -43,16 +45,17 @@ final class BufferedCharStream extends AbstractCharStream {
     /** reader是否已到达文件尾部 -- 部分reader在到达文件尾部的时候不可继续读 */
     private boolean readerEof;
 
-    BufferedCharStream(boolean jsonLike, Reader reader) {
-        this(jsonLike, reader, MIN_BUFFER_SIZE * 2);
+    BufferedCharStream(Reader reader, DsonMode dsonMode) {
+        this(reader, dsonMode, MIN_BUFFER_SIZE * 2, true);
     }
 
-    BufferedCharStream(boolean jsonLike, Reader reader, int bufferSize) {
-        super(jsonLike);
+    BufferedCharStream(Reader reader, DsonMode dsonMode, int bufferSize, boolean autoClose) {
+        super(dsonMode);
         Objects.requireNonNull(reader);
         bufferSize = Math.max(MIN_BUFFER_SIZE, bufferSize);
 
         this.reader = reader;
+        this.autoClose = autoClose;
         this.buffer = new CharBuffer(new char[bufferSize]);
         this.nextBuffer = new CharBuffer(new char[64]);
     }
@@ -60,7 +63,7 @@ final class BufferedCharStream extends AbstractCharStream {
     @Override
     public void close() {
         try {
-            if (reader != null) {
+            if (reader != null && autoClose) {
                 reader.close();
                 reader = null;
             }
@@ -209,7 +212,7 @@ final class BufferedCharStream extends AbstractCharStream {
         if (tempLine.startPos > tempLine.endPos) { // 无效行，没有输入
             return false;
         }
-        if (jsonLike) {
+        if (dsonMode == DsonMode.RELAXED) {
             if (startPos > tempLine.lastReadablePosition()) { // 空行(仅换行符)
                 tempLine = new LineInfo(ln, startPos, tempLine.endPos, LheadType.APPEND, -1);
             }

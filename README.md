@@ -228,13 +228,13 @@ ps: 我去除了顶层不能是header的限制，因此可以用顶层的header�
 ### 二进制
 
 1. 配置格式限定二元组 \[type, data]
-2. type限定为int32，且禁止负数
+2. type限定为int32，**且禁止负数**
 3. data部分使用 **16进制** 编码，且不可以为null
 
 ### ei、eL、es
 
 1. 配置格式限定二元组 \[type, value]
-2. type限定int32，且禁止负数
+2. type限定int32，**且禁止负数**
 3. value部分遵循各自的规范
 4. es允许value为null
 

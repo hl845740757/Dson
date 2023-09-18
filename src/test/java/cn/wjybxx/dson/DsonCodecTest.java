@@ -122,7 +122,7 @@ public class DsonCodecTest {
     void testText() {
         DsonTextWriterSettings settings = DsonTextWriterSettings.newBuilder().build();
         StringWriter stringWriter = new StringWriter();
-        try (DsonTextWriter writer = new DsonTextWriter(16, stringWriter, settings)) {
+        try (DsonTextWriter writer = new DsonTextWriter(16, settings, stringWriter)) {
             for (DsonObject<String> dsonObject : srcList) {
                 Dsons.writeObject(writer, dsonObject, ObjectStyle.INDENT);
             }

@@ -36,6 +36,14 @@ public class DsonObjectLiteWriter extends AbstractDsonLiteWriter {
     public void flush() {
 
     }
+
+    public DsonArray<FieldNumber> getOutList() {
+        Context context = getContext();
+        while (context.contextType != DsonContextType.TOP_LEVEL) {
+            context = context.getParent();
+        }
+        return context.container.asArrayLite();
+    }
     //
 
     @Override

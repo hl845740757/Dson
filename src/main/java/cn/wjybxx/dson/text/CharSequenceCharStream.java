@@ -28,8 +28,8 @@ final class CharSequenceCharStream extends AbstractCharStream {
 
     private CharSequence buffer;
 
-    public CharSequenceCharStream(boolean jsonLike, CharSequence buffer) {
-        super(jsonLike);
+    public CharSequenceCharStream(CharSequence buffer, DsonMode dsonMode) {
+        super(dsonMode);
         this.buffer = Objects.requireNonNull(buffer);
     }
 
@@ -113,7 +113,7 @@ final class CharSequenceCharStream extends AbstractCharStream {
         LheadType lheadType = LheadType.COMMENT;
         int contentStartPos = -1;
         int lastReadablePos = LineInfo.lastReadablePosition(state, endPos);
-        if (jsonLike) {
+        if (dsonMode == DsonMode.RELAXED) {
             if (startPos <= lastReadablePos) {
                 lheadType = LheadType.APPEND;
                 contentStartPos = startPos;

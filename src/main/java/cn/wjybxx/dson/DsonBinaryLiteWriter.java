@@ -22,6 +22,8 @@ import cn.wjybxx.dson.types.ObjectRef;
 import cn.wjybxx.dson.types.OffsetTimestamp;
 import com.google.protobuf.MessageLite;
 
+import java.util.Objects;
+
 /**
  * @author wjybxx
  * date - 2023/4/21
@@ -29,10 +31,16 @@ import com.google.protobuf.MessageLite;
 public class DsonBinaryLiteWriter extends AbstractDsonLiteWriter {
 
     private DsonOutput output;
+    private final boolean autoClose;
 
     public DsonBinaryLiteWriter(int recursionLimit, DsonOutput output) {
+        this(recursionLimit, output, true);
+    }
+
+    public DsonBinaryLiteWriter(int recursionLimit, DsonOutput output, boolean autoClose) {
         super(recursionLimit);
-        this.output = output;
+        this.output = Objects.requireNonNull(output);
+        this.autoClose = autoClose;
         setContext(new Context().init(null, DsonContextType.TOP_LEVEL, null));
     }
 
@@ -54,7 +62,7 @@ public class DsonBinaryLiteWriter extends AbstractDsonLiteWriter {
 
     @Override
     public void close() {
-        if (output != null) {
+        if (autoClose && output != null) {
             output.close();
             output = null;
         }

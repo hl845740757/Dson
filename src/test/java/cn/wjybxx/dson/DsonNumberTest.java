@@ -41,12 +41,13 @@ public class DsonNumberTest {
 
         for (NumberStyle style : styleList) {
             StringWriter stringWriter = new StringWriter(120);
-            try (DsonTextWriter writer = new DsonTextWriter(16, stringWriter, DsonTextWriterSettings.newBuilder().build())) {
+            try (DsonTextWriter writer = new DsonTextWriter(16, DsonTextWriterSettings.newBuilder().build(), stringWriter)) {
                 writer.writeStartObject(ObjectStyle.INDENT);
                 if (style.supportFloat()) {
                     for (int i = 1; i <= value.size(); i++) {
                         String name = "value" + i;
-                        DsonNumber dsonNumber = value.get(name).asDsonNumber();
+                        DsonValue dsonValue = value.get(name);
+                        DsonNumber dsonNumber = dsonValue.asNumber();
                         if (dsonNumber == null) {
                             break;
                         }
@@ -60,7 +61,8 @@ public class DsonNumberTest {
                 } else {
                     for (int i = 1; i <= value.size(); i++) {
                         String name = "value" + i;
-                        DsonNumber dsonNumber = value.get(name).asDsonNumber();
+                        DsonValue dsonValue = value.get(name);
+                        DsonNumber dsonNumber = dsonValue.asNumber();
                         if (dsonNumber == null) {
                             break;
                         }

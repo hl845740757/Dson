@@ -35,14 +35,21 @@ import java.io.Writer;
  */
 public class DsonTextWriter extends AbstractDsonWriter {
 
-    private DsonPrinter printer;
+    private final Writer writer;
     private final DsonTextWriterSettings settings;
+
+    private DsonPrinter printer;
     private final StyleOut styleOut = new StyleOut();
 
-    public DsonTextWriter(int recursionLimit, Writer writer, DsonTextWriterSettings settings) {
+    public DsonTextWriter(int recursionLimit, DsonTextWriterSettings settings, Writer writer) {
+        this(recursionLimit, settings, writer, true);
+    }
+
+    public DsonTextWriter(int recursionLimit, DsonTextWriterSettings settings, Writer writer, boolean autoClose) {
         super(recursionLimit);
         this.settings = settings;
-        this.printer = new DsonPrinter(writer, settings.lineSeparator);
+        this.writer = writer;
+        this.printer = new DsonPrinter(writer, settings.lineSeparator, autoClose);
         setContext(new Context().init(null, DsonContextType.TOP_LEVEL, null));
     }
 
@@ -56,7 +63,6 @@ public class DsonTextWriter extends AbstractDsonWriter {
         return (Context) super.getPooledContext();
     }
 
-    //
     @Override
     public void flush() {
         printer.flush();
@@ -71,6 +77,12 @@ public class DsonTextWriter extends AbstractDsonWriter {
         styleOut.reset();
         super.close();
     }
+
+    public Writer getWriter() {
+        return writer;
+    }
+
+    //
 
     // region state
 

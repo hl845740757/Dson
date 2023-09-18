@@ -290,7 +290,7 @@ public final class Dsons {
             throw new IllegalArgumentException("invalid dsonType " + dsonValue.getDsonType());
         }
         StringWriter stringWriter = new StringWriter(1024);
-        try (DsonTextWriter writer = new DsonTextWriter(32, stringWriter, settings)) {
+        try (DsonTextWriter writer = new DsonTextWriter(32, settings, stringWriter)) {
             writeTopDsonValue(writer, dsonValue, style);
         }
         return stringWriter.toString();
@@ -328,28 +328,27 @@ public final class Dsons {
     // region 工厂方法
 
     public static DsonScanner newStringScanner(CharSequence dsonString) {
-        return new DsonScanner(DsonCharStream.newCharStream(dsonString, false));
+        return new DsonScanner(DsonCharStream.newCharStream(dsonString, DsonMode.STANDARD));
     }
 
-    /**
-     * 如果没有行首，每一行都被当做append行，可以用于解析json和无行首的dson字符串
-     *
-     * @param jsonLike 是否像json一样没有行首
-     */
-    public static DsonScanner newStringScanner(CharSequence dsonString, boolean jsonLike) {
-        return new DsonScanner(DsonCharStream.newCharStream(dsonString, jsonLike));
+    public static DsonScanner newStringScanner(CharSequence dsonString, DsonMode dsonMode) {
+        return new DsonScanner(DsonCharStream.newCharStream(dsonString, dsonMode));
     }
 
     public static DsonScanner newJsonScanner(CharSequence jsonString) {
-        return new DsonScanner(DsonCharStream.newCharStream(jsonString, true));
+        return new DsonScanner(DsonCharStream.newCharStream(jsonString, DsonMode.RELAXED));
     }
 
     public static DsonScanner newStreamScanner(Reader reader) {
-        return new DsonScanner(DsonCharStream.newBufferedCharStream(reader));
+        return new DsonScanner(DsonCharStream.newBufferedCharStream(reader, DsonMode.STANDARD));
     }
 
-    public static DsonScanner newStreamScanner(Reader reader, int bufferSize, boolean jsonLike) {
-        return new DsonScanner(DsonCharStream.newBufferedCharStream(reader, bufferSize, jsonLike));
+    public static DsonScanner newStreamScanner(Reader reader, DsonMode dsonMode) {
+        return new DsonScanner(DsonCharStream.newBufferedCharStream(reader, dsonMode));
+    }
+
+    public static DsonScanner newStreamScanner(Reader reader, DsonMode dsonMode, boolean autoClose, int bufferSize) {
+        return new DsonScanner(DsonCharStream.newBufferedCharStream(reader, dsonMode, bufferSize, autoClose));
     }
 
     // endregion

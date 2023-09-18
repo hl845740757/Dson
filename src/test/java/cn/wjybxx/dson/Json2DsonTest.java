@@ -19,6 +19,7 @@ package cn.wjybxx.dson;
 import cn.wjybxx.dson.text.DsonScanner;
 import cn.wjybxx.dson.text.DsonTextReader;
 import cn.wjybxx.dson.text.ObjectStyle;
+import cn.wjybxx.dson.text.DsonMode;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -59,7 +60,7 @@ public class Json2DsonTest {
     private static void testBigFile() throws IOException {
         String jsonFilePath = "D:\\github-mine\\Dson\\testres\\test.json";
         String dsonFilePath = "D:\\github-mine\\Dson\\testres\\testout.dson";
-        try (DsonScanner scanner = Dsons.newStreamScanner(new FileReader(jsonFilePath), 64, true);
+        try (DsonScanner scanner = Dsons.newStreamScanner(new FileReader(jsonFilePath), DsonMode.RELAXED);
              DsonTextReader reader = new DsonTextReader(16, scanner)) {
             DsonValue jsonObject = Dsons.readTopDsonValue(reader);
             DsonValue jsonObject2 = Dsons.fromJson(FileUtils.readFileToString(new File(jsonFilePath), StandardCharsets.UTF_8));

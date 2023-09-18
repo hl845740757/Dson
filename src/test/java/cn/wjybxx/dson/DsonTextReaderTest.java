@@ -86,7 +86,7 @@ public class DsonTextReaderTest {
                 .build();
 
         DsonValue fileHeaderObj = topObjects.get(0);
-        try (DsonTextWriter writer = new DsonTextWriter(16, stringWriter, settings)) {
+        try (DsonTextWriter writer = new DsonTextWriter(16, settings, stringWriter)) {
             Dsons.writeTopDsonValue(writer, fileHeaderObj, ObjectStyle.INDENT);
             writer.flush();
         }

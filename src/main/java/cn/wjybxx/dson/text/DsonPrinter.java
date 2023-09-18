@@ -30,10 +30,12 @@ import java.util.Objects;
  * @author wjybxx
  * date - 2023/6/5
  */
+@SuppressWarnings("unused")
 public final class DsonPrinter implements AutoCloseable {
 
     private final Writer writer;
     private final String lineSeparator;
+    private final boolean autoClose;
 
     /** 行缓冲，减少同步写操作 */
     private final StringBuilder builder = new StringBuilder(150);
@@ -43,9 +45,10 @@ public final class DsonPrinter implements AutoCloseable {
     private String headLabel;
     private int column;
 
-    public DsonPrinter(Writer writer, String lineSeparator) {
+    public DsonPrinter(Writer writer, String lineSeparator, boolean autoClose) {
         this.writer = Objects.requireNonNull(writer);
         this.lineSeparator = Objects.requireNonNull(lineSeparator);
+        this.autoClose = autoClose;
     }
 
     /** 当前列数 */
@@ -66,6 +69,10 @@ public final class DsonPrinter implements AutoCloseable {
     /** 当前行内容的长度 */
     public int getContentLength() {
         return headLabel == null ? column : column - headLabel.length() - 1;
+    }
+
+    public Writer getWriter() {
+        return writer;
     }
 
     // region 普通打印
@@ -373,7 +380,9 @@ public final class DsonPrinter implements AutoCloseable {
     public void close() {
         try {
             flush();
-            writer.close();
+            if (autoClose) {
+                writer.close();
+            }
         } catch (Exception e) {
             ExceptionUtils.rethrow(e);
         }

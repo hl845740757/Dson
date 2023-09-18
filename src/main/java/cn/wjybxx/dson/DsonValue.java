@@ -55,17 +55,23 @@ public abstract class DsonValue {
         return ((DsonString) this).getValue();
     }
 
-    /** {@link Number}不是接口导致需要额外的装箱 */
-    public Number asNumber() {
-        return ((DsonNumber) this).number();
-    }
-
     public ObjectRef asReference() {
         return ((DsonReference) this).getValue();
     }
 
     public OffsetTimestamp asTimestamp() {
         return ((DsonTimestamp) this).getValue();
+    }
+
+    public DsonNumber asNumber() {
+        return (DsonNumber) this;
+    }
+
+    public boolean isNumber() {
+        return switch (getDsonType()) {
+            case INT32, INT64, FLOAT, DOUBLE -> true;
+            default -> false;
+        };
     }
 
     // endregion
@@ -94,10 +100,6 @@ public abstract class DsonValue {
 
     public DsonString asDsonString() {
         return (DsonString) this;
-    }
-
-    public DsonNumber asDsonNumber() {
-        return (DsonNumber) this;
     }
 
     public DsonReference asDsonReference() {

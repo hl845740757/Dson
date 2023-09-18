@@ -22,6 +22,8 @@ import cn.wjybxx.dson.types.ObjectRef;
 import cn.wjybxx.dson.types.OffsetTimestamp;
 import com.google.protobuf.Parser;
 
+import java.util.Objects;
+
 /**
  * @author wjybxx
  * date - 2023/4/22
@@ -29,20 +31,17 @@ import com.google.protobuf.Parser;
 public class DsonBinaryReader extends AbstractDsonReader {
 
     private DsonInput input;
+    private final boolean autoClose;
 
     public DsonBinaryReader(int recursionLimit, DsonInput input) {
-        super(recursionLimit);
-        this.input = input;
-        setContext(new Context().init(null, DsonContextType.TOP_LEVEL, null));
+        this(recursionLimit, input, true);
     }
 
-    @Override
-    public void close() {
-        if (input != null) {
-            input.close();
-            input = null;
-        }
-        super.close();
+    public DsonBinaryReader(int recursionLimit, DsonInput input, boolean autoClose) {
+        super(recursionLimit);
+        this.input = Objects.requireNonNull(input);
+        this.autoClose = autoClose;
+        setContext(new Context().init(null, DsonContextType.TOP_LEVEL, null));
     }
 
     @Override
@@ -53,6 +52,15 @@ public class DsonBinaryReader extends AbstractDsonReader {
     @Override
     protected Context getPooledContext() {
         return (Context) super.getPooledContext();
+    }
+
+    @Override
+    public void close() {
+        if (autoClose && input != null) {
+            input.close();
+            input = null;
+        }
+        super.close();
     }
 
     // region state
