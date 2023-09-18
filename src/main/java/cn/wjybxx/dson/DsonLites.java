@@ -3,6 +3,7 @@ package cn.wjybxx.dson;
 import cn.wjybxx.dson.text.ObjectStyle;
 
 import javax.annotation.Nullable;
+import java.util.Objects;
 
 /**
  * Dson二进制流工具类
@@ -242,5 +243,57 @@ public class DsonLites {
             case END_OF_OBJECT -> throw new AssertionError();
         };
     }
+    // endregion
+
+    // region 拷贝
+
+    @SuppressWarnings("unchecked")
+    public static <T extends DsonValue> T mutableDeepCopy(T dsonValue) {
+        Objects.requireNonNull(dsonValue);
+        switch (dsonValue.getDsonType()) {
+            case OBJECT -> {
+                return (T) copyObject(dsonValue.asObjectLite());
+            }
+            case HEADER -> {
+                return (T) copyHeader(dsonValue.asHeaderLite());
+            }
+            case ARRAY -> {
+                return (T) copyArray(dsonValue.asArrayLite());
+            }
+            case BINARY -> {
+                return (T) new DsonBinary(dsonValue.asBinary());
+            }
+            default -> {
+                return dsonValue;
+            }
+        }
+    }
+
+    private static DsonHeader<FieldNumber> copyHeader(DsonHeader<FieldNumber> src) {
+        DsonHeader<FieldNumber> result = new DsonHeader<>();
+        copyObject(src, result);
+        return result;
+    }
+
+    private static DsonObject<FieldNumber> copyObject(DsonObject<FieldNumber> src) {
+        DsonObject<FieldNumber> result = new DsonObject<>(src.size());
+        copyObject(src.getHeader(), result.getHeader());
+        copyObject(src, result);
+        return result;
+    }
+
+    private static DsonArray<FieldNumber> copyArray(DsonArray<FieldNumber> src) {
+        DsonArray<FieldNumber> result = new DsonArray<>(src.size());
+        copyObject(src.getHeader(), result.getHeader());
+        src.forEach(e -> result.add(mutableDeepCopy(e)));
+        return result;
+    }
+
+    private static void copyObject(AbstractDsonObject<FieldNumber> src, AbstractDsonObject<FieldNumber> dest) {
+        if (src.size() > 0) {
+            src.forEach((s, dsonValue) -> dest.put(s, mutableDeepCopy(dsonValue)));
+        }
+    }
+
     // endregion
 }

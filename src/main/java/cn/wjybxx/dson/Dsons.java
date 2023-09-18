@@ -22,6 +22,7 @@ import cn.wjybxx.dson.text.*;
 import javax.annotation.Nullable;
 import java.io.Reader;
 import java.io.StringWriter;
+import java.util.Objects;
 import java.util.Properties;
 
 /**
@@ -281,7 +282,9 @@ public final class Dsons {
     }
 
     public static String toDson(DsonValue dsonValue, ObjectStyle style, DsonMode dsonMode) {
-        return toDson(dsonValue, style, dsonMode == DsonMode.RELAXED ? DsonTextWriterSettings.RELAXED_DEFAULT : DsonTextWriterSettings.DEFAULT);
+        return toDson(dsonValue, style, dsonMode == DsonMode.RELAXED
+                ? DsonTextWriterSettings.RELAXED_DEFAULT
+                : DsonTextWriterSettings.DEFAULT);
     }
 
     public static String toDson(DsonValue dsonValue, ObjectStyle style, DsonTextWriterSettings settings) {
@@ -346,8 +349,60 @@ public final class Dsons {
         return new DsonScanner(DsonCharStream.newBufferedCharStream(reader, dsonMode));
     }
 
-    public static DsonScanner newStreamScanner(Reader reader, DsonMode dsonMode, boolean autoClose, int bufferSize) {
+    public static DsonScanner newStreamScanner(Reader reader, DsonMode dsonMode, int bufferSize, boolean autoClose) {
         return new DsonScanner(DsonCharStream.newBufferedCharStream(reader, dsonMode, bufferSize, autoClose));
+    }
+
+    // endregion
+
+    // region 拷贝
+
+    @SuppressWarnings("unchecked")
+    public static <T extends DsonValue> T mutableDeepCopy(T dsonValue) {
+        Objects.requireNonNull(dsonValue);
+        switch (dsonValue.getDsonType()) {
+            case OBJECT -> {
+                return (T) copyObject(dsonValue.asObject());
+            }
+            case HEADER -> {
+                return (T) copyHeader(dsonValue.asHeader());
+            }
+            case ARRAY -> {
+                return (T) copyArray(dsonValue.asArray());
+            }
+            case BINARY -> {
+                return (T) new DsonBinary(dsonValue.asBinary());
+            }
+            default -> {
+                return dsonValue;
+            }
+        }
+    }
+
+    private static DsonHeader<String> copyHeader(DsonHeader<String> src) {
+        DsonHeader<String> result = new DsonHeader<>();
+        copyObject(src, result);
+        return result;
+    }
+
+    private static DsonObject<String> copyObject(DsonObject<String> src) {
+        DsonObject<String> result = new DsonObject<>(src.size());
+        copyObject(src.getHeader(), result.getHeader());
+        copyObject(src, result);
+        return result;
+    }
+
+    private static DsonArray<String> copyArray(DsonArray<String> src) {
+        DsonArray<String> result = new DsonArray<>(src.size());
+        copyObject(src.getHeader(), result.getHeader());
+        src.forEach(e -> result.add(mutableDeepCopy(e)));
+        return result;
+    }
+
+    private static void copyObject(AbstractDsonObject<String> src, AbstractDsonObject<String> dest) {
+        if (src.size() > 0) {
+            src.forEach((s, dsonValue) -> dest.put(s, mutableDeepCopy(dsonValue)));
+        }
     }
 
     // endregion
