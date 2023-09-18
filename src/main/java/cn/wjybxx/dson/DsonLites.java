@@ -247,21 +247,20 @@ public class DsonLites {
 
     // region 拷贝
 
-    @SuppressWarnings("unchecked")
-    public static <T extends DsonValue> T mutableDeepCopy(T dsonValue) {
+    public static DsonValue mutableDeepCopy(DsonValue dsonValue) {
         Objects.requireNonNull(dsonValue);
         switch (dsonValue.getDsonType()) {
             case OBJECT -> {
-                return (T) copyObject(dsonValue.asObjectLite());
+                return mutableDeepCopy(dsonValue.asObjectLite());
             }
             case HEADER -> {
-                return (T) copyHeader(dsonValue.asHeaderLite());
+                return copyHeader(dsonValue.asHeaderLite());
             }
             case ARRAY -> {
-                return (T) copyArray(dsonValue.asArrayLite());
+                return mutableDeepCopy(dsonValue.asArrayLite());
             }
             case BINARY -> {
-                return (T) new DsonBinary(dsonValue.asBinary());
+                return new DsonBinary(dsonValue.asBinary());
             }
             default -> {
                 return dsonValue;
@@ -269,23 +268,23 @@ public class DsonLites {
         }
     }
 
-    private static DsonHeader<FieldNumber> copyHeader(DsonHeader<FieldNumber> src) {
-        DsonHeader<FieldNumber> result = new DsonHeader<>();
-        copyObject(src, result);
-        return result;
-    }
-
-    private static DsonObject<FieldNumber> copyObject(DsonObject<FieldNumber> src) {
+    public static DsonObject<FieldNumber> mutableDeepCopy(DsonObject<FieldNumber> src) {
         DsonObject<FieldNumber> result = new DsonObject<>(src.size());
         copyObject(src.getHeader(), result.getHeader());
         copyObject(src, result);
         return result;
     }
 
-    private static DsonArray<FieldNumber> copyArray(DsonArray<FieldNumber> src) {
+    public static DsonArray<FieldNumber> mutableDeepCopy(DsonArray<FieldNumber> src) {
         DsonArray<FieldNumber> result = new DsonArray<>(src.size());
         copyObject(src.getHeader(), result.getHeader());
         src.forEach(e -> result.add(mutableDeepCopy(e)));
+        return result;
+    }
+
+    private static DsonHeader<FieldNumber> copyHeader(DsonHeader<FieldNumber> src) {
+        DsonHeader<FieldNumber> result = new DsonHeader<>();
+        copyObject(src, result);
         return result;
     }
 

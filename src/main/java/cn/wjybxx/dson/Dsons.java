@@ -357,21 +357,20 @@ public final class Dsons {
 
     // region 拷贝
 
-    @SuppressWarnings("unchecked")
-    public static <T extends DsonValue> T mutableDeepCopy(T dsonValue) {
+    public static DsonValue mutableDeepCopy(DsonValue dsonValue) {
         Objects.requireNonNull(dsonValue);
         switch (dsonValue.getDsonType()) {
             case OBJECT -> {
-                return (T) copyObject(dsonValue.asObject());
+                return mutableDeepCopy(dsonValue.asObject());
             }
             case HEADER -> {
-                return (T) copyHeader(dsonValue.asHeader());
+                return copyHeader(dsonValue.asHeader());
             }
             case ARRAY -> {
-                return (T) copyArray(dsonValue.asArray());
+                return mutableDeepCopy(dsonValue.asArray());
             }
             case BINARY -> {
-                return (T) new DsonBinary(dsonValue.asBinary());
+                return new DsonBinary(dsonValue.asBinary());
             }
             default -> {
                 return dsonValue;
@@ -379,23 +378,23 @@ public final class Dsons {
         }
     }
 
-    private static DsonHeader<String> copyHeader(DsonHeader<String> src) {
-        DsonHeader<String> result = new DsonHeader<>();
-        copyObject(src, result);
-        return result;
-    }
-
-    private static DsonObject<String> copyObject(DsonObject<String> src) {
+    public static DsonObject<String> mutableDeepCopy(DsonObject<String> src) {
         DsonObject<String> result = new DsonObject<>(src.size());
         copyObject(src.getHeader(), result.getHeader());
         copyObject(src, result);
         return result;
     }
 
-    private static DsonArray<String> copyArray(DsonArray<String> src) {
+    public static DsonArray<String> mutableDeepCopy(DsonArray<String> src) {
         DsonArray<String> result = new DsonArray<>(src.size());
         copyObject(src.getHeader(), result.getHeader());
         src.forEach(e -> result.add(mutableDeepCopy(e)));
+        return result;
+    }
+
+    private static DsonHeader<String> copyHeader(DsonHeader<String> src) {
+        DsonHeader<String> result = new DsonHeader<>();
+        copyObject(src, result);
         return result;
     }
 
