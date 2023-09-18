@@ -280,9 +280,8 @@ public final class Dsons {
         return toDson(dsonValue, style, DsonTextWriterSettings.DEFAULT);
     }
 
-    /** @param jsonLike 是否打印为类json模式（无行首） */
-    public static String toDson(DsonValue dsonValue, ObjectStyle style, boolean jsonLike) {
-        return toDson(dsonValue, style, jsonLike ? DsonTextWriterSettings.JSON_DEFAULT : DsonTextWriterSettings.DEFAULT);
+    public static String toDson(DsonValue dsonValue, ObjectStyle style, DsonMode dsonMode) {
+        return toDson(dsonValue, style, dsonMode == DsonMode.RELAXED ? DsonTextWriterSettings.RELAXED_DEFAULT : DsonTextWriterSettings.DEFAULT);
     }
 
     public static String toDson(DsonValue dsonValue, ObjectStyle style, DsonTextWriterSettings settings) {

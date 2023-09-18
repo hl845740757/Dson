@@ -66,7 +66,7 @@ public class Json2DsonTest {
             DsonValue jsonObject2 = Dsons.fromJson(FileUtils.readFileToString(new File(jsonFilePath), StandardCharsets.UTF_8));
             Assertions.assertEquals(jsonObject, jsonObject2);
 
-            String dson = Dsons.toDson(jsonObject, ObjectStyle.INDENT, true);
+            String dson = Dsons.toDson(jsonObject, ObjectStyle.INDENT, DsonMode.RELAXED);
             DsonValue jsonObject3 = Dsons.fromJson(dson);
             Assertions.assertEquals(jsonObject, jsonObject3);
 

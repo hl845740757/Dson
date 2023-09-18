@@ -246,7 +246,7 @@ public class DsonTextWriter extends AbstractDsonWriter {
     }
 
     private void printLhead(LheadType lheadType) {
-        if (!settings.jsonLike) {
+        if (settings.dsonMode == DsonMode.STANDARD) {
             printer.printLhead(lheadType);
         }
     }

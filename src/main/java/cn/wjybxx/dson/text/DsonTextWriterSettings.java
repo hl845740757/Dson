@@ -27,11 +27,11 @@ import java.util.Objects;
 public class DsonTextWriterSettings {
 
     public static final DsonTextWriterSettings DEFAULT = DsonTextWriterSettings.newBuilder().build();
-    public static final DsonTextWriterSettings JSON_DEFAULT = DsonTextWriterSettings.newBuilder().setJsonLike(true).build();
+    public static final DsonTextWriterSettings RELAXED_DEFAULT = DsonTextWriterSettings.newBuilder().setDsonMode(DsonMode.RELAXED).build();
 
     public final String lineSeparator;
     public final int softLineLength;
-    public final boolean jsonLike;
+    public final DsonMode dsonMode;
 
     public final boolean enableText;
     public final float lengthFactorOfText;
@@ -41,9 +41,10 @@ public class DsonTextWriterSettings {
     private DsonTextWriterSettings(Builder builder) {
         this.lineSeparator = Objects.requireNonNull(builder.lineSeparator);
         this.softLineLength = Math.max(8, builder.softLineLength);
-        this.jsonLike = builder.jsonLike;
+        this.dsonMode = builder.dsonMode;
 
-        this.enableText = !jsonLike && builder.enableText; // 启用类json模式下禁用文本模式
+        // 标准模式下才可启用纯文本
+        this.enableText = dsonMode == DsonMode.STANDARD && builder.enableText;
         this.lengthFactorOfText = builder.lengthFactorOfText;
         this.unicodeChar = builder.unicodeChar;
         this.maxLengthOfUnquoteString = builder.maxLengthOfUnquoteString;
@@ -65,9 +66,9 @@ public class DsonTextWriterSettings {
          */
         private int softLineLength = 120;
         /**
-         * 是否打印为类json格式，即不支持行首
+         * 文本模式
          */
-        private boolean jsonLike = false;
+        private DsonMode dsonMode = DsonMode.STANDARD;
         /**
          * 是否支持纯文本模式
          * 如果{@link #unicodeChar}为true，该值通常需要关闭，text模式不会执行转义，也就不会处理unicode字符
@@ -113,12 +114,12 @@ public class DsonTextWriterSettings {
             return this;
         }
 
-        public boolean isJsonLike() {
-            return jsonLike;
+        public DsonMode getDsonMode() {
+            return dsonMode;
         }
 
-        public Builder setJsonLike(boolean jsonLike) {
-            this.jsonLike = jsonLike;
+        public Builder setDsonMode(DsonMode dsonMode) {
+            this.dsonMode = dsonMode;
             return this;
         }
 
