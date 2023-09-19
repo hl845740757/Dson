@@ -16,6 +16,8 @@
 
 package cn.wjybxx.dson.types;
 
+import cn.wjybxx.dson.Dsons;
+
 /**
  * long值的简单扩展
  *
@@ -28,9 +30,7 @@ public class ExtInt32 implements Comparable<ExtInt32> {
     private final int value;
 
     public ExtInt32(int type, int value) {
-        if (type < 0) {
-            throw new IllegalArgumentException("type cant be negative");
-        }
+        Dsons.checkSubType(type);
         this.type = type;
         this.value = value;
     }

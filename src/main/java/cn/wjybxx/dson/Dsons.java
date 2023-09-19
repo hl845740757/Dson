@@ -77,6 +77,13 @@ public final class Dsons {
         return (enableClassIntern && className.length() <= 128) ? className.intern() : className;
     }
 
+    public static int checkSubType(int type) {
+        if (type < 0) {
+            throw new IllegalArgumentException("type cant be negative");
+        }
+        return type;
+    }
+
     // fullType
 
     /**
@@ -277,6 +284,63 @@ public final class Dsons {
         };
     }
 
+    // endregion
+
+    // region 拷贝
+
+    public static DsonValue mutableDeepCopy(DsonValue dsonValue) {
+        Objects.requireNonNull(dsonValue);
+        switch (dsonValue.getDsonType()) {
+            case OBJECT -> {
+                return mutableDeepCopy(dsonValue.asObject());
+            }
+            case HEADER -> {
+                return copyHeader(dsonValue.asHeader());
+            }
+            case ARRAY -> {
+                return mutableDeepCopy(dsonValue.asArray());
+            }
+            case BINARY -> {
+                return new DsonBinary(dsonValue.asBinary());
+            }
+            default -> {
+                return dsonValue;
+            }
+        }
+    }
+
+    public static DsonObject<String> mutableDeepCopy(DsonObject<String> src) {
+        DsonObject<String> result = new DsonObject<>(src.size());
+        copyObject(src.getHeader(), result.getHeader());
+        copyObject(src, result);
+        return result;
+    }
+
+    public static DsonArray<String> mutableDeepCopy(DsonArray<String> src) {
+        DsonArray<String> result = new DsonArray<>(src.size());
+        copyObject(src.getHeader(), result.getHeader());
+        if (src.size() > 0) {
+            src.forEach(e -> result.add(mutableDeepCopy(e)));
+        }
+        return result;
+    }
+
+    private static DsonHeader<String> copyHeader(DsonHeader<String> src) {
+        DsonHeader<String> result = new DsonHeader<>();
+        copyObject(src, result);
+        return result;
+    }
+
+    private static void copyObject(AbstractDsonObject<String> src, AbstractDsonObject<String> dest) {
+        if (src.size() > 0) {
+            src.forEach((s, dsonValue) -> dest.put(s, mutableDeepCopy(dsonValue)));
+        }
+    }
+
+    // endregion
+
+    // region 快捷方法
+
     public static String toDson(DsonValue dsonValue, ObjectStyle style) {
         return toDson(dsonValue, style, DsonTextWriterSettings.DEFAULT);
     }
@@ -355,54 +419,4 @@ public final class Dsons {
 
     // endregion
 
-    // region 拷贝
-
-    public static DsonValue mutableDeepCopy(DsonValue dsonValue) {
-        Objects.requireNonNull(dsonValue);
-        switch (dsonValue.getDsonType()) {
-            case OBJECT -> {
-                return mutableDeepCopy(dsonValue.asObject());
-            }
-            case HEADER -> {
-                return copyHeader(dsonValue.asHeader());
-            }
-            case ARRAY -> {
-                return mutableDeepCopy(dsonValue.asArray());
-            }
-            case BINARY -> {
-                return new DsonBinary(dsonValue.asBinary());
-            }
-            default -> {
-                return dsonValue;
-            }
-        }
-    }
-
-    public static DsonObject<String> mutableDeepCopy(DsonObject<String> src) {
-        DsonObject<String> result = new DsonObject<>(src.size());
-        copyObject(src.getHeader(), result.getHeader());
-        copyObject(src, result);
-        return result;
-    }
-
-    public static DsonArray<String> mutableDeepCopy(DsonArray<String> src) {
-        DsonArray<String> result = new DsonArray<>(src.size());
-        copyObject(src.getHeader(), result.getHeader());
-        src.forEach(e -> result.add(mutableDeepCopy(e)));
-        return result;
-    }
-
-    private static DsonHeader<String> copyHeader(DsonHeader<String> src) {
-        DsonHeader<String> result = new DsonHeader<>();
-        copyObject(src, result);
-        return result;
-    }
-
-    private static void copyObject(AbstractDsonObject<String> src, AbstractDsonObject<String> dest) {
-        if (src.size() > 0) {
-            src.forEach((s, dsonValue) -> dest.put(s, mutableDeepCopy(dsonValue)));
-        }
-    }
-
-    // endregion
 }

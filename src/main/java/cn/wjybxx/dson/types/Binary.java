@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package cn.wjybxx.dson;
+package cn.wjybxx.dson.types;
 
-import cn.wjybxx.dson.types.Binary;
+import cn.wjybxx.dson.Dsons;
 
-import javax.annotation.Nonnull;
 import java.util.Arrays;
 
 /**
@@ -29,31 +28,41 @@ import java.util.Arrays;
  * @author wjybxx
  * date - 2023/4/19
  */
-public class DsonBinary extends DsonValue {
+public class Binary {
+
+    /** 数据的最大长度 -- type使用 varint编码，最大占用5个字节 */
+    public static final int MAX_DATA_LENGTH = Integer.MAX_VALUE - 5;
 
     private final int type;
     private final byte[] data;
 
-    public DsonBinary(byte[] data) {
+    public Binary(byte[] data) {
         this(0, data);
     }
 
-    public DsonBinary(int type, byte[] data) {
+    public Binary(int type, byte[] data) {
         Dsons.checkSubType(type);
-        Binary.checkDataLength(data.length); // 顺带NPE
+        checkDataLength(data.length);
         this.type = type;
         this.data = data;
     }
 
     /** 默认采取拷贝的方式，保证安全性 */
-    public DsonBinary(DsonBinary src) {
+    public Binary(Binary src) {
         this.type = src.type;
         this.data = src.data.clone();
     }
 
+    public static void checkDataLength(int length) {
+        if (length > MAX_DATA_LENGTH) {
+            throw new IllegalArgumentException("the length of data must between[0, %d], but found: %d"
+                    .formatted(MAX_DATA_LENGTH, length));
+        }
+    }
+
     /** 创建一个拷贝 */
-    public DsonBinary copy() {
-        return new DsonBinary(type, data.clone());
+    public Binary copy() {
+        return new Binary(type, data.clone());
     }
 
     public int getType() {
@@ -65,12 +74,6 @@ public class DsonBinary extends DsonValue {
         return data;
     }
 
-    @Nonnull
-    @Override
-    public DsonType getDsonType() {
-        return DsonType.BINARY;
-    }
-
     //
 
     @Override
@@ -78,7 +81,7 @@ public class DsonBinary extends DsonValue {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        DsonBinary that = (DsonBinary) o;
+        Binary that = (Binary) o;
 
         if (type != that.type) return false;
         return Arrays.equals(data, that.data);
@@ -93,7 +96,7 @@ public class DsonBinary extends DsonValue {
 
     @Override
     public String toString() {
-        return "DsonBinary{" +
+        return "Binary{" +
                 "type=" + type +
                 ", data=" + Arrays.toString(data) +
                 '}';

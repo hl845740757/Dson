@@ -21,6 +21,7 @@ import cn.wjybxx.dson.io.DsonIOException;
 import cn.wjybxx.dson.text.INumberStyle;
 import cn.wjybxx.dson.text.ObjectStyle;
 import cn.wjybxx.dson.text.StringStyle;
+import cn.wjybxx.dson.types.Binary;
 import cn.wjybxx.dson.types.ObjectRef;
 import cn.wjybxx.dson.types.OffsetTimestamp;
 import com.google.protobuf.MessageLite;
@@ -185,8 +186,8 @@ public abstract class AbstractDsonWriter implements DsonWriter {
     @Override
     public void writeBinary(String name, int type, Chunk chunk) {
         Objects.requireNonNull(chunk);
-        DsonBinary.checkType(type);
-        DsonBinary.checkDataLength(chunk.getLength());
+        Dsons.checkSubType(type);
+        Binary.checkDataLength(chunk.getLength());
         advanceToValueState(name);
         doWriteBinary(type, chunk);
         setNextState();
@@ -344,7 +345,7 @@ public abstract class AbstractDsonWriter implements DsonWriter {
 
     @Override
     public void writeMessage(String name, int binaryType, MessageLite messageLite) {
-        DsonBinary.checkType(binaryType);
+        Dsons.checkSubType(binaryType);
         advanceToValueState(name);
         doWriteMessage(binaryType, messageLite);
         setNextState();

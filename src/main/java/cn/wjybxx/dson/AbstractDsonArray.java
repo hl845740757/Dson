@@ -113,7 +113,6 @@ public abstract class AbstractDsonArray extends DsonValue implements List<DsonVa
         return values.toArray(a);
     }
 
-
     @Override
     public boolean remove(Object o) {
         return values.remove(o);
@@ -136,7 +135,7 @@ public abstract class AbstractDsonArray extends DsonValue implements List<DsonVa
 
     @Override
     public void replaceAll(UnaryOperator<DsonValue> operator) {
-        values.replaceAll(operator);
+        values.replaceAll(operator); // TODO 缺少结果校验
     }
 
     @Override
@@ -176,7 +175,7 @@ public abstract class AbstractDsonArray extends DsonValue implements List<DsonVa
 
     @Override
     public ListIterator<DsonValue> listIterator() {
-        return values.listIterator();
+        return values.listIterator(); // TODO 缺少Set和Add校验
     }
 
     @Override

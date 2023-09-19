@@ -30,9 +30,7 @@ public class DsonExtInt32 extends DsonValue implements Comparable<DsonExtInt32> 
     private final int value;
 
     public DsonExtInt32(int type, int value) {
-        if (type < 0) {
-            throw new IllegalArgumentException("type cant be negative");
-        }
+        Dsons.checkSubType(type);
         this.type = type;
         this.value = value;
     }

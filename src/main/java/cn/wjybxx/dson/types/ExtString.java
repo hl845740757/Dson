@@ -16,6 +16,8 @@
 
 package cn.wjybxx.dson.types;
 
+import cn.wjybxx.dson.Dsons;
+
 import java.util.Objects;
 
 /**
@@ -30,9 +32,7 @@ public class ExtString implements Comparable<ExtString> {
     private final String value;
 
     public ExtString(int type, String value) {
-        if (type < 0) {
-            throw new IllegalArgumentException("type cant be negative");
-        }
+        Dsons.checkSubType(type);
         this.type = type;
         this.value = value;
     }

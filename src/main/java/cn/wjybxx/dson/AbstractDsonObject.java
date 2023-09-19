@@ -155,7 +155,7 @@ public abstract class AbstractDsonObject<K> extends DsonValue implements Map<K, 
 
     @Override
     public Set<Entry<K, DsonValue>> entrySet() {
-        return valueMap.entrySet();
+        return valueMap.entrySet(); // 这里也缺少对 entry.setValue 的校验
     }
 
     // endregion

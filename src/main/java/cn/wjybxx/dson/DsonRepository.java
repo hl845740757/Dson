@@ -98,7 +98,7 @@ public class DsonRepository {
     }
 
     private void resolveReference(DsonValue dsonValue) {
-        if (dsonValue instanceof DsonObject<?> dsonObject) {
+        if (dsonValue instanceof AbstractDsonObject<?> dsonObject) { // 支持header...
             for (Map.Entry<?, DsonValue> entry : dsonObject.entrySet()) {
                 DsonValue value = entry.getValue();
                 if (value.getDsonType() == DsonType.REFERENCE) {

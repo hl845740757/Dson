@@ -278,7 +278,9 @@ public class DsonLites {
     public static DsonArray<FieldNumber> mutableDeepCopy(DsonArray<FieldNumber> src) {
         DsonArray<FieldNumber> result = new DsonArray<>(src.size());
         copyObject(src.getHeader(), result.getHeader());
-        src.forEach(e -> result.add(mutableDeepCopy(e)));
+        if (src.size() > 0) {
+            src.forEach(e -> result.add(mutableDeepCopy(e)));
+        }
         return result;
     }
 
