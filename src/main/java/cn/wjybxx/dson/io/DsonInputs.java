@@ -319,7 +319,6 @@ public class DsonInputs {
             if (getPosition() == readerIndex) {
                 return;
             }
-            codedInputStream.resetSizeCounter();
 
             int newOffset = offset + readerIndex;
             BinaryUtils.position(byteBuffer, newOffset);
