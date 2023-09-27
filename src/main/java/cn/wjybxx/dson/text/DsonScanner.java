@@ -161,7 +161,7 @@ public class DsonScanner implements AutoCloseable {
         if (firstChar == '"') {
             className = scanString((char) firstChar);
         } else {
-            // 非双引号模式下，只能由安全字符共促
+            // 非双引号模式下，只能由安全字符构成
             if (DsonTexts.isUnsafeStringChar(firstChar)) {
                 throw invalidClassName(Character.toString((char) firstChar), getPosition());
             }

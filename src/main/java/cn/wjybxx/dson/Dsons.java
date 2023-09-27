@@ -232,7 +232,7 @@ public final class Dsons {
             writer.writeName(name);
         }
         switch (dsonValue.getDsonType()) {
-            case INT32 -> writer.writeInt32(name, dsonValue.asInt32(), WireType.VARINT, NumberStyle.TYPED);
+            case INT32 -> writer.writeInt32(name, dsonValue.asInt32(), WireType.VARINT, NumberStyle.TYPED); // 必须能精确反序列化
             case INT64 -> writer.writeInt64(name, dsonValue.asInt64(), WireType.VARINT, NumberStyle.TYPED);
             case FLOAT -> writer.writeFloat(name, dsonValue.asFloat(), NumberStyle.TYPED);
             case DOUBLE -> writer.writeDouble(name, dsonValue.asDouble(), NumberStyle.SIMPLE);
