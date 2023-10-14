@@ -220,6 +220,7 @@ public abstract class AbstractDsonReader implements DsonReader {
     // endregion
 
     // region 简单值
+
     @Override
     public int readInt32(String name) {
         advanceToValueState(name, DsonType.INT32);
@@ -495,6 +496,18 @@ public abstract class AbstractDsonReader implements DsonReader {
         setNextState();
         readDsonType(); // end of object
         assert currentDsonType == DsonType.END_OF_OBJECT;
+    }
+
+    @Override
+    public Number readNumber(String name) {
+        advanceToValueState(name, null);
+        return switch (currentDsonType) {
+            case INT32 -> readInt32(name);
+            case INT64 -> readInt64(name);
+            case FLOAT -> readFloat(name);
+            case DOUBLE -> readDouble(name);
+            default -> throw DsonIOException.dsonTypeMismatch(DsonType.DOUBLE, currentDsonType);
+        };
     }
 
     @Override

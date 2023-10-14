@@ -185,6 +185,14 @@ public interface DsonReader extends AutoCloseable {
     void skipToEndOfObject();
 
     /**
+     * {@link DsonType#INT32}
+     * {@link DsonType#INT64}
+     * {@link DsonType#FLOAT}
+     * {@link DsonType#DOUBLE}
+     */
+    Number readNumber(String name);
+
+    /**
      * 读取一个protobuf消息
      * 只有当前数据是Binary的时候才合法
      *

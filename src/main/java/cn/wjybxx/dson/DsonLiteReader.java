@@ -130,7 +130,6 @@ public interface DsonLiteReader extends AutoCloseable {
     ObjectRef readRef(int name);
 
     OffsetTimestamp readTimestamp(int name);
-
     // endregion
 
     // region 容器
@@ -187,6 +186,14 @@ public interface DsonLiteReader extends AutoCloseable {
      * 也就是说，调用该方法后应立即调用 readEnd 相关方法
      */
     void skipToEndOfObject();
+
+    /**
+     * {@link DsonType#INT32}
+     * {@link DsonType#INT64}
+     * {@link DsonType#FLOAT}
+     * {@link DsonType#DOUBLE}
+     */
+    Number readNumber(int name);
 
     /**
      * 读取一个protobuf消息
