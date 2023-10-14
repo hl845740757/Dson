@@ -16,6 +16,8 @@
 
 package cn.wjybxx.dson.text;
 
+import cn.wjybxx.dson.DsonWriterSettings;
+
 import javax.annotation.concurrent.Immutable;
 import java.util.Objects;
 
@@ -24,7 +26,7 @@ import java.util.Objects;
  * date - 2023/6/5
  */
 @Immutable
-public class DsonTextWriterSettings {
+public class DsonTextWriterSettings extends DsonWriterSettings {
 
     public static final DsonTextWriterSettings DEFAULT = DsonTextWriterSettings.newBuilder().build();
     public static final DsonTextWriterSettings RELAXED_DEFAULT = DsonTextWriterSettings.newBuilder().setDsonMode(DsonMode.RELAXED).build();
@@ -39,6 +41,7 @@ public class DsonTextWriterSettings {
     public final int maxLengthOfUnquoteString;
 
     private DsonTextWriterSettings(Builder builder) {
+        super(builder);
         this.lineSeparator = Objects.requireNonNull(builder.lineSeparator);
         this.softLineLength = Math.max(8, builder.softLineLength);
         this.dsonMode = builder.dsonMode;
@@ -54,7 +57,7 @@ public class DsonTextWriterSettings {
         return new Builder();
     }
 
-    public static class Builder {
+    public static class Builder extends DsonWriterSettings.Builder {
 
         /** 行分隔符 */
         private String lineSeparator = System.lineSeparator();
@@ -92,6 +95,7 @@ public class DsonTextWriterSettings {
         private Builder() {
         }
 
+        @Override
         public DsonTextWriterSettings build() {
             return new DsonTextWriterSettings(this);
         }

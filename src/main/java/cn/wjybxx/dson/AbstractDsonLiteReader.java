@@ -37,7 +37,7 @@ public abstract class AbstractDsonLiteReader implements DsonLiteReader {
 
     protected static final int INVALID_NAME = -1;
 
-    protected final int recursionLimit;
+    protected final DsonReaderSettings settings;
     private Context context;
     private Context pooledContext; // 一个额外的缓存，用于写集合等减少上下文创建
 
@@ -48,8 +48,8 @@ public abstract class AbstractDsonLiteReader implements DsonLiteReader {
     protected int currentWireTypeBits;
     protected int currentName = INVALID_NAME;
 
-    public AbstractDsonLiteReader(int recursionLimit) {
-        this.recursionLimit = recursionLimit;
+    public AbstractDsonLiteReader(DsonReaderSettings settings) {
+        this.settings = settings;
     }
 
     protected Context getContext() {
@@ -395,7 +395,7 @@ public abstract class AbstractDsonLiteReader implements DsonLiteReader {
             setNextState();
             return;
         }
-        if (recursionDepth >= recursionLimit) {
+        if (recursionDepth >= settings.recursionLimit) {
             throw DsonIOException.recursionLimitExceeded();
         }
         autoStartTopLevel(context);

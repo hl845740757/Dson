@@ -20,10 +20,7 @@ import cn.wjybxx.dson.io.DsonInput;
 import cn.wjybxx.dson.io.DsonInputs;
 import cn.wjybxx.dson.io.DsonOutput;
 import cn.wjybxx.dson.io.DsonOutputs;
-import cn.wjybxx.dson.text.DsonTextReader;
-import cn.wjybxx.dson.text.DsonTextWriter;
-import cn.wjybxx.dson.text.DsonTextWriterSettings;
-import cn.wjybxx.dson.text.ObjectStyle;
+import cn.wjybxx.dson.text.*;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -83,7 +80,7 @@ public class DsonCodecTest {
         final byte[] buffer = new byte[8192];
         int totalBytesWritten;
         try (DsonOutput dsonOutput = DsonOutputs.newInstance(buffer)) {
-            DsonWriter writer = new DsonBinaryWriter(16, dsonOutput);
+            DsonWriter writer = new DsonBinaryWriter(DsonWriterSettings.DEFAULT, dsonOutput);
             for (DsonObject<String> dsonObject : srcList) {
                 Dsons.writeObject(writer, dsonObject, ObjectStyle.INDENT);
             }
@@ -91,7 +88,7 @@ public class DsonCodecTest {
         }
         List<DsonObject<String>> copiedList = new ArrayList<>(loop);
         try (DsonInput dsonInput = DsonInputs.newInstance(buffer, 0, totalBytesWritten)) {
-            DsonReader reader = new DsonBinaryReader(16, dsonInput);
+            DsonReader reader = new DsonBinaryReader(DsonReaderSettings.DEFAULT, dsonInput);
             DsonValue dsonValue;
             while ((dsonValue = Dsons.readTopDsonValue(reader)) != null) {
                 copiedList.add(dsonValue.asObject());
@@ -103,13 +100,13 @@ public class DsonCodecTest {
     @Test
     void testObjet() {
         DsonArray<String> dsonArray = new DsonArray<>();
-        try (DsonWriter writer = new DsonObjectWriter(16, dsonArray)) {
+        try (DsonWriter writer = new DsonObjectWriter(DsonWriterSettings.DEFAULT, dsonArray)) {
             for (DsonObject<String> dsonObject : srcList) {
                 Dsons.writeObject(writer, dsonObject, ObjectStyle.INDENT);
             }
         }
         List<DsonObject<String>> copiedList = new ArrayList<>(loop);
-        try (DsonReader reader = new DsonObjectReader(16, dsonArray)) {
+        try (DsonReader reader = new DsonObjectReader(DsonReaderSettings.DEFAULT, dsonArray)) {
             DsonValue dsonValue;
             while ((dsonValue = Dsons.readTopDsonValue(reader)) != null) {
                 copiedList.add(dsonValue.asObject());
@@ -122,7 +119,7 @@ public class DsonCodecTest {
     void testText() {
         DsonTextWriterSettings settings = DsonTextWriterSettings.newBuilder().build();
         StringWriter stringWriter = new StringWriter();
-        try (DsonTextWriter writer = new DsonTextWriter(16, settings, stringWriter)) {
+        try (DsonTextWriter writer = new DsonTextWriter(settings, stringWriter)) {
             for (DsonObject<String> dsonObject : srcList) {
                 Dsons.writeObject(writer, dsonObject, ObjectStyle.INDENT);
             }
@@ -130,7 +127,7 @@ public class DsonCodecTest {
         String dsonString = stringWriter.toString();
 //        System.out.println(dsonString);
         List<DsonObject<String>> copiedList = new ArrayList<>(loop);
-        try (DsonTextReader reader = new DsonTextReader(16, dsonString)) {
+        try (DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.DEFAULT, dsonString)) {
             DsonValue dsonValue;
             while ((dsonValue = Dsons.readTopDsonValue(reader)) != null) {
                 copiedList.add(dsonValue.asObject());
@@ -149,7 +146,7 @@ public class DsonCodecTest {
 
         int totalBytesWritten;
         try (DsonOutput dsonOutput = DsonOutputs.newInstance(buffer)) {
-            DsonLiteWriter writer = new DsonBinaryLiteWriter(16, dsonOutput);
+            DsonLiteWriter writer = new DsonBinaryLiteWriter(DsonWriterSettings.DEFAULT, dsonOutput);
             for (int i = 0; i < loop; i++) {
                 DsonObject<FieldNumber> obj1 = new DsonObject<FieldNumber>(6);
                 obj1.append(FieldNumber.ofLnumber(0), new DsonString("wjybxx"))
@@ -163,7 +160,7 @@ public class DsonCodecTest {
         }
 
         try (DsonInput dsonInput = DsonInputs.newInstance(buffer, 0, totalBytesWritten)) {
-            DsonLiteReader reader = new DsonBinaryLiteReader(16, dsonInput);
+            DsonLiteReader reader = new DsonBinaryLiteReader(DsonReaderSettings.DEFAULT, dsonInput);
             DsonValue dsonValue;
             while ((dsonValue = DsonLites.readTopDsonValue(reader)) != null) {
                 copiedList.add(dsonValue.asObjectLite());

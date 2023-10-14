@@ -16,10 +16,7 @@
 
 package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.text.DsonScanner;
-import cn.wjybxx.dson.text.DsonTextReader;
-import cn.wjybxx.dson.text.ObjectStyle;
-import cn.wjybxx.dson.text.DsonMode;
+import cn.wjybxx.dson.text.*;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -51,7 +48,7 @@ public class Json2DsonTest {
     @Test
     void test() {
         DsonValue dsonValue;
-        try (DsonTextReader reader = new DsonTextReader(16, Dsons.newJsonScanner(jsonString))) {
+        try (DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.DEFAULT, Dsons.newJsonScanner(jsonString))) {
             dsonValue = Dsons.readTopDsonValue(reader);
             Assertions.assertInstanceOf(DsonObject.class, dsonValue);
         }
@@ -61,7 +58,7 @@ public class Json2DsonTest {
         String jsonFilePath = "D:\\github-mine\\Dson\\testres\\test.json";
         String dsonFilePath = "D:\\github-mine\\Dson\\testres\\testout.dson";
         try (DsonScanner scanner = Dsons.newStreamScanner(new FileReader(jsonFilePath), DsonMode.RELAXED);
-             DsonTextReader reader = new DsonTextReader(16, scanner)) {
+             DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.DEFAULT, scanner)) {
             DsonValue jsonObject = Dsons.readTopDsonValue(reader);
             DsonValue jsonObject2 = Dsons.fromJson(FileUtils.readFileToString(new File(jsonFilePath), StandardCharsets.UTF_8));
             Assertions.assertEquals(jsonObject, jsonObject2);

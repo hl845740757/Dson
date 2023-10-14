@@ -2,6 +2,7 @@ package cn.wjybxx.dson;
 
 import cn.wjybxx.dson.internal.CollectionUtils;
 import cn.wjybxx.dson.text.DsonTextReader;
+import cn.wjybxx.dson.text.DsonTextReaderSettings;
 import cn.wjybxx.dson.types.ObjectRef;
 
 import java.util.*;
@@ -135,7 +136,7 @@ public class DsonRepository {
 
     public static DsonRepository fromDson(String dsonString, boolean resolveRef) {
         DsonRepository repository = new DsonRepository();
-        try (DsonTextReader reader = new DsonTextReader(16, dsonString)) {
+        try (DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.DEFAULT, dsonString)) {
             DsonValue value;
             while ((value = Dsons.readTopDsonValue(reader)) != null) {
                 repository.add(value);

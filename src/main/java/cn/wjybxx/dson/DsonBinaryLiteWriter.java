@@ -31,16 +31,10 @@ import java.util.Objects;
 public class DsonBinaryLiteWriter extends AbstractDsonLiteWriter {
 
     private DsonOutput output;
-    private final boolean autoClose;
 
-    public DsonBinaryLiteWriter(int recursionLimit, DsonOutput output) {
-        this(recursionLimit, output, true);
-    }
-
-    public DsonBinaryLiteWriter(int recursionLimit, DsonOutput output, boolean autoClose) {
-        super(recursionLimit);
+    public DsonBinaryLiteWriter(DsonWriterSettings settings, DsonOutput output) {
+        super(settings);
         this.output = Objects.requireNonNull(output);
-        this.autoClose = autoClose;
         setContext(new Context().init(null, DsonContextType.TOP_LEVEL, null));
     }
 
@@ -62,7 +56,7 @@ public class DsonBinaryLiteWriter extends AbstractDsonLiteWriter {
 
     @Override
     public void close() {
-        if (autoClose && output != null) {
+        if (settings.autoClose && output != null) {
             output.close();
             output = null;
         }

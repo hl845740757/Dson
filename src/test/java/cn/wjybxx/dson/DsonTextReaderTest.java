@@ -16,10 +16,7 @@
 
 package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.text.DsonTextReader;
-import cn.wjybxx.dson.text.DsonTextWriter;
-import cn.wjybxx.dson.text.DsonTextWriterSettings;
-import cn.wjybxx.dson.text.ObjectStyle;
+import cn.wjybxx.dson.text.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -72,7 +69,7 @@ public class DsonTextReaderTest {
     @Test
     void test() {
         List<DsonValue> topObjects = new ArrayList<>(4);
-        try (DsonReader reader = new DsonTextReader(16, dsonString)) {
+        try (DsonReader reader = new DsonTextReader(DsonTextReaderSettings.DEFAULT, dsonString)) {
             DsonValue dsonValue;
             while ((dsonValue = Dsons.readTopDsonValue(reader)) != null) {
                 topObjects.add(dsonValue);
@@ -86,7 +83,7 @@ public class DsonTextReaderTest {
                 .build();
 
         DsonValue fileHeaderObj = topObjects.get(0);
-        try (DsonTextWriter writer = new DsonTextWriter(16, settings, stringWriter)) {
+        try (DsonTextWriter writer = new DsonTextWriter(settings, stringWriter)) {
             Dsons.writeTopDsonValue(writer, fileHeaderObj, ObjectStyle.INDENT);
             writer.flush();
         }

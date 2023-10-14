@@ -31,16 +31,10 @@ import java.util.Objects;
 public class DsonBinaryLiteReader extends AbstractDsonLiteReader {
 
     private DsonInput input;
-    private final boolean autoClose;
 
-    public DsonBinaryLiteReader(int recursionLimit, DsonInput input) {
-        this(recursionLimit, input, true);
-    }
-
-    public DsonBinaryLiteReader(int recursionLimit, DsonInput input, boolean autoClose) {
-        super(recursionLimit);
+    public DsonBinaryLiteReader(DsonReaderSettings settings, DsonInput input) {
+        super(settings);
         this.input = Objects.requireNonNull(input);
-        this.autoClose = autoClose;
         setContext(new Context().init(null, DsonContextType.TOP_LEVEL, null));
     }
 
@@ -56,7 +50,7 @@ public class DsonBinaryLiteReader extends AbstractDsonLiteReader {
 
     @Override
     public void close() {
-        if (autoClose && input != null) {
+        if (settings.autoClose && input != null) {
             input.close();
             input = null;
         }

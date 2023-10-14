@@ -4,6 +4,7 @@ import cn.wjybxx.dson.io.DsonInputs;
 import cn.wjybxx.dson.io.DsonOutput;
 import cn.wjybxx.dson.io.DsonOutputs;
 import cn.wjybxx.dson.text.DsonTextReader;
+import cn.wjybxx.dson.text.DsonTextReaderSettings;
 import cn.wjybxx.dson.text.ObjectStyle;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -21,14 +22,14 @@ public class DsonSkipTest {
 
         byte[] buffer = new byte[4096];
         DsonOutput dsonOutput = DsonOutputs.newInstance(buffer);
-        try (DsonBinaryWriter writer = new DsonBinaryWriter(16, dsonOutput)) {
+        try (DsonBinaryWriter writer = new DsonBinaryWriter(DsonWriterSettings.DEFAULT, dsonOutput)) {
             Dsons.writeTopDsonValue(writer, dsonObject, ObjectStyle.INDENT);
         }
 
         String dsonString = Dsons.toDson(dsonObject, ObjectStyle.INDENT);
-        return List.of(new DsonObjectReader(16, new DsonArray<String>(1).append(dsonObject)),
-                new DsonTextReader(16, dsonString),
-                new DsonBinaryReader(16, DsonInputs.newInstance(buffer, 0, dsonOutput.getPosition())));
+        return List.of(new DsonObjectReader(DsonReaderSettings.DEFAULT, new DsonArray<String>(1).append(dsonObject)),
+                new DsonTextReader(DsonTextReaderSettings.DEFAULT, dsonString),
+                new DsonBinaryReader(DsonReaderSettings.DEFAULT, DsonInputs.newInstance(buffer, 0, dsonOutput.getPosition())));
     }
 
     @Test

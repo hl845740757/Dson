@@ -34,8 +34,8 @@ public class DsonObjectLiteReader extends AbstractDsonLiteReader {
     private FieldNumber nextName = null;
     private DsonValue nextValue;
 
-    public DsonObjectLiteReader(int recursionLimit, DsonArray<FieldNumber> dsonArray) {
-        super(recursionLimit);
+    public DsonObjectLiteReader(DsonReaderSettings settings, DsonArray<FieldNumber> dsonArray) {
+        super(settings);
         Context context = new Context();
         context.init(null, DsonContextType.TOP_LEVEL, null);
         context.arrayIterator = new MarkableIterator<>(dsonArray.iterator());

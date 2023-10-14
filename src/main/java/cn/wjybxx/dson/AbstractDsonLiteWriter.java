@@ -32,14 +32,14 @@ import java.util.Objects;
  */
 public abstract class AbstractDsonLiteWriter implements DsonLiteWriter {
 
-    protected final int recursionLimit;
+    protected final DsonWriterSettings settings;
     private Context context;
     private Context pooledContext; // 一个额外的缓存，用于写集合等减少上下文创建
 
     protected int recursionDepth;
 
-    public AbstractDsonLiteWriter(int recursionLimit) {
-        this.recursionLimit = recursionLimit;
+    public AbstractDsonLiteWriter(DsonWriterSettings settings) {
+        this.settings = settings;
     }
 
     protected Context getContext() {
@@ -299,7 +299,7 @@ public abstract class AbstractDsonLiteWriter implements DsonLiteWriter {
     }
 
     private void writeStartContainer(DsonContextType contextType, DsonType dsonType) {
-        if (recursionDepth >= recursionLimit) {
+        if (recursionDepth >= settings.recursionLimit) {
             throw DsonIOException.recursionLimitExceeded();
         }
         Context context = this.context;

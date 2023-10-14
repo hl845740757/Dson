@@ -16,8 +16,8 @@ import java.util.Objects;
  */
 public class DsonObjectWriter extends AbstractDsonWriter {
 
-    public DsonObjectWriter(int recursionLimit, DsonArray<String> outList) {
-        super(recursionLimit);
+    public DsonObjectWriter(DsonWriterSettings settings, DsonArray<String> outList) {
+        super(settings);
         // 顶层输出是一个数组
         Context context = new Context();
         context.init(null, DsonContextType.TOP_LEVEL, null);

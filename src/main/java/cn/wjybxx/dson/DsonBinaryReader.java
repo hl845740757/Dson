@@ -31,16 +31,10 @@ import java.util.Objects;
 public class DsonBinaryReader extends AbstractDsonReader {
 
     private DsonInput input;
-    private final boolean autoClose;
 
-    public DsonBinaryReader(int recursionLimit, DsonInput input) {
-        this(recursionLimit, input, true);
-    }
-
-    public DsonBinaryReader(int recursionLimit, DsonInput input, boolean autoClose) {
-        super(recursionLimit);
+    public DsonBinaryReader(DsonReaderSettings settings, DsonInput input) {
+        super(settings);
         this.input = Objects.requireNonNull(input);
-        this.autoClose = autoClose;
         setContext(new Context().init(null, DsonContextType.TOP_LEVEL, null));
     }
 
@@ -56,7 +50,7 @@ public class DsonBinaryReader extends AbstractDsonReader {
 
     @Override
     public void close() {
-        if (autoClose && input != null) {
+        if (setting.autoClose && input != null) {
             input.close();
             input = null;
         }
@@ -94,7 +88,12 @@ public class DsonBinaryReader extends AbstractDsonReader {
 
     @Override
     protected void doReadName() {
-        currentName = Dsons.internField(input.readString());
+        String fieldName = input.readString();
+        if (setting.enableFieldIntern) {
+            currentName = Dsons.internField(fieldName);
+        } else {
+            currentName = fieldName;
+        }
     }
 
     // endregion

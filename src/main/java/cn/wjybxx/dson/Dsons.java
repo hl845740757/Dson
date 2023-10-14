@@ -16,14 +16,12 @@
 
 package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.internal.InternalUtils;
 import cn.wjybxx.dson.text.*;
 
 import javax.annotation.Nullable;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.util.Objects;
-import java.util.Properties;
 
 /**
  * dson的辅助工具类，二进制流工具类{@link DsonLites}
@@ -49,32 +47,9 @@ public final class Dsons {
     public static final int FULL_TYPE_BITS = DSON_TYPE_BITES + WIRETYPE_BITS;
     public static final int FULL_TYPE_MASK = (1 << FULL_TYPE_BITS) - 1;
 
-    /**
-     * 在文档数据解码中是否启用 字段字符串池化
-     * 启用池化在大量相同字段名时可能很好地降低内存占用，默认开启
-     * 字段名几乎都是常量，因此命中率几乎百分之百。
-     */
-    public static final boolean enableFieldIntern;
-    /**
-     * 在文档数据解码中是否启用 类型别名字符串池化
-     * 类型数通常不多，开启池化对编解码性能影响较小，默认开启
-     * 类型别名也基本是常量，因此命中率几乎百分之百
-     */
-    public static final boolean enableClassIntern;
-
-    static {
-        Properties properties = System.getProperties();
-        enableFieldIntern = InternalUtils.getBool(properties, "cn.wjybxx.dson.enableFieldIntern", true);
-        enableClassIntern = InternalUtils.getBool(properties, "cn.wjybxx.dson.enableClassIntern", true);
-    }
-
     public static String internField(String fieldName) {
-        return (enableFieldIntern && fieldName.length() <= 32) ? fieldName.intern() : fieldName;
-    }
-
-    public static String internClass(String className) {
         // 长度异常的数据不池化
-        return (enableClassIntern && className.length() <= 128) ? className.intern() : className;
+        return fieldName.length() <= 32 ? fieldName.intern() : fieldName;
     }
 
     public static int checkSubType(int type) {
@@ -356,21 +331,21 @@ public final class Dsons {
             throw new IllegalArgumentException("invalid dsonType " + dsonValue.getDsonType());
         }
         StringWriter stringWriter = new StringWriter(1024);
-        try (DsonTextWriter writer = new DsonTextWriter(32, settings, stringWriter)) {
+        try (DsonTextWriter writer = new DsonTextWriter(settings, stringWriter)) {
             writeTopDsonValue(writer, dsonValue, style);
         }
         return stringWriter.toString();
     }
 
     public static DsonValue fromDson(CharSequence dsonString) {
-        try (DsonTextReader reader = new DsonTextReader(32, dsonString)) {
+        try (DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.DEFAULT, dsonString)) {
             return readTopDsonValue(reader);
         }
     }
 
     /** @param jsonString json字符串或无行首的dson字符串 */
     public static DsonValue fromJson(CharSequence jsonString) {
-        try (DsonTextReader reader = new DsonTextReader(32, newJsonScanner(jsonString))) {
+        try (DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.DEFAULT, newJsonScanner(jsonString))) {
             return readTopDsonValue(reader);
         }
     }
