@@ -34,6 +34,10 @@ public class ExtInt64 implements Comparable<ExtInt64> {
         this(type, value, true);
     }
 
+    public ExtInt64(int type, Long value) {
+        this(type, value == null ? 0 : value, value != null);
+    }
+
     public ExtInt64(int type, long value, boolean hasValue) {
         Dsons.checkSubType(type);
         Dsons.checkHasValue(value, hasValue);

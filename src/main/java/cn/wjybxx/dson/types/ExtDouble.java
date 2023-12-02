@@ -38,6 +38,10 @@ public class ExtDouble implements Comparable<ExtDouble> {
         this(type, value, true);
     }
 
+    public ExtDouble(int type, Double value) {
+        this(type, value == null ? 0 : value, value != null);
+    }
+
     public ExtDouble(int type, double value, boolean hasValue) {
         Dsons.checkSubType(type);
         Dsons.checkHasValue(value, hasValue);

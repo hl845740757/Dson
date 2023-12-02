@@ -35,6 +35,10 @@ public class DsonExtDouble extends DsonValue implements Comparable<DsonExtDouble
         this(type, value, true);
     }
 
+    public DsonExtDouble(int type, Double value) {
+        this(type, value == null ? 0 : value, value != null);
+    }
+
     public DsonExtDouble(int type, double value, boolean hasValue) {
         Dsons.checkSubType(type);
         Dsons.checkHasValue(value, hasValue);

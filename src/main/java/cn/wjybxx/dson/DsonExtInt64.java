@@ -34,6 +34,10 @@ public class DsonExtInt64 extends DsonValue implements Comparable<DsonExtInt64> 
         this(type, value, true);
     }
 
+    public DsonExtInt64(int type, Long value) {
+        this(type, value == null ? 0 : value, value != null);
+    }
+
     public DsonExtInt64(int type, long value, boolean hasValue) {
         Dsons.checkSubType(type);
         Dsons.checkHasValue(value, hasValue);

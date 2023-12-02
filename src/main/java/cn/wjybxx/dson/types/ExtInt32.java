@@ -34,6 +34,10 @@ public class ExtInt32 implements Comparable<ExtInt32> {
         this(type, value, true);
     }
 
+    public ExtInt32(int type, Integer value) {
+        this(type, value == null ? 0 : value, value != null);
+    }
+
     public ExtInt32(int type, int value, boolean hasValue) {
         Dsons.checkSubType(type);
         Dsons.checkHasValue(value, hasValue);
