@@ -52,9 +52,9 @@ public class PeekTypeTest {
     @Test
     void test() {
         DsonObject<String> dsonObject = DsonCodecTest.genRandObject();
-        createReaders(dsonObject);
+        List<DsonReader> dsonReaders = createReaders(dsonObject);
 
-        for (DsonReader reader : createReaders(dsonObject)) {
+        for (DsonReader reader : dsonReaders) {
             DsonObject<String> object = new DsonObject<>();
             try (reader) {
                 Assertions.assertEquals(DsonType.OBJECT, reader.peekDsonType());
@@ -209,6 +209,7 @@ public class PeekTypeTest {
             case BINARY -> reader.readBinary(name);
             case EXT_INT32 -> reader.readExtInt32(name);
             case EXT_INT64 -> reader.readExtInt64(name);
+            case EXT_DOUBLE -> reader.readExtDouble(name);
             case EXT_STRING -> reader.readExtString(name);
             case REFERENCE -> new DsonReference(reader.readRef(name));
             case TIMESTAMP -> new DsonTimestamp(reader.readTimestamp(name));

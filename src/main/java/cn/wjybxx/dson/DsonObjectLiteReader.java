@@ -211,11 +211,6 @@ public class DsonObjectLiteReader extends AbstractDsonLiteReader {
     }
 
     @Override
-    protected DsonExtString doReadExtString() {
-        return popNextValue().asExtString();
-    }
-
-    @Override
     protected DsonExtInt32 doReadExtInt32() {
         return popNextValue().asExtInt32();
     }
@@ -223,6 +218,16 @@ public class DsonObjectLiteReader extends AbstractDsonLiteReader {
     @Override
     protected DsonExtInt64 doReadExtInt64() {
         return popNextValue().asExtInt64();
+    }
+
+    @Override
+    protected DsonExtDouble doReadExtDouble() {
+        return popNextValue().asExtDouble();
+    }
+
+    @Override
+    protected DsonExtString doReadExtString() {
+        return popNextValue().asExtString();
     }
 
     @Override

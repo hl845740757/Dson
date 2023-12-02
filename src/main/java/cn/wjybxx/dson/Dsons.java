@@ -47,16 +47,12 @@ public final class Dsons {
     public static final int FULL_TYPE_BITS = DSON_TYPE_BITES + WIRETYPE_BITS;
     public static final int FULL_TYPE_MASK = (1 << FULL_TYPE_BITS) - 1;
 
+    /** 二进制数据的最大长度 -- type使用 varint编码，最大占用5个字节 */
+    public static final int MAX_BINARY_LENGTH = Integer.MAX_VALUE - 5;
+
     public static String internField(String fieldName) {
         // 长度异常的数据不池化
         return fieldName.length() <= 32 ? fieldName.intern() : fieldName;
-    }
-
-    public static int checkSubType(int type) {
-        if (type < 0) {
-            throw new IllegalArgumentException("type cant be negative");
-        }
-        return type;
     }
 
     // fullType
@@ -86,6 +82,40 @@ public final class Dsons {
     public static int wireTypeOfFullType(int fullType) {
         return (fullType & WIRETYPE_MASK);
     }
+
+    // region check
+    public static int checkSubType(int type) {
+        if (type < 0) {
+            throw new IllegalArgumentException("type cant be negative");
+        }
+        return type;
+    }
+
+    public static void checkBinaryLength(int length) {
+        if (length > MAX_BINARY_LENGTH) {
+            throw new IllegalArgumentException("the length of data must between[0, %d], but found: %d"
+                    .formatted(MAX_BINARY_LENGTH, length));
+        }
+    }
+
+    public static void checkHasValue(int value, boolean hasVal) {
+        if (!hasVal && value != 0) {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    public static void checkHasValue(long value, boolean hasVal) {
+        if (!hasVal && value != 0) {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    public static void checkHasValue(double value, boolean hasVal) {
+        if (!hasVal && value != 0) {
+            throw new IllegalArgumentException();
+        }
+    }
+    // endregion
 
     // region read/write
 
@@ -217,6 +247,7 @@ public final class Dsons {
             case BINARY -> writer.writeBinary(name, dsonValue.asBinary());
             case EXT_INT32 -> writer.writeExtInt32(name, dsonValue.asExtInt32(), WireType.VARINT, NumberStyle.SIMPLE);
             case EXT_INT64 -> writer.writeExtInt64(name, dsonValue.asExtInt64(), WireType.VARINT, NumberStyle.SIMPLE);
+            case EXT_DOUBLE -> writer.writeExtDouble(name, dsonValue.asExtDouble(), NumberStyle.SIMPLE);
             case EXT_STRING -> writer.writeExtString(name, dsonValue.asExtString(), StringStyle.AUTO);
             case REFERENCE -> writer.writeRef(name, dsonValue.asReference());
             case TIMESTAMP -> writer.writeTimestamp(name, dsonValue.asTimestamp());
@@ -245,6 +276,7 @@ public final class Dsons {
             case BINARY -> reader.readBinary(name);
             case EXT_INT32 -> reader.readExtInt32(name);
             case EXT_INT64 -> reader.readExtInt64(name);
+            case EXT_DOUBLE -> reader.readExtDouble(name);
             case EXT_STRING -> reader.readExtString(name);
             case REFERENCE -> new DsonReference(reader.readRef(name));
             case TIMESTAMP -> new DsonTimestamp(reader.readTimestamp(name));

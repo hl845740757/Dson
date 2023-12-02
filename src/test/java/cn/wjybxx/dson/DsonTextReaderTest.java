@@ -52,8 +52,12 @@ public class DsonTextReaderTest {
             -
             - [@{localId : 10001}
             -  [@bin 1, FFFA],
-            -  [@ei 1, 10010],
-            -  [@eL 1, 10010],
+            -  [@ei 1, 10001],
+            -  [@ei 2, null],
+            -  [@eL 1, 20001],
+            -  [@eL 2, null],
+            -  [@ed 1, 0.5],
+            -  [@ed 2, null],
             -  [@es 1, 10010],
             -  [@es 1, null],
             - ]

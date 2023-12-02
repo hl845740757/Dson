@@ -78,6 +78,8 @@ public interface DsonLiteWriter extends AutoCloseable {
 
     void writeExtInt64(int name, DsonExtInt64 value, WireType wireType);
 
+    void writeExtDouble(int name, DsonExtDouble value);
+
     void writeExtString(int name, DsonExtString value);
 
     void writeRef(int name, ObjectRef objectRef);

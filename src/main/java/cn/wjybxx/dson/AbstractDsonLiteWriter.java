@@ -18,7 +18,6 @@ package cn.wjybxx.dson;
 
 import cn.wjybxx.dson.io.Chunk;
 import cn.wjybxx.dson.io.DsonIOException;
-import cn.wjybxx.dson.types.Binary;
 import cn.wjybxx.dson.types.ObjectRef;
 import cn.wjybxx.dson.types.OffsetTimestamp;
 import com.google.protobuf.MessageLite;
@@ -186,7 +185,7 @@ public abstract class AbstractDsonLiteWriter implements DsonLiteWriter {
     public void writeBinary(int name, int type, Chunk chunk) {
         Objects.requireNonNull(chunk);
         Dsons.checkSubType(type);
-        Binary.checkDataLength(chunk.getLength());
+        Dsons.checkBinaryLength(chunk.getLength());
         advanceToValueState(name);
         doWriteBinary(type, chunk);
         setNextState();
@@ -205,6 +204,14 @@ public abstract class AbstractDsonLiteWriter implements DsonLiteWriter {
         Objects.requireNonNull(value);
         advanceToValueState(name);
         doWriteExtInt64(value, wireType);
+        setNextState();
+    }
+
+    @Override
+    public void writeExtDouble(int name, DsonExtDouble value) {
+        Objects.requireNonNull(value);
+        advanceToValueState(name);
+        doWriteExtDouble(value);
         setNextState();
     }
 
@@ -253,6 +260,8 @@ public abstract class AbstractDsonLiteWriter implements DsonLiteWriter {
     protected abstract void doWriteExtInt32(DsonExtInt32 value, WireType wireType);
 
     protected abstract void doWriteExtInt64(DsonExtInt64 value, WireType wireType);
+
+    protected abstract void doWriteExtDouble(DsonExtDouble value);
 
     protected abstract void doWriteExtString(DsonExtString value);
 

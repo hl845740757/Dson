@@ -16,8 +16,6 @@
 
 package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.types.Binary;
-
 import javax.annotation.Nonnull;
 import java.util.Arrays;
 
@@ -40,7 +38,7 @@ public class DsonBinary extends DsonValue {
 
     public DsonBinary(int type, byte[] data) {
         Dsons.checkSubType(type);
-        Binary.checkDataLength(data.length); // 顺带NPE
+        Dsons.checkBinaryLength(data.length); // 顺带NPE
         this.type = type;
         this.data = data;
     }

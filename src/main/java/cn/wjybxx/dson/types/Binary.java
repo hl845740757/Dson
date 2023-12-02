@@ -30,9 +30,6 @@ import java.util.Arrays;
  */
 public class Binary {
 
-    /** 数据的最大长度 -- type使用 varint编码，最大占用5个字节 */
-    public static final int MAX_DATA_LENGTH = Integer.MAX_VALUE - 5;
-
     private final int type;
     private final byte[] data;
 
@@ -42,7 +39,7 @@ public class Binary {
 
     public Binary(int type, byte[] data) {
         Dsons.checkSubType(type);
-        checkDataLength(data.length);
+        Dsons.checkBinaryLength(data.length);
         this.type = type;
         this.data = data;
     }
@@ -51,13 +48,6 @@ public class Binary {
     public Binary(Binary src) {
         this.type = src.type;
         this.data = src.data.clone();
-    }
-
-    public static void checkDataLength(int length) {
-        if (length > MAX_DATA_LENGTH) {
-            throw new IllegalArgumentException("the length of data must between[0, %d], but found: %d"
-                    .formatted(MAX_DATA_LENGTH, length));
-        }
     }
 
     /** 创建一个拷贝 */

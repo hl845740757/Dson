@@ -28,11 +28,22 @@ public class ExtInt32 implements Comparable<ExtInt32> {
 
     private final int type;
     private final int value;
+    private final boolean hasValue;
 
     public ExtInt32(int type, int value) {
+        this(type, value, true);
+    }
+
+    public ExtInt32(int type, int value, boolean hasValue) {
         Dsons.checkSubType(type);
+        Dsons.checkHasValue(value, hasValue);
         this.type = type;
         this.value = value;
+        this.hasValue = hasValue;
+    }
+
+    public static ExtInt32 emptyOf(int type) {
+        return new ExtInt32(type, 0, false);
     }
 
     public int getType() {
@@ -41,6 +52,10 @@ public class ExtInt32 implements Comparable<ExtInt32> {
 
     public int getValue() {
         return value;
+    }
+
+    public boolean hasValue() {
+        return hasValue;
     }
 
     //
@@ -76,6 +91,7 @@ public class ExtInt32 implements Comparable<ExtInt32> {
         return "ExtInt32{" +
                 "type=" + type +
                 ", value=" + value +
+                ", hasValue=" + hasValue +
                 '}';
     }
 }

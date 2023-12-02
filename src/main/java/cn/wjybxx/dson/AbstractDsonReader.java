@@ -301,6 +301,14 @@ public abstract class AbstractDsonReader implements DsonReader {
     }
 
     @Override
+    public DsonExtDouble readExtDouble(String name) {
+        advanceToValueState(name, DsonType.EXT_DOUBLE);
+        DsonExtDouble value = doReadExtDouble();
+        setNextState();
+        return value;
+    }
+
+    @Override
     public DsonExtString readExtString(String name) {
         advanceToValueState(name, DsonType.EXT_STRING);
         DsonExtString value = doReadExtString();
@@ -343,6 +351,8 @@ public abstract class AbstractDsonReader implements DsonReader {
     protected abstract DsonExtInt32 doReadExtInt32();
 
     protected abstract DsonExtInt64 doReadExtInt64();
+
+    protected abstract DsonExtDouble doReadExtDouble();
 
     protected abstract DsonExtString doReadExtString();
 

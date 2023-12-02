@@ -349,8 +349,12 @@ public class DsonTextWriter extends AbstractDsonWriter {
         printer.printFastPath("[@ei ");
         printer.printFastPath(Integer.toString(value.getType()));
         printer.printFastPath(", ");
-        style.toString(value.getValue(), styleOut.reset());
-        printer.printFastPath(styleOut.getValue());
+        if (value.hasValue()) {
+            style.toString(value.getValue(), styleOut.reset());
+            printer.printFastPath(styleOut.getValue());
+        } else {
+            printer.printFastPath("null");
+        }
         printer.print(']');
     }
 
@@ -361,8 +365,28 @@ public class DsonTextWriter extends AbstractDsonWriter {
         printer.printFastPath("[@eL ");
         printer.printFastPath(Integer.toString(value.getType()));
         printer.printFastPath(", ");
-        style.toString(value.getValue(), styleOut.reset());
-        printer.printFastPath(styleOut.getValue());
+        if (value.hasValue()) {
+            style.toString(value.getValue(), styleOut.reset());
+            printer.printFastPath(styleOut.getValue());
+        } else {
+            printer.printFastPath("null");
+        }
+        printer.print(']');
+    }
+
+    @Override
+    protected void doWriteExtDouble(DsonExtDouble value, INumberStyle style) {
+        DsonPrinter printer = this.printer;
+        writeCurrentName(printer, DsonType.EXT_DOUBLE);
+        printer.printFastPath("[@ed ");
+        printer.printFastPath(Integer.toString(value.getType()));
+        printer.printFastPath(", ");
+        if (value.hasValue()) {
+            style.toString(value.getValue(), styleOut.reset());
+            printer.printFastPath(styleOut.getValue());
+        } else {
+            printer.printFastPath("null");
+        }
         printer.print(']');
     }
 

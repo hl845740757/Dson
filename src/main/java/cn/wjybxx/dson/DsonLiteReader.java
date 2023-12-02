@@ -125,6 +125,8 @@ public interface DsonLiteReader extends AutoCloseable {
 
     DsonExtInt64 readExtInt64(int name);
 
+    DsonExtDouble readExtDouble(int name);
+
     DsonExtString readExtString(int name);
 
     ObjectRef readRef(int name);

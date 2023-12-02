@@ -111,12 +111,13 @@ Dson支持的值类型和内置结构体包括：
 | b   | bool      | 5  | bool值                 |                                                                                      | @b true <br> true <br/> @b 1                                                                               |
 | s   | string    | 6  | 字符串                   |                                                                                      | "10"   <br>  abc                                                                                           |
 | N   | null      | 7  | null，大写N              |                                                                                      | @N null <br> null                                                                                          |
-| bin | binary    | 8  | 二进制，带类型标签             | {<br> int32 type;<br> byte[] data <br>}                                              | 格式固定二元数组 \[@bin type, data] <br> \[@bin 1, FFFE]                                                           |
-| ei  | extInt32  | 9  | 带类型标签的int32           | {<br> int32 type;<br> int32 value <br>}                                              | 格式固定二元数组 \[@ei type, value] <br> \[@ei 1,  10086]                                                          |
-| eL  | extInt64  | 10 | 带类型标签的int64           | {<br> int32 type;<br> int64 value <br>}                                              | 格式固定二元数组 \[@eL type, value] <br> \[@eL 1,  10086]                                                          |
-| es  | extString | 11 | *<b>带类型标签的string</b>* | {<br> int32 type;<br> string value <br>}                                             | 格式固定二元数组 \[@es type, value] <br> - \[@es 10, <br/>- @ss ^\[\\u4e00-\\u9fa5_a-zA-Z0-9]+$ <br/> ~ ]          |
-| ref | reference | 12 | 引用                    | {<br> string namespace;<br> string localId;<br> int32 type; <br> int32 policy; <br>} | 格式为单值 '@ref localId' 格式或 object格式 <br/> @ref abcdefg <br> {@ref ns: wjybxx, localId: abcdefg, type: 0}     |
-| dt  | datetime  | 13 | 日期时间                  | { <br>  int64 seconds; <br> int32 nanos;<br> int32 offset;<br> int32 enables; <br> } | 无需引号<br/> @dt 2023-06-17T18:37:00 <br/>{@dt date: 2023-06-17, time: 18:37:00, offset: +08:00, millis: 100} |
+| bin | binary    | 8  | 二进制，带类型标签             | {<br> int32 type;<br> byte[] data; <br>}                                             | 格式固定二元数组 \[@bin type, data] <br> \[@bin 1, FFFE]                                                           |
+| ei  | extInt32  | 9  | 带类型标签的int32           | {<br> int32 type;<br> int32 value;<br> bool hasVal; <br>}                            | 格式固定二元数组 \[@ei type, value] <br> \[@ei 1, 10086] <br> \[@ei 1, null]                                       |
+| eL  | extInt64  | 10 | 带类型标签的int64           | {<br> int32 type;<br> int64 value;<br> bool hasVal; <br>}                            | 格式固定二元数组 \[@eL type, value] <br> \[@eL 1, 10086] <br> \[@eL 1, null]                                       |
+| ed  | extDouble | 11 | 带类型标签的double          | {<br> int32 type;<br> double value;<br> bool hasVal; <br>}                           | 格式固定二元数组 \[@ed type, value] <br> \[@ed 1, 0.5] <br>\[@ed 1, null]                                          |
+| es  | extString | 12 | *<b>带类型标签的string</b>* | {<br> int32 type;<br> string value; <br>}                                            | 格式固定二元数组 \[@es type, value] <br> - \[@es 10, <br/>- @ss ^\[\\u4e00-\\u9fa5_a-zA-Z0-9]+$ <br/> ~ ]          |
+| ref | reference | 13 | 引用                    | {<br> string namespace;<br> string localId;<br> int32 type; <br> int32 policy; <br>} | 格式为单值 '@ref localId' 格式或 object格式 <br/> @ref abcdefg <br> {@ref ns: wjybxx, localId: abcdefg, type: 0}     |
+| dt  | datetime  | 14 | 日期时间                  | { <br>  int64 seconds; <br> int32 nanos;<br> int32 offset;<br> int32 enables; <br> } | 无需引号<br/> @dt 2023-06-17T18:37:00 <br/>{@dt date: 2023-06-17, time: 18:37:00, offset: +08:00, millis: 100} |
 |     | header    | 29 | 对象头                   |                                                                                      | 对象形式： @{clsName: Vector3 } <br/> 简写形式： @Vector3                                                            |
 |     | array     | 30 | 数组                    |                                                                                      | \[ 1, 2, 3, 4, 5 ]                                                                                         |
 |     | object    | 31 | 对象/结构体                |                                                                                      | { name: wjybxx, age: 28 }                                                                                  |
@@ -231,12 +232,17 @@ ps: 我去除了顶层不能是header的限制，因此可以用顶层的header�
 2. type限定为int32，**且禁止负数**
 3. data部分使用 **16进制** 编码，且不可以为null
 
-### ei、eL、es
+### ei、eL、ed、es
 
 1. 配置格式限定二元组 \[type, value]
 2. type限定int32，**且禁止负数**
 3. value部分遵循各自的规范
-4. es允许value为null
+4. **允许value为null**，使用null时必须显式输入。
+
+```
+   {@ei type: 1, value: 1}
+   {@ei type: 1, value: null}
+```
 
 ### ref
 

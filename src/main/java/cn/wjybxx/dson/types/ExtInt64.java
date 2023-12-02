@@ -28,11 +28,22 @@ public class ExtInt64 implements Comparable<ExtInt64> {
 
     private final int type;
     private final long value;
+    private final boolean hasValue;
 
     public ExtInt64(int type, long value) {
+        this(type, value, true);
+    }
+
+    public ExtInt64(int type, long value, boolean hasValue) {
         Dsons.checkSubType(type);
+        Dsons.checkHasValue(value, hasValue);
         this.type = type;
         this.value = value;
+        this.hasValue = hasValue;
+    }
+
+    public static ExtInt64 emptyOf(int type) {
+        return new ExtInt64(type, 0, false);
     }
 
     public int getType() {
@@ -41,6 +52,10 @@ public class ExtInt64 implements Comparable<ExtInt64> {
 
     public long getValue() {
         return value;
+    }
+
+    public boolean hasValue() {
+        return hasValue;
     }
 
     //
@@ -76,6 +91,7 @@ public class ExtInt64 implements Comparable<ExtInt64> {
         return "ExtInt64{" +
                 "type=" + type +
                 ", value=" + value +
+                ", hasValue=" + hasValue +
                 '}';
     }
 }

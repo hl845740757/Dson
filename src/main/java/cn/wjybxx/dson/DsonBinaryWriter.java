@@ -161,6 +161,14 @@ public class DsonBinaryWriter extends AbstractDsonWriter {
     }
 
     @Override
+    protected void doWriteExtDouble(DsonExtDouble value, INumberStyle style) {
+        int wireType = DsonReaderUtils.wireTypeOfDouble(value.getValue());
+        DsonOutput output = this.output;
+        writeFullTypeAndCurrentName(output, DsonType.EXT_DOUBLE, wireType);
+        DsonReaderUtils.writeExtDouble(output, value, wireType);
+    }
+
+    @Override
     protected void doWriteExtString(DsonExtString value, StringStyle style) {
         DsonOutput output = this.output;
         writeFullTypeAndCurrentName(output, DsonType.EXT_STRING, DsonReaderUtils.wireTypeOfExtString(value));

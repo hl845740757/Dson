@@ -130,6 +130,8 @@ public abstract class DsonValue {
         return (DsonExtInt64) this;
     }
 
+    public DsonExtDouble asExtDouble() {return (DsonExtDouble)this;}
+
     public DsonBinary asBinary() {
         return (DsonBinary) this;
     }

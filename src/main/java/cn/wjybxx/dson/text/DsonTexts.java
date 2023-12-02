@@ -47,6 +47,7 @@ public class DsonTexts {
     public static final String LABEL_BINARY = "bin";
     public static final String LABEL_EXTINT32 = "ei";
     public static final String LABEL_EXTINT64 = "eL";
+    public static final String LABEL_EXTDOUBLE = "ed";
     public static final String LABEL_EXTSTRING = "es";
     public static final String LABEL_REFERENCE = "ref";
     public static final String LABEL_DATETIME = "dt";
@@ -366,6 +367,7 @@ public class DsonTexts {
             case BINARY -> new DsonToken(TokenType.CLASS_NAME, LABEL_BINARY, -1);
             case EXT_INT32 -> new DsonToken(TokenType.CLASS_NAME, LABEL_EXTINT32, -1);
             case EXT_INT64 -> new DsonToken(TokenType.CLASS_NAME, LABEL_EXTINT64, -1);
+            case EXT_DOUBLE -> new DsonToken(TokenType.CLASS_NAME, LABEL_EXTDOUBLE, -1);
             case EXT_STRING -> new DsonToken(TokenType.CLASS_NAME, LABEL_EXTSTRING, -1);
             case REFERENCE -> new DsonToken(TokenType.CLASS_NAME, LABEL_REFERENCE, -1);
             case TIMESTAMP -> new DsonToken(TokenType.CLASS_NAME, LABEL_DATETIME, -1);

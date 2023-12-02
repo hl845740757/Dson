@@ -28,11 +28,22 @@ public class DsonExtInt32 extends DsonValue implements Comparable<DsonExtInt32> 
 
     private final int type;
     private final int value;
+    private final boolean hasValue;
 
     public DsonExtInt32(int type, int value) {
+        this(type, value, true);
+    }
+
+    public DsonExtInt32(int type, int value, boolean hasValue) {
         Dsons.checkSubType(type);
+        Dsons.checkHasValue(value, hasValue);
         this.type = type;
         this.value = value;
+        this.hasValue = hasValue;
+    }
+
+    public static DsonExtInt32 emptyOf(int type) {
+        return new DsonExtInt32(type, 0, false);
     }
 
     public int getType() {
@@ -41,6 +52,10 @@ public class DsonExtInt32 extends DsonValue implements Comparable<DsonExtInt32> 
 
     public int getValue() {
         return value;
+    }
+
+    public boolean hasValue() {
+        return hasValue;
     }
 
     @Nonnull
@@ -82,6 +97,7 @@ public class DsonExtInt32 extends DsonValue implements Comparable<DsonExtInt32> 
         return "DsonExtInt32{" +
                 "type=" + type +
                 ", value=" + value +
+                ", hasValue=" + hasValue +
                 '}';
     }
 }

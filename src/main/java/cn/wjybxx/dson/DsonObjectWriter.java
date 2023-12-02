@@ -105,6 +105,11 @@ public class DsonObjectWriter extends AbstractDsonWriter {
     }
 
     @Override
+    protected void doWriteExtDouble(DsonExtDouble value, INumberStyle style) {
+        getContext().add(value);
+    }
+
+    @Override
     protected void doWriteExtString(DsonExtString value, StringStyle style) {
         getContext().add(value);
     }

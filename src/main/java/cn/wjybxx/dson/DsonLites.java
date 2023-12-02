@@ -202,6 +202,7 @@ public class DsonLites {
             case BINARY -> writer.writeBinary(name, dsonValue.asBinary());
             case EXT_INT32 -> writer.writeExtInt32(name, dsonValue.asExtInt32(), WireType.VARINT);
             case EXT_INT64 -> writer.writeExtInt64(name, dsonValue.asExtInt64(), WireType.VARINT);
+            case EXT_DOUBLE -> writer.writeExtDouble(name, dsonValue.asExtDouble());
             case EXT_STRING -> writer.writeExtString(name, dsonValue.asExtString());
             case REFERENCE -> writer.writeRef(name, dsonValue.asReference());
             case TIMESTAMP -> writer.writeTimestamp(name, dsonValue.asTimestamp());
@@ -230,6 +231,7 @@ public class DsonLites {
             case BINARY -> reader.readBinary(name);
             case EXT_INT32 -> reader.readExtInt32(name);
             case EXT_INT64 -> reader.readExtInt64(name);
+            case EXT_DOUBLE -> reader.readExtDouble(name);
             case EXT_STRING -> reader.readExtString(name);
             case REFERENCE -> new DsonReference(reader.readRef(name));
             case TIMESTAMP -> new DsonTimestamp(reader.readTimestamp(name));

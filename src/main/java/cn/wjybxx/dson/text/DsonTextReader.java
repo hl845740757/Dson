@@ -445,19 +445,28 @@ public class DsonTextReader extends AbstractDsonReader {
             }
             case DsonTexts.LABEL_EXTINT32 -> {
                 Tuple2 tuple2 = scanTuple2(context);
-                int value = DsonTexts.parseInt(tuple2.value);
-                pushNextValue(new DsonExtInt32(tuple2.type, value));
+                boolean hasValue = !tuple2.isUnquoteNull();
+                int value = hasValue ? DsonTexts.parseInt(tuple2.value) : 0;
+                pushNextValue(new DsonExtInt32(tuple2.type, value, hasValue));
                 yield DsonType.EXT_INT32;
             }
             case DsonTexts.LABEL_EXTINT64 -> {
                 Tuple2 tuple2 = scanTuple2(context);
-                long value = DsonTexts.parseLong(tuple2.value);
-                pushNextValue(new DsonExtInt64(tuple2.type, value));
+                boolean hasValue = !tuple2.isUnquoteNull();
+                long value = hasValue ? DsonTexts.parseLong(tuple2.value) : 0;
+                pushNextValue(new DsonExtInt64(tuple2.type, value, hasValue));
                 yield DsonType.EXT_INT64;
+            }
+            case DsonTexts.LABEL_EXTDOUBLE -> {
+                Tuple2 tuple2 = scanTuple2(context);
+                boolean hasValue = !tuple2.isUnquoteNull();
+                double value = hasValue ? DsonTexts.parseDouble(tuple2.value) : 0;
+                pushNextValue(new DsonExtDouble(tuple2.type, value, hasValue));
+                yield DsonType.EXT_DOUBLE;
             }
             case DsonTexts.LABEL_EXTSTRING -> {
                 Tuple2 tuple2 = scanTuple2(context);
-                String value = tuple2.isUnquoteNullString() ? null : tuple2.value;
+                String value = tuple2.isUnquoteNull() ? null : tuple2.value;
                 pushNextValue(new DsonExtString(tuple2.type, value));
                 yield DsonType.EXT_STRING;
             }
@@ -644,8 +653,8 @@ public class DsonTextReader extends AbstractDsonReader {
             this.tokenType = tokenType;
         }
 
-        boolean isUnquoteNullString() {
-            return tokenType == TokenType.UNQUOTE_STRING && "null".equals(value);
+        boolean isUnquoteNull() {
+            return "null".equals(value);
         }
     }
     // endregion
@@ -768,11 +777,6 @@ public class DsonTextReader extends AbstractDsonReader {
     }
 
     @Override
-    protected DsonExtString doReadExtString() {
-        return (DsonExtString) Objects.requireNonNull(popNextValue());
-    }
-
-    @Override
     protected DsonExtInt32 doReadExtInt32() {
         return (DsonExtInt32) Objects.requireNonNull(popNextValue());
     }
@@ -780,6 +784,16 @@ public class DsonTextReader extends AbstractDsonReader {
     @Override
     protected DsonExtInt64 doReadExtInt64() {
         return (DsonExtInt64) Objects.requireNonNull(popNextValue());
+    }
+
+    @Override
+    protected DsonExtDouble doReadExtDouble() {
+        return (DsonExtDouble) Objects.requireNonNull(popNextValue());
+    }
+
+    @Override
+    protected DsonExtString doReadExtString() {
+        return (DsonExtString) Objects.requireNonNull(popNextValue());
     }
 
     @Override

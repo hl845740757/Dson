@@ -49,24 +49,26 @@ public enum DsonType {
     EXT_INT32(9),
     /**
      * Int64的扩展类型
-     * 基本类型的long无法直接表达其使用目的，需要额外的类型支持；
-     * 通过扩展类型，可避免破坏业务代码，可避免用户自行封装
      */
     EXT_INT64(10),
+    /**
+     * Double的扩展类型
+     */
+    EXT_DOUBLE(11),
     /**
      * String的扩展类型
      * 基本类型的String无法直接表达其使用目的，需要额外的类型支持；
      * 通过扩展类型，可避免破坏业务代码，可避免用户自行封装
      */
-    EXT_STRING(11),
+    EXT_STRING(12),
     /**
      * 对象引用
      */
-    REFERENCE(12),
+    REFERENCE(13),
     /**
      * 时间戳
      */
-    TIMESTAMP(13),
+    TIMESTAMP(14),
 
     /**
      * 对象头信息，与Object类型编码格式类似
@@ -114,6 +116,7 @@ public enum DsonType {
         }
     }
 
+    /** {@link WireType} */
     public boolean hasWireType() {
         switch (this) {
             case INT32, INT64, EXT_INT32, EXT_INT64:

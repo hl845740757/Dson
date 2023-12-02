@@ -6,7 +6,7 @@
 
     <groupId>cn.wjybxx.dson</groupId>
     <artifactId>dson-core</artifactId>
-    <version>1.0.7</version>
+    <version>1.0.8</version>
 
     <name>Dson-Core</name>
     <description>有点奇怪的配置文件格式和序列化方案</description>

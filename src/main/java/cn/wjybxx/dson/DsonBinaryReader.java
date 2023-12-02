@@ -141,11 +141,6 @@ public class DsonBinaryReader extends AbstractDsonReader {
     }
 
     @Override
-    protected DsonExtString doReadExtString() {
-        return DsonReaderUtils.readDsonExtString(input, currentWireTypeBits);
-    }
-
-    @Override
     protected DsonExtInt32 doReadExtInt32() {
         return DsonReaderUtils.readDsonExtInt32(input, currentWireType);
     }
@@ -153,6 +148,16 @@ public class DsonBinaryReader extends AbstractDsonReader {
     @Override
     protected DsonExtInt64 doReadExtInt64() {
         return DsonReaderUtils.readDsonExtInt64(input, currentWireType);
+    }
+
+    @Override
+    protected DsonExtDouble doReadExtDouble() {
+        return DsonReaderUtils.readDsonExtDouble(input, currentWireTypeBits);
+    }
+
+    @Override
+    protected DsonExtString doReadExtString() {
+        return DsonReaderUtils.readDsonExtString(input, currentWireTypeBits);
     }
 
     @Override
