@@ -62,33 +62,41 @@ public class ExtInt64 implements Comparable<ExtInt64> {
         return hasValue;
     }
 
-    //
-    @Override
-    public int compareTo(ExtInt64 that) {
-        int r = Integer.compare(type, that.type);
-        if (r != 0) {
-            return r;
-        }
-        return Long.compare(value, that.value);
-    }
+    //region equals
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ExtInt64 that = (ExtInt64) o;
+        ExtInt64 extInt64 = (ExtInt64) o;
 
-        if (type != that.type) return false;
-        return value == that.value;
+        if (type != extInt64.type) return false;
+        if (value != extInt64.value) return false;
+        return hasValue == extInt64.hasValue;
     }
 
     @Override
     public int hashCode() {
         int result = type;
         result = 31 * result + (int) (value ^ (value >>> 32));
+        result = 31 * result + (hasValue ? 1 : 0);
         return result;
     }
+
+    @Override
+    public int compareTo(ExtInt64 that) {
+        int r = Integer.compare(type, that.type);
+        if (r != 0) {
+            return r;
+        }
+        r = Boolean.compare(hasValue, that.hasValue);
+        if (r != 0) {
+            return r;
+        }
+        return Long.compare(value, that.value);
+    }
+    // endregion
 
     @Override
     public String toString() {

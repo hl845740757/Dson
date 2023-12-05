@@ -31,21 +31,17 @@ public class DsonString extends DsonValue implements Comparable<DsonString> {
         this.value = Objects.requireNonNull(value);
     }
 
-    public String getValue() {
-        return value;
-    }
-
     @Nonnull
     @Override
     public DsonType getDsonType() {
         return DsonType.STRING;
     }
 
-    //
-    @Override
-    public int compareTo(DsonString that) {
-        return value.compareTo(that.value);
+    public String getValue() {
+        return value;
     }
+
+    // region equals
 
     @Override
     public boolean equals(Object o) {
@@ -61,6 +57,13 @@ public class DsonString extends DsonValue implements Comparable<DsonString> {
     public int hashCode() {
         return value.hashCode();
     }
+
+    @Override
+    public int compareTo(DsonString that) {
+        return value.compareTo(that.value);
+    }
+
+    // endregion
 
     @Override
     public String toString() {

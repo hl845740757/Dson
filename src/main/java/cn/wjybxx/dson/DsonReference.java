@@ -33,15 +33,17 @@ public class DsonReference extends DsonValue {
         this.value = Objects.requireNonNull(value);
     }
 
-    public ObjectRef getValue() {
-        return value;
-    }
-
     @Nonnull
     @Override
     public DsonType getDsonType() {
         return DsonType.REFERENCE;
     }
+
+    public ObjectRef getValue() {
+        return value;
+    }
+
+    // region equals
 
     @Override
     public boolean equals(Object o) {
@@ -57,6 +59,8 @@ public class DsonReference extends DsonValue {
     public int hashCode() {
         return value.hashCode();
     }
+
+    // endregion
 
     @Override
     public String toString() {

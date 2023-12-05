@@ -26,7 +26,8 @@ public class DsonTimestamp extends DsonValue {
         return DsonType.TIMESTAMP;
     }
 
-    //
+    //region equals
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -41,6 +42,8 @@ public class DsonTimestamp extends DsonValue {
     public int hashCode() {
         return value.hashCode();
     }
+
+    // endregion
 
     @Override
     public String toString() {

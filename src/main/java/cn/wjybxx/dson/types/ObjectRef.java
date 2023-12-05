@@ -88,7 +88,7 @@ public final class ObjectRef {
         return type;
     }
 
-    //
+    //region equals
 
     @Override
     public boolean equals(Object o) {
@@ -111,6 +111,7 @@ public final class ObjectRef {
         result = 31 * result + policy;
         return result;
     }
+    // endregion
 
     @Override
     public String toString() {

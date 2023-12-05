@@ -64,7 +64,7 @@ public class Binary {
         return data;
     }
 
-    //
+    //region equals
 
     @Override
     public boolean equals(Object o) {
@@ -83,6 +83,8 @@ public class Binary {
         result = 31 * result + Arrays.hashCode(data);
         return result;
     }
+
+    // endregion
 
     @Override
     public String toString() {

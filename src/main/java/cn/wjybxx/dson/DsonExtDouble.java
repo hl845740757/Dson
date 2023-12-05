@@ -28,8 +28,8 @@ import javax.annotation.Nonnull;
 public class DsonExtDouble extends DsonValue implements Comparable<DsonExtDouble> {
 
     private final int type;
+    private final boolean hasValue; // 比较时放前面
     private final double value;
-    private final boolean hasValue;
 
     public DsonExtDouble(int type, double value) {
         this(type, value, true);
@@ -69,20 +69,7 @@ public class DsonExtDouble extends DsonValue implements Comparable<DsonExtDouble
         return DsonType.EXT_DOUBLE;
     }
 
-    //
-
-    @Override
-    public int compareTo(DsonExtDouble that) {
-        int r = Integer.compare(type, that.type);
-        if (r != 0) {
-            return r;
-        }
-        r = Boolean.compare(hasValue, that.hasValue);
-        if (r != 0) {
-            return r;
-        }
-        return Double.compare(value, that.value);
-    }
+    //region equals
 
     @Override
     public boolean equals(Object o) {
@@ -106,6 +93,20 @@ public class DsonExtDouble extends DsonValue implements Comparable<DsonExtDouble
         result = 31 * result + (hasValue ? 1 : 0);
         return result;
     }
+
+    @Override
+    public int compareTo(DsonExtDouble that) {
+        int r = Integer.compare(type, that.type);
+        if (r != 0) {
+            return r;
+        }
+        r = Boolean.compare(hasValue, that.hasValue);
+        if (r != 0) {
+            return r;
+        }
+        return Double.compare(value, that.value);
+    }
+    // endregion
 
     @Override
     public String toString() {

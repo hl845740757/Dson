@@ -37,14 +37,14 @@ public class DsonBool extends DsonValue implements Comparable<DsonBool> {
         return value ? TRUE : FALSE;
     }
 
-    public boolean getValue() {
-        return value;
-    }
-
     @Nonnull
     @Override
     public DsonType getDsonType() {
         return DsonType.BOOLEAN;
+    }
+
+    public boolean getValue() {
+        return value;
     }
 
     //

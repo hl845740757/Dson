@@ -173,6 +173,8 @@ public final class OffsetTimestamp {
 
     // endregion
 
+    //region equals
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -194,6 +196,7 @@ public final class OffsetTimestamp {
         result = 31 * result + enables;
         return result;
     }
+    // endregion
 
     @Override
     public String toString() {

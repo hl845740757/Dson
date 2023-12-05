@@ -65,12 +65,7 @@ public class DsonInt32 extends DsonNumber implements Comparable<DsonInt32> {
         return value;
     }
 
-    //
-
-    @Override
-    public int compareTo(DsonInt32 that) {
-        return Integer.compare(value, that.value);
-    }
+    //region equals
 
     @Override
     public boolean equals(Object o) {
@@ -86,6 +81,13 @@ public class DsonInt32 extends DsonNumber implements Comparable<DsonInt32> {
     public int hashCode() {
         return value;
     }
+
+    @Override
+    public int compareTo(DsonInt32 that) {
+        return Integer.compare(value, that.value);
+    }
+
+    // endregion
 
     @Override
     public String toString() {

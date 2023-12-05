@@ -227,7 +227,7 @@ public class CollectionUtils {
 
     /** @throws NoSuchElementException 如果map为空 */
     public static <K> K firstKey(Map<K, ?> map) {
-        // JDK的LinkedHashMap真的有点气人，都知道是有序的，还不让查询第一个Key...
+        // JDK21支持查询FirstKey
         if (map instanceof SortedMap<K, ?> sortedMap) {
             return sortedMap.firstKey();
         } else {

@@ -64,14 +64,14 @@ public class DsonObject<K> extends AbstractDsonObject<K> {
         return (DsonObject<K>) EMPTY;
     }
 
-    public DsonHeader<K> getHeader() {
-        return header;
-    }
-
     @Nonnull
     @Override
     public final DsonType getDsonType() {
         return DsonType.OBJECT;
+    }
+
+    public DsonHeader<K> getHeader() {
+        return header;
     }
 
     /** @return this */

@@ -37,11 +37,7 @@ public class DsonNull extends DsonValue implements Comparable<DsonNull> {
         return DsonType.NULL;
     }
 
-    @Override
-    public int compareTo(DsonNull o) {
-        return 0;
-    }
-
+    //region equals
     @Override
     public boolean equals(final Object o) {
         if (this == o) return true;
@@ -53,6 +49,12 @@ public class DsonNull extends DsonValue implements Comparable<DsonNull> {
     public int hashCode() {
         return 0;
     }
+
+    @Override
+    public int compareTo(DsonNull o) {
+        return 0;
+    }
+    // endregion
 
     @Override
     public String toString() {

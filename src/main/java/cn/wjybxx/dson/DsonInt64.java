@@ -64,12 +64,8 @@ public class DsonInt64 extends DsonNumber implements Comparable<DsonInt64> {
     public double doubleValue() {
         return value;
     }
-    //
-
-    @Override
-    public int compareTo(DsonInt64 that) {
-        return Long.compare(value, that.value);
-    }
+    
+    //region equals
 
     @Override
     public boolean equals(Object o) {
@@ -85,6 +81,13 @@ public class DsonInt64 extends DsonNumber implements Comparable<DsonInt64> {
     public int hashCode() {
         return (int) (value ^ (value >>> 32));
     }
+
+    @Override
+    public int compareTo(DsonInt64 that) {
+        return Long.compare(value, that.value);
+    }
+
+    // endregion
 
     @Override
     public String toString() {

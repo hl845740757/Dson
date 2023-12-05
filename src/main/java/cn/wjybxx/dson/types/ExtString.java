@@ -49,7 +49,26 @@ public class ExtString implements Comparable<ExtString> {
         return value != null;
     }
 
-    //
+    // region equals
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ExtString extString = (ExtString) o;
+
+        if (type != extString.type) return false;
+        return Objects.equals(value, extString.value);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = type;
+        result = 31 * result + (value != null ? value.hashCode() : 0);
+        return result;
+    }
+
     @Override
     public int compareTo(ExtString that) {
         int r = Integer.compare(type, that.type);
@@ -65,24 +84,7 @@ public class ExtString implements Comparable<ExtString> {
             return 1;
         }
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        ExtString that = (ExtString) o;
-
-        if (type != that.type) return false;
-        return Objects.equals(value, that.value);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = type;
-        result = 31 * result + (value != null ? value.hashCode() : 0);
-        return result;
-    }
+    // endregion
 
     @Override
     public String toString() {

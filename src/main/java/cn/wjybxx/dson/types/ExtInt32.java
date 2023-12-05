@@ -62,33 +62,42 @@ public class ExtInt32 implements Comparable<ExtInt32> {
         return hasValue;
     }
 
-    //
-    @Override
-    public int compareTo(ExtInt32 that) {
-        int r = Integer.compare(type, that.type);
-        if (r != 0) {
-            return r;
-        }
-        return Integer.compare(value, that.value);
-    }
+    //region equals
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ExtInt32 that = (ExtInt32) o;
+        ExtInt32 extInt32 = (ExtInt32) o;
 
-        if (type != that.type) return false;
-        return value == that.value;
+        if (type != extInt32.type) return false;
+        if (value != extInt32.value) return false;
+        return hasValue == extInt32.hasValue;
     }
 
     @Override
     public int hashCode() {
         int result = type;
         result = 31 * result + value;
+        result = 31 * result + (hasValue ? 1 : 0);
         return result;
     }
+
+    @Override
+    public int compareTo(ExtInt32 that) {
+        int r = Integer.compare(type, that.type);
+        if (r != 0) {
+            return r;
+        }
+        r = Boolean.compare(hasValue, that.hasValue);
+        if (r != 0) {
+            return r;
+        }
+        return Integer.compare(value, that.value);
+    }
+
+    //endregion
 
     @Override
     public String toString() {

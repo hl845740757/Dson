@@ -65,11 +65,7 @@ public class DsonFloat extends DsonNumber implements Comparable<DsonFloat> {
         return value;
     }
 
-    //
-    @Override
-    public int compareTo(DsonFloat that) {
-        return Float.compare(value, that.value);
-    }
+    //region equals
 
     @Override
     public boolean equals(Object o) {
@@ -85,6 +81,13 @@ public class DsonFloat extends DsonNumber implements Comparable<DsonFloat> {
     public int hashCode() {
         return (value != 0.0f ? Float.floatToIntBits(value) : 0);
     }
+
+    @Override
+    public int compareTo(DsonFloat that) {
+        return Float.compare(value, that.value);
+    }
+
+    // endregion
 
     @Override
     public String toString() {

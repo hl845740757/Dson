@@ -39,6 +39,12 @@ public class DsonExtString extends DsonValue implements Comparable<DsonExtString
         this.value = value;
     }
 
+    @Nonnull
+    @Override
+    public DsonType getDsonType() {
+        return DsonType.EXT_STRING;
+    }
+
     public int getType() {
         return type;
     }
@@ -51,29 +57,7 @@ public class DsonExtString extends DsonValue implements Comparable<DsonExtString
         return value != null;
     }
 
-    @Nonnull
-    @Override
-    public DsonType getDsonType() {
-        return DsonType.EXT_STRING;
-    }
-
-    //
-    @Override
-    public int compareTo(DsonExtString that) {
-        int r = Integer.compare(type, that.type);
-        if (r != 0) {
-            return r;
-        }
-        if (value != null && that.value != null) {
-            return value.compareTo(that.value);
-        }
-        if (value == null) {
-            return -1;
-        } else {
-            return 1;
-        }
-    }
-
+    //region equals
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -91,6 +75,23 @@ public class DsonExtString extends DsonValue implements Comparable<DsonExtString
         result = 31 * result + (value != null ? value.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public int compareTo(DsonExtString that) {
+        int r = Integer.compare(type, that.type);
+        if (r != 0) {
+            return r;
+        }
+        if (value != null && that.value != null) {
+            return value.compareTo(that.value);
+        }
+        if (value == null) {
+            return -1;
+        } else {
+            return 1;
+        }
+    }
+    // endregion
 
     @Override
     public String toString() {

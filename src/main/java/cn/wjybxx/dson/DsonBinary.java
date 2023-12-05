@@ -49,9 +49,10 @@ public class DsonBinary extends DsonValue {
         this.data = src.data.clone();
     }
 
-    /** 创建一个拷贝 */
-    public DsonBinary copy() {
-        return new DsonBinary(type, data.clone());
+    @Nonnull
+    @Override
+    public DsonType getDsonType() {
+        return DsonType.BINARY;
     }
 
     public int getType() {
@@ -63,13 +64,12 @@ public class DsonBinary extends DsonValue {
         return data;
     }
 
-    @Nonnull
-    @Override
-    public DsonType getDsonType() {
-        return DsonType.BINARY;
+    /** 创建一个拷贝 */
+    public DsonBinary copy() {
+        return new DsonBinary(type, data.clone());
     }
 
-    //
+    //region equals
 
     @Override
     public boolean equals(Object o) {
@@ -88,6 +88,8 @@ public class DsonBinary extends DsonValue {
         result = 31 * result + Arrays.hashCode(data);
         return result;
     }
+
+    // endregion
 
     @Override
     public String toString() {

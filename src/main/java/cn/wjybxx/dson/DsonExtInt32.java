@@ -27,8 +27,8 @@ import javax.annotation.Nonnull;
 public class DsonExtInt32 extends DsonValue implements Comparable<DsonExtInt32> {
 
     private final int type;
+    private final boolean hasValue; // 比较时放前面
     private final int value;
-    private final boolean hasValue;
 
     public DsonExtInt32(int type, int value) {
         this(type, value, true);
@@ -50,6 +50,12 @@ public class DsonExtInt32 extends DsonValue implements Comparable<DsonExtInt32> 
         return new DsonExtInt32(type, 0, false);
     }
 
+    @Nonnull
+    @Override
+    public DsonType getDsonType() {
+        return DsonType.EXT_INT32;
+    }
+
     public int getType() {
         return type;
     }
@@ -62,21 +68,7 @@ public class DsonExtInt32 extends DsonValue implements Comparable<DsonExtInt32> 
         return hasValue;
     }
 
-    @Nonnull
-    @Override
-    public DsonType getDsonType() {
-        return DsonType.EXT_INT32;
-    }
-
-    //
-    @Override
-    public int compareTo(DsonExtInt32 that) {
-        int r = Integer.compare(type, that.type);
-        if (r != 0) {
-            return r;
-        }
-        return Integer.compare(value, that.value);
-    }
+    // region equals
 
     @Override
     public boolean equals(Object o) {
@@ -86,15 +78,32 @@ public class DsonExtInt32 extends DsonValue implements Comparable<DsonExtInt32> 
         DsonExtInt32 that = (DsonExtInt32) o;
 
         if (type != that.type) return false;
+        if (hasValue != that.hasValue) return false;
         return value == that.value;
     }
 
     @Override
     public int hashCode() {
         int result = type;
+        result = 31 * result + (hasValue ? 1 : 0);
         result = 31 * result + value;
         return result;
     }
+
+    @Override
+    public int compareTo(DsonExtInt32 that) {
+        int r = Integer.compare(type, that.type);
+        if (r != 0) {
+            return r;
+        }
+        r = Boolean.compare(hasValue, that.hasValue);
+        if (r != 0) {
+            return r;
+        }
+        return Integer.compare(value, that.value);
+    }
+
+    // endregion
 
     @Override
     public String toString() {

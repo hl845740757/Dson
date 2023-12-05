@@ -65,12 +65,7 @@ public class DsonDouble extends DsonNumber implements Comparable<DsonDouble> {
         return value;
     }
 
-    //
-    @Override
-    public int compareTo(DsonDouble that) {
-        return Double.compare(value, that.value);
-    }
-
+    //region equals
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -86,6 +81,13 @@ public class DsonDouble extends DsonNumber implements Comparable<DsonDouble> {
         long temp = Double.doubleToLongBits(value);
         return (int) (temp ^ (temp >>> 32));
     }
+
+    @Override
+    public int compareTo(DsonDouble that) {
+        return Double.compare(value, that.value);
+    }
+
+    // endregion
 
     @Override
     public String toString() {

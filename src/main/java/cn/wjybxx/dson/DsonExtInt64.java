@@ -27,8 +27,8 @@ import javax.annotation.Nonnull;
 public class DsonExtInt64 extends DsonValue implements Comparable<DsonExtInt64> {
 
     private final int type;
+    private final boolean hasValue; // 比较时放前面
     private final long value;
-    private final boolean hasValue;
 
     public DsonExtInt64(int type, long value) {
         this(type, value, true);
@@ -50,6 +50,12 @@ public class DsonExtInt64 extends DsonValue implements Comparable<DsonExtInt64> 
         return new DsonExtInt64(type, 0, false);
     }
 
+    @Nonnull
+    @Override
+    public DsonType getDsonType() {
+        return DsonType.EXT_INT64;
+    }
+
     public int getType() {
         return type;
     }
@@ -62,21 +68,7 @@ public class DsonExtInt64 extends DsonValue implements Comparable<DsonExtInt64> 
         return hasValue;
     }
 
-    @Nonnull
-    @Override
-    public DsonType getDsonType() {
-        return DsonType.EXT_INT64;
-    }
-
-    //
-    @Override
-    public int compareTo(DsonExtInt64 that) {
-        int r = Integer.compare(type, that.type);
-        if (r != 0) {
-            return r;
-        }
-        return Long.compare(value, that.value);
-    }
+    // region equals
 
     @Override
     public boolean equals(Object o) {
@@ -86,15 +78,32 @@ public class DsonExtInt64 extends DsonValue implements Comparable<DsonExtInt64> 
         DsonExtInt64 that = (DsonExtInt64) o;
 
         if (type != that.type) return false;
+        if (hasValue != that.hasValue) return false;
         return value == that.value;
     }
 
     @Override
     public int hashCode() {
         int result = type;
+        result = 31 * result + (hasValue ? 1 : 0);
         result = 31 * result + (int) (value ^ (value >>> 32));
         return result;
     }
+
+    @Override
+    public int compareTo(DsonExtInt64 that) {
+        int r = Integer.compare(type, that.type);
+        if (r != 0) {
+            return r;
+        }
+        r = Boolean.compare(hasValue, that.hasValue);
+        if (r != 0) {
+            return r;
+        }
+        return Long.compare(value, that.value);
+    }
+
+    // endregion
 
     @Override
     public String toString() {

@@ -62,14 +62,14 @@ public class DsonArray<K> extends AbstractDsonArray implements RandomAccess {
     }
 
     @Nonnull
-    public DsonHeader<K> getHeader() {
-        return header;
-    }
-
-    @Nonnull
     @Override
     public final DsonType getDsonType() {
         return DsonType.ARRAY;
+    }
+
+    @Nonnull
+    public DsonHeader<K> getHeader() {
+        return header;
     }
 
     @Override

@@ -16,10 +16,7 @@
 
 package cn.wjybxx.dson.types;
 
-import cn.wjybxx.dson.DsonType;
 import cn.wjybxx.dson.Dsons;
-
-import javax.annotation.Nonnull;
 
 /**
  * double的简单扩展
@@ -66,7 +63,7 @@ public class ExtDouble implements Comparable<ExtDouble> {
         return hasValue;
     }
 
-    //
+    //region equals
 
     @Override
     public int compareTo(ExtDouble that) {
@@ -103,6 +100,7 @@ public class ExtDouble implements Comparable<ExtDouble> {
         result = 31 * result + (hasValue ? 1 : 0);
         return result;
     }
+    // endregion
 
     @Override
     public String toString() {
