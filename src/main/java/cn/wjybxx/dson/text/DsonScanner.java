@@ -16,7 +16,7 @@
 
 package cn.wjybxx.dson.text;
 
-import cn.wjybxx.dson.internal.CollectionUtils;
+import cn.wjybxx.dson.internal.DsonInternals;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
@@ -96,7 +96,7 @@ public class DsonScanner implements AutoCloseable {
     }
 
     private static void checkToken(List<TokenType> expected, TokenType tokenType, int position) {
-        if (!CollectionUtils.containsRef(expected, tokenType)) {
+        if (!DsonInternals.containsRef(expected, tokenType)) {
             throw invalidTokenType(expected, tokenType, position);
         }
     }

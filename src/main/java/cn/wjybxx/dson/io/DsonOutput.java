@@ -61,6 +61,7 @@ public interface DsonOutput extends AutoCloseable {
     /** 由output写入string的长度，且长度字段需要使用uint32编码 */
     void writeString(String value);
 
+    /** 仅写入内容，不会写入数组的长度 */
     default void writeRawBytes(byte[] value) {
         writeRawBytes(value, 0, value.length);
     }
@@ -80,9 +81,13 @@ public interface DsonOutput extends AutoCloseable {
      */
     void setPosition(final int writerIndex);
 
+    /** 在指定索引位置写入一个byte */
+    void setByte(final int writerIndex, byte value);
+
     /**
-     * 在指定写索引处写如给定值。
-     * 相比先{@link #setPosition(int)}再{@link #writeFixed32(int)}的方式，该接口更容易优化实现。
+     * 在指定索引位置以Fixed32格式写入一个int值。
+     * 1.该方法可能有较大的开销，不宜频繁使用
+     * 2.相比先{@link #setPosition(int)}再{@link #writeFixed32(int)}的方式，该接口更容易优化实现。
      */
     default void setFixedInt32(final int writerIndex, int value) {
         int oldPosition = getPosition();

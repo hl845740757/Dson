@@ -61,7 +61,7 @@ public enum ValuesPolicy {
     IMMUTABLE {
         @Override
         public <K, V> Map<K, V> applyMap(Map<K, V> src) {
-            return CollectionUtils.toImmutableLinkedHashMap(src);
+            return DsonInternals.toImmutableLinkedHashMap(src);
         }
 
         @Override
@@ -71,7 +71,7 @@ public enum ValuesPolicy {
 
         @Override
         public <E> Set<E> applySet(Set<E> src) {
-            return CollectionUtils.toImmutableLinkedHashSet(src);
+            return DsonInternals.toImmutableLinkedHashSet(src);
         }
     },
 

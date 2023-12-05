@@ -267,6 +267,14 @@ public class DsonOutputs {
         }
 
         @Override
+        public void setByte(int writerIndex, byte value) {
+            Objects.checkIndex(writerIndex, limit - offset);
+            int newOffset = offset + writerIndex;
+            BinaryUtils.checkBuffer(buffer, newOffset, 1);
+            buffer[newOffset] = value;
+        }
+
+        @Override
         public void setFixedInt32(final int writerIndex, int value) {
             Objects.checkIndex(writerIndex, limit - offset);
             int newOffset = offset + writerIndex;
@@ -321,6 +329,12 @@ public class DsonOutputs {
             } catch (IOException e) {
                 throw DsonIOException.wrap(e);
             }
+        }
+
+        @Override
+        public void setByte(int writerIndex, byte value) {
+            int newOffset = offset + writerIndex;
+            byteBuffer.put(newOffset, value);
         }
 
         @Override

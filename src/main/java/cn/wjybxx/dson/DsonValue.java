@@ -118,8 +118,8 @@ public abstract class DsonValue {
         return (DsonNull) this;
     }
 
-    public DsonExtString asExtString() {
-        return (DsonExtString) this;
+    public DsonBinary asBinary() {
+        return (DsonBinary) this;
     }
 
     public DsonExtInt32 asExtInt32() {
@@ -134,8 +134,8 @@ public abstract class DsonValue {
         return (DsonExtDouble) this;
     }
 
-    public DsonBinary asBinary() {
-        return (DsonBinary) this;
+    public DsonExtString asExtString() {
+        return (DsonExtString) this;
     }
 
     @SuppressWarnings("unchecked")

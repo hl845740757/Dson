@@ -17,7 +17,7 @@
 package cn.wjybxx.dson.text;
 
 import cn.wjybxx.dson.*;
-import cn.wjybxx.dson.internal.CollectionUtils;
+import cn.wjybxx.dson.internal.DsonInternals;
 import cn.wjybxx.dson.io.DsonIOException;
 import cn.wjybxx.dson.types.ObjectRef;
 import cn.wjybxx.dson.types.OffsetTimestamp;
@@ -686,7 +686,7 @@ public class DsonTextReader extends AbstractDsonReader {
     }
 
     private static void verifyTokenType(Context context, DsonToken token, List<TokenType> expected) {
-        if (!CollectionUtils.containsRef(expected, token.getType())) {
+        if (!DsonInternals.containsRef(expected, token.getType())) {
             throw DsonIOException.invalidTokenType(context.contextType, token, expected);
         }
     }

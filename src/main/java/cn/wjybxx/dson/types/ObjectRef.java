@@ -17,7 +17,7 @@
 package cn.wjybxx.dson.types;
 
 import cn.wjybxx.dson.DsonLites;
-import cn.wjybxx.dson.internal.InternalUtils;
+import cn.wjybxx.dson.internal.DsonInternals;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.concurrent.Immutable;
@@ -54,8 +54,8 @@ public final class ObjectRef {
     }
 
     public ObjectRef(String localId, String namespace, int type, int policy) {
-        this.localId = InternalUtils.nullToDef(localId, "");
-        this.namespace = InternalUtils.nullToDef(namespace, "");
+        this.localId = DsonInternals.nullToDef(localId, "");
+        this.namespace = DsonInternals.nullToDef(namespace, "");
         this.type = type;
         this.policy = policy;
     }

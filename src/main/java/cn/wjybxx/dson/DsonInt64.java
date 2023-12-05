@@ -64,7 +64,7 @@ public class DsonInt64 extends DsonNumber implements Comparable<DsonInt64> {
     public double doubleValue() {
         return value;
     }
-    
+
     //region equals
 
     @Override

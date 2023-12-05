@@ -1,7 +1,7 @@
 package cn.wjybxx.dson.types;
 
 import cn.wjybxx.dson.DsonLites;
-import cn.wjybxx.dson.internal.InternalUtils;
+import cn.wjybxx.dson.internal.DsonInternals;
 
 import javax.annotation.concurrent.Immutable;
 import java.time.LocalDate;
@@ -43,13 +43,13 @@ public final class OffsetTimestamp {
      * @param enables 哪些字段有效
      */
     public OffsetTimestamp(long seconds, int nanos, int offset, int enables) {
-        if (InternalUtils.isDisabled(enables, MASK_DATE) && InternalUtils.isDisabled(enables, MASK_TIME)) {
+        if (DsonInternals.isDisabled(enables, MASK_DATE) && DsonInternals.isDisabled(enables, MASK_TIME)) {
             throw new IllegalArgumentException("date and time are disabled");
         }
-        if (offset != 0 && InternalUtils.isDisabled(enables, MASK_OFFSET)) {
+        if (offset != 0 && DsonInternals.isDisabled(enables, MASK_OFFSET)) {
             throw new IllegalArgumentException("offset is disabled, but the value is not 0");
         }
-        if (nanos != 0 && InternalUtils.isDisabled(enables, MASK_NANOS)) {
+        if (nanos != 0 && DsonInternals.isDisabled(enables, MASK_NANOS)) {
             throw new IllegalArgumentException("nanos is disabled, but the value is not 0");
         }
         if (nanos > 999_999_999 || nanos < 0) {
@@ -80,23 +80,23 @@ public final class OffsetTimestamp {
     // region
 
     public boolean hasDate() {
-        return InternalUtils.isEnabled(enables, MASK_DATE);
+        return DsonInternals.isEnabled(enables, MASK_DATE);
     }
 
     public boolean hasTime() {
-        return InternalUtils.isEnabled(enables, MASK_TIME);
+        return DsonInternals.isEnabled(enables, MASK_TIME);
     }
 
     public boolean hasOffset() {
-        return InternalUtils.isEnabled(enables, MASK_OFFSET);
+        return DsonInternals.isEnabled(enables, MASK_OFFSET);
     }
 
     public boolean hasNanos() {
-        return InternalUtils.isEnabled(enables, MASK_NANOS);
+        return DsonInternals.isEnabled(enables, MASK_NANOS);
     }
 
     public boolean hasFields(int mask) {
-        return InternalUtils.isEnabled(enables, mask);
+        return DsonInternals.isEnabled(enables, mask);
     }
 
     public boolean canConvertNanosToMillis() {

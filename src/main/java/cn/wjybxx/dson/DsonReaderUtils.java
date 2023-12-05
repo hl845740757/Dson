@@ -16,7 +16,7 @@
 
 package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.internal.InternalUtils;
+import cn.wjybxx.dson.internal.DsonInternals;
 import cn.wjybxx.dson.io.Chunk;
 import cn.wjybxx.dson.io.DsonIOException;
 import cn.wjybxx.dson.io.DsonInput;
@@ -257,8 +257,8 @@ public class DsonReaderUtils {
     }
 
     public static DsonExtString readDsonExtString(DsonInput input, int wireTypeBits) {
-        int type = InternalUtils.isEnabled(wireTypeBits, DsonExtString.MASK_TYPE) ? input.readUint32() : 0;
-        String value = InternalUtils.isEnabled(wireTypeBits, DsonExtString.MASK_VALUE) ? input.readString() : null;
+        int type = DsonInternals.isEnabled(wireTypeBits, DsonExtString.MASK_TYPE) ? input.readUint32() : 0;
+        String value = DsonInternals.isEnabled(wireTypeBits, DsonExtString.MASK_VALUE) ? input.readString() : null;
         return new DsonExtString(type, value);
     }
 
@@ -291,9 +291,9 @@ public class DsonReaderUtils {
 
     public static ObjectRef readRef(DsonInput input, int wireTypeBits) {
         String localId = input.readString();
-        String namespace = InternalUtils.isEnabled(wireTypeBits, ObjectRef.MASK_NAMESPACE) ? input.readString() : null;
-        int type = InternalUtils.isEnabled(wireTypeBits, ObjectRef.MASK_TYPE) ? input.readUint32() : 0;
-        int policy = InternalUtils.isEnabled(wireTypeBits, ObjectRef.MASK_POLICY) ? input.readUint32() : 0;
+        String namespace = DsonInternals.isEnabled(wireTypeBits, ObjectRef.MASK_NAMESPACE) ? input.readString() : null;
+        int type = DsonInternals.isEnabled(wireTypeBits, ObjectRef.MASK_TYPE) ? input.readUint32() : 0;
+        int policy = DsonInternals.isEnabled(wireTypeBits, ObjectRef.MASK_POLICY) ? input.readUint32() : 0;
         return new ObjectRef(localId, namespace, type, policy);
     }
 
@@ -397,10 +397,10 @@ public class DsonReaderUtils {
                 }
             }
             case EXT_STRING -> {
-                if (InternalUtils.isEnabled(wireTypeBits, DsonExtString.MASK_TYPE)) {
+                if (DsonInternals.isEnabled(wireTypeBits, DsonExtString.MASK_TYPE)) {
                     input.readUint32(); // 子类型
                 }
-                if (InternalUtils.isEnabled(wireTypeBits, DsonExtString.MASK_VALUE)) {
+                if (DsonInternals.isEnabled(wireTypeBits, DsonExtString.MASK_VALUE)) {
                     skip = input.readUint32(); // string长度
                     input.skipRawBytes(skip);
                 }
@@ -410,14 +410,14 @@ public class DsonReaderUtils {
                 skip = input.readUint32(); // localId
                 input.skipRawBytes(skip);
 
-                if (InternalUtils.isEnabled(wireTypeBits, ObjectRef.MASK_NAMESPACE)) {
+                if (DsonInternals.isEnabled(wireTypeBits, ObjectRef.MASK_NAMESPACE)) {
                     skip = input.readUint32(); // namespace
                     input.skipRawBytes(skip);
                 }
-                if (InternalUtils.isEnabled(wireTypeBits, ObjectRef.MASK_TYPE)) {
+                if (DsonInternals.isEnabled(wireTypeBits, ObjectRef.MASK_TYPE)) {
                     input.readUint32();
                 }
-                if (InternalUtils.isEnabled(wireTypeBits, ObjectRef.MASK_POLICY)) {
+                if (DsonInternals.isEnabled(wireTypeBits, ObjectRef.MASK_POLICY)) {
                     input.readUint32();
                 }
                 return;

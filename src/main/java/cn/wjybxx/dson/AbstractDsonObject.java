@@ -1,6 +1,6 @@
 package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.internal.CollectionUtils;
+import cn.wjybxx.dson.internal.DsonInternals;
 import cn.wjybxx.dson.internal.ValuesPolicy;
 
 import java.util.*;
@@ -49,7 +49,7 @@ public abstract class AbstractDsonObject<K> extends DsonValue implements Map<K, 
      * @throws NoSuchElementException 如果对象为空
      */
     public K firstKey() {
-        return CollectionUtils.firstKey(valueMap);
+        return DsonInternals.firstKey(valueMap);
     }
 
     public AbstractDsonObject<K> append(K key, DsonValue value) {

@@ -55,18 +55,20 @@ public interface DsonInput extends AutoCloseable {
 
     //
 
-    /** 该接口默认序列化为4字节 */
+    /** 该接口默认读取4字节 */
     float readFloat();
 
-    /** 该接口默认序列化为8字节 */
+    /** 该接口默认读取8字节 */
     double readDouble();
 
     boolean readBool();
 
     String readString();
 
+    /** @param size 要读取的字节数 */
     byte[] readRawBytes(int size);
 
+    /** @param n 要跳过的字节数 */
     void skipRawBytes(int n);
 
     /**
@@ -112,6 +114,11 @@ public interface DsonInput extends AutoCloseable {
      */
     int pushLimit(int byteLimit);
 
+    /**
+     * 恢复字节数限制
+     *
+     * @param oldLimit 前一次设置的限制点
+     */
     void popLimit(int oldLimit);
 
     /** @return 剩余可用的字节数 */
