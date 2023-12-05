@@ -67,9 +67,7 @@ public interface DsonLiteReader extends AutoCloseable {
     /** 当前是否处于应该读取name状态 */
     boolean isAtName();
 
-    /**
-     * 读取下一个值的name
-     */
+    /** 读取下一个值的name */
     int readName();
 
     /**
@@ -90,7 +88,7 @@ public interface DsonLiteReader extends AutoCloseable {
     DsonType getCurrentDsonType();
 
     /**
-     * 后去当前的字段编号
+     * 获取当前的字段名字
      * 1.该值在调用任意的读方法后将变化
      * 2.只有在读取值状态下才可访问
      *

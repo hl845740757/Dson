@@ -28,7 +28,7 @@ import java.util.Objects;
  */
 public class DsonScanner implements AutoCloseable {
 
-    private static final List<TokenType> STRING_TOKEN_TYPES = List.of(TokenType.STRING, TokenType.UNQUOTE_STRING);
+    private static final List<DsonTokenType> STRING_TOKEN_TYPES = List.of(DsonTokenType.STRING, DsonTokenType.UNQUOTE_STRING);
 
     private DsonCharStream buffer;
     private StringBuilder pooldStringBuilder = new StringBuilder(64);
@@ -55,7 +55,7 @@ public class DsonScanner implements AutoCloseable {
         }
         int c = skipWhitespace();
         if (c == -1) {
-            return new DsonToken(TokenType.EOF, "eof", getPosition());
+            return new DsonToken(DsonTokenType.EOF, "eof", getPosition());
         }
         return switch (c) {
             case '{' -> {
@@ -63,27 +63,27 @@ public class DsonScanner implements AutoCloseable {
                 int nextChar = buffer.read();
                 buffer.unread();
                 if (nextChar == '@') {
-                    yield new DsonToken(TokenType.BEGIN_OBJECT, "{@", getPosition());
+                    yield new DsonToken(DsonTokenType.BEGIN_OBJECT, "{@", getPosition());
                 } else {
-                    yield new DsonToken(TokenType.BEGIN_OBJECT, "{", getPosition());
+                    yield new DsonToken(DsonTokenType.BEGIN_OBJECT, "{", getPosition());
                 }
             }
             case '[' -> {
                 int nextChar = buffer.read();
                 buffer.unread();
                 if (nextChar == '@') {
-                    yield new DsonToken(TokenType.BEGIN_ARRAY, "[@", getPosition());
+                    yield new DsonToken(DsonTokenType.BEGIN_ARRAY, "[@", getPosition());
                 } else {
-                    yield new DsonToken(TokenType.BEGIN_ARRAY, "[", getPosition());
+                    yield new DsonToken(DsonTokenType.BEGIN_ARRAY, "[", getPosition());
                 }
             }
-            case '}' -> new DsonToken(TokenType.END_OBJECT, "}", getPosition());
-            case ']' -> new DsonToken(TokenType.END_ARRAY, "]", getPosition());
-            case ':' -> new DsonToken(TokenType.COLON, ":", getPosition());
-            case ',' -> new DsonToken(TokenType.COMMA, ",", getPosition());
+            case '}' -> new DsonToken(DsonTokenType.END_OBJECT, "}", getPosition());
+            case ']' -> new DsonToken(DsonTokenType.END_ARRAY, "]", getPosition());
+            case ':' -> new DsonToken(DsonTokenType.COLON, ":", getPosition());
+            case ',' -> new DsonToken(DsonTokenType.COMMA, ",", getPosition());
             case '@' -> parseHeaderToken();
-            case '"' -> new DsonToken(TokenType.STRING, scanString((char) c), getPosition());
-            default -> new DsonToken(TokenType.UNQUOTE_STRING, scanUnquotedString((char) c), getPosition());
+            case '"' -> new DsonToken(DsonTokenType.STRING, scanString((char) c), getPosition());
+            default -> new DsonToken(DsonTokenType.UNQUOTE_STRING, scanUnquotedString((char) c), getPosition());
         };
     }
 
@@ -95,13 +95,13 @@ public class DsonScanner implements AutoCloseable {
         }
     }
 
-    private static void checkToken(List<TokenType> expected, TokenType tokenType, int position) {
+    private static void checkToken(List<DsonTokenType> expected, DsonTokenType tokenType, int position) {
         if (!DsonInternals.containsRef(expected, tokenType)) {
             throw invalidTokenType(expected, tokenType, position);
         }
     }
 
-    private static DsonParseException invalidTokenType(List<TokenType> expected, TokenType tokenType, int position) {
+    private static DsonParseException invalidTokenType(List<DsonTokenType> expected, DsonTokenType tokenType, int position) {
         return new DsonParseException(String.format("Invalid Dson Token. Position: %d. Expected: %s. Found: '%s'.",
                 position, expected, tokenType));
     }
@@ -139,7 +139,7 @@ public class DsonScanner implements AutoCloseable {
         try {
             String className = scanClassName();
             if (className.equals("{")) {
-                return new DsonToken(TokenType.BEGIN_HEADER, "@{", getPosition());
+                return new DsonToken(DsonTokenType.BEGIN_HEADER, "@{", getPosition());
             }
             return onReadClassName(className);
         } catch (Exception e) {
@@ -195,44 +195,44 @@ public class DsonScanner implements AutoCloseable {
             case DsonTexts.LABEL_INT32 -> {
                 DsonToken nextToken = nextToken();
                 checkToken(STRING_TOKEN_TYPES, nextToken.getType(), position);
-                return new DsonToken(TokenType.INT32, DsonTexts.parseInt(nextToken.castAsString()), getPosition());
+                return new DsonToken(DsonTokenType.INT32, DsonTexts.parseInt(nextToken.castAsString()), getPosition());
             }
             case DsonTexts.LABEL_INT64 -> {
                 DsonToken nextToken = nextToken();
                 checkToken(STRING_TOKEN_TYPES, nextToken.getType(), position);
-                return new DsonToken(TokenType.INT64, DsonTexts.parseLong(nextToken.castAsString()), getPosition());
+                return new DsonToken(DsonTokenType.INT64, DsonTexts.parseLong(nextToken.castAsString()), getPosition());
             }
             case DsonTexts.LABEL_FLOAT -> {
                 DsonToken nextToken = nextToken();
                 checkToken(STRING_TOKEN_TYPES, nextToken.getType(), position);
-                return new DsonToken(TokenType.FLOAT, DsonTexts.parseFloat(nextToken.castAsString()), getPosition());
+                return new DsonToken(DsonTokenType.FLOAT, DsonTexts.parseFloat(nextToken.castAsString()), getPosition());
             }
             case DsonTexts.LABEL_DOUBLE -> {
                 DsonToken nextToken = nextToken();
                 checkToken(STRING_TOKEN_TYPES, nextToken.getType(), position);
-                return new DsonToken(TokenType.DOUBLE, DsonTexts.parseDouble(nextToken.castAsString()), getPosition());
+                return new DsonToken(DsonTokenType.DOUBLE, DsonTexts.parseDouble(nextToken.castAsString()), getPosition());
             }
             case DsonTexts.LABEL_BOOL -> {
                 DsonToken nextToken = nextToken();
                 checkToken(STRING_TOKEN_TYPES, nextToken.getType(), position);
-                return new DsonToken(TokenType.BOOL, DsonTexts.parseBool(nextToken.castAsString()), getPosition());
+                return new DsonToken(DsonTokenType.BOOL, DsonTexts.parseBool(nextToken.castAsString()), getPosition());
             }
             case DsonTexts.LABEL_NULL -> {
                 DsonToken nextToken = nextToken();
                 checkToken(STRING_TOKEN_TYPES, nextToken.getType(), position);
                 DsonTexts.checkNullString(nextToken.castAsString());
-                return new DsonToken(TokenType.NULL, null, getPosition());
+                return new DsonToken(DsonTokenType.NULL, null, getPosition());
             }
             case DsonTexts.LABEL_STRING -> {
                 DsonToken nextToken = nextToken();
                 checkToken(STRING_TOKEN_TYPES, nextToken.getType(), position);
-                return new DsonToken(TokenType.STRING, nextToken.castAsString(), getPosition());
+                return new DsonToken(DsonTokenType.STRING, nextToken.castAsString(), getPosition());
             }
             case DsonTexts.LABEL_TEXT -> {
-                return new DsonToken(TokenType.STRING, scanText(), getPosition());
+                return new DsonToken(DsonTokenType.STRING, scanText(), getPosition());
             }
         }
-        return new DsonToken(TokenType.CLASS_NAME, className, getPosition());
+        return new DsonToken(DsonTokenType.CLASS_NAME, className, getPosition());
     }
 
     // endregion

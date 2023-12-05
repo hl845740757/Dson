@@ -16,7 +16,7 @@
 
 package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.io.Chunk;
+import cn.wjybxx.dson.io.DsonChunk;
 import cn.wjybxx.dson.io.DsonOutput;
 import cn.wjybxx.dson.text.INumberStyle;
 import cn.wjybxx.dson.text.ObjectStyle;
@@ -140,7 +140,7 @@ public class DsonBinaryWriter extends AbstractDsonWriter {
     }
 
     @Override
-    protected void doWriteBinary(int type, Chunk chunk) {
+    protected void doWriteBinary(int type, DsonChunk chunk) {
         DsonOutput output = this.output;
         writeFullTypeAndCurrentName(output, DsonType.BINARY, 0);
         DsonReaderUtils.writeBinary(output, type, chunk);

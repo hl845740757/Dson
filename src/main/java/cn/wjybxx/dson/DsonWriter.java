@@ -16,7 +16,7 @@
 
 package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.io.Chunk;
+import cn.wjybxx.dson.io.DsonChunk;
 import cn.wjybxx.dson.text.INumberStyle;
 import cn.wjybxx.dson.text.ObjectStyle;
 import cn.wjybxx.dson.text.StringStyle;
@@ -47,7 +47,7 @@ public interface DsonWriter extends AutoCloseable {
 
     /**
      * 编码的时候，用户总是习惯 name和value 同时写入，
-     * 但在写Array或Object容器的时候，不能同时完成，需要先写入number再开始写值
+     * 但在写Array或Object容器的时候，不能同时完成，需要先写入name再开始写值
      */
     void writeName(String name);
 
@@ -75,7 +75,7 @@ public interface DsonWriter extends AutoCloseable {
     void writeBinary(String name, DsonBinary dsonBinary);
 
     /** @param chunk 写入chunk的length区域 */
-    void writeBinary(String name, int type, Chunk chunk);
+    void writeBinary(String name, int type, DsonChunk chunk);
 
     void writeExtInt32(String name, DsonExtInt32 value, WireType wireType, INumberStyle style);
 

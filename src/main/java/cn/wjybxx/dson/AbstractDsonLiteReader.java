@@ -534,12 +534,12 @@ public abstract class AbstractDsonLiteReader implements DsonLiteReader {
 
     @Override
     public Object attach(Object userData) {
-        return getContext().attach(userData);
+        return context.attach(userData);
     }
 
     @Override
     public Object attachment() {
-        return getContext().userData;
+        return context.userData;
     }
 
     @Override

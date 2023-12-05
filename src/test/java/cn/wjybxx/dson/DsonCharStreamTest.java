@@ -190,7 +190,7 @@ public class DsonCharStreamTest {
     private static void pullToList(DsonScanner scanner, List<DsonToken> outList) {
         while (true) {
             DsonToken nextToken = scanner.nextToken();
-            if (nextToken.getType() == TokenType.EOF) {
+            if (nextToken.getType() == DsonTokenType.EOF) {
                 break;
             }
             outList.add(nextToken);

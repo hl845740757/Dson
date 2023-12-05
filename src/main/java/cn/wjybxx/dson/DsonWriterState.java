@@ -31,13 +31,10 @@ public enum DsonWriterState {
     /** 顶层上下文初始状态 */
     INITIAL,
 
-    /**
-     * 等待写入name(fullNumber)
-     */
+    /** 等待写入name(fullNumber) */
     NAME,
-    /**
-     * 等待写入Value
-     */
+
+    /** 等待写入Value */
     VALUE,
 
 }

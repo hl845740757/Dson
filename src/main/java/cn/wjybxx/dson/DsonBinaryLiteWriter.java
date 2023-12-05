@@ -16,7 +16,7 @@
 
 package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.io.Chunk;
+import cn.wjybxx.dson.io.DsonChunk;
 import cn.wjybxx.dson.io.DsonOutput;
 import cn.wjybxx.dson.types.ObjectRef;
 import cn.wjybxx.dson.types.OffsetTimestamp;
@@ -137,7 +137,7 @@ public class DsonBinaryLiteWriter extends AbstractDsonLiteWriter {
     }
 
     @Override
-    protected void doWriteBinary(int type, Chunk chunk) {
+    protected void doWriteBinary(int type, DsonChunk chunk) {
         DsonOutput output = this.output;
         writeFullTypeAndCurrentName(output, DsonType.BINARY, 0);
         DsonReaderUtils.writeBinary(output, type, chunk);

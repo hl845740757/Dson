@@ -17,7 +17,7 @@
 package cn.wjybxx.dson.text;
 
 import cn.wjybxx.dson.*;
-import cn.wjybxx.dson.io.Chunk;
+import cn.wjybxx.dson.io.DsonChunk;
 import cn.wjybxx.dson.types.ObjectRef;
 import cn.wjybxx.dson.types.OffsetTimestamp;
 import com.google.protobuf.MessageLite;
@@ -332,7 +332,7 @@ public class DsonTextWriter extends AbstractDsonWriter {
     }
 
     @Override
-    protected void doWriteBinary(int type, Chunk chunk) {
+    protected void doWriteBinary(int type, DsonChunk chunk) {
         DsonPrinter printer = this.printer;
         writeCurrentName(printer, DsonType.BINARY);
         printer.printFastPath("[@bin ");

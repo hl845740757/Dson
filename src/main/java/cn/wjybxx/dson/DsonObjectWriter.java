@@ -1,6 +1,6 @@
 package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.io.Chunk;
+import cn.wjybxx.dson.io.DsonChunk;
 import cn.wjybxx.dson.text.INumberStyle;
 import cn.wjybxx.dson.text.ObjectStyle;
 import cn.wjybxx.dson.text.StringStyle;
@@ -90,7 +90,7 @@ public class DsonObjectWriter extends AbstractDsonWriter {
     }
 
     @Override
-    protected void doWriteBinary(int type, Chunk chunk) {
+    protected void doWriteBinary(int type, DsonChunk chunk) {
         getContext().add(new DsonBinary(type, chunk.payload()));
     }
 

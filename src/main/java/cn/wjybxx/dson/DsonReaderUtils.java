@@ -17,7 +17,7 @@
 package cn.wjybxx.dson;
 
 import cn.wjybxx.dson.internal.DsonInternals;
-import cn.wjybxx.dson.io.Chunk;
+import cn.wjybxx.dson.io.DsonChunk;
 import cn.wjybxx.dson.io.DsonIOException;
 import cn.wjybxx.dson.io.DsonInput;
 import cn.wjybxx.dson.io.DsonOutput;
@@ -149,7 +149,7 @@ public class DsonReaderUtils {
         output.writeRawBytes(binary.getData());
     }
 
-    public static void writeBinary(DsonOutput output, int type, Chunk chunk) {
+    public static void writeBinary(DsonOutput output, int type, DsonChunk chunk) {
         int sizeOfBinaryType = CodedOutputStream.computeUInt32SizeNoTag(type);
         output.writeFixed32(sizeOfBinaryType + chunk.getLength());
         output.writeUint32(type);

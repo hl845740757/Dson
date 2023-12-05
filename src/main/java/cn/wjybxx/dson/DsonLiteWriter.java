@@ -16,7 +16,7 @@
 
 package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.io.Chunk;
+import cn.wjybxx.dson.io.DsonChunk;
 import cn.wjybxx.dson.types.ObjectRef;
 import cn.wjybxx.dson.types.OffsetTimestamp;
 import com.google.protobuf.MessageLite;
@@ -72,7 +72,7 @@ public interface DsonLiteWriter extends AutoCloseable {
     void writeBinary(int name, DsonBinary dsonBinary);
 
     /** @param chunk 写入chunk的length区域 */
-    void writeBinary(int name, int type, Chunk chunk);
+    void writeBinary(int name, int type, DsonChunk chunk);
 
     void writeExtInt32(int name, DsonExtInt32 value, WireType wireType);
 

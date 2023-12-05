@@ -39,21 +39,13 @@ public enum DsonReaderState {
      * 简单说，用于peek一部分数据之后，重新设置为等待readStartXXX状态，避免数据流的回滚
      */
     WAIT_START_OBJECT,
-    /**
-     * 等待读取类型
-     */
+    /** 等待读取类型 */
     TYPE,
-    /**
-     * 等待用户读取name(fullNumber)
-     */
+    /** 等待用户读取name(fullNumber) */
     NAME,
-    /**
-     * 等待读取value
-     */
+    /** 等待读取value */
     VALUE,
-    /**
-     * 当前对象读取完毕；等待用户调用writeEndXXX
-     */
+    /** 当前对象读取完毕；等待用户调用writeEndXXX */
     WAIT_END_OBJECT,
 
     /** 到达输入的尾部 */

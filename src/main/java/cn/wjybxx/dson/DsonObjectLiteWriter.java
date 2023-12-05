@@ -1,6 +1,6 @@
 package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.io.Chunk;
+import cn.wjybxx.dson.io.DsonChunk;
 import cn.wjybxx.dson.types.ObjectRef;
 import cn.wjybxx.dson.types.OffsetTimestamp;
 import com.google.protobuf.MessageLite;
@@ -87,7 +87,7 @@ public class DsonObjectLiteWriter extends AbstractDsonLiteWriter {
     }
 
     @Override
-    protected void doWriteBinary(int type, Chunk chunk) {
+    protected void doWriteBinary(int type, DsonChunk chunk) {
         getContext().add(new DsonBinary(type, chunk.payload()));
     }
 

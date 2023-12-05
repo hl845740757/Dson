@@ -26,20 +26,20 @@ import java.util.Objects;
  */
 public class DsonToken {
 
-    private final TokenType type;
+    private final DsonTokenType type;
     private final Object value;
     private final int pos;
 
     /**
      * @param pos token所在的位置，-1表示动态生成的token
      */
-    public DsonToken(TokenType type, Object value, int pos) {
+    public DsonToken(DsonTokenType type, Object value, int pos) {
         this.type = Objects.requireNonNull(type);
         this.value = value;
         this.pos = pos;
     }
 
-    public TokenType getType() {
+    public DsonTokenType getType() {
         return type;
     }
 

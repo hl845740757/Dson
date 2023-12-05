@@ -21,7 +21,7 @@ import cn.wjybxx.dson.DsonReaderState;
 import cn.wjybxx.dson.DsonType;
 import cn.wjybxx.dson.DsonWriterState;
 import cn.wjybxx.dson.text.DsonToken;
-import cn.wjybxx.dson.text.TokenType;
+import cn.wjybxx.dson.text.DsonTokenType;
 
 import java.util.List;
 
@@ -87,11 +87,11 @@ public class DsonIOException extends RuntimeException {
     }
 
     public static DsonIOException invalidDsonType(List<DsonType> dsonTypeList, DsonType dsonType) {
-        return new DsonIOException(String.format("The dson type is invalid in context, context: %s, type: %s", dsonTypeList, dsonType));
+        return new DsonIOException(String.format("The dson type is invalid in context, context: %s, dsonType: %s", dsonTypeList, dsonType));
     }
 
     public static DsonIOException invalidDsonType(DsonContextType contextType, DsonType dsonType) {
-        return new DsonIOException(String.format("The dson type is invalid in context, context: %s, type: %s", contextType, dsonType));
+        return new DsonIOException(String.format("The dson type is invalid in context, context: %s, dsonType: %s", contextType, dsonType));
     }
 
     public static DsonIOException unexpectedSubType(int expected, int subType) {
@@ -120,7 +120,7 @@ public class DsonIOException extends RuntimeException {
         return new DsonIOException(String.format("invalid token, contextType %s, token %s.", contextType, token));
     }
 
-    public static DsonIOException invalidTokenType(DsonContextType contextType, DsonToken token, List<TokenType> expected) {
+    public static DsonIOException invalidTokenType(DsonContextType contextType, DsonToken token, List<DsonTokenType> expected) {
         return new DsonIOException(String.format("invalid token, contextType %s, expected %s, but found %s.",
                 contextType, expected, token));
     }

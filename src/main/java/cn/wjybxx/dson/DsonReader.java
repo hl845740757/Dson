@@ -63,9 +63,7 @@ public interface DsonReader extends AutoCloseable {
     /** 当前是否处于应该读取name状态 */
     boolean isAtName();
 
-    /**
-     * 读取下一个值的name
-     */
+    /** 读取下一个值的name */
     String readName();
 
     /**
@@ -86,7 +84,7 @@ public interface DsonReader extends AutoCloseable {
     DsonType getCurrentDsonType();
 
     /**
-     * 后去当前的字段编号
+     * 获取当前的字段名字
      * 1.该值在调用任意的读方法后将变化
      * 2.只有在读取值状态下才可访问
      *
@@ -204,8 +202,8 @@ public interface DsonReader extends AutoCloseable {
 
     /**
      * 将value的值读取为字节数组
-     * 1.支持类型：String、Binary、Array、Object、Header
-     * 2.返回的bytes中去除了value的length信息，
+     * 1.支持类型：String、Binary、Array、Object、Header；
+     * 2.返回的bytes中去除了value的length信息；
      * 3.只在二进制流下生效。
      * <p>
      * 该方法主要用于避免中间编解码过程，eg：

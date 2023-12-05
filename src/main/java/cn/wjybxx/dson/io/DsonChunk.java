@@ -25,7 +25,7 @@ import cn.wjybxx.dson.internal.BinaryUtils;
  * @author wjybxx
  * date 2023/4/2
  */
-public final class Chunk {
+public final class DsonChunk {
 
     private final byte[] buffer;
     /** 有效区域的起始偏移 */
@@ -35,7 +35,7 @@ public final class Chunk {
     /** 有效区域已使用长度 */
     private int used;
 
-    public Chunk(byte[] buffer) {
+    public DsonChunk(byte[] buffer) {
         this(buffer, 0, buffer.length);
     }
 
@@ -43,7 +43,7 @@ public final class Chunk {
      * @param offset 有效区域的起始偏移
      * @param length 有效区域的长度
      */
-    public Chunk(byte[] buffer, int offset, int length) {
+    public DsonChunk(byte[] buffer, int offset, int length) {
         BinaryUtils.checkBuffer(buffer, offset, length);
         this.buffer = buffer;
         this.offset = offset;
@@ -65,7 +65,7 @@ public final class Chunk {
 
     /** 设置已使用的块大小 */
     public void setUsed(int used) {
-        if (used > length) {
+        if (used < 0 || used > length) {
             throw new IllegalArgumentException(String.format("used %d, length %d", used, length));
         }
         this.used = used;
