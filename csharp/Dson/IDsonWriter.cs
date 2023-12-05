@@ -32,6 +32,11 @@ public interface IDsonWriter<in TName> : IDisposable
     void Flush();
 
     /// <summary>
+    /// 获取当前上下文的类型
+    /// </summary>
+    DsonContextType ContextType { get; }
+
+    /// <summary>
     /// 当前是否处于等待写入name的状态
     /// </summary>
     bool IsAtName { get; }
@@ -42,11 +47,6 @@ public interface IDsonWriter<in TName> : IDisposable
     /// </summary>
     /// <param name="name"></param>
     void WriteName(TName name);
-
-    /// <summary>
-    /// 获取当前上下文的类型
-    /// </summary>
-    DsonContextType ContextType { get; }
 
     #region 简单值
 

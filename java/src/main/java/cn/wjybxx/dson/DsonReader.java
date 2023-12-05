@@ -35,6 +35,11 @@ public interface DsonReader extends AutoCloseable {
     @Override
     void close();
 
+    /**
+     * 获取当前上下文的类型
+     */
+    DsonContextType getContextType();
+
     /** 当前是否处于应该读取type状态 */
     boolean isAtType();
 
@@ -91,11 +96,6 @@ public interface DsonReader extends AutoCloseable {
      * @return 当前字段的name
      */
     String getCurrentName();
-
-    /**
-     * 获取当前上下文的类型
-     */
-    DsonContextType getContextType();
 
     // region 简单值
 

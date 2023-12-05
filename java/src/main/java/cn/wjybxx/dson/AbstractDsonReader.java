@@ -46,11 +46,11 @@ public abstract class AbstractDsonReader implements DsonReader {
     protected DsonType currentDsonType;
     protected WireType currentWireType;
     protected int currentWireTypeBits;
-    protected String currentName = INVALID_NAME;
-
     public AbstractDsonReader(DsonReaderSettings setting) {
         this.setting = Objects.requireNonNull(setting);
     }
+
+    protected String currentName = INVALID_NAME;
 
     public DsonReaderSettings getSetting() {
         return setting;
@@ -79,6 +79,11 @@ public abstract class AbstractDsonReader implements DsonReader {
     }
 
     // region state
+    @Override
+    public DsonContextType getContextType() {
+        return context.contextType;
+    }
+
     @Nonnull
     @Override
     public DsonType getCurrentDsonType() {
@@ -95,11 +100,6 @@ public abstract class AbstractDsonReader implements DsonReader {
             throw invalidState(List.of(DsonReaderState.VALUE));
         }
         return currentName;
-    }
-
-    @Override
-    public DsonContextType getContextType() {
-        return context.contextType;
     }
 
     @Override

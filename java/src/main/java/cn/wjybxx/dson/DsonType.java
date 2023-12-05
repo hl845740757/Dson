@@ -108,22 +108,18 @@ public enum DsonType {
     }
 
     public boolean isNumber() {
-        switch (this) {
-            case INT32, INT64, FLOAT, DOUBLE:
-                return true;
-            default:
-                return false;
-        }
+        return switch (this) {
+            case INT32, INT64, FLOAT, DOUBLE -> true;
+            default -> false;
+        };
     }
 
     /** {@link WireType} */
     public boolean hasWireType() {
-        switch (this) {
-            case INT32, INT64, EXT_INT32, EXT_INT64:
-                return true;
-            default:
-                return false;
-        }
+        return switch (this) {
+            case INT32, INT64, EXT_INT32, EXT_INT64 -> true;
+            default -> false;
+        };
     }
 
     /** header不属于普通意义上的容器 */

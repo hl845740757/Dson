@@ -28,6 +28,11 @@ public interface IDsonReader<TName> : IDisposable
     #region Ctx
 
     /// <summary>
+    /// 获取当前上下文的类型
+    /// </summary>
+    DsonContextType ContextType { get; }
+    
+    /// <summary>
     /// 当前是否处于应该读取type状态
     /// </summary>
     bool IsAtType { get; }
@@ -78,7 +83,7 @@ public interface IDsonReader<TName> : IDisposable
     /// 当前是否处于应该读取value状态
     /// </summary>
     /// <returns></returns>
-    bool IsAtValue();
+    bool IsAtValue { get; }
 
     /// <summary>
     /// 获取当前的数据类型
@@ -95,11 +100,6 @@ public interface IDsonReader<TName> : IDisposable
     /// 2.只有在读取值状态下才可访问
     /// </summary>
     TName CurrentName { get; }
-
-    /// <summary>
-    /// 获取当前上下文的类型
-    /// </summary>
-    DsonContextType ContextType { get; }
 
     #endregion
 
@@ -214,7 +214,7 @@ public interface IDsonReader<TName> : IDisposable
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
-    byte[] ReadValueAsBytes(String name);
+    byte[] ReadValueAsBytes(TName name);
 
     /// <summary>
     /// 附近一个数据到当前上下文

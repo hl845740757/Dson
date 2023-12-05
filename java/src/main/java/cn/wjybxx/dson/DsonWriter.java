@@ -42,6 +42,11 @@ public interface DsonWriter extends AutoCloseable {
     @Override
     void close();
 
+    /**
+     * 获取当前上下文的类型
+     */
+    DsonContextType getContextType();
+
     /** 当前是否处于等待写入name的状态 */
     boolean isAtName();
 
@@ -50,11 +55,6 @@ public interface DsonWriter extends AutoCloseable {
      * 但在写Array或Object容器的时候，不能同时完成，需要先写入name再开始写值
      */
     void writeName(String name);
-
-    /**
-     * 获取当前上下文的类型
-     */
-    DsonContextType getContextType();
 
     // region 简单值
 

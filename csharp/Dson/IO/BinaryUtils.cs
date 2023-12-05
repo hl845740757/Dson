@@ -38,6 +38,10 @@ public static class BinaryUtils
         }
     }
 
+    public static int ToUint(byte value) {
+        return value & 0xFF;
+    }
+
     #region 大端编码
 
     public static byte GetByte(byte[] buffer, int index) {

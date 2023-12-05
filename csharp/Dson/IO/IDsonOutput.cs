@@ -99,7 +99,7 @@ public interface IDsonOutput : IDisposable
     /// </summary>
     /// <param name="pos">写索引</param>
     /// <param name="value">value</param>
-    void SetFixed32(int pos, int value);
+    void SetFixedInt32(int pos, int value);
 
     void Flush();
 

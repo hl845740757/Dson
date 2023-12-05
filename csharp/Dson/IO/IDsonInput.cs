@@ -26,10 +26,6 @@ public interface IDsonInput : IDisposable
 
     byte ReadRawByte();
 
-    int ReadUint8() {
-        return ReadRawByte() & 0xFF;
-    }
-
     int ReadInt32();
 
     int ReadUint32();

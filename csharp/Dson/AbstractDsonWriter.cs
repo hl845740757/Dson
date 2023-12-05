@@ -23,76 +23,66 @@ namespace Dson;
 
 public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName>
 {
-    protected readonly DsonWriterSettings settings;
-    protected readonly bool isStringKey;
+    protected readonly DsonWriterSettings Settings;
+    protected readonly bool IsStringKey;
 
-    private Context context;
-    private Context? pooledContext; // 一个额外的缓存，用于写集合等减少上下文创建
-    protected int recursionDepth = 0; // 当前递归深度
+    private Context _context;
+    private Context? _pooledContext; // 一个额外的缓存，用于写集合等减少上下文创建
+    protected int RecursionDepth = 0; // 当前递归深度
 
     protected AbstractDsonWriter(DsonWriterSettings settings) {
-        this.settings = settings;
-
-        Type nameType = typeof(TName);
-        if (nameType == typeof(string)) {
-            isStringKey = true;
-        }
-        else {
-            if (nameType != typeof(int)) {
-                throw new InvalidOperationException("invalid type of name");
-            }
-            isStringKey = false;
-        }
+        this.Settings = settings;
+        this.IsStringKey = DsonInternals.IsStringKey<TName>();
     }
 
-    public DsonWriterSettings WriterSettings => settings;
+    public DsonWriterSettings WriterSettings => Settings;
 
-    protected virtual Context getContext() {
-        return context;
+    protected virtual Context GetContext() {
+        return _context;
     }
 
     protected void SetContext(Context context) {
-        this.context = context;
+        this._context = context;
     }
 
     protected virtual Context? GetPooledContext() {
-        return pooledContext;
+        return _pooledContext;
     }
 
     protected void SetPooledContext(Context? pooledContext) {
-        this.pooledContext = pooledContext;
+        this._pooledContext = pooledContext;
     }
 
     public abstract void Flush();
 
     public virtual void Dispose() {
-        context = null!;
-        pooledContext = null;
+        _context = null!;
+        _pooledContext = null;
     }
 
     #region state
 
-    public DsonContextType ContextType => context.contextType;
+    public DsonContextType ContextType => _context.contextType;
 
-    public bool IsAtName => context.state == DsonWriterState.NAME;
+    public bool IsAtName => _context.state == DsonWriterState.NAME;
 
     public void WriteName(TName name) {
         if (name == null) throw new ArgumentNullException(nameof(name));
-        Context context = this.context;
+        Context context = this._context;
         if (context.state != DsonWriterState.NAME) {
             throw invalidState(DsonInternals.NewList(DsonWriterState.NAME), context.state);
         }
         context.curName = name;
         context.state = DsonWriterState.VALUE;
-        DoWriteName(name);
+        doWriteName(name);
     }
 
     /** 执行{@link #WriteName(String)}时调用 */
-    protected void DoWriteName(TName name) {
+    protected void doWriteName(TName name) {
     }
 
     protected void advanceToValueState(TName name) {
-        Context context = this.context;
+        Context context = this._context;
         if (context.state == DsonWriterState.NAME) {
             WriteName(name);
         }
@@ -108,15 +98,15 @@ public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName>
     }
 
     protected void setNextState() {
-        switch (context.contextType) {
+        switch (_context.contextType) {
             case DsonContextType.OBJECT:
             case DsonContextType.HEADER: {
-                context.setState(DsonWriterState.NAME);
+                _context.setState(DsonWriterState.NAME);
                 break;
             }
             case DsonContextType.TOP_LEVEL:
             case DsonContextType.ARRAY: {
-                context.setState(DsonWriterState.VALUE);
+                _context.setState(DsonWriterState.VALUE);
                 break;
             }
             default: throw new InvalidOperationException();
@@ -124,7 +114,7 @@ public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName>
     }
 
     private DsonIOException invalidState(List<DsonWriterState> expected, DsonWriterState state) {
-        return DsonIOException.invalidState(context.contextType, expected, state);
+        return DsonIOException.invalidState(_context.contextType, expected, state);
     }
 
     #endregion
@@ -282,7 +272,7 @@ public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName>
 
     public void WriteStartHeader(ObjectStyle style) {
         // object下默认是name状态
-        Context context = this.context;
+        Context context = this._context;
         if (context.contextType == DsonContextType.OBJECT && context.state == DsonWriterState.NAME) {
             context.setState(DsonWriterState.VALUE);
         }
@@ -294,10 +284,10 @@ public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName>
     }
 
     private void WriteStartContainer(DsonContextType contextType, DsonType dsonType, ObjectStyle style) {
-        if (recursionDepth >= settings.recursionLimit) {
+        if (RecursionDepth >= Settings.recursionLimit) {
             throw DsonIOException.recursionLimitExceeded();
         }
-        Context context = this.context;
+        Context context = this._context;
         autoStartTopLevel(context);
         ensureValueState(context);
         doWriteStartContainer(contextType, dsonType, style);
@@ -305,7 +295,7 @@ public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName>
     }
 
     private void writeEndContainer(DsonContextType contextType, DsonWriterState expectedState) {
-        Context context = this.context;
+        Context context = this._context;
         checkEndContext(context, contextType, expectedState);
         doWriteEndContainer();
         setNextState(); // parent前进一个状态
@@ -352,11 +342,11 @@ public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName>
     }
 
     public object? Attach(object userData) {
-        return context.Attach(userData);
+        return _context.Attach(userData);
     }
 
     public object? Attachment() {
-        return context.userData;
+        return _context.userData;
     }
 
     protected abstract void doWriteMessage(int binaryType, IMessage message);
@@ -404,7 +394,7 @@ public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName>
         public void reset() {
             _parent = null;
             contextType = default;
-            dsonType = default;
+            dsonType = DsonTypeExt.INVALID;
             state = default;
             curName = default;
             userData = null;

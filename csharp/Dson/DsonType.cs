@@ -68,3 +68,52 @@ public enum DsonType
     /// </summary>
     OBJECT = 31,
 }
+
+public static class DsonTypeExt
+{
+    private static readonly IList<DsonType> LOOK_UP;
+    public static readonly DsonType INVALID = (DsonType)(-1);
+
+    static DsonTypeExt() {
+        LOOK_UP = new List<DsonType>((int)DsonType.OBJECT + 1);
+        foreach (var dsonType in Enum.GetValues<DsonType>()) {
+            LOOK_UP[(int)dsonType] = dsonType;
+        }
+    }
+
+    public static bool IsNumber(this DsonType dsonType) {
+        return dsonType switch
+        {
+            DsonType.INT32 => true,
+            DsonType.INT64 => true,
+            DsonType.FLOAT => true,
+            DsonType.DOUBLE => true,
+            _ => false
+        };
+    }
+
+    /** {@link WireType} */
+    public static bool HasWireType(this DsonType dsonType) {
+        return dsonType switch
+        {
+            DsonType.INT32 => true,
+            DsonType.INT64 => true,
+            DsonType.EXT_INT32 => true,
+            DsonType.EXT_INT64 => true,
+            _ => false
+        };
+    }
+
+    /** header不属于普通意义上的容器 */
+    public static bool IsContainer(this DsonType dsonType) {
+        return dsonType == DsonType.OBJECT || dsonType == DsonType.ARRAY;
+    }
+
+    public static bool IsContainerOrHeader(this DsonType dsonType) {
+        return dsonType == DsonType.OBJECT || dsonType == DsonType.ARRAY || dsonType == DsonType.HEADER;
+    }
+
+    public static DsonType ForNumber(int number) {
+        return LOOK_UP[number];
+    }
+}

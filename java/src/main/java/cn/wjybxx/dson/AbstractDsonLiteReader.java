@@ -75,6 +75,12 @@ public abstract class AbstractDsonLiteReader implements DsonLiteReader {
     }
 
     // region state
+
+    @Override
+    public DsonContextType getContextType() {
+        return context.contextType;
+    }
+
     @Nonnull
     @Override
     public DsonType getCurrentDsonType() {
@@ -91,11 +97,6 @@ public abstract class AbstractDsonLiteReader implements DsonLiteReader {
             throw invalidState(List.of(DsonReaderState.VALUE));
         }
         return currentName;
-    }
-
-    @Override
-    public DsonContextType getContextType() {
-        return context.contextType;
     }
 
     @Override

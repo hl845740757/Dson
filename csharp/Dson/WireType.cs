@@ -47,3 +47,17 @@ public enum WireType
     /// </summary>
     Fixed = 3,
 }
+
+public static class WireTypeExt
+{
+    public static WireType ForNumber(int number) {
+        return number switch
+        {
+            0 => WireType.VarInt,
+            1 => WireType.Uint,
+            2 => WireType.Sint,
+            3 => WireType.Fixed,
+            _ => throw new ArgumentException(nameof(number))
+        };
+    }
+}

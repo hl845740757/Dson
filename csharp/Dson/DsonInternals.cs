@@ -41,6 +41,16 @@ public static class DsonInternals
         return (value & mask) != mask;
     }
 
+    public static bool IsStringKey<TName>() {
+        if (typeof(TName) == typeof(string)) {
+            return true;
+        }
+        if (typeof(TName) == typeof(int)) {
+            return false;
+        }
+        throw new InvalidCastException("Cant cast TName to string or int, type: " + typeof(TName));
+    }
+
     #region 集合Util
 
     public static IDictionary<TK, DsonValue> NewLinkedDictionary<TK>(int capacity = 0) {
