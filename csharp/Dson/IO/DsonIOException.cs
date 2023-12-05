@@ -61,7 +61,7 @@ public class DsonIOException : Exception
         return new DsonIOException($"The number of the field does not match, expected {expected}, but found {name}");
     }
 
-    public static DsonIOException unexpectedName(String expected, String name) {
+    public static DsonIOException unexpectedName(string? expected, string name) {
         return new DsonIOException($"The name of the field does not match, expected {expected}, but found {name}");
     }
 

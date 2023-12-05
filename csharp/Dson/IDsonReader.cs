@@ -75,6 +75,7 @@ public interface IDsonReader<TName> : IDisposable
     /// <summary>
     /// 读取下一个值的name
     /// 如果下一个name不等于期望的值，则抛出异常
+    /// PS：对于int类型会产生装箱，但目前暂不优化。
     /// </summary>
     /// <param name="name"></param>
     void ReadName(TName name);

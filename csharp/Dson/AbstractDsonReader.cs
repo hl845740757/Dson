@@ -95,9 +95,22 @@ public abstract class AbstractDsonReader<TName> : IDsonReader<TName>
     }
 
     public void ReadName(TName expected) {
-        TName name = ReadName(); // 这个装箱对于int有损失
-        if (!object.Equals(name, expected)) {
-            throw DsonIOException.unexpectedName(expected, name);
+        // 还不清楚这个性能影响如何
+        if (IsStringKey) {
+            AbstractDsonReader<string> textReader = (AbstractDsonReader<string>)(object)this;
+            string name = textReader.ReadName();
+            string expected2 = expected as string;
+            if (!name.Equals(expected2)) {
+                throw DsonIOException.unexpectedName(expected2, name);
+            }
+        }
+        else {
+            AbstractDsonReader<int> binReader = (AbstractDsonReader<int>)(object)this;
+            int expected2 = (int)((object)expected)!;
+            int name = binReader.ReadName();
+            if (name != expected2) {
+                throw DsonIOException.unexpectedName(expected2, name);
+            }
         }
     }
 
