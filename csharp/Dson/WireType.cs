@@ -17,7 +17,7 @@
 namespace Dson;
 
 /// <summary>
-/// 数组
+/// 数字类型字段的编码方式
 /// </summary>
 public enum WireType
 {

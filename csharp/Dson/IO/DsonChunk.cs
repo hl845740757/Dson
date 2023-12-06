@@ -37,6 +37,10 @@ public class DsonChunk
         this._length = length;
     }
 
+    public byte[] Buffer => _buffer;
+    public int Offset => _offset;
+    public int Length => _length;
+
     /// <summary>
     /// 重新设置块的有效载荷部分
     /// </summary>
@@ -61,7 +65,21 @@ public class DsonChunk
         }
     }
 
-    public byte[] Buffer => _buffer;
-    public int Offset => _offset;
-    public int Length => _length;
+    /// <summary>
+    /// chunk的有效载荷部分
+    /// </summary>
+    /// <returns></returns>
+    public byte[] Payload() {
+        byte[] r = new byte[_length];
+        Array.Copy(_buffer, _offset, r, 0, _length);
+        return r;
+    }
+
+    public Span<byte> AsSpan() {
+        return new Span<byte>(_buffer, _offset, _length);
+    }
+
+    public ArraySegment<byte> AsSegment() {
+        return new ArraySegment<byte>(_buffer, _offset, _length);
+    }
 }

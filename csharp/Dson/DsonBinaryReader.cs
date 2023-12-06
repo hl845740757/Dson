@@ -4,7 +4,7 @@ using Google.Protobuf;
 
 namespace Dson;
 
-public class DsonBinaryReader<TName> : AbstractDsonReader<TName>
+public class DsonBinaryReader<TName> : AbstractDsonReader<TName> where TName : IEquatable<TName>
 {
     private IDsonInput input;
 
@@ -13,7 +13,7 @@ public class DsonBinaryReader<TName> : AbstractDsonReader<TName>
     }
 
     protected override Context GetContext() {
-        return (Context)base.GetContext();
+        return (Context)_context;
     }
 
     protected override Context? GetPooledContext() {
@@ -56,18 +56,15 @@ public class DsonBinaryReader<TName> : AbstractDsonReader<TName>
     }
 
     protected override void doReadName() {
-        if (IsStringKey) {
+        if (textReader != null) {
             string filedName = input.ReadString();
             if (Settings.enableFieldIntern) {
                 filedName = Dsons.InternField(filedName);
             }
-            DsonBinaryReader<string> textReader = (DsonBinaryReader<string>)(object)this;
             textReader.currentName = filedName;
         }
         else {
-            int fieldName = input.ReadUint32();
-            DsonBinaryReader<int> binReader = (DsonBinaryReader<int>)(object)this;
-            binReader.currentName = fieldName;
+            binReader!.currentName = input.ReadUint32();
         }
     }
 
@@ -163,7 +160,7 @@ public class DsonBinaryReader<TName> : AbstractDsonReader<TName>
     #region 特殊
 
     protected override void doSkipName() {
-        if (IsStringKey) {
+        if (textReader != null) {
             // 避免构建字符串
             int size = input.ReadUint32();
             if (size > 0) {
@@ -212,14 +209,14 @@ public class DsonBinaryReader<TName> : AbstractDsonReader<TName>
         SetPooledContext(context);
     }
 
-    protected class Context : AbstractDsonReader<TName>.Context
+    protected new class Context : AbstractDsonReader<TName>.Context
     {
         protected internal int oldLimit = -1;
 
         public Context() {
         }
 
-        public void reset() {
+        public override void reset() {
             base.reset();
             oldLimit = -1;
         }

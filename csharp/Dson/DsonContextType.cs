@@ -30,3 +30,44 @@ public enum DsonContextType
     /** 当前是一个Header结构 - 类似Object */
     HEADER,
 }
+
+public static class DsonContextTypes
+{
+    /// <summary>
+    /// 上下文的开始符号
+    /// </summary>
+    public static string? startSymbol(this DsonContextType contextType) {
+        return contextType switch {
+            DsonContextType.TOP_LEVEL => null,
+            DsonContextType.OBJECT => "{",
+            DsonContextType.ARRAY => "[",
+            DsonContextType.HEADER => "@{",
+            _ => throw new ArgumentException(nameof(contextType))
+        };
+    }
+
+    /// <summary>
+    /// 上下文的结束符号
+    /// </summary>
+    public static string? endSymbol(this DsonContextType contextType) {
+        return contextType switch {
+            DsonContextType.TOP_LEVEL => null,
+            DsonContextType.OBJECT => "}",
+            DsonContextType.ARRAY => "]",
+            DsonContextType.HEADER => "}",
+            _ => throw new ArgumentException(nameof(contextType))
+        };
+    }
+
+    public static bool isContainer(this DsonContextType contextType) {
+        return contextType == DsonContextType.OBJECT || contextType == DsonContextType.ARRAY;
+    }
+
+    public static bool isLikeArray(this DsonContextType contextType) {
+        return contextType == DsonContextType.ARRAY || contextType == DsonContextType.TOP_LEVEL;
+    }
+
+    public static bool isLikeObject(this DsonContextType contextType) {
+        return contextType == DsonContextType.OBJECT || contextType == DsonContextType.HEADER;
+    }
+}

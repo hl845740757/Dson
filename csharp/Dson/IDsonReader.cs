@@ -23,7 +23,7 @@ namespace Dson;
 /// 
 /// </summary>
 /// <typeparam name="TName">name的类型，int或string</typeparam>
-public interface IDsonReader<TName> : IDisposable
+public interface IDsonReader<TName> : IDisposable where TName : IEquatable<TName>
 {
     #region Ctx
 

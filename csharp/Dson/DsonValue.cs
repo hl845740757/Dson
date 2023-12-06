@@ -24,67 +24,77 @@ public abstract class DsonValue
 
     #region 拆箱类型
 
-    public int AsInt32 => ((DsonInt32)this).IntValue;
+    public int AsInt32() => ((DsonInt32)this).IntValue;
 
-    public long AsInt64 => ((DsonInt64)this).LongValue;
+    public long AsInt64() => ((DsonInt64)this).LongValue;
 
-    public float AsFloat => ((DsonFloat)this).FloatValue;
+    public float AsFloat() => ((DsonFloat)this).FloatValue;
 
-    public double AsDouble => ((DsonDouble)this).DoubleValue;
+    public double AsDouble() => ((DsonDouble)this).DoubleValue;
 
-    public bool AsBool => ((DsonBool)this).Value;
+    public bool AsBool() => ((DsonBool)this).Value;
 
-    public string AsString => ((DsonString)this).Value;
+    public string AsString() => ((DsonString)this).Value;
 
-    public ObjectRef AsReference => ((DsonReference)this).Value;
+    public ObjectRef AsReference() => ((DsonReference)this).Value;
 
-    public OffsetTimestamp AsTimestamp => ((DsonTimestamp)this).Value;
+    public OffsetTimestamp AsTimestamp() => ((DsonTimestamp)this).Value;
 
-    public DsonNumber AsNumber => ((DsonNumber)this);
+    public DsonNumber AsNumber() => ((DsonNumber)this);
 
     #endregion
 
     #region 装箱类型
 
-    public DsonInt32 AsDsonInt32 => (DsonInt32)this;
+    public DsonInt32 AsDsonInt32() => (DsonInt32)this;
 
-    public DsonInt64 AsDsonInt64 => (DsonInt64)this;
+    public DsonInt64 AsDsonInt64() => (DsonInt64)this;
 
-    public DsonFloat AsDsonFloat => (DsonFloat)this;
+    public DsonFloat AsDsonFloat() => (DsonFloat)this;
 
-    public DsonDouble AsDsonDouble => (DsonDouble)this;
+    public DsonDouble AsDsonDouble() => (DsonDouble)this;
 
-    public DsonBool AsDsonBool => (DsonBool)this;
+    public DsonBool AsDsonBool() => (DsonBool)this;
 
-    public DsonString AsDsonString => (DsonString)this;
+    public DsonString AsDsonString() => (DsonString)this;
 
-    public DsonReference AsDsonReference => (DsonReference)this;
+    public DsonReference AsDsonReference() => (DsonReference)this;
 
-    public DsonTimestamp AsDsonTimestamp => (DsonTimestamp)this;
+    public DsonTimestamp AsDsonTimestamp() => (DsonTimestamp)this;
 
     #endregion
 
     #region Dson特定类型
 
-    public DsonNull AsNull => (DsonNull)this;
+    public DsonNull AsNull() => (DsonNull)this;
 
     public DsonBinary AsBinary() => (DsonBinary)this;
 
-    public DsonExtInt32 AsExtInt32 => (DsonExtInt32)this;
+    public DsonExtInt32 AsExtInt32() => (DsonExtInt32)this;
 
     public DsonExtInt64 AsExtInt64() => (DsonExtInt64)this;
 
     public DsonExtDouble AsExtDouble() => (DsonExtDouble)this;
 
-    public DsonExtString AsExtString => (DsonExtString)this;
+    public DsonExtString AsExtString() => (DsonExtString)this;
 
-    public DsonHeader<string> AsHeader => (DsonHeader<string>)this;
-    public DsonArray<string> AsArray => (DsonArray<string>)this;
-    public DsonObject<string> AsObject => (DsonObject<string>)this;
+    public DsonHeader<T> AsHeader<T>() => (DsonHeader<T>)this;
 
-    public DsonHeader<int> AsHeaderLite => (DsonHeader<int>)this;
-    public DsonArray<int> AsArrayLite => (DsonArray<int>)this;
-    public DsonObject<int> AsObjectLite => (DsonObject<int>)this;
+    public DsonArray<T> AsArray<T>() => (DsonArray<T>)this;
+
+    public DsonObject<T> AsObject<T>() => (DsonObject<T>)this;
+
+    public DsonHeader<string> AsHeader() => (DsonHeader<string>)this;
+
+    public DsonArray<string> AsArray() => (DsonArray<string>)this;
+
+    public DsonObject<string> AsObject() => (DsonObject<string>)this;
+
+    public DsonHeader<int> AsHeaderLite() => (DsonHeader<int>)this;
+
+    public DsonArray<int> AsArrayLite() => (DsonArray<int>)this;
+
+    public DsonObject<int> AsObjectLite() => (DsonObject<int>)this;
 
     #endregion
 

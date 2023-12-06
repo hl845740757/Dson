@@ -27,7 +27,7 @@ namespace Dson;
 /// 3.内置结构体总是输出类型标签，且总是Flow模式，可以降低使用复杂度；
 /// </summary>
 /// <typeparam name="TName">name的类型，int或string</typeparam>
-public interface IDsonWriter<in TName> : IDisposable
+public interface IDsonWriter<in TName> : IDisposable where TName : IEquatable<TName>
 {
     void Flush();
 

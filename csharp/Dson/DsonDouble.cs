@@ -18,16 +18,16 @@ namespace Dson;
 
 public class DsonDouble : DsonNumber, IComparable<DsonDouble>, IEquatable<DsonDouble>, IComparable
 {
-    private readonly float _value;
+    private readonly double _value;
 
-    public DsonDouble(float value) {
+    public DsonDouble(double value) {
         this._value = value;
     }
 
     public override DsonType DsonType => DsonType.DOUBLE;
     public override int IntValue => (int)_value;
     public override long LongValue => (long)_value;
-    public override float FloatValue => _value;
+    public override float FloatValue => (float)_value;
     public override double DoubleValue => _value;
 
     #region equals

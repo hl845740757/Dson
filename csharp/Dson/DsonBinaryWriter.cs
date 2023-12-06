@@ -5,7 +5,7 @@ using Google.Protobuf;
 
 namespace Dson;
 
-public class DsonBinaryWriter<TName> : AbstractDsonWriter<TName>
+public class DsonBinaryWriter<TName> : AbstractDsonWriter<TName> where TName : IEquatable<TName>
 {
     private IDsonOutput _output;
 
@@ -14,7 +14,7 @@ public class DsonBinaryWriter<TName> : AbstractDsonWriter<TName>
     }
 
     protected override Context GetContext() {
-        return (Context)base.GetContext();
+        return (Context)_context;
     }
 
     protected override Context? GetPooledContext() {
@@ -37,16 +37,14 @@ public class DsonBinaryWriter<TName> : AbstractDsonWriter<TName>
 
     private void writeFullTypeAndCurrentName(IDsonOutput output, DsonType dsonType, int wireType) {
         output.WriteRawByte((byte)Dsons.MakeFullType((int)dsonType, wireType));
-        if (dsonType != DsonType.HEADER) {
-            // header是匿名属性
-            Context context = GetContext();
-            if (context.contextType == DsonContextType.OBJECT ||
-                context.contextType == DsonContextType.HEADER) {
-                if (IsStringKey) {
-                    output.WriteString(context.StringName);
+        if (dsonType != DsonType.HEADER) { // header是匿名属性
+            DsonContextType contextType = this.ContextType;
+            if (contextType == DsonContextType.OBJECT || contextType == DsonContextType.HEADER) {
+                if (textWriter != null) { // 避免装箱
+                    output.WriteString(textWriter._context.curName);
                 }
                 else {
-                    output.WriteUint32(context.IntName);
+                    output.WriteUint32(binWriter!._context.curName);
                 }
             }
         }
@@ -218,7 +216,7 @@ public class DsonBinaryWriter<TName> : AbstractDsonWriter<TName>
         public Context() {
         }
 
-        public void reset() {
+        public override void reset() {
             base.reset();
             PreWritten = 0;
         }

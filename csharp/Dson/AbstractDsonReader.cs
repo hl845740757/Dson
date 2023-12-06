@@ -5,24 +5,32 @@ using Google.Protobuf;
 
 namespace Dson;
 
-public abstract class AbstractDsonReader<TName> : IDsonReader<TName>
+public abstract class AbstractDsonReader<TName> : IDsonReader<TName> where TName : IEquatable<TName>
 {
     protected readonly DsonReaderSettings Settings;
-    protected readonly bool IsStringKey;
+    protected readonly AbstractDsonReader<string>? textReader;
+    protected readonly AbstractDsonReader<int>? binReader;
 
-    private Context _context;
+    internal Context _context;
     private Context? _pooledContext; // 一个额外的缓存，用于写集合等减少上下文创建
 
     // 这些值放外面，不需要上下文隔离，但需要能恢复
-    protected int recursionDepth;
-    protected DsonType currentDsonType = DsonTypeExt.INVALID;
-    protected WireType currentWireType;
-    protected int currentWireTypeBits;
-    protected TName? currentName;
+    protected internal int recursionDepth;
+    protected internal DsonType currentDsonType = DsonTypeExt.INVALID;
+    protected internal WireType currentWireType;
+    protected internal int currentWireTypeBits;
+    protected internal TName currentName;
 
     protected AbstractDsonReader(DsonReaderSettings settings) {
         Settings = settings;
-        this.IsStringKey = DsonInternals.IsStringKey<TName>();
+        if (DsonInternals.IsStringKey<TName>()) {
+            this.textReader = this as AbstractDsonReader<string>;
+            this.binReader = null;
+        }
+        else {
+            this.textReader = null;
+            this.binReader = this as AbstractDsonReader<int>;
+        }
     }
 
     public DsonReaderSettings ReaderSettings => Settings;
@@ -95,22 +103,10 @@ public abstract class AbstractDsonReader<TName> : IDsonReader<TName>
     }
 
     public void ReadName(TName expected) {
-        // 还不清楚这个性能影响如何
-        if (IsStringKey) {
-            AbstractDsonReader<string> textReader = (AbstractDsonReader<string>)(object)this;
-            string name = textReader.ReadName();
-            string expected2 = expected as string;
-            if (!name.Equals(expected2)) {
-                throw DsonIOException.unexpectedName(expected2, name);
-            }
-        }
-        else {
-            AbstractDsonReader<int> binReader = (AbstractDsonReader<int>)(object)this;
-            int expected2 = (int)((object)expected)!;
-            int name = binReader.ReadName();
-            if (name != expected2) {
-                throw DsonIOException.unexpectedName(expected2, name);
-            }
+        // 不直接使用方法返回值比较，避免装箱
+        ReadName();
+        if (!expected.Equals(currentName)) {
+            throw DsonIOException.unexpectedName(expected, currentName);
         }
     }
 
@@ -482,7 +478,7 @@ public abstract class AbstractDsonReader<TName> : IDsonReader<TName>
         return data;
     }
 
-    public object Attach(object? userData) {
+    public object? Attach(object? userData) {
         return _context.attach(userData);
     }
 
@@ -516,14 +512,14 @@ public abstract class AbstractDsonReader<TName> : IDsonReader<TName>
         public Context() {
         }
 
-        public Context init(Context parent, DsonContextType contextType, DsonType dsonType) {
+        public Context init(Context? parent, DsonContextType contextType, DsonType dsonType) {
             this.parent = parent;
             this.contextType = contextType;
             this.dsonType = dsonType;
             return this;
         }
 
-        public void reset() {
+        public virtual void reset() {
             parent = null;
             contextType = default;
             dsonType = DsonTypeExt.INVALID;

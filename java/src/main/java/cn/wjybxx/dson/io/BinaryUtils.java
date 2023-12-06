@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cn.wjybxx.dson.internal;
+package cn.wjybxx.dson.io;
 
 import java.nio.Buffer;
 

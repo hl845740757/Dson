@@ -267,7 +267,7 @@ public class DsonTextReader extends AbstractDsonReader {
                 yield DsonType.STRING;
             }
             case NULL -> {
-                pushNextValue(DsonNull.INSTANCE);
+                pushNextValue(DsonNull.NULL);
                 yield DsonType.NULL;
             }
             case UNQUOTE_STRING -> parseUnquoteStringToken(context, valueToken);
@@ -351,7 +351,7 @@ public class DsonTextReader extends AbstractDsonReader {
             return DsonType.BOOLEAN;
         }
         if ("null".equals(unquotedString)) {
-            pushNextValue(DsonNull.INSTANCE);
+            pushNextValue(DsonNull.NULL);
             return DsonType.NULL;
         }
         if (DsonTexts.isParsable(unquotedString)) {
@@ -768,7 +768,7 @@ public class DsonTextReader extends AbstractDsonReader {
     @Override
     protected void doReadNull() {
         Object value = popNextValue();
-        assert value == DsonNull.INSTANCE;
+        assert value == DsonNull.NULL;
     }
 
     @Override

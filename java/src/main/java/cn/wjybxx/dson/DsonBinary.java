@@ -16,6 +16,8 @@
 
 package cn.wjybxx.dson;
 
+import cn.wjybxx.dson.io.DsonChunk;
+
 import javax.annotation.Nonnull;
 import java.util.Arrays;
 
@@ -41,6 +43,13 @@ public class DsonBinary extends DsonValue {
         Dsons.checkBinaryLength(data.length); // 顺带NPE
         this.type = type;
         this.data = data;
+    }
+
+    public DsonBinary(int type, DsonChunk chunk) {
+        Dsons.checkSubType(type);
+        Dsons.checkBinaryLength(chunk.getLength()); // 顺带NPE
+        this.type = type;
+        this.data = chunk.payload();
     }
 
     /** 默认采取拷贝的方式，保证安全性 */

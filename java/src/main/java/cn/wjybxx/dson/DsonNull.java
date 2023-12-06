@@ -24,8 +24,8 @@ import javax.annotation.Nonnull;
  */
 public class DsonNull extends DsonValue implements Comparable<DsonNull> {
 
-    public static final DsonNull INSTANCE = new DsonNull();
-    /** 用于不存在对应key时的返回值，用与特殊情况下的测试 */
+    public static final DsonNull NULL = new DsonNull();
+    /** 用于不存在对应key时的返回值，用于特殊情况下的测试 */
     public static final DsonNull UNDEFINE = new DsonNull();
 
     private DsonNull() {

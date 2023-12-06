@@ -27,23 +27,25 @@ import java.util.Objects;
 public class MarkableIterator<E> implements Iterator<E> {
 
     private final Iterator<E> baseIterator;
-    private ArrayList<E> markIterator;
-
-    private int curIndex;
-    private int shiftIndex;
     private boolean marking;
+
+    private ArrayList<E> buffer;
+    private int bufferIndex;
+    /** 用于避免List频繁删除队首 */
+    private int bufferOffset;
+
 
     public MarkableIterator(Iterator<E> baseIterator) {
         this.baseIterator = Objects.requireNonNull(baseIterator);
-        this.curIndex = 0;
+        this.bufferIndex = 0;
         this.marking = false;
     }
 
     public void mark() {
         if (marking) throw new IllegalStateException();
         marking = true;
-        if (markIterator == null) { // 延迟分配
-            markIterator = new ArrayList<>(4);
+        if (buffer == null) { // 延迟分配
+            buffer = new ArrayList<>(4);
         }
     }
 
@@ -52,17 +54,18 @@ public class MarkableIterator<E> implements Iterator<E> {
     }
 
     public void rewind() {
-        curIndex = shiftIndex;
+        bufferIndex = bufferOffset;
     }
 
     public void reset() {
-        curIndex = shiftIndex;
+        if (!marking) throw new IllegalStateException();
         marking = false;
+        bufferIndex = bufferOffset;
     }
 
     @Override
     public boolean hasNext() {
-        if (markIterator != null && curIndex < markIterator.size()) {
+        if (buffer != null && bufferIndex < buffer.size()) {
             return true;
         }
         return baseIterator.hasNext();
@@ -70,31 +73,31 @@ public class MarkableIterator<E> implements Iterator<E> {
 
     @Override
     public E next() {
-        ArrayList<E> markIterator = this.markIterator;
+        ArrayList<E> markIterator = this.buffer;
         if (markIterator == null) { // 延迟分配可能为null
             return baseIterator.next();
         }
 
         E value;
-        if (curIndex < markIterator.size()) {
-            value = markIterator.get(curIndex++);
-            if (!marking) { // 使用双指针法避免频繁的拷贝
-                markIterator.set(shiftIndex++, null);
-                if (shiftIndex == markIterator.size() || shiftIndex >= 8) {
-                    if (shiftIndex == markIterator.size()) {
+        if (bufferIndex < markIterator.size()) {
+            value = markIterator.get(bufferIndex++);
+            if (!marking) {
+                markIterator.set(bufferOffset++, null); // 使用双指针法避免频繁的拷贝
+                if (bufferOffset == markIterator.size() || bufferOffset >= 8) {
+                    if (bufferOffset == markIterator.size()) {
                         markIterator.clear();
                     } else {
-                        markIterator.subList(0, shiftIndex).clear();
+                        markIterator.subList(0, bufferOffset).clear();
                     }
-                    shiftIndex = 0;
-                    curIndex = 0;
+                    bufferOffset = 0;
+                    bufferIndex = 0;
                 }
             }
         } else {
             value = baseIterator.next();
-            if (marking) {
+            if (marking) { // 所有读取的值要保存下来
                 markIterator.add(value);
-                curIndex++;
+                bufferIndex++;
             }
         }
         return value;

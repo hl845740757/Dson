@@ -16,7 +16,6 @@
 
 package cn.wjybxx.dson.io;
 
-import cn.wjybxx.dson.internal.BinaryUtils;
 import com.google.protobuf.CodedInputStream;
 import com.google.protobuf.ExtensionRegistryLite;
 import com.google.protobuf.InvalidProtocolBufferException;

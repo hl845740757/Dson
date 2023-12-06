@@ -65,6 +65,10 @@ public class DsonIOException : Exception
         return new DsonIOException($"The name of the field does not match, expected {expected}, but found {name}");
     }
 
+    public static DsonIOException unexpectedName<T>(T? expected, T name) where T : IEquatable<T> {
+        return new DsonIOException($"The name of the field does not match, expected {expected}, but found {name}");
+    }
+
     public static DsonIOException dsonTypeMismatch(DsonType expected, DsonType dsonType) {
         return new DsonIOException($"The dsonType does not match, expected {expected}, but found {dsonType}");
     }

@@ -24,11 +24,16 @@ public class DsonArray<TK> : AbstractDsonArray
 {
     private readonly DsonHeader<TK> _header;
 
-    public DsonArray(int capacity) : this(new List<DsonValue>(capacity), new DsonHeader<TK>()) {
+    public DsonArray()
+        : this(new List<DsonValue>(), new DsonHeader<TK>()) {
     }
 
-    public DsonArray(DsonArray<TK> src) :
-        this(new List<DsonValue>(src._values), new DsonHeader<TK>(src._header)) {
+    public DsonArray(int capacity)
+        : this(new List<DsonValue>(capacity), new DsonHeader<TK>()) {
+    }
+
+    public DsonArray(DsonArray<TK> src) // 需要拷贝
+        : this(new List<DsonValue>(src._values), new DsonHeader<TK>(src._header)) {
     }
 
     private DsonArray(IList<DsonValue> values, DsonHeader<TK> header)

@@ -25,6 +25,15 @@ public class DsonObjectWriter extends AbstractDsonWriter {
         setContext(context);
     }
 
+    /** 获取传入的OutList */
+    public DsonArray<String> getOutList() {
+        Context context = getContext();
+        while (context.contextType != DsonContextType.TOP_LEVEL) {
+            context = context.getParent();
+        }
+        return context.container.asArray();
+    }
+
     @Override
     protected Context getContext() {
         return (Context) super.getContext();
@@ -40,15 +49,7 @@ public class DsonObjectWriter extends AbstractDsonWriter {
 
     }
 
-    public DsonArray<String> getOutList() {
-        Context context = getContext();
-        while (context.contextType != DsonContextType.TOP_LEVEL) {
-            context = context.getParent();
-        }
-        return context.container.asArray();
-    }
-    //
-
+    //region 简单值
     @Override
     protected void doWriteInt32(int value, WireType wireType, INumberStyle style) {
         getContext().add(new DsonInt32(value));
@@ -81,7 +82,7 @@ public class DsonObjectWriter extends AbstractDsonWriter {
 
     @Override
     protected void doWriteNull() {
-        getContext().add(DsonNull.INSTANCE);
+        getContext().add(DsonNull.NULL);
     }
 
     @Override
@@ -91,7 +92,7 @@ public class DsonObjectWriter extends AbstractDsonWriter {
 
     @Override
     protected void doWriteBinary(int type, DsonChunk chunk) {
-        getContext().add(new DsonBinary(type, chunk.payload()));
+        getContext().add(new DsonBinary(type, chunk));
     }
 
     @Override
@@ -124,6 +125,9 @@ public class DsonObjectWriter extends AbstractDsonWriter {
         getContext().add(new DsonTimestamp(timestamp));
     }
 
+    //endregion
+
+    //region 容器
     @Override
     protected void doWriteStartContainer(DsonContextType contextType, DsonType dsonType, ObjectStyle style) {
         Context parent = getContext();
@@ -150,6 +154,7 @@ public class DsonObjectWriter extends AbstractDsonWriter {
         setContext(context.parent);
         poolContext(context);
     }
+    // endregion
 
     // region 特殊接口
 

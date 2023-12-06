@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dson-Core", "Dson-Core\Dson-Core.csproj", "{3BD989D7-E9BB-4F2A-86C2-1E7953582518}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dson", "Dson.csproj", "{3BD989D7-E9BB-4F2A-86C2-1E7953582518}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

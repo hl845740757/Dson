@@ -16,7 +16,7 @@
 
 package cn.wjybxx.dson.text;
 
-import cn.wjybxx.dson.internal.BinaryUtils;
+import cn.wjybxx.dson.io.BinaryUtils;
 
 import javax.annotation.Nonnull;
 import java.nio.BufferOverflowException;

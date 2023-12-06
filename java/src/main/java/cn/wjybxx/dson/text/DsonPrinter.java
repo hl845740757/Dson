@@ -16,7 +16,7 @@
 
 package cn.wjybxx.dson.text;
 
-import cn.wjybxx.dson.internal.BinaryUtils;
+import cn.wjybxx.dson.io.BinaryUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.io.Writer;

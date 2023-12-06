@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+using Dson.IO;
+
 namespace Dson;
 
 public class DsonBinary : DsonValue, IEquatable<DsonBinary>
@@ -28,6 +30,14 @@ public class DsonBinary : DsonValue, IEquatable<DsonBinary>
         _type = type;
         _data = data;
     }
+    
+    public DsonBinary(int type, DsonChunk chunk) {
+        if (chunk == null) throw new ArgumentNullException(nameof(chunk));
+        Dsons.CheckSubType(type);
+        Dsons.CheckBinaryLength(chunk.Length);
+        _type = type;
+        _data = chunk.Payload();
+    }
 
     public DsonBinary(DsonBinary src) {
         this._type = src._type;
@@ -41,6 +51,14 @@ public class DsonBinary : DsonValue, IEquatable<DsonBinary>
     /// 不宜修改返回的数据
     /// </summary>
     public byte[] Data => _data;
+
+    /// <summary>
+    /// 创建一个副本
+    /// </summary>
+    /// <returns></returns>
+    public DsonBinary Copy() {
+        return new DsonBinary(this);
+    }
 
     #region equals
 

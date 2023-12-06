@@ -91,8 +91,7 @@ public static class DsonTypeExt
             _ => false
         };
     }
-
-    /** {@link WireType} */
+    
     public static bool HasWireType(this DsonType dsonType) {
         return dsonType switch
         {

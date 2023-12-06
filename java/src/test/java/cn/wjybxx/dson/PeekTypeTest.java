@@ -204,7 +204,7 @@ public class PeekTypeTest {
             case STRING -> new DsonString(reader.readString(name));
             case NULL -> {
                 reader.readNull(name);
-                yield DsonNull.INSTANCE;
+                yield DsonNull.NULL;
             }
             case BINARY -> reader.readBinary(name);
             case EXT_INT32 -> reader.readExtInt32(name);

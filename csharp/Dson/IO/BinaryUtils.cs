@@ -42,6 +42,10 @@ public static class BinaryUtils
         return value & 0xFF;
     }
 
+    public static int ToUint(short value) {
+        return value & 0xFFFF;
+    }
+
     #region 大端编码
 
     public static byte GetByte(byte[] buffer, int index) {

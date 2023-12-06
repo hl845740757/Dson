@@ -44,7 +44,7 @@ public class DsonObjectLiteWriter extends AbstractDsonLiteWriter {
         }
         return context.container.asArrayLite();
     }
-    //
+    // region 简单值
 
     @Override
     protected void doWriteInt32(int value, WireType wireType) {
@@ -78,7 +78,7 @@ public class DsonObjectLiteWriter extends AbstractDsonLiteWriter {
 
     @Override
     protected void doWriteNull() {
-        getContext().add(DsonNull.INSTANCE);
+        getContext().add(DsonNull.NULL);
     }
 
     @Override
@@ -88,7 +88,7 @@ public class DsonObjectLiteWriter extends AbstractDsonLiteWriter {
 
     @Override
     protected void doWriteBinary(int type, DsonChunk chunk) {
-        getContext().add(new DsonBinary(type, chunk.payload()));
+        getContext().add(new DsonBinary(type, chunk));
     }
 
     @Override
@@ -121,6 +121,10 @@ public class DsonObjectLiteWriter extends AbstractDsonLiteWriter {
         getContext().add(new DsonTimestamp(timestamp));
     }
 
+    //endregion
+
+    //region 容器
+
     @Override
     protected void doWriteStartContainer(DsonContextType contextType, DsonType dsonType) {
         Context parent = getContext();
@@ -147,6 +151,8 @@ public class DsonObjectLiteWriter extends AbstractDsonLiteWriter {
         setContext(context.parent);
         poolContext(context);
     }
+
+    // endregion
 
     // region 特殊接口
 

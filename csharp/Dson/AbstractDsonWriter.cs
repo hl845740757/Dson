@@ -21,18 +21,26 @@ using Google.Protobuf;
 
 namespace Dson;
 
-public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName>
+public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName> where TName : IEquatable<TName>
 {
     protected readonly DsonWriterSettings Settings;
-    protected readonly bool IsStringKey;
+    protected readonly AbstractDsonWriter<string>? textWriter;
+    protected readonly AbstractDsonWriter<int>? binWriter;
 
-    private Context _context;
+    internal Context _context;
     private Context? _pooledContext; // 一个额外的缓存，用于写集合等减少上下文创建
     protected int RecursionDepth = 0; // 当前递归深度
 
     protected AbstractDsonWriter(DsonWriterSettings settings) {
         this.Settings = settings;
-        this.IsStringKey = DsonInternals.IsStringKey<TName>();
+        if (DsonInternals.IsStringKey<TName>()) {
+            textWriter = this as AbstractDsonWriter<string>;
+            binWriter = null;
+        }
+        else {
+            textWriter = null;
+            binWriter = this as AbstractDsonWriter<int>;
+        }
     }
 
     public DsonWriterSettings WriterSettings => Settings;
@@ -377,21 +385,7 @@ public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName>
             return this;
         }
 
-        public string StringName {
-            get {
-                AbstractDsonWriter<string>.Context stringContext = (AbstractDsonWriter<string>.Context)(object)this;
-                return stringContext.curName!;
-            }
-        }
-
-        public int IntName {
-            get {
-                AbstractDsonWriter<int>.Context stringContext = (AbstractDsonWriter<int>.Context)(object)this;
-                return stringContext.curName;
-            }
-        }
-
-        public void reset() {
+        public virtual void reset() {
             _parent = null;
             contextType = default;
             dsonType = DsonTypeExt.INVALID;
@@ -401,7 +395,7 @@ public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName>
         }
 
         public object? Attach(object? userData) {
-            object r = this.userData;
+            object? r = this.userData;
             this.userData = userData;
             return r;
         }

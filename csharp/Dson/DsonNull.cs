@@ -19,6 +19,8 @@ namespace Dson;
 public class DsonNull : DsonValue, IEquatable<DsonNull>
 {
     public static readonly DsonNull Null = new DsonNull();
+    /** 可用于特殊情况下的测试 -- 一般不建议使用 */
+    public static readonly DsonNull Undefine = new DsonNull();
 
     public override DsonType DsonType => DsonType.NULL;
 

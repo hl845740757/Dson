@@ -23,7 +23,7 @@ public class DsonReference : DsonValue, IEquatable<DsonReference>
     private readonly ObjectRef _value;
 
     public DsonReference(ObjectRef value) {
-        _value = value ?? throw new ArgumentNullException(nameof(value));
+        _value = value;
     }
 
     public override DsonType DsonType => DsonType.REFERENCE;

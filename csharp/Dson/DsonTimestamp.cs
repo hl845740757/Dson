@@ -21,7 +21,7 @@ public class DsonTimestamp : DsonValue, IEquatable<DsonTimestamp>
     private readonly OffsetTimestamp _value;
 
     public DsonTimestamp(OffsetTimestamp value) {
-        _value = value ?? throw new ArgumentNullException(nameof(value));
+        _value = value;
     }
 
     public override DsonType DsonType => DsonType.TIMESTAMP;

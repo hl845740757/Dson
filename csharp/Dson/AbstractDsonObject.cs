@@ -22,7 +22,7 @@ namespace Dson;
 /// Dson KV类结构的抽象实现
 /// </summary>
 /// <typeparam name="TK"></typeparam>
-public abstract class AbstractDsonObject<TK> : DsonValue, IDictionary<TK, DsonValue>, IEquatable<AbstractDsonObject<TK>> where TK : notnull
+public abstract class AbstractDsonObject<TK> : DsonValue, IDictionary<TK, DsonValue>, IEquatable<AbstractDsonObject<TK>>
 {
     protected readonly IDictionary<TK, DsonValue> _valueMap;
 
@@ -65,7 +65,7 @@ public abstract class AbstractDsonObject<TK> : DsonValue, IDictionary<TK, DsonVa
 
     public virtual AbstractDsonObject<TK> Append(TK key, DsonValue value) {
         CheckElement(key, value);
-        _valueMap[key] = value;
+        _valueMap[key!] = value;
         return this;
     }
 
