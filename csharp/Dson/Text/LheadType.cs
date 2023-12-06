@@ -21,8 +21,14 @@ namespace Dson.Text;
 /// </summary>
 public enum LheadType
 {
-}
-
-public static class LheadTypes
-{
+    /** 注释 */
+    COMMENT,
+    /** 添加新行 */
+    APPEND_LINE,
+    /** 与上一行合并 */
+    APPEND,
+    /** 切换模式 */
+    SWITCH_MODE,
+    /** 文本输入结束 */
+    END_OF_TEXT
 }

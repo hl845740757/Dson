@@ -22,15 +22,31 @@ public class DsonWriterSettings
     public readonly bool autoClose;
 
     public DsonWriterSettings(Builder builder) {
-        this.recursionLimit = Math.Max(1, builder.RecursionLimit);
-        this.autoClose = builder.AutoClose;
+        this.recursionLimit = Math.Max(1, builder._recursionLimit);
+        this.autoClose = builder._autoClose;
+    }
+
+    public static Builder NewBuilder() {
+        return new Builder();
     }
 
     public class Builder
     {
         /** 递归深度限制 */
-        public int RecursionLimit = 32;
+        internal int _recursionLimit = 32;
         /** 是否自动关闭底层的输入输出流 */
-        public bool AutoClose = true;
+        internal bool _autoClose = true;
+
+        internal Builder() {
+        }
+
+        public int RecursionLimit {
+            get => _recursionLimit;
+            set => _recursionLimit = value;
+        }
+        public bool AutoClose {
+            get => _autoClose;
+            set => _autoClose = value;
+        }
     }
 }

@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+using System.Globalization;
+
 namespace Dson.Text;
 
 /// <summary>
@@ -22,7 +24,6 @@ namespace Dson.Text;
 public class NumberStyles
 {
     public static readonly INumberStyle Simple = new SimpleStyle();
-
 
     /** double能精确表示的最大整数 */
     private const long DOUBLE_MAX_LONG = (1L << 53) - 1;
@@ -39,14 +40,30 @@ public class NumberStyles
 
         public StyleOut ToString(float value) {
             if (float.IsInfinity(value) || float.IsNaN(value)) {
-                value.
+                return new StyleOut(value.ToString(CultureInfo.InvariantCulture), true);
             }
-            
-            return new StyleOut(value.ToString(), )
+            int iv = (int)value;
+            if (iv == value) {
+                return new StyleOut(iv.ToString(), false);
+            }
+            else {
+                string str = value.ToString(CultureInfo.InvariantCulture);
+                return new StyleOut(str, str.IndexOf('E') >= 0);
+            }
         }
 
         public StyleOut ToString(double value) {
-            throw new NotImplementedException();
+            if (double.IsInfinity(value) || double.IsNaN(value)) {
+                return new StyleOut(value.ToString(CultureInfo.InvariantCulture), true);
+            }
+            long lv = (long)value;
+            if (lv == value) {
+                return new StyleOut(lv.ToString(), false);
+            }
+            else {
+                string str = value.ToString(CultureInfo.InvariantCulture);
+                return new StyleOut(str, str.IndexOf('E') >= 0);
+            }
         }
     }
 }

@@ -95,6 +95,11 @@ public class DsonTexts {
         }
     }
 
+    /** 是否是缩进字符 */
+    public static boolean isIndentChar(int c) {
+        return c == ' ' || c == '\t';
+    }
+
     /** 是否是不安全的字符，不能省略引号的字符 */
     public static boolean isUnsafeStringChar(int c) {
         return unsafeCharSet.get(c) || Character.isWhitespace(c);
@@ -145,7 +150,7 @@ public class DsonTexts {
 
     //
 
-    public static Object parseBool(String str) {
+    public static boolean parseBool(String str) {
         if (str.equals("true") || str.equals("1")) return true;
         if (str.equals("false") || str.equals("0")) return false;
         throw new IllegalArgumentException("invalid bool str: " + str);
@@ -156,6 +161,17 @@ public class DsonTexts {
             return;
         }
         throw new IllegalArgumentException("invalid null str: " + str);
+    }
+
+    //region 数字
+
+    /** 是否是可解析的数字类型 */
+    public static boolean isParsable(String str) {
+        int length = str.length();
+        if (length == 0 || length > 67 + 16) { // 最长也不应该比二进制格式长，16是下划线预留
+            return false;
+        }
+        return NumberUtils.isParsable(str);
     }
 
     public static int parseInt(String rawStr) {
@@ -235,7 +251,7 @@ public class DsonTexts {
 
     private static String deleteUnderline(String str) {
         int length = str.length();
-        if (str.charAt(0) == '-' || str.charAt(length - 1) == '_') {
+        if (str.charAt(0) == '_' || str.charAt(length - 1) == '_') { // 首尾字符不能是下划线
             throw new NumberFormatException(str);
         }
         StringBuilder sb = new StringBuilder(length - 1);
@@ -243,7 +259,7 @@ public class DsonTexts {
         for (int i = 0; i < length; i++) {
             char c = str.charAt(i);
             if (c == '_') {
-                if (hasUnderline) throw new NumberFormatException(str);
+                if (hasUnderline) throw new NumberFormatException(str); // 不能多个连续下划线
                 hasUnderline = true;
             } else {
                 sb.append(c);
@@ -253,13 +269,7 @@ public class DsonTexts {
         return sb.toString();
     }
 
-    public static boolean isParsable(String str) {
-        int length = str.length();
-        if (length == 0 || length > 67 + 16) { // 最长也不应该比二进制格式长，16是下划线预留
-            return false;
-        }
-        return NumberUtils.isParsable(str);
-    }
+    // endregion
 
     // 修改自commons-codec，避免引入依赖
     public static void encodeHex(final byte[] data, final int dataOffset, final int dataLen,
@@ -348,11 +358,6 @@ public class DsonTexts {
                 throw new DsonIOException("Illegal hexadecimal character " + c + " at index " + index);
             }
         }
-    }
-
-    /** 是否是缩进字符 */
-    public static boolean isIndentChar(int c) {
-        return c == ' ' || c == '\t';
     }
 
     public static DsonToken clsNameTokenOfType(DsonType dsonType) {

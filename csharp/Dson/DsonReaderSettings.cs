@@ -28,6 +28,10 @@ public class DsonReaderSettings
         enableFieldIntern = builder.EnableFieldIntern;
     }
 
+    public static Builder NewBuilder() {
+        return new Builder();
+    }
+
     public class Builder
     {
         /// <summary>

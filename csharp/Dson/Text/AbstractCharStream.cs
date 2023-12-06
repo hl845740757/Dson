@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright 2023 wjybxx(845740757@qq.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,70 +13,69 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cn.wjybxx.dson.text;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+using System.Diagnostics;
 
-/**
- * @author wjybxx
- * date - 2023/6/5
- */
-public abstract class AbstractCharStream implements DsonCharStream {
+namespace Dson.Text;
 
-    protected final DsonMode dsonMode;
-    private final List<LineInfo> lines = new ArrayList<>();
-    private LineInfo curLine;
-    private boolean readingContent = false;
+public abstract class AbstractCharStream : DsonCharStream
+{
+    protected readonly DsonMode dsonMode;
+    private readonly List<LineInfo> lines = new List<LineInfo>();
+    private LineInfo? curLine;
+    private bool readingContent = false;
     private int position = -1;
-    private boolean eof = false;
+    private bool eof = false;
 
     public AbstractCharStream(DsonMode dsonMode) {
         this.dsonMode = dsonMode;
     }
 
-    protected final void addLine(LineInfo lineInfo) {
-        Objects.requireNonNull(lineInfo);
-        lines.add(lineInfo);
+    protected void addLine(LineInfo lineInfo) {
+        if (lineInfo == null) throw new ArgumentNullException(nameof(lineInfo));
+        lines.Add(lineInfo);
     }
 
-    @Override
     public int read() {
         if (isClosed()) throw new DsonParseException("Trying to read after closed");
         if (eof) throw new DsonParseException("Trying to read past eof");
 
         LineInfo curLine = this.curLine;
         if (curLine == null) {
-            if (lines.isEmpty() && !scanNextLine()) {
+            if (lines.Count == 0 && !scanNextLine()) {
                 eof = true;
                 return -1;
             }
-            curLine = lines.get(0);
+            curLine = lines[0];
             onReadNextLine(curLine);
             return -2;
         }
         // 到达当前扫描部分的尾部，扫描更多的字符 - 不测试readingContent也没问题
         if (position == curLine.endPos && !curLine.isScanCompleted()) {
             scanMoreChars(curLine); // 要么读取到一个输入，要么行扫描完毕
-            assert position < curLine.endPos || curLine.isScanCompleted();
+            Debug.Assert(position < curLine.endPos || curLine.isScanCompleted());
         }
         if (curLine.isScanCompleted()) {
             if (readingContent) {
                 if (position >= curLine.lastReadablePosition()) { // 读完或已在行尾(unread)
                     return onReadEndOfLine(curLine);
-                } else {
+                }
+                else {
                     position++;
                 }
-            } else if (curLine.hasContent()) {
+            }
+            else if (curLine.hasContent()) {
                 readingContent = true;
-            } else {
+            }
+            else {
                 return onReadEndOfLine(curLine);
             }
-        } else {
+        }
+        else {
             if (readingContent) {
                 position++;
-            } else {
+            }
+            else {
                 readingContent = true;
             }
         }
@@ -90,42 +89,43 @@ public abstract class AbstractCharStream implements DsonCharStream {
             return -1;
         }
         int index = indexOfCurLine(lines, curLine);
-        if (index + 1 == lines.size() && !scanNextLine()) {
+        if (index + 1 == lines.Count && !scanNextLine()) {
             eof = true;
             return -1;
         }
-        curLine = lines.get(index + 1);
+        curLine = lines[index + 1];
         onReadNextLine(curLine);
         return -2;
     }
 
     private void onReadNextLine(LineInfo nextLine) {
-        assert nextLine.isScanCompleted() || nextLine.hasContent();
+        Debug.Assert(nextLine.isScanCompleted() || nextLine.hasContent());
         this.curLine = nextLine;
         this.readingContent = false;
         if (nextLine.hasContent()) {
             this.position = nextLine.contentStartPos;
-        } else {
+        }
+        else {
             this.position = nextLine.startPos;
         }
         discardReadLines(lines, nextLine); // 清除部分缓存
     }
 
     private void onBackToPreLine(LineInfo preLine) {
-        assert preLine.isScanCompleted();
+        Debug.Assert(preLine.isScanCompleted());
         this.curLine = preLine;
         if (preLine.hasContent()) {
             // 有内容的情况下，需要回退到上一行最后一个字符的位置，否则继续unread会出错
             this.position = preLine.lastReadablePosition();
             this.readingContent = true;
-        } else {
+        }
+        else {
             // 无内容的情况下回退到startPos，和read保持一致
             this.position = preLine.startPos;
             this.readingContent = false;
         }
     }
 
-    @Override
     public int unread() {
         if (eof) {
             eof = false;
@@ -133,14 +133,15 @@ public abstract class AbstractCharStream implements DsonCharStream {
         }
         LineInfo curLine = this.curLine;
         if (curLine == null) {
-            throw new IllegalStateException("read must be called before unread.");
+            throw new InvalidOperationException("read must be called before unread.");
         }
         // 当前行回退 -- 需要检测是否回退到bufferStartPos之前
         if (readingContent) {
             if (position > curLine.contentStartPos) {
                 checkUnreadOverFlow(position - 1);
                 position--;
-            } else {
+            }
+            else {
                 readingContent = false;
             }
             return 0;
@@ -148,15 +149,17 @@ public abstract class AbstractCharStream implements DsonCharStream {
         // 尝试回退到上一行，需要检测上一行的最后一个可读字符是否溢出
         int index = indexOfCurLine(lines, curLine);
         if (index > 0) {
-            LineInfo preLine = lines.get(index - 1);
+            LineInfo preLine = lines[index - 1];
             if (preLine.hasContent()) {
                 checkUnreadOverFlow(preLine.lastReadablePosition());
-            } else {
+            }
+            else {
                 checkUnreadOverFlow(preLine.startPos);
             }
             onBackToPreLine(preLine);
             return -2;
-        } else {
+        }
+        else {
             if (curLine.ln != getStartLn()) {
                 throw bufferOverFlow(position);
             }
@@ -168,10 +171,9 @@ public abstract class AbstractCharStream implements DsonCharStream {
         }
     }
 
-    @Override
     public void skipLine() {
         LineInfo curLine = this.curLine;
-        if (curLine == null) throw new IllegalStateException();
+        if (curLine == null) throw new InvalidOperationException();
         while (!curLine.isScanCompleted()) {
             position = curLine.endPos;
             scanMoreChars(curLine);
@@ -182,31 +184,29 @@ public abstract class AbstractCharStream implements DsonCharStream {
         }
     }
 
-    @Override
     public int getPosition() {
         return position;
     }
 
-    @Override
-    public LineInfo getCurLine() {
+    public LineInfo? getCurLine() {
         return curLine;
     }
 
     //
 
     protected static int indexOfCurLine(List<LineInfo> lines, LineInfo curLine) {
-        return curLine.ln - lines.get(0).ln;
+        return curLine.ln - lines[0].ln;
     }
 
     protected static DsonParseException bufferOverFlow(int position) {
         return new DsonParseException("BufferOverFlow, caused by unread, pos: " + position);
     }
 
-    protected boolean isReadingContent() {
+    protected bool isReadingContent() {
         return readingContent;
     }
 
-    protected boolean isEof() {
+    protected bool isEof() {
         return eof;
     }
 
@@ -221,12 +221,12 @@ public abstract class AbstractCharStream implements DsonCharStream {
         }
         int idx = indexOfCurLine(lines, curLine);
         if (idx >= 10) {
-            lines.subList(0, 5).clear();
+            lines.RemoveRange(0, 5);
         }
     }
 
     /** 当前流是否已处于关闭状态 */
-    protected abstract boolean isClosed();
+    protected abstract bool isClosed();
 
     /** 获取指定全局位置的字符 */
     protected abstract int charAt(LineInfo curLine, int position);
@@ -246,6 +246,7 @@ public abstract class AbstractCharStream implements DsonCharStream {
     protected abstract void scanMoreChars(LineInfo line);
 
     /** @return 如果扫描到新的一行则返回true */
-    protected abstract boolean scanNextLine();
+    protected abstract bool scanNextLine();
 
+    public abstract void Dispose();
 }

@@ -41,8 +41,8 @@ public interface DsonCharStream extends AutoCloseable {
 
     /**
      * 1.如果产生换行，则返回 -2
-     * 2.退出eof状态，则返回-1
-     * 3.其它情况下返回0
+     * 2.退出eof状态，则返回 -1
+     * 3.其它情况下返回 0
      * <p>
      * 1.回退可以是有限制的，以节省开销
      * 2.unread后再read必须返回相同的值

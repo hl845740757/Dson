@@ -13,9 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 namespace Dson.Text;
 
-public enum TokenType
+public class DsonTextReaderSettings : DsonReaderSettings
 {
+    public DsonTextReaderSettings(Builder builder) : base(builder) {
+    }
+    
+    public new static Builder NewBuilder() {
+        return new Builder();
+    }
+
+    public new class Builder : DsonReaderSettings.Builder
+    {
+    }
 }

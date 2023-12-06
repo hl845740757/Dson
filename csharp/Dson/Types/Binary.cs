@@ -16,7 +16,7 @@
 
 namespace Dson;
 
-public class Binary : IEquatable<Binary>
+public struct Binary : IEquatable<Binary>
 {
     private readonly int _type;
     private readonly byte[] _data;
@@ -43,29 +43,16 @@ public class Binary : IEquatable<Binary>
 
     #region equals
 
-    public bool Equals(Binary? other) {
-        if (ReferenceEquals(null, other)) return false;
-        if (ReferenceEquals(this, other)) return true;
-        return _type == other._type && _data.SequenceEqual(other._data); // 比较数组元素需要使用SequenceEqual
+    public bool Equals(Binary other) {
+        return _type == other._type && _data.SequenceEqual(other._data);
     }
 
     public override bool Equals(object? obj) {
-        if (ReferenceEquals(null, obj)) return false;
-        if (ReferenceEquals(this, obj)) return true;
-        if (obj.GetType() != this.GetType()) return false;
-        return Equals((Binary)obj);
+        return obj is Binary other && Equals(other);
     }
 
     public override int GetHashCode() {
         return HashCode.Combine(_type, _data);
-    }
-
-    public static bool operator ==(Binary? left, Binary? right) {
-        return Equals(left, right);
-    }
-
-    public static bool operator !=(Binary? left, Binary? right) {
-        return !Equals(left, right);
     }
 
     #endregion
