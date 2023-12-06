@@ -34,7 +34,6 @@ public class MarkableIterator<E> implements Iterator<E> {
     /** 用于避免List频繁删除队首 */
     private int bufferOffset;
 
-
     public MarkableIterator(Iterator<E> baseIterator) {
         this.baseIterator = Objects.requireNonNull(baseIterator);
         this.bufferIndex = 0;

@@ -21,5 +21,32 @@ namespace Dson.Text;
 /// </summary>
 public class NumberStyles
 {
-    public static readonly INumberStyle Simple;
+    public static readonly INumberStyle Simple = new SimpleStyle();
+
+
+    /** double能精确表示的最大整数 */
+    private const long DOUBLE_MAX_LONG = (1L << 53) - 1;
+
+    private class SimpleStyle : INumberStyle
+    {
+        public StyleOut ToString(int value) {
+            return new StyleOut(value.ToString(), false);
+        }
+
+        public StyleOut ToString(long value) {
+            return new StyleOut(value.ToString(), value >= DOUBLE_MAX_LONG);
+        }
+
+        public StyleOut ToString(float value) {
+            if (float.IsInfinity(value) || float.IsNaN(value)) {
+                value.
+            }
+            
+            return new StyleOut(value.ToString(), )
+        }
+
+        public StyleOut ToString(double value) {
+            throw new NotImplementedException();
+        }
+    }
 }

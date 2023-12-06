@@ -82,8 +82,7 @@ public static class DsonTypeExt
     }
 
     public static bool IsNumber(this DsonType dsonType) {
-        return dsonType switch
-        {
+        return dsonType switch {
             DsonType.INT32 => true,
             DsonType.INT64 => true,
             DsonType.FLOAT => true,
@@ -91,10 +90,9 @@ public static class DsonTypeExt
             _ => false
         };
     }
-    
+
     public static bool HasWireType(this DsonType dsonType) {
-        return dsonType switch
-        {
+        return dsonType switch {
             DsonType.INT32 => true,
             DsonType.INT64 => true,
             DsonType.EXT_INT32 => true,

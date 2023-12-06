@@ -1,4 +1,20 @@
-﻿using Dson.IO;
+﻿/*
+ * Copyright 2023 wjybxx(845740757@qq.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+using Dson.IO;
 using Dson.Text;
 using Dson.Types;
 using Google.Protobuf;
@@ -18,7 +34,7 @@ public class DsonObjectWriter<TName> : AbstractDsonWriter<TName> where TName : I
         // 顶层输出是一个数组
         Context context = new Context();
         context.init(null, DsonContextType.TOP_LEVEL, DsonTypeExt.INVALID);
-        context.container = outList;
+        context.Container = outList;
         SetContext(context);
     }
 
@@ -28,10 +44,10 @@ public class DsonObjectWriter<TName> : AbstractDsonWriter<TName> where TName : I
     public DsonArray<TName> OutList {
         get {
             Context context = GetContext();
-            while (context.contextType != DsonContextType.TOP_LEVEL) {
+            while (context!.contextType != DsonContextType.TOP_LEVEL) {
                 context = context.Parent;
             }
-            return context.container.AsArray<TName>();
+            return context.Container.AsArray<TName>();
         }
     }
 
@@ -49,63 +65,63 @@ public class DsonObjectWriter<TName> : AbstractDsonWriter<TName> where TName : I
     #region 简单值
 
     protected override void doWriteInt32(int value, WireType wireType, INumberStyle style) {
-        GetContext().add(new DsonInt32(value));
+        GetContext().Add(new DsonInt32(value));
     }
 
     protected override void doWriteInt64(long value, WireType wireType, INumberStyle style) {
-        GetContext().add(new DsonInt64(value));
+        GetContext().Add(new DsonInt64(value));
     }
 
     protected override void doWriteFloat(float value, INumberStyle style) {
-        GetContext().add(new DsonFloat(value));
+        GetContext().Add(new DsonFloat(value));
     }
 
     protected override void doWriteDouble(double value, INumberStyle style) {
-        GetContext().add(new DsonDouble(value));
+        GetContext().Add(new DsonDouble(value));
     }
 
     protected override void doWriteBool(bool value) {
-        GetContext().add(DsonBool.ValueOf(value));
+        GetContext().Add(DsonBool.ValueOf(value));
     }
 
     protected override void doWriteString(String value, StringStyle style) {
-        GetContext().add(new DsonString(value));
+        GetContext().Add(new DsonString(value));
     }
 
     protected override void doWriteNull() {
-        GetContext().add(DsonNull.Null);
+        GetContext().Add(DsonNull.Null);
     }
 
     protected override void doWriteBinary(DsonBinary binary) {
-        GetContext().add(binary.Copy()); // 需要拷贝
+        GetContext().Add(binary.Copy()); // 需要拷贝
     }
 
     protected override void doWriteBinary(int type, DsonChunk chunk) {
-        GetContext().add(new DsonBinary(type, chunk));
+        GetContext().Add(new DsonBinary(type, chunk));
     }
 
     protected override void doWriteExtInt32(DsonExtInt32 value, WireType wireType, INumberStyle style) {
-        GetContext().add(value); // 不可变对象
+        GetContext().Add(value); // 不可变对象
     }
 
     protected override void doWriteExtInt64(DsonExtInt64 value, WireType wireType, INumberStyle style) {
-        GetContext().add(value);
+        GetContext().Add(value);
     }
 
     protected override void doWriteExtDouble(DsonExtDouble value, INumberStyle style) {
-        GetContext().add(value);
+        GetContext().Add(value);
     }
 
     protected override void doWriteExtString(DsonExtString value, StringStyle style) {
-        GetContext().add(value);
+        GetContext().Add(value);
     }
 
     protected override void doWriteRef(ObjectRef objectRef) {
-        GetContext().add(new DsonReference(objectRef));
+        GetContext().Add(new DsonReference(objectRef));
     }
 
     protected override void doWriteTimestamp(OffsetTimestamp timestamp) {
-        GetContext().add(new DsonTimestamp(timestamp));
+        GetContext().Add(new DsonTimestamp(timestamp));
     }
 
     #endregion
@@ -117,15 +133,15 @@ public class DsonObjectWriter<TName> : AbstractDsonWriter<TName> where TName : I
         Context newContext = NewContext(parent, contextType, dsonType);
         switch (contextType) {
             case DsonContextType.HEADER: {
-                newContext.container = parent.getHeader();
+                newContext.Container = parent.GetHeader();
                 break;
             }
             case DsonContextType.ARRAY: {
-                newContext.container = new DsonArray<TName>();
+                newContext.Container = new DsonArray<TName>();
                 break;
             }
             case DsonContextType.OBJECT: {
-                newContext.container = new DsonObject<TName>();
+                newContext.Container = new DsonObject<TName>();
                 break;
             }
             default: throw new InvalidOperationException();
@@ -138,11 +154,11 @@ public class DsonObjectWriter<TName> : AbstractDsonWriter<TName> where TName : I
     protected override void doWriteEndContainer() {
         Context context = GetContext();
         if (context.contextType != DsonContextType.HEADER) {
-            context.Parent.add(context.container);
+            context.Parent!.Add(context.Container);
         }
 
         this.RecursionDepth--;
-        SetContext(context.Parent);
+        SetContext(context.Parent!);
         poolContext(context);
     }
 
@@ -181,33 +197,33 @@ public class DsonObjectWriter<TName> : AbstractDsonWriter<TName> where TName : I
 
     protected new class Context : AbstractDsonWriter<TName>.Context
     {
-        protected internal DsonValue container;
+        protected internal DsonValue Container;
 
         public Context() {
         }
 
-        public DsonHeader<TName> getHeader() {
-            if (container.DsonType == DsonType.OBJECT) {
-                return container.AsObject<TName>().Header;
+        public DsonHeader<TName> GetHeader() {
+            if (Container.DsonType == DsonType.OBJECT) {
+                return Container.AsObject<TName>().Header;
             }
             else {
-                return container.AsArray<TName>().Header;
+                return Container.AsArray<TName>().Header;
             }
         }
 
-        public void add(DsonValue value) {
-            if (container.DsonType == DsonType.OBJECT) {
-                container.AsObject<TName>().Append(curName, value);
+        public void Add(DsonValue value) {
+            if (Container.DsonType == DsonType.OBJECT) {
+                Container.AsObject<TName>().Append(curName, value);
             }
-            else if (container.DsonType == DsonType.ARRAY) {
-                container.AsArray<TName>().Add(value);
+            else if (Container.DsonType == DsonType.ARRAY) {
+                Container.AsArray<TName>().Add(value);
             }
             else {
-                container.AsHeader<TName>().Append(curName, value);
+                Container.AsHeader<TName>().Append(curName, value);
             }
         }
 
-        public new Context Parent => (Context)_parent;
+        public new Context? Parent => (Context)_parent;
     }
 
     #endregion

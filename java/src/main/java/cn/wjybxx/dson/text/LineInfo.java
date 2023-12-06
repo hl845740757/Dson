@@ -19,7 +19,7 @@ package cn.wjybxx.dson.text;
 import javax.annotation.Nonnull;
 
 /**
- * 换行一定的行信息可以有效避免unread时反向扫描整行
+ * 缓存一定的行信息可以有效避免unread时反向扫描整行
  * 行的基础信息 ln、startPos、endPos等由{@link DsonCharStream}维护。
  * 行的业务信息 contentStartPos、contentEndPos、lheadType由{@link DsonScanner}维护。
  *

@@ -76,7 +76,7 @@ public interface IDsonOutput : IDisposable
     /// </summary>
     /// <param name="value"></param>
     void WriteMessage(IMessage value);
-    
+
     #endregion
 
     #region Advance

@@ -31,7 +31,7 @@ public interface IDsonReader<TName> : IDisposable where TName : IEquatable<TName
     /// 获取当前上下文的类型
     /// </summary>
     DsonContextType ContextType { get; }
-    
+
     /// <summary>
     /// 当前是否处于应该读取type状态
     /// </summary>

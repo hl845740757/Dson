@@ -30,7 +30,7 @@ public class DsonBinary : DsonValue, IEquatable<DsonBinary>
         _type = type;
         _data = data;
     }
-    
+
     public DsonBinary(int type, DsonChunk chunk) {
         if (chunk == null) throw new ArgumentNullException(nameof(chunk));
         Dsons.CheckSubType(type);
