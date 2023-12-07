@@ -69,7 +69,7 @@ final class CharSequenceCharStream extends AbstractCharStream {
         final int startPos;
         final int ln;
         if (curLine == null) {
-            ln = getStartLn();
+            ln = getFirstLn();
             startPos = 0;
         } else {
             ln = curLine.ln + 1;

@@ -157,7 +157,7 @@ public abstract class AbstractCharStream implements DsonCharStream {
             onBackToPreLine(preLine);
             return -2;
         } else {
-            if (curLine.ln != getStartLn()) {
+            if (curLine.ln != getFirstLn()) {
                 throw bufferOverFlow(position);
             }
             // 回退到初始状态
@@ -210,7 +210,8 @@ public abstract class AbstractCharStream implements DsonCharStream {
         return eof;
     }
 
-    protected int getStartLn() {
+    /** 获取首行行号，基于Reader时可能不是第一行开始 */
+    protected int getFirstLn() {
         return 1;
     }
 

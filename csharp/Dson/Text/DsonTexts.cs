@@ -55,15 +55,13 @@ public static class DsonTexts
     public const string LHEAD_END_OF_TEXT = "~";
 
     /** 有特殊含义的字符串 */
-    private static readonly ISet<string> PARSABLE_STRINGS = new[]
-    {
+    private static readonly ISet<string> PARSABLE_STRINGS = new[] {
         "true", "false",
         "null", "undefine",
         "NaN", "Infinity", "-Infinity"
     }.ToImmutableHashSet();
 
-    private static readonly char[] DIGITS_UPPER =
-    {
+    private static readonly char[] DIGITS_UPPER = {
         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
         'A', 'B', 'C', 'D', 'E', 'F'
     };
@@ -240,8 +238,7 @@ public static class DsonTexts
     /// <param name="label">行首标签</param>
     /// <returns>行首值</returns>
     public static LheadType? LheadTypeOfLabel(string label) {
-        return label switch
-        {
+        return label switch {
             DsonTexts.LHEAD_COMMENT => LheadType.COMMENT,
             DsonTexts.LHEAD_APPEND_LINE => LheadType.APPEND_LINE,
             DsonTexts.LHEAD_APPEND => LheadType.APPEND,
@@ -251,9 +248,19 @@ public static class DsonTexts
         };
     }
 
+    public static string GetLabel(LheadType lheadType) {
+        return lheadType switch {
+            LheadType.COMMENT => DsonTexts.LHEAD_COMMENT,
+            LheadType.APPEND_LINE => DsonTexts.LHEAD_APPEND_LINE,
+            LheadType.APPEND => DsonTexts.LHEAD_APPEND,
+            LheadType.SWITCH_MODE => DsonTexts.LHEAD_SWITCH_MODE,
+            LheadType.END_OF_TEXT => DsonTexts.LHEAD_END_OF_TEXT,
+            _ => throw new InvalidOperationException()
+        };
+    }
+
     public static DsonToken clsNameTokenOfType(DsonType dsonType) {
-        return dsonType switch
-        {
+        return dsonType switch {
             DsonType.INT32 => new DsonToken(DsonTokenType.CLASS_NAME, LABEL_INT32, -1),
             DsonType.INT64 => new DsonToken(DsonTokenType.CLASS_NAME, LABEL_INT64, -1),
             DsonType.FLOAT => new DsonToken(DsonTokenType.CLASS_NAME, LABEL_FLOAT, -1),

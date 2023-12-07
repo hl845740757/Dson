@@ -199,7 +199,7 @@ final class BufferedCharStream extends AbstractCharStream {
         final int ln;
         final int startPos;
         if (curLine == null) {
-            ln = getStartLn();
+            ln = getFirstLn();
             startPos = 0;
         } else {
             ln = curLine.ln + 1;

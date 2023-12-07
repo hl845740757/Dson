@@ -81,16 +81,12 @@ public final class DsonPrinter implements AutoCloseable {
      * @apiNote tab增加的列不是固定的...所以其它打印字符串的方法都必须调用该方法，一定程度上降低了性能，不能批量拷贝
      */
     public void print(char c) {
-        try {
-            builder.append(c);
-            if (c == '\t') {
-                column--;
-                column += (4 - (column % 4));
-            } else {
-                column += 1;
-            }
-        } catch (Exception e) {
-            ExceptionUtils.rethrow(e);
+        builder.append(c);
+        if (c == '\t') {
+            column--;
+            column += (4 - (column % 4));
+        } else {
+            column += 1;
         }
     }
 
@@ -133,42 +129,26 @@ public final class DsonPrinter implements AutoCloseable {
 
     /** @param cBuffer 内容中无tab字符 */
     public void printFastPath(char[] cBuffer) {
-        try {
-            builder.append(cBuffer);
-            column += cBuffer.length;
-        } catch (Exception e) {
-            ExceptionUtils.rethrow(e);
-        }
+        builder.append(cBuffer);
+        column += cBuffer.length;
     }
 
     /** @param cBuffer 内容中无tab字符 */
     public void printFastPath(char[] cBuffer, int offset, int len) {
-        try {
-            builder.append(cBuffer, offset, len);
-            column += len;
-        } catch (Exception e) {
-            ExceptionUtils.rethrow(e);
-        }
+        builder.append(cBuffer, offset, len);
+        column += len;
     }
 
     /** @param text 内容中无tab字符 */
     public void printFastPath(CharSequence text) {
-        try {
-            builder.append(text);
-            column += text.length();
-        } catch (Exception e) {
-            ExceptionUtils.rethrow(e);
-        }
+        builder.append(text);
+        column += text.length();
     }
 
     /** @param text 内容中无tab字符 */
     public void printRangeFastPath(CharSequence text, int start, int end) {
-        try {
-            builder.append(text, start, end);
-            column += (end - start);
-        } catch (Exception e) {
-            ExceptionUtils.rethrow(e);
-        }
+        builder.append(text, start, end);
+        column += (end - start);
     }
 
     // endregion
@@ -185,79 +165,47 @@ public final class DsonPrinter implements AutoCloseable {
         if (headLabel != null) {
             throw new IllegalStateException();
         }
-        try {
-            builder.append(label);
-            builder.append(' ');
-            column += label.length() + 1;
-            headLabel = label;
-        } catch (Exception e) {
-            ExceptionUtils.rethrow(e);
-        }
+        builder.append(label);
+        builder.append(' ');
+        column += label.length() + 1;
+        headLabel = label;
     }
 
     public void printBeginObject() {
-        try {
-            builder.append('{');
-            column += 1;
-        } catch (Exception e) {
-            ExceptionUtils.rethrow(e);
-        }
+        builder.append('{');
+        column += 1;
     }
 
     public void printEndObject() {
-        try {
-            builder.append('}');
-            column += 1;
-        } catch (Exception e) {
-            ExceptionUtils.rethrow(e);
-        }
+        builder.append('}');
+        column += 1;
     }
 
     public void printBeginArray() {
-        try {
-            builder.append('[');
-            column += 1;
-        } catch (Exception e) {
-            ExceptionUtils.rethrow(e);
-        }
+        builder.append('[');
+        column += 1;
     }
 
     public void printEndArray() {
-        try {
-            builder.append(']');
-            column += 1;
-        } catch (Exception e) {
-            ExceptionUtils.rethrow(e);
-        }
+        builder.append(']');
+        column += 1;
     }
 
     public void printBeginHeader() {
-        try {
-            builder.append("@{");
-            column += 2;
-        } catch (Exception e) {
-            ExceptionUtils.rethrow(e);
-        }
+        builder.append("@{");
+        column += 2;
     }
 
     /** 打印冒号 */
     public void printColon() {
-        try {
-            builder.append(':');
-            column += 1;
-        } catch (Exception e) {
-            ExceptionUtils.rethrow(e);
-        }
+        builder.append(':');
+        column += 1;
     }
 
     /** 打印逗号 */
     public void printComma() {
-        try {
-            builder.append(',');
-            column += 1;
-        } catch (Exception e) {
-            ExceptionUtils.rethrow(e);
-        }
+        builder.append(',');
+        column += 1;
     }
 
     /** 打印可能需要转义的字符 */
@@ -287,24 +235,16 @@ public final class DsonPrinter implements AutoCloseable {
 
     /** 换行 */
     public void println() {
-        try {
-            builder.append(lineSeparator);
-            flush();
-            column = 0;
-            headLabel = null;
-        } catch (Exception e) {
-            ExceptionUtils.rethrow(e);
-        }
+        builder.append(lineSeparator);
+        flush();
+        column = 0;
+        headLabel = null;
     }
 
     /** 打印缩进 */
     public void printIndent() {
-        try {
-            builder.append(indentionArray, 0, indent);
-            column += indent;
-        } catch (Exception e) {
-            ExceptionUtils.rethrow(e);
-        }
+        builder.append(indentionArray, 0, indent);
+        column += indent;
     }
 
     /** 打印缩进，可指定一个偏移量 */
@@ -313,22 +253,14 @@ public final class DsonPrinter implements AutoCloseable {
         if (len <= 0) {
             throw new IllegalArgumentException("invalid offset, indent: %d, offset: %d".formatted(indent, offset));
         }
-        try {
-            builder.append(indentionArray, offset, len);
-            column += len;
-        } catch (Exception e) {
-            ExceptionUtils.rethrow(e);
-        }
+        builder.append(indentionArray, offset, len);
+        column += len;
     }
 
     /** 打印一个空格 */
     public void printSpace() {
-        try {
-            builder.append(' ');
-            column += 1;
-        } catch (Exception e) {
-            ExceptionUtils.rethrow(e);
-        }
+        builder.append(' ');
+        column += 1;
     }
 
     /** 当前的缩进长度 */
@@ -343,7 +275,7 @@ public final class DsonPrinter implements AutoCloseable {
 
     public void retract() {
         if (indent < 2) {
-            throw new IllegalArgumentException("indent must be called before retract");
+            throw new IllegalStateException("indent must be called before retract");
         }
         indent -= 2;
         updateIndent();

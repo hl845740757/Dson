@@ -38,7 +38,7 @@ class StringCharStream : AbstractCharStream
         int startPos;
         int ln;
         if (curLine == null) {
-            ln = GetStartLn();
+            ln = FirstLn;
             startPos = 0;
         }
         else {

@@ -66,7 +66,7 @@ class BufferedCharStream : AbstractCharStream
         }
     }
 
-    private void discardReadChars() {
+    private void DiscardReadChars() {
         CharBuffer buffer = this._buffer;
         // 已读部分达75%时丢弃50%(保留最近的25%)；这里不根据具体的数字来进行丢弃，减少不必要的数组拷贝
         if (Position - _bufferStartPos >= buffer.Capacity * 0.75f) {
@@ -75,24 +75,24 @@ class BufferedCharStream : AbstractCharStream
         // 如果可写空间不足，则尝试扩容
         if (buffer.WritableChars <= 4
             && buffer.Capacity < MaxBufferSize) {
-            growUp(buffer);
+            GrowUp(buffer);
         }
     }
 
-    private void growUp(CharBuffer charBuffer) {
+    private void GrowUp(CharBuffer charBuffer) {
         int capacity = Math.Min(MaxBufferSize, charBuffer.Capacity * 2);
         charBuffer.Grow(capacity);
     }
 
     /** 该方法一直读到指定行读取完毕，或缓冲区满(不一定扩容) */
     protected override void ScanMoreChars(LineInfo line) {
-        discardReadChars();
+        DiscardReadChars();
         CharBuffer buffer = this._buffer;
         CharBuffer nextBuffer = this._nextBuffer;
         try {
             // >= 2 是为了处理\r\n换行符，避免读入单个\r不知如何处理
             while (!line.IsScanCompleted() && buffer.WritableChars >= 2) {
-                readToBuffer(nextBuffer);
+                ReadToBuffer(nextBuffer);
                 while (nextBuffer.IsReadable && buffer.WritableChars >= 2) {
                     char c = nextBuffer.Read();
                     line.EndPos++;
@@ -105,7 +105,7 @@ class BufferedCharStream : AbstractCharStream
                     if (c == '\r') {
                         // 再读取一次，以判断\r\n
                         if (!nextBuffer.IsReadable) {
-                            readToBuffer(nextBuffer);
+                            ReadToBuffer(nextBuffer);
                         }
                         if (!nextBuffer.IsReadable) {
                             Debug.Assert(_readerEof);
@@ -132,7 +132,7 @@ class BufferedCharStream : AbstractCharStream
         }
     }
 
-    private void readToBuffer(CharBuffer nextBuffer) {
+    private void ReadToBuffer(CharBuffer nextBuffer) {
         if (!_readerEof) {
             if (nextBuffer.Ridx >= nextBuffer.Capacity / 2) {
                 nextBuffer.Shift(nextBuffer.Ridx);
@@ -159,7 +159,7 @@ class BufferedCharStream : AbstractCharStream
         int ln;
         int startPos;
         if (curLine == null) {
-            ln = GetStartLn();
+            ln = FirstLn;
             startPos = 0;
         }
         else {
@@ -207,7 +207,7 @@ class BufferedCharStream : AbstractCharStream
                 if (Position - bufferStartPos >= MinBufferSize) {
                     DiscardReadChars(bufferStartPos + MinBufferSize / 2);
                 }
-                growUp(buffer);
+                GrowUp(buffer);
                 ScanMoreChars(tempLine);
                 continue;
             }
