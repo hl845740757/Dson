@@ -79,7 +79,7 @@ public final class FieldNumber implements Comparable<FieldNumber> {
         return idep;
     }
 
-    //
+    // region 比较
 
     /** 比较两个fullNumber的大小 */
     public static int compare(int fullNumber1, int fullNumber2) {
@@ -104,6 +104,10 @@ public final class FieldNumber implements Comparable<FieldNumber> {
         return Integer.compare(lnumber, that.lnumber);
     }
 
+    // endregion
+
+    // region equals
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -121,6 +125,8 @@ public final class FieldNumber implements Comparable<FieldNumber> {
         result = 31 * result + lnumber;
         return result;
     }
+
+    // endregion
 
     @Override
     public String toString() {

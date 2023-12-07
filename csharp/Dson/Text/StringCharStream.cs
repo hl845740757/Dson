@@ -1,6 +1,6 @@
 ﻿namespace Dson.Text;
 
-public class StringCharStream : AbstractCharStream
+class StringCharStream : AbstractCharStream
 {
     private string? _buffer;
 
@@ -83,7 +83,7 @@ public class StringCharStream : AbstractCharStream
         LheadType? lheadType = LheadType.COMMENT;
         int contentStartPos = -1;
         int lastReadablePos = LineInfo.lastReadablePosition(state, endPos);
-        if (dsonMode == DsonMode.RELAXED) {
+        if (DsonMode == DsonMode.RELAXED) {
             if (startPos <= lastReadablePos) {
                 lheadType = LheadType.APPEND;
                 contentStartPos = startPos;
@@ -108,7 +108,7 @@ public class StringCharStream : AbstractCharStream
         }
         LineInfo tempLine = new LineInfo(ln, startPos, endPos, lheadType.Value, contentStartPos);
         tempLine.state = state;
-        addLine(tempLine);
+        AddLine(tempLine);
         return true;
     }
 }

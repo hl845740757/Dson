@@ -16,6 +16,10 @@
 
 namespace Dson;
 
+/// <summary>
+/// 
+/// </summary>
+/// <typeparam name="TK">String或<see cref="FieldNumber"/></typeparam>
 public class DsonObject<TK> : AbstractDsonObject<TK>
 {
     private readonly DsonHeader<TK> _header;
@@ -24,7 +28,11 @@ public class DsonObject<TK> : AbstractDsonObject<TK>
         : this(DsonInternals.NewLinkedDictionary<TK>(), new DsonHeader<TK>()) {
     }
 
-    public DsonObject(IDictionary<TK, DsonValue> valueMap, DsonHeader<TK> header)
+    public DsonObject(DsonObject<TK> src) // 需要拷贝
+        : this(DsonInternals.NewLinkedDictionary(src), new DsonHeader<TK>(src._header)) {
+    }
+
+    private DsonObject(IDictionary<TK, DsonValue> valueMap, DsonHeader<TK> header)
         : base(valueMap) {
         _header = header;
     }

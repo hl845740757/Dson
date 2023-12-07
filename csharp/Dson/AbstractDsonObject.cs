@@ -21,7 +21,7 @@ namespace Dson;
 /// <summary>
 /// Dson KV类结构的抽象实现
 /// </summary>
-/// <typeparam name="TK"></typeparam>
+/// <typeparam name="TK">String或<see cref="FieldNumber"/></typeparam>
 public abstract class AbstractDsonObject<TK> : DsonValue, IDictionary<TK, DsonValue>, IEquatable<AbstractDsonObject<TK>>
 {
     protected readonly IDictionary<TK, DsonValue> _valueMap;

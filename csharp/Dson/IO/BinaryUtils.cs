@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+using System.Runtime.CompilerServices;
+
 namespace Dson.IO;
 
 /// <summary>
@@ -38,14 +40,12 @@ public static class BinaryUtils
         }
     }
 
+    /** c#的byte默认是无符号的；这一点我觉得C#是对的... */
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int ToUint(byte value) {
-        return value & 0xFF;
+        return value;
     }
-
-    public static int ToUint(short value) {
-        return value & 0xFFFF;
-    }
-
+    
     #region 大端编码
 
     public static byte GetByte(byte[] buffer, int index) {

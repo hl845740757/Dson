@@ -58,6 +58,7 @@ public static class DsonInternals
     }
 
     public static IDictionary<TK, DsonValue> NewLinkedDictionary<TK>(IDictionary<TK, DsonValue> src) {
+        if (src == null) throw new ArgumentNullException(nameof(src));
         return new Dictionary<TK, DsonValue>(src);
     }
 
@@ -84,6 +85,25 @@ public static class DsonInternals
 
     public static List<T> NewList<T>(params T[] elements) {
         return new List<T>(elements);
+    }
+
+    #endregion
+
+    #region 数组
+
+    /// <summary>
+    /// 拷贝数组
+    /// </summary>
+    /// <param name="src">原始四组</param>
+    /// <param name="newLen">可大于或小于原始数组长度</param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static T[] CopyOf<T>(T[] src, int newLen) {
+        if (src == null) throw new ArgumentNullException(nameof(src));
+        if (newLen < 0) throw new ArgumentException("newLen cant be negative");
+        T[] result = new T[newLen];
+        Array.Copy(src, 0, result, 0, Math.Min(src.Length, newLen));
+        return result;
     }
 
     #endregion

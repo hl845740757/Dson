@@ -16,6 +16,10 @@
 
 namespace Dson;
 
+/// <summary>
+/// Dson对象头
+/// </summary>
+/// <typeparam name="TK">String或<see cref="FieldNumber"/></typeparam>
 public class DsonHeader<TK> : AbstractDsonObject<TK>
 {
     public DsonHeader()
@@ -23,7 +27,7 @@ public class DsonHeader<TK> : AbstractDsonObject<TK>
     }
 
     public DsonHeader(IDictionary<TK, DsonValue> valueMap)
-        : base(DsonInternals.NewLinkedDictionary<TK>(valueMap)) {
+        : base(DsonInternals.NewLinkedDictionary(valueMap)) {
     }
 
     public override DsonType DsonType => DsonType.HEADER;

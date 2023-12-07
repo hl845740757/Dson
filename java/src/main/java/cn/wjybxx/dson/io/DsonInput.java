@@ -30,11 +30,6 @@ public interface DsonInput extends AutoCloseable {
 
     byte readRawByte();
 
-    /** 将一个byte读取为正整数 */
-    default int readUint8() {
-        return Byte.toUnsignedInt(readRawByte());
-    }
-
     //
     int readInt32();
 

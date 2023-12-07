@@ -25,6 +25,7 @@ namespace Dson;
 /// 1.写数组普通元素的时候，{@code name}传null或0，写嵌套对象时使用无name参数的start方法（实在不想定义太多的方法）
 /// 2.double、boolean、null由于可以从无符号字符串精确解析得出，因此可以总是不输出类型标签，
 /// 3.内置结构体总是输出类型标签，且总是Flow模式，可以降低使用复杂度；
+/// 4.Name为int时表示<see cref="FieldNumber"/>中的完整编号
 /// </summary>
 /// <typeparam name="TName">name的类型，int或string</typeparam>
 public interface IDsonWriter<in TName> : IDisposable where TName : IEquatable<TName>
