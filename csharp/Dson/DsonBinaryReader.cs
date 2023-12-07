@@ -72,15 +72,15 @@ public class DsonBinaryReader<TName> : AbstractDsonReader<TName> where TName : I
     }
 
     protected override void doReadName() {
-        if (textReader != null) {
+        if (TextReader != null) {
             string filedName = _input.ReadString();
             if (Settings.enableFieldIntern) {
                 filedName = Dsons.InternField(filedName);
             }
-            textReader.currentName = filedName;
+            TextReader.currentName = filedName;
         }
         else {
-            binReader!.currentName = _input.ReadUint32();
+            BinReader!.currentName = _input.ReadUint32();
         }
     }
 
@@ -176,7 +176,7 @@ public class DsonBinaryReader<TName> : AbstractDsonReader<TName> where TName : I
     #region 特殊
 
     protected override void doSkipName() {
-        if (textReader != null) {
+        if (TextReader != null) {
             // 避免构建字符串
             int size = _input.ReadUint32();
             if (size > 0) {

@@ -24,28 +24,29 @@ namespace Dson;
 public abstract class AbstractDsonReader<TName> : IDsonReader<TName> where TName : IEquatable<TName>
 {
     protected readonly DsonReaderSettings Settings;
-    protected readonly AbstractDsonReader<string>? textReader;
-    protected readonly AbstractDsonReader<int>? binReader;
+    protected readonly AbstractDsonReader<string>? TextReader;
+    protected readonly AbstractDsonReader<int>? BinReader;
 
+#nullable disable
     internal Context _context;
-    private Context? _pooledContext; // 一个额外的缓存，用于写集合等减少上下文创建
+    private Context _pooledContext; // 一个额外的缓存，用于写集合等减少上下文创建
 
-    // 这些值放外面，不需要上下文隔离，但需要能恢复
-    protected internal int recursionDepth;
+    protected internal int recursionDepth; // 这些值放外面，不需要上下文隔离，但需要能恢复
     protected internal DsonType currentDsonType = DsonTypeExt.INVALID;
     protected internal WireType currentWireType;
     protected internal int currentWireTypeBits;
     protected internal TName currentName;
+#nullable enable
 
     protected AbstractDsonReader(DsonReaderSettings settings) {
         Settings = settings;
         if (DsonInternals.IsStringKey<TName>()) {
-            this.textReader = this as AbstractDsonReader<string>;
-            this.binReader = null;
+            this.TextReader = this as AbstractDsonReader<string>;
+            this.BinReader = null;
         }
         else {
-            this.textReader = null;
-            this.binReader = this as AbstractDsonReader<int>;
+            this.TextReader = null;
+            this.BinReader = this as AbstractDsonReader<int>;
         }
     }
 

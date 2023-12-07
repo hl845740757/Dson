@@ -50,8 +50,4 @@ public class DsonParseException extends DsonIOException {
         return new DsonParseException(e);
     }
 
-    public static DsonParseException formatted(String format, Object... args) {
-        return new DsonParseException(String.format(format, args));
-    }
-
 }

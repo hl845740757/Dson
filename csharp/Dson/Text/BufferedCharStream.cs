@@ -4,125 +4,125 @@ namespace Dson.Text;
 
 class BufferedCharStream : AbstractCharStream
 {
-    private const int MIN_BUFFER_SIZE = 32;
+    private const int MinBufferSize = 32;
     /** 行首前面超过1000个空白字符是有问题的 */
-    private const int MAX_BUFFER_SIZE = 1024;
+    private const int MaxBufferSize = 1024;
 
 #nullable disable
-    private StreamReader reader;
-    private readonly bool autoClose;
+    private StreamReader _reader;
+    private readonly bool _autoClose;
 #nullable enable
 
-    private CharBuffer buffer;
+    private CharBuffer _buffer;
     /** reader批量读取数据到该buffer，然后再读取到当前buffer -- 缓冲的缓冲，减少io操作 */
-    private CharBuffer nextBuffer;
+    private CharBuffer _nextBuffer;
 
     /** buffer全局开始位置 */
-    public int bufferStartPos;
+    private int _bufferStartPos;
     /** reader是否已到达文件尾部 -- 部分reader在到达文件尾部的时候不可继续读 */
-    private bool readerEof;
+    private bool _readerEof;
 
     public BufferedCharStream(StreamReader reader, DsonMode dsonMode,
                               int bufferSize = 64, bool autoClose = true) : base(dsonMode) {
-        this.reader = reader ?? throw new ArgumentNullException(nameof(reader));
-        this.buffer = new CharBuffer(Math.Max(MIN_BUFFER_SIZE, bufferSize));
-        this.nextBuffer = new CharBuffer(64);
-        this.autoClose = autoClose;
+        this._reader = reader ?? throw new ArgumentNullException(nameof(reader));
+        this._buffer = new CharBuffer(Math.Max(MinBufferSize, bufferSize));
+        this._nextBuffer = new CharBuffer(64);
+        this._autoClose = autoClose;
     }
 
     public override void Dispose() {
-        if (reader != null && autoClose) {
-            reader.Dispose();
-            reader = null;
+        if (_reader != null && _autoClose) {
+            _reader.Dispose();
+            _reader = null;
         }
-        buffer = null!;
-        nextBuffer = null!;
+        _buffer = null!;
+        _nextBuffer = null!;
     }
 
-    protected override bool isClosed() {
-        return reader == null;
+    protected override bool IsClosed() {
+        return _reader == null;
     }
 
-    protected override int charAt(LineInfo curLine, int position) {
-        int ridx = position - bufferStartPos;
-        return buffer.charAt(ridx);
+    protected override int CharAt(LineInfo curLine, int position) {
+        int ridx = position - _bufferStartPos;
+        return _buffer.CharAt(ridx);
     }
 
-    protected override void checkUnreadOverFlow(int position) {
-        int ridx = position - bufferStartPos;
-        if (ridx < 0 || ridx >= buffer.widx) {
-            throw bufferOverFlow(position);
+    protected override void CheckUnreadOverFlow(int position) {
+        int ridx = position - _bufferStartPos;
+        if (ridx < 0 || ridx >= _buffer.Widx) {
+            throw BufferOverFlow(position);
         }
     }
 
-    public override void discardReadChars(int position) {
-        if (position <= 0 || position >= getPosition()) {
+    public override void DiscardReadChars(int position) {
+        if (position <= 0 || position >= Position) {
             return;
         }
-        int shiftCount = position - bufferStartPos - 1;
+        int shiftCount = position - _bufferStartPos - 1;
         if (shiftCount > 0) {
-            buffer.shift(shiftCount);
-            bufferStartPos += shiftCount;
+            _buffer.Shift(shiftCount);
+            _bufferStartPos += shiftCount;
         }
     }
 
     private void discardReadChars() {
-        CharBuffer buffer = this.buffer;
+        CharBuffer buffer = this._buffer;
         // 已读部分达75%时丢弃50%(保留最近的25%)；这里不根据具体的数字来进行丢弃，减少不必要的数组拷贝
-        if (getPosition() - bufferStartPos >= buffer.capacity() * 0.75f) {
-            discardReadChars((int)(bufferStartPos + buffer.capacity() * 0.25d));
+        if (Position - _bufferStartPos >= buffer.Capacity * 0.75f) {
+            DiscardReadChars((int)(_bufferStartPos + buffer.Capacity * 0.25d));
         }
         // 如果可写空间不足，则尝试扩容
-        if (buffer.writableChars() <= 4
-            && buffer.capacity() < MAX_BUFFER_SIZE) {
+        if (buffer.WritableChars <= 4
+            && buffer.Capacity < MaxBufferSize) {
             growUp(buffer);
         }
     }
 
     private void growUp(CharBuffer charBuffer) {
-        int capacity = Math.Min(MAX_BUFFER_SIZE, charBuffer.capacity() * 2);
-        charBuffer.grow(capacity);
+        int capacity = Math.Min(MaxBufferSize, charBuffer.Capacity * 2);
+        charBuffer.Grow(capacity);
     }
 
     /** 该方法一直读到指定行读取完毕，或缓冲区满(不一定扩容) */
-    protected override void scanMoreChars(LineInfo line) {
+    protected override void ScanMoreChars(LineInfo line) {
         discardReadChars();
-        CharBuffer buffer = this.buffer;
-        CharBuffer nextBuffer = this.nextBuffer;
+        CharBuffer buffer = this._buffer;
+        CharBuffer nextBuffer = this._nextBuffer;
         try {
             // >= 2 是为了处理\r\n换行符，避免读入单个\r不知如何处理
-            while (!line.isScanCompleted() && buffer.writableChars() >= 2) {
+            while (!line.IsScanCompleted() && buffer.WritableChars >= 2) {
                 readToBuffer(nextBuffer);
-                while (nextBuffer.isReadable() && buffer.writableChars() >= 2) {
-                    char c = nextBuffer.read();
-                    line.endPos++;
-                    buffer.write(c);
+                while (nextBuffer.IsReadable && buffer.WritableChars >= 2) {
+                    char c = nextBuffer.Read();
+                    line.EndPos++;
+                    buffer.Write(c);
 
                     if (c == '\n') { // LF
-                        line.state = LineInfo.STATE_LF;
+                        line.State = LineInfo.STATE_LF;
                         return;
                     }
                     if (c == '\r') {
                         // 再读取一次，以判断\r\n
-                        if (!nextBuffer.isReadable()) {
+                        if (!nextBuffer.IsReadable) {
                             readToBuffer(nextBuffer);
                         }
-                        if (!nextBuffer.isReadable()) {
-                            Debug.Assert(readerEof);
-                            line.state = LineInfo.STATE_EOF;
+                        if (!nextBuffer.IsReadable) {
+                            Debug.Assert(_readerEof);
+                            line.State = LineInfo.STATE_EOF;
                             return;
                         }
-                        c = nextBuffer.read();
-                        line.endPos++;
-                        buffer.write(c);
+                        c = nextBuffer.Read();
+                        line.EndPos++;
+                        buffer.Write(c);
                         if (c == '\n') { // CRLF
-                            line.state = LineInfo.STATE_CRLF;
+                            line.State = LineInfo.STATE_CRLF;
                             return;
                         }
                     }
                 }
-                if (readerEof && !nextBuffer.isReadable()) {
-                    line.state = LineInfo.STATE_EOF;
+                if (_readerEof && !nextBuffer.IsReadable) {
+                    line.State = LineInfo.STATE_EOF;
                     return;
                 }
             }
@@ -133,97 +133,97 @@ class BufferedCharStream : AbstractCharStream
     }
 
     private void readToBuffer(CharBuffer nextBuffer) {
-        if (!readerEof) {
-            if (nextBuffer.ridx >= nextBuffer.capacity() / 2) {
-                nextBuffer.shift(nextBuffer.ridx);
+        if (!_readerEof) {
+            if (nextBuffer.Ridx >= nextBuffer.Capacity / 2) {
+                nextBuffer.Shift(nextBuffer.Ridx);
             }
-            int len = nextBuffer.writableChars();
+            int len = nextBuffer.WritableChars;
             if (len <= 0) {
                 return;
             }
-            int n = reader.Read(nextBuffer.buffer, nextBuffer.widx, len);
+            int n = _reader.Read(nextBuffer.Buffer, nextBuffer.Widx, len);
             if (n == -1) {
-                readerEof = true;
+                _readerEof = true;
             }
             else {
-                nextBuffer.addWidx(n);
+                nextBuffer.AddWidx(n);
             }
         }
     }
 
-    protected override bool scanNextLine() {
-        if (readerEof && !nextBuffer.isReadable()) {
+    protected override bool ScanNextLine() {
+        if (_readerEof && !_nextBuffer.IsReadable) {
             return false;
         }
-        LineInfo? curLine = getCurLine();
+        LineInfo? curLine = CurLine;
         int ln;
         int startPos;
         if (curLine == null) {
-            ln = getStartLn();
+            ln = GetStartLn();
             startPos = 0;
         }
         else {
-            ln = curLine.ln + 1;
-            startPos = curLine.endPos + 1;
+            ln = curLine.Ln + 1;
+            startPos = curLine.EndPos + 1;
         }
 
         // startPos指向的是下一个位置，而endPos是在scan的时候增加，因此endPos需要回退一个位置
         LineInfo tempLine = new LineInfo(ln, startPos, startPos - 1, LheadType.APPEND, startPos);
-        scanMoreChars(tempLine);
-        if (tempLine.startPos > tempLine.endPos) { // 无效行，没有输入
+        ScanMoreChars(tempLine);
+        if (tempLine.StartPos > tempLine.EndPos) { // 无效行，没有输入
             return false;
         }
         if (DsonMode == DsonMode.RELAXED) {
-            if (startPos > tempLine.lastReadablePosition()) { // 空行(仅换行符)
-                tempLine = new LineInfo(ln, startPos, tempLine.endPos, LheadType.APPEND, -1);
+            if (startPos > tempLine.LastReadablePosition()) { // 空行(仅换行符)
+                tempLine = new LineInfo(ln, startPos, tempLine.EndPos, LheadType.APPEND, -1);
             }
             AddLine(tempLine);
             return true;
         }
 
-        CharBuffer buffer = this.buffer;
-        int bufferStartPos = this.bufferStartPos;
+        CharBuffer buffer = this._buffer;
+        int bufferStartPos = this._bufferStartPos;
         // 必须出现行首，或扫描结束
         int headPos = -1;
         int indexStartPos = startPos;
         while (true) {
             if (headPos == -1) {
-                for (; indexStartPos <= tempLine.endPos; indexStartPos++) {
+                for (; indexStartPos <= tempLine.EndPos; indexStartPos++) {
                     int ridx = indexStartPos - bufferStartPos;
-                    if (!DsonTexts.isIndentChar(buffer.charAt(ridx))) {
+                    if (!DsonTexts.isIndentChar(buffer.CharAt(ridx))) {
                         headPos = indexStartPos;
                         break;
                     }
                 }
             }
-            if (tempLine.isScanCompleted()) {
+            if (tempLine.IsScanCompleted()) {
                 break;
             }
             // 不足以判定行首或内容的开始，需要继续读 -- 要准备更多的空间
-            if (headPos == -1 || headPos + 2 > tempLine.endPos) {
-                if (buffer.capacity() >= MAX_BUFFER_SIZE) {
-                    throw new DsonParseException("BufferOverFlow, caused by scanNextLine, pos: " + getPosition());
+            if (headPos == -1 || headPos + 2 > tempLine.EndPos) {
+                if (buffer.Capacity >= MaxBufferSize) {
+                    throw new DsonParseException("BufferOverFlow, caused by scanNextLine, pos: " + Position);
                 }
-                if (getPosition() - bufferStartPos >= MIN_BUFFER_SIZE) {
-                    discardReadChars(bufferStartPos + MIN_BUFFER_SIZE / 2);
+                if (Position - bufferStartPos >= MinBufferSize) {
+                    DiscardReadChars(bufferStartPos + MinBufferSize / 2);
                 }
                 growUp(buffer);
-                scanMoreChars(tempLine);
+                ScanMoreChars(tempLine);
                 continue;
             }
             break;
         }
 
-        int state = tempLine.state; // 可能已完成，也可能未完成
-        int lastReadablePos = tempLine.lastReadablePosition();
+        int state = tempLine.State; // 可能已完成，也可能未完成
+        int lastReadablePos = tempLine.LastReadablePosition();
         if (headPos >= startPos && headPos <= lastReadablePos) {
-            String label = buffer.charAt(headPos - bufferStartPos).ToString();
+            String label = buffer.CharAt(headPos - bufferStartPos).ToString();
             LheadType? lheadType = DsonTexts.LheadTypeOfLabel(label);
             if (!lheadType.HasValue) {
                 throw new DsonParseException($"Unknown head {label}, pos: {headPos}");
             }
             // 检查缩进
-            if (headPos + 1 <= lastReadablePos && buffer.charAt(headPos + 1 - bufferStartPos) != ' ') {
+            if (headPos + 1 <= lastReadablePos && buffer.CharAt(headPos + 1 - bufferStartPos) != ' ') {
                 throw new DsonParseException($"space is required, head {{label}}, pos: {headPos}");
             }
             // 确定内容开始位置
@@ -231,13 +231,13 @@ class BufferedCharStream : AbstractCharStream
             if (headPos + 2 <= lastReadablePos) {
                 contentStartPos = headPos + 2;
             }
-            tempLine = new LineInfo(ln, tempLine.startPos, tempLine.endPos, lheadType.Value, contentStartPos);
-            tempLine.state = state;
+            tempLine = new LineInfo(ln, tempLine.StartPos, tempLine.EndPos, lheadType.Value, contentStartPos);
+            tempLine.State = state;
         }
         else {
-            Debug.Assert(tempLine.isScanCompleted());
-            tempLine = new LineInfo(ln, startPos, tempLine.endPos, LheadType.COMMENT, -1);
-            tempLine.state = state;
+            Debug.Assert(tempLine.IsScanCompleted());
+            tempLine = new LineInfo(ln, startPos, tempLine.EndPos, LheadType.COMMENT, -1);
+            tempLine.State = state;
         }
         AddLine(tempLine);
         return true;

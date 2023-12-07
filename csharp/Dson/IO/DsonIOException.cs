@@ -105,7 +105,7 @@ public class DsonIOException : Exception
         return new DsonIOException($"invalid token, contextType {contextType}, token {token}.");
     }
 
-    public static DsonIOException invalidTokenType(DsonContextType contextType, DsonToken token, IList<TokenType> expected) {
+    public static DsonIOException invalidTokenType(DsonContextType contextType, DsonToken token, IList<DsonTokenType> expected) {
         return new DsonIOException($"invalid token, contextType {contextType}, expected {expected}, but found {token}.");
     }
 

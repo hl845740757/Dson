@@ -57,6 +57,29 @@ class CharBuffer implements CharSequence {
         return Math.max(0, widx - ridx);
     }
 
+    // region CharSequence
+
+    /** Length为可读字节数 */
+    @Override
+    public int length() {
+        return Math.max(0, widx - ridx);
+    }
+
+    @Override
+    public char charAt(int index) {
+        return buffer[ridx + index];
+    }
+
+    @Nonnull
+    @Override
+    public CharSequence subSequence(int start, int end) {
+        return new String(buffer, ridx + start, end - start);
+    }
+
+    // endregion
+
+    // region 读写
+
     public char read() {
         if (ridx == widx) throw new BufferOverflowException();
         return buffer[ridx++];
@@ -112,8 +135,9 @@ class CharBuffer implements CharSequence {
         charBuffer.addRidx(n);
         return n;
     }
+    // endregion
 
-    //
+    //region 索引调整
 
     public void addRidx(int count) {
         setRidx(ridx + count);
@@ -147,8 +171,9 @@ class CharBuffer implements CharSequence {
         this.ridx = ridx;
         this.widx = widx;
     }
+    // endregion
 
-    //
+    //region 容量调整
 
     public void shift(int shiftCount) {
         if (shiftCount <= 0) {
@@ -173,22 +198,8 @@ class CharBuffer implements CharSequence {
         }
         this.buffer = Arrays.copyOf(this.buffer, capacity);
     }
+    // endregion
 
-    @Override
-    public int length() {
-        return Math.max(0, widx - ridx);
-    }
-
-    @Override
-    public char charAt(int index) {
-        return buffer[ridx + index];
-    }
-
-    @Nonnull
-    @Override
-    public CharSequence subSequence(int start, int end) {
-        return new String(buffer, ridx + start, end - start);
-    }
 
     @Nonnull
     @Override

@@ -41,7 +41,7 @@ final class BufferedCharStream extends AbstractCharStream {
     private CharBuffer nextBuffer;
 
     /** buffer全局开始位置 */
-    public int bufferStartPos;
+    private int bufferStartPos;
     /** reader是否已到达文件尾部 -- 部分reader在到达文件尾部的时候不可继续读 */
     private boolean readerEof;
 

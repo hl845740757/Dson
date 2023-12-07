@@ -24,22 +24,24 @@ namespace Dson;
 public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName> where TName : IEquatable<TName>
 {
     protected readonly DsonWriterSettings Settings;
-    protected readonly AbstractDsonWriter<string>? textWriter;
-    protected readonly AbstractDsonWriter<int>? binWriter;
+    protected readonly AbstractDsonWriter<string>? TextWriter;
+    protected readonly AbstractDsonWriter<int>? BinWriter;
 
+#nullable disable
     internal Context _context;
-    private Context? _pooledContext; // 一个额外的缓存，用于写集合等减少上下文创建
+    private Context _pooledContext; // 一个额外的缓存，用于写集合等减少上下文创建
     protected int RecursionDepth = 0; // 当前递归深度
+#nullable enable
 
     protected AbstractDsonWriter(DsonWriterSettings settings) {
         this.Settings = settings;
         if (DsonInternals.IsStringKey<TName>()) {
-            textWriter = this as AbstractDsonWriter<string>;
-            binWriter = null;
+            TextWriter = this as AbstractDsonWriter<string>;
+            BinWriter = null;
         }
         else {
-            textWriter = null;
-            binWriter = this as AbstractDsonWriter<int>;
+            TextWriter = null;
+            BinWriter = this as AbstractDsonWriter<int>;
         }
     }
 

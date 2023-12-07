@@ -155,8 +155,8 @@ public class DsonCharStreamTest {
         if (self.ln != lineInfo.ln) return false;
         if (self.startPos != lineInfo.startPos) return false;
         if (self.endPos != lineInfo.endPos) return false;
-        if (self.getContentStartPos() != lineInfo.getContentStartPos()) return false;
-        return self.getLheadType() == lineInfo.getLheadType();
+        if (self.contentStartPos != lineInfo.contentStartPos) return false;
+        return self.lheadType == lineInfo.lheadType;
     }
 
     private static void pullToList(DsonCharStream buffer, List<LineInfo> outList) {

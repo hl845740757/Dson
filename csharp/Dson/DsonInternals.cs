@@ -87,6 +87,33 @@ public static class DsonInternals
         return new List<T>(elements);
     }
 
+    public static bool ContainsRef<TE>(IList<TE> list, TE element) where TE : class {
+        for (int i = 0, size = list.Count; i < size; i++) {
+            if (ReferenceEquals(list[i], element)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static int IndexOfRef<TE>(IList<TE> list, Object element) where TE : class {
+        for (int idx = 0, size = list.Count; idx < size; idx++) {
+            if (ReferenceEquals(list[idx], element)) {
+                return idx;
+            }
+        }
+        return -1;
+    }
+
+    public static int LastIndexOfRef<TE>(IList<TE> list, Object element) where TE : class {
+        for (int idx = list.Count - 1; idx >= 0; idx--) {
+            if (ReferenceEquals(list[idx], element)) {
+                return idx;
+            }
+        }
+        return -1;
+    }
+
     #endregion
 
     #region 数组
@@ -104,6 +131,33 @@ public static class DsonInternals
         T[] result = new T[newLen];
         Array.Copy(src, 0, result, 0, Math.Min(src.Length, newLen));
         return result;
+    }
+
+    public static bool ContainsRef<TE>(TE[] list, TE element) where TE : class {
+        for (int i = 0, size = list.Length; i < size; i++) {
+            if (ReferenceEquals(list[i], element)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static int IndexOfRef<TE>(TE[] list, Object element) where TE : class {
+        for (int idx = 0, size = list.Length; idx < size; idx++) {
+            if (ReferenceEquals(list[idx], element)) {
+                return idx;
+            }
+        }
+        return -1;
+    }
+
+    public static int LastIndexOfRef<TE>(TE[] list, Object element) where TE : class {
+        for (int idx = list.Length - 1; idx >= 0; idx--) {
+            if (ReferenceEquals(list[idx], element)) {
+                return idx;
+            }
+        }
+        return -1;
     }
 
     #endregion

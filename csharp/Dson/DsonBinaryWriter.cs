@@ -56,11 +56,11 @@ public class DsonBinaryWriter<TName> : AbstractDsonWriter<TName> where TName : I
         if (dsonType != DsonType.HEADER) { // header是匿名属性
             DsonContextType contextType = this.ContextType;
             if (contextType == DsonContextType.OBJECT || contextType == DsonContextType.HEADER) {
-                if (textWriter != null) { // 避免装箱
-                    output.WriteString(textWriter._context.curName);
+                if (TextWriter != null) { // 避免装箱
+                    output.WriteString(TextWriter._context.curName);
                 }
                 else {
-                    output.WriteUint32(binWriter!._context.curName);
+                    output.WriteUint32(BinWriter!._context.curName);
                 }
             }
         }

@@ -26,10 +26,10 @@ public class LineInfo
     public const int STATE_EOF = 3;
 
     /** 行号 */
-    public readonly int ln;
+    public readonly int Ln;
 
     /** 行全局起始位置， 0-based */
-    public readonly int startPos;
+    public readonly int StartPos;
     /**
      * 行结束位置（全局），0-based
      * 1.如果换行符是\r\n，则是\n的位置；
@@ -37,38 +37,38 @@ public class LineInfo
      * 3.eof的情况下，是最后一个字符的位置 --换行结束的情况下，eof出现在读取下一行的时候
      * 4.start和end相等时表示空行；
      */
-    public int endPos;
+    public int EndPos;
     /** 行在字符流中的状态 -- endPos是否到达行尾 */
-    public int state = STATE_SCAN;
+    public int State = STATE_SCAN;
 
     /** 行首类型 */
-    public readonly LheadType lheadType;
+    public readonly LheadType LheadType;
     /**
      * 内容全局起始位置 -- -1表示无内容
      * 由于文件可能是没有行首的，因此不能记录行首的开始位置;
      */
-    public readonly int contentStartPos;
+    public readonly int ContentStartPos;
 
     public LineInfo(int ln, int startPos, int endPos, LheadType lheadType, int contentStartPos) {
-        this.ln = ln;
-        this.startPos = startPos;
-        this.endPos = endPos;
-        this.lheadType = lheadType;
-        this.contentStartPos = contentStartPos;
+        this.Ln = ln;
+        this.StartPos = startPos;
+        this.EndPos = endPos;
+        this.LheadType = lheadType;
+        this.ContentStartPos = contentStartPos;
     }
 
     /** 当前行是否已扫描完成 */
-    public bool isScanCompleted() {
-        return state != STATE_SCAN;
+    public bool IsScanCompleted() {
+        return State != STATE_SCAN;
     }
 
     /** 最后一个可读取的位置 */
-    public int lastReadablePosition() {
-        return lastReadablePosition(state, endPos);
+    public int LastReadablePosition() {
+        return LastReadablePosition(State, EndPos);
     }
 
     /** 最后一个可读取的位置 -- 不包含换行符；可能小于startPos */
-    public static int lastReadablePosition(int state, int endPos) {
+    public static int LastReadablePosition(int state, int endPos) {
         if (state == STATE_LF) {
             return endPos - 1;
         }
@@ -78,42 +78,40 @@ public class LineInfo
         return endPos;
     }
 
-    public bool hasContent() {
-        return contentStartPos != -1;
+    /** 当前行是否有内容 */
+    public bool HasContent() {
+        return ContentStartPos != -1;
     }
 
-    public int lineLength() {
-        if (endPos < startPos) {
+    /** 当前已扫描部分长度 */
+    public int LineLength() {
+        if (EndPos < StartPos) {
             return 0;
         }
-        return endPos - startPos + 1;
+        return EndPos - StartPos + 1;
     }
 
-    public LheadType getLheadType() {
-        return lheadType;
-    }
-
-    public int getContentStartPos() {
-        return contentStartPos;
-    }
+    #region equals
 
     public override bool Equals(Object o) {
         return this == o;
     }
 
     public override int GetHashCode() {
-        return ln;
+        return Ln;
     }
+
+    #endregion
 
     public override string ToString() {
         return new StringBuilder(64)
             .Append("LineInfo{")
-            .Append("ln=").Append(ln)
-            .Append(", startPos=").Append(startPos)
-            .Append(", endPos=").Append(endPos)
-            .Append(", state=").Append(state)
-            .Append(", lheadType=").Append(lheadType)
-            .Append(", contentStartPos=").Append(contentStartPos)
+            .Append("ln=").Append(Ln)
+            .Append(", startPos=").Append(StartPos)
+            .Append(", endPos=").Append(EndPos)
+            .Append(", state=").Append(State)
+            .Append(", lheadType=").Append(LheadType)
+            .Append(", contentStartPos=").Append(ContentStartPos)
             .Append('}').ToString();
     }
 }

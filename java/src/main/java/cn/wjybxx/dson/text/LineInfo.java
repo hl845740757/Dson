@@ -85,23 +85,17 @@ public class LineInfo {
         return endPos;
     }
 
+    /** 当前行是否有内容 */
     public boolean hasContent() {
         return contentStartPos != -1;
     }
 
+    /** 当前已扫描部分长度 */
     public int lineLength() {
         if (endPos < startPos) {
             return 0;
         }
         return endPos - startPos + 1;
-    }
-
-    public LheadType getLheadType() {
-        return lheadType;
-    }
-
-    public int getContentStartPos() {
-        return contentStartPos;
     }
 
     @Override

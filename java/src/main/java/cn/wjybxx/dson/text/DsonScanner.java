@@ -31,7 +31,7 @@ public class DsonScanner implements AutoCloseable {
     private static final List<DsonTokenType> STRING_TOKEN_TYPES = List.of(DsonTokenType.STRING, DsonTokenType.UNQUOTE_STRING);
 
     private DsonCharStream buffer;
-    private StringBuilder pooldStringBuilder = new StringBuilder(64);
+    private StringBuilder pooledStringBuilder = new StringBuilder(64);
     private final char[] hexBuffer = new char[4];
 
     public DsonScanner(DsonCharStream buffer) {
@@ -44,8 +44,8 @@ public class DsonScanner implements AutoCloseable {
             buffer.close();
             buffer = null;
         }
-        if (pooldStringBuilder != null) {
-            pooldStringBuilder = null;
+        if (pooledStringBuilder != null) {
+            pooledStringBuilder = null;
         }
     }
 
@@ -106,10 +106,6 @@ public class DsonScanner implements AutoCloseable {
                 position, expected, tokenType));
     }
 
-    private static DsonParseException invalidInput(int c, int position) {
-        return new DsonParseException(String.format("Invalid Dson input. Position: %d. Character: '%c'.", position, c));
-    }
-
     private static DsonParseException invalidClassName(String c, int position) {
         return new DsonParseException(String.format("Invalid className. Position: %d. ClassName: '%s'.", position, c));
     }
@@ -123,8 +119,8 @@ public class DsonScanner implements AutoCloseable {
     }
 
     private StringBuilder allocStringBuilder() {
-        pooldStringBuilder.setLength(0);
-        return pooldStringBuilder;
+        pooledStringBuilder.setLength(0);
+        return pooledStringBuilder;
     }
 
     private int getPosition() {

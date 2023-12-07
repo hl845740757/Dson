@@ -29,7 +29,7 @@ public interface DsonCharStream : IDisposable
     /// 
     /// </summary>
     /// <returns>下一字符或事件</returns>
-    int read();
+    int Read();
 
     //
     /// <summary>
@@ -42,12 +42,12 @@ public interface DsonCharStream : IDisposable
     /// 3.position不一定是减1，与换行符和行首前的缩进相关
     /// </summary>
     /// <returns>事件</returns>
-    int unread();
+    int Unread();
 
     /// <summary>
     /// 跳过当前行，下次读取时产生换行或eof
     /// </summary>
-    void skipLine();
+    void SkipLine();
 
     /// <summary>
     /// 当前已读位置
@@ -55,24 +55,25 @@ public interface DsonCharStream : IDisposable
     /// 2.有效值0-base，第1行第1个字符位置为0 -- 我们更需要当前位置而不是下一个位置
     /// 3.换行时position可能不连续，如果换行符是\r\n
     /// </summary>
-    /// <returns></returns>
-    int getPosition();
-
+    /// <value></value>
+    int Position { get; }
 
     /// <summary>
     /// 获取当前行数据
     /// </summary>
-    /// <returns></returns>
-    LineInfo? getCurLine();
+    /// <value></value>
+    LineInfo? CurLine { get; }
 
     /// <summary>
     /// 获取行首
     /// </summary>
-    /// <returns></returns>
-    LheadType getLhead() {
-        LineInfo curLine = getCurLine();
-        if (curLine == null) throw new InvalidOperationException("read must be called before lhead");
-        return curLine.lheadType;
+    /// <value></value>
+    LheadType Lhead {
+        get {
+            LineInfo curLine = CurLine;
+            if (curLine == null) throw new InvalidOperationException("read must be called before lhead");
+            return curLine.LheadType;
+        }
     }
 
     /**
@@ -80,41 +81,42 @@ public interface DsonCharStream : IDisposable
   * 1.初始0，表示尚未开始
   * 2.初始行号可能不为1，部分输入流可能是截断的
   */
-    int getLn() {
-        LineInfo curLine = getCurLine();
-        return curLine == null ? 0 : curLine.ln;
+    int Ln {
+        get {
+            LineInfo curLine = CurLine;
+            return curLine == null ? 0 : curLine.Ln;
+        }
     }
 
-    /**
-  * 丢弃指定位置之前的缓存
-  * 该接口用于外部告诉Buffer可以安全的丢弃不再读取字符位置。
-  * 注意：并不是只有调用该接口的时候才触发丢弃字符，Stream为了控制内存在{@link #read()}的时候是可能丢弃字符的。
-  *
-  * @param position 已读取位置，该位置的字符需要保留；position可能是一个估测值，因此position小于等于0则不处理
-  */
-    void discardReadChars(int position) {
+    /// <summary>
+    /// 丢弃指定位置之前的缓存
+    /// 该接口用于外部告诉Buffer可以安全的丢弃不再读取字符位置
+    /// 注意：并不是只有调用该接口的时候才触发丢弃字符，Stream为了控制内存在{@link #read()}的时候是可能丢弃字符的。
+    /// </summary>
+    /// <param name="position">已读取位置，该位置的字符需要保留；position可能是一个估测值，因此position小于等于0则不处理</param>
+    void DiscardReadChars(int position) {
 //        assert position <= getPosition();
     }
 
     #region 工厂方法
 
-    public static DsonCharStream newCharStream(string dsonString) {
+    public static DsonCharStream NewCharStream(string dsonString) {
         return new StringCharStream(dsonString, DsonMode.STANDARD);
     }
 
-    public static DsonCharStream newCharStream(string dsonString, DsonMode dsonMode) {
+    public static DsonCharStream NewCharStream(string dsonString, DsonMode dsonMode) {
         return new StringCharStream(dsonString, dsonMode);
     }
 
-    public static DsonCharStream newBufferedCharStream(StreamReader reader) {
+    public static DsonCharStream NewBufferedCharStream(StreamReader reader) {
         return new BufferedCharStream(reader, DsonMode.STANDARD);
     }
 
-    public static DsonCharStream newBufferedCharStream(StreamReader reader, DsonMode dsonMode) {
+    public static DsonCharStream NewBufferedCharStream(StreamReader reader, DsonMode dsonMode) {
         return new BufferedCharStream(reader, dsonMode);
     }
 
-    public static DsonCharStream newBufferedCharStream(StreamReader reader, DsonMode dsonMode, int bufferSize, bool autoClose) {
+    public static DsonCharStream NewBufferedCharStream(StreamReader reader, DsonMode dsonMode, int bufferSize, bool autoClose) {
         return new BufferedCharStream(reader, dsonMode, bufferSize, autoClose);
     }
 

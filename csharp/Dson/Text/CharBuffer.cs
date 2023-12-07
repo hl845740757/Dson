@@ -20,78 +20,75 @@ namespace Dson.Text;
 
 internal class CharBuffer
 {
-    internal char[] buffer;
-    internal int ridx;
-    internal int widx;
+    internal char[] Buffer;
+    internal int Ridx;
+    internal int Widx;
 
     internal CharBuffer(int length) {
-        this.buffer = new char[length];
+        this.Buffer = new char[length];
     }
 
     internal CharBuffer(char[] buffer) {
-        this.buffer = buffer ?? throw new ArgumentNullException(nameof(buffer));
+        this.Buffer = buffer ?? throw new ArgumentNullException(nameof(buffer));
     }
 
-    public int capacity() {
-        return buffer.Length;
-    }
+    public int Capacity => Buffer.Length;
 
-    public bool isReadable() {
-        return ridx < widx;
-    }
+    public bool IsReadable => Ridx < Widx;
 
-    public bool isWritable() {
-        return widx < buffer.Length;
-    }
+    public bool IsWritable => Widx < Buffer.Length;
 
-    public int writableChars() {
-        return buffer.Length - widx;
-    }
+    public int WritableChars => Buffer.Length - Widx;
 
-    public int readableChars() {
-        return Math.Max(0, widx - ridx);
+    public int ReadableChars => Math.Max(0, Widx - Ridx);
+
+    /** Length为可读字节数 */
+    public int Length => Math.Max(0, Widx - Ridx);
+
+    public char CharAt(int index) {
+        return Buffer[Ridx + index];
     }
 
     #region 读写
 
-    public char read() {
-        if (ridx == widx) throw new InternalBufferOverflowException();
-        return buffer[ridx++];
+    public char Read() {
+        if (Ridx == Widx) throw new InternalBufferOverflowException();
+        return Buffer[Ridx++];
     }
 
-    public void unread() {
-        if (ridx == 0) throw new InternalBufferOverflowException();
-        ridx--;
+    public void Unread() {
+        if (Ridx == 0) throw new InternalBufferOverflowException();
+        Ridx--;
     }
 
-    public void write(char c) {
-        if (widx == buffer.Length) {
+    public void Write(char c) {
+        if (Widx == Buffer.Length) {
             throw new InternalBufferOverflowException();
         }
-        buffer[widx++] = c;
+        Buffer[Widx++] = c;
     }
 
-    public void write(char[] chars) {
+    public void Write(char[] chars) {
         if (chars.Length == 0) {
             return;
         }
-        if (widx + chars.Length > buffer.Length) {
+        if (Widx + chars.Length > Buffer.Length) {
             throw new InternalBufferOverflowException();
         }
-        Array.Copy(chars, 0, buffer, widx, chars.Length);
-        widx += chars.Length;
+        Array.Copy(chars, 0, Buffer, Widx, chars.Length);
+        Widx += chars.Length;
     }
 
-    public void write(char[] chars, int offset, int len) {
+    public void Write(char[] chars, int offset, int len) {
         if (len == 0) {
             return;
         }
         BinaryUtils.CheckBuffer(chars.Length, offset, len);
-        if (widx + len > buffer.Length) {
+        if (Widx + len > Buffer.Length) {
             throw new InternalBufferOverflowException();
         }
-        Array.Copy(chars, offset, buffer, widx, len);
-        widx += len;
+        Array.Copy(chars, offset, Buffer, Widx, len);
+        Widx += len;
     }
 
     /**
@@ -100,13 +97,13 @@ internal class CharBuffer
      *
      * @return 写入的字符数；返回0时可能是因为当前buffer已满，或给定的buffer无可读字符
      */
-    public int write(CharBuffer charBuffer) {
-        int n = Math.Min(writableChars(), charBuffer.readableChars());
+    public int Write(CharBuffer charBuffer) {
+        int n = Math.Min(WritableChars, charBuffer.ReadableChars);
         if (n == 0) {
             return 0;
         }
-        write(charBuffer.buffer, charBuffer.ridx, n);
-        charBuffer.addRidx(n);
+        Write(charBuffer.Buffer, charBuffer.Ridx, n);
+        charBuffer.AddRidx(n);
         return n;
     }
 
@@ -114,88 +111,80 @@ internal class CharBuffer
 
     #region 索引调整
 
-    public void addRidx(int count) {
-        setRidx(ridx + count);
+    public void AddRidx(int count) {
+        SetRidx(Ridx + count);
     }
 
-    public void addWidx(int count) {
-        setWidx(widx + count);
+    public void AddWidx(int count) {
+        SetWidx(Widx + count);
     }
 
-    public void setRidx(int ridx) {
+    public void SetRidx(int ridx) {
+        if (ridx < 0 || ridx > Widx) {
+            throw new ArgumentException("ridx overflow");
+        }
+        this.Ridx = ridx;
+    }
+
+    public void SetWidx(int widx) {
+        if (widx < Ridx || widx > Buffer.Length) {
+            throw new ArgumentException("widx overflow");
+        }
+        this.Widx = widx;
+    }
+
+    public void SetIndexes(int ridx, int widx) {
         if (ridx < 0 || ridx > widx) {
             throw new ArgumentException("ridx overflow");
         }
-        this.ridx = ridx;
-    }
-
-    public void setWidx(int widx) {
-        if (widx < ridx || widx > buffer.Length) {
+        if (widx > Buffer.Length) {
             throw new ArgumentException("widx overflow");
         }
-        this.widx = widx;
-    }
-
-    public void setIndexes(int ridx, int widx) {
-        if (ridx < 0 || ridx > widx) {
-            throw new ArgumentException("ridx overflow");
-        }
-        if (widx > buffer.Length) {
-            throw new ArgumentException("widx overflow");
-        }
-        this.ridx = ridx;
-        this.widx = widx;
+        this.Ridx = ridx;
+        this.Widx = widx;
     }
 
     #endregion
 
     #region 容量调整
 
-    public void shift(int shiftCount) {
+    public void Shift(int shiftCount) {
         if (shiftCount <= 0) {
             return;
         }
-        if (shiftCount >= buffer.Length) {
-            ridx = 0;
-            widx = 0;
+        if (shiftCount >= Buffer.Length) {
+            Ridx = 0;
+            Widx = 0;
         }
         else {
-            Array.Copy(buffer, shiftCount, buffer, 0, buffer.Length - shiftCount);
-            ridx = Math.Max(0, ridx - shiftCount);
-            widx = Math.Max(0, widx - shiftCount);
+            Array.Copy(Buffer, shiftCount, Buffer, 0, Buffer.Length - shiftCount);
+            Ridx = Math.Max(0, Ridx - shiftCount);
+            Widx = Math.Max(0, Widx - shiftCount);
         }
     }
 
-    public void grow(int capacity) {
-        char[] buffer = this.buffer;
+    public void Grow(int capacity) {
+        char[] buffer = this.Buffer;
         if (capacity <= buffer.Length) {
             return;
         }
-        this.buffer = DsonInternals.CopyOf(this.buffer, capacity);
+        this.Buffer = DsonInternals.CopyOf(this.Buffer, capacity);
     }
 
     #endregion
 
-    public int length() {
-        return Math.Max(0, widx - ridx);
-    }
-
-    public char charAt(int index) {
-        return buffer[ridx + index];
-    }
-
-    public String toString() {
+    public override string ToString() {
         return "CharBuffer{" +
-               "buffer='" + encodeBuffer() + "'" +
-               ", ridx=" + ridx +
-               ", widx=" + widx +
+               "buffer='" + EncodeBuffer() + "'" +
+               ", ridx=" + Ridx +
+               ", widx=" + Widx +
                '}';
     }
 
-    private String encodeBuffer() {
-        if (ridx >= widx) {
+    private string EncodeBuffer() {
+        if (Ridx >= Widx) {
             return "";
         }
-        return new String(buffer, ridx, Math.Max(0, widx - ridx));
+        return new string(Buffer, Ridx, Math.Max(0, Widx - Ridx));
     }
 }

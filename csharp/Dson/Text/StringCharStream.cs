@@ -13,37 +13,37 @@ class StringCharStream : AbstractCharStream
         _buffer = null;
     }
 
-    protected override bool isClosed() {
+    protected override bool IsClosed() {
         return _buffer == null;
     }
 
-    protected override int charAt(LineInfo curLine, int position) {
+    protected override int CharAt(LineInfo curLine, int position) {
         return _buffer![position];
     }
 
-    protected override void checkUnreadOverFlow(int position) {
+    protected override void CheckUnreadOverFlow(int position) {
         if (position < 0 || position >= _buffer!.Length) {
-            throw bufferOverFlow(position);
+            throw BufferOverFlow(position);
         }
     }
 
-    protected override void scanMoreChars(LineInfo line) {
+    protected override void ScanMoreChars(LineInfo line) {
     }
 
-    protected override bool scanNextLine() {
+    protected override bool ScanNextLine() {
         string buffer = this._buffer;
         int bufferLength = buffer.Length;
 
-        LineInfo curLine = getCurLine();
+        LineInfo curLine = CurLine;
         int startPos;
         int ln;
         if (curLine == null) {
-            ln = getStartLn();
+            ln = GetStartLn();
             startPos = 0;
         }
         else {
-            ln = curLine.ln + 1;
-            startPos = curLine.endPos + 1;
+            ln = curLine.Ln + 1;
+            startPos = curLine.EndPos + 1;
         }
         if (startPos >= bufferLength) {
             return false;
@@ -82,7 +82,7 @@ class StringCharStream : AbstractCharStream
 
         LheadType? lheadType = LheadType.COMMENT;
         int contentStartPos = -1;
-        int lastReadablePos = LineInfo.lastReadablePosition(state, endPos);
+        int lastReadablePos = LineInfo.LastReadablePosition(state, endPos);
         if (DsonMode == DsonMode.RELAXED) {
             if (startPos <= lastReadablePos) {
                 lheadType = LheadType.APPEND;
@@ -107,7 +107,7 @@ class StringCharStream : AbstractCharStream
             }
         }
         LineInfo tempLine = new LineInfo(ln, startPos, endPos, lheadType.Value, contentStartPos);
-        tempLine.state = state;
+        tempLine.State = state;
         AddLine(tempLine);
         return true;
     }
