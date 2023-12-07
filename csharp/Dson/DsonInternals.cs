@@ -16,7 +16,7 @@
 
 namespace Dson;
 
-public static class DsonInternals
+internal static class DsonInternals
 {
     //c#居然没有一开始就支持逻辑右移...C#11提供了逻辑右移，但目前.NET6是主流
     public static int LogicalShiftRight(int val, int offset) {
@@ -45,10 +45,10 @@ public static class DsonInternals
         if (typeof(TName) == typeof(string)) {
             return true;
         }
-        if (typeof(TName) == typeof(int)) {
+        if (typeof(TName) == typeof(FieldNumber)) {
             return false;
         }
-        throw new InvalidCastException("Cant cast TName to string or int, type: " + typeof(TName));
+        throw new InvalidCastException("Cant cast TName to string or FieldNumber, type: " + typeof(TName));
     }
 
     #region 集合Util

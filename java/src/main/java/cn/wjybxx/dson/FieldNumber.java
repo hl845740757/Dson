@@ -51,17 +51,13 @@ public final class FieldNumber implements Comparable<FieldNumber> {
         return new IllegalArgumentException(String.format("invalid idep:%d or lnumber:%d", lnumber, idep));
     }
 
-    public static FieldNumber of(int idep, int lnumber) {
-        return new FieldNumber((byte) idep, lnumber);
+    public static FieldNumber ofLnumber(int lnumber) {
+        return new FieldNumber((byte) 0, lnumber);
     }
 
     public static FieldNumber ofFullNumber(int fullNumber) {
         return new FieldNumber(DsonLites.idepOfFullNumber(fullNumber),
                 DsonLites.lnumberOfFullNumber(fullNumber));
-    }
-
-    public static FieldNumber ofLnumber(int lnumber) {
-        return new FieldNumber((byte) 0, lnumber);
     }
 
     /**

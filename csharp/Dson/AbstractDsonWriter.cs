@@ -24,8 +24,6 @@ namespace Dson;
 public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName> where TName : IEquatable<TName>
 {
     protected readonly DsonWriterSettings Settings;
-    protected readonly AbstractDsonWriter<string>? TextWriter;
-    protected readonly AbstractDsonWriter<int>? BinWriter;
 
 #nullable disable
     internal Context _context;
@@ -35,14 +33,6 @@ public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName> where TName
 
     protected AbstractDsonWriter(DsonWriterSettings settings) {
         this.Settings = settings;
-        if (DsonInternals.IsStringKey<TName>()) {
-            TextWriter = this as AbstractDsonWriter<string>;
-            BinWriter = null;
-        }
-        else {
-            TextWriter = null;
-            BinWriter = this as AbstractDsonWriter<int>;
-        }
     }
 
     public DsonWriterSettings WriterSettings => Settings;

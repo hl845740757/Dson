@@ -45,7 +45,7 @@ public static class BinaryUtils
     public static int ToUint(byte value) {
         return value;
     }
-    
+
     #region 大端编码
 
     public static byte GetByte(byte[] buffer, int index) {

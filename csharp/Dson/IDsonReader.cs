@@ -20,11 +20,10 @@ using Google.Protobuf;
 namespace Dson;
 
 /// <summary>
-/// 1.读取数组内普通成员时，name传null，读取嵌套对象时使用无name参数的方法
-/// 2.如果先调用了{@link #readName()}，name传null或之前读取的值
-/// 3.Name为int时表示<see cref="FieldNumber"/>中的完整编号
+/// 1. 读取数组内普通成员时，name传null或零值，读取嵌套对象时使用无name参数的方法
+/// 2. 如果先调用了{@link #readName()}，name传之前读取的值
 /// </summary>
-/// <typeparam name="TName">name的类型，int或string</typeparam>
+/// <typeparam name="TName">name的类型，string或<see cref="FieldNumber"/></typeparam>
 public interface IDsonReader<TName> : IDisposable where TName : IEquatable<TName>
 {
     #region Ctx

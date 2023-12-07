@@ -24,8 +24,6 @@ namespace Dson;
 public abstract class AbstractDsonReader<TName> : IDsonReader<TName> where TName : IEquatable<TName>
 {
     protected readonly DsonReaderSettings Settings;
-    protected readonly AbstractDsonReader<string>? TextReader;
-    protected readonly AbstractDsonReader<int>? BinReader;
 
 #nullable disable
     internal Context _context;
@@ -40,14 +38,6 @@ public abstract class AbstractDsonReader<TName> : IDsonReader<TName> where TName
 
     protected AbstractDsonReader(DsonReaderSettings settings) {
         Settings = settings;
-        if (DsonInternals.IsStringKey<TName>()) {
-            this.TextReader = this as AbstractDsonReader<string>;
-            this.BinReader = null;
-        }
-        else {
-            this.TextReader = null;
-            this.BinReader = this as AbstractDsonReader<int>;
-        }
     }
 
     public DsonReaderSettings ReaderSettings => Settings;

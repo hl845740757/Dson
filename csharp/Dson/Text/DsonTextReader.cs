@@ -27,7 +27,7 @@ public class DsonTextReader : AbstractDsonReader<string>
         this.scanner = scanner ?? throw new ArgumentNullException(nameof(scanner));
     }
 
-    
+
     protected override Context GetContext() {
         return (Context)_context;
     }

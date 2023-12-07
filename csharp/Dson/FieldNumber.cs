@@ -24,19 +24,17 @@ namespace Dson;
 /// 1.Dson最初是为序列化设计的，是支持继承的。
 /// 2.完整编号不可直接比较，需要调用这里提供的静态比较方法
 /// </summary>
-public struct FieldNumber : IEquatable<FieldNumber>, IComparable<FieldNumber>, IComparable
+public readonly struct FieldNumber : IEquatable<FieldNumber>, IComparable<FieldNumber>, IComparable
 {
-    public static readonly FieldNumber Zero = new FieldNumber(0, 0);
+    public static readonly FieldNumber Zero = new FieldNumber(0);
+
+    private readonly int _fullNumber;
 
     /// <summary>
-    /// 继承深度
+    /// 
     /// </summary>
-    public readonly byte Idep;
-    /// <summary>
-    /// 字段本地编码
-    /// </summary>
-    public readonly int Lnumber;
-
+    /// <param name="idep">继承深度</param>
+    /// <param name="lnumber">字段本地编号</param>
     public FieldNumber(byte idep, int lnumber) {
         if (idep > Dsons.IDEP_MAX_VALUE) {
             throw InvalidArgs(idep, lnumber);
@@ -44,8 +42,11 @@ public struct FieldNumber : IEquatable<FieldNumber>, IComparable<FieldNumber>, I
         if (lnumber < 0) {
             throw InvalidArgs(idep, lnumber);
         }
-        this.Idep = idep;
-        this.Lnumber = lnumber;
+        this._fullNumber = Dsons.MakeFullNumber(idep, lnumber);
+    }
+
+    private FieldNumber(int fullNumber) {
+        this._fullNumber = fullNumber;
     }
 
     private static Exception InvalidArgs(int idep, int lnumber) {
@@ -53,23 +54,24 @@ public struct FieldNumber : IEquatable<FieldNumber>, IComparable<FieldNumber>, I
     }
 
     /// <summary>
+    /// 继承深度
+    /// </summary>
+    public byte Idep => Dsons.IdepOfFullNumber(_fullNumber);
+    /// <summary>
+    /// 字段本地编码
+    /// </summary>
+    public int Lnumber => Dsons.LnumberOfFullNumber(_fullNumber);
+
+    /// <summary>
     /// 字段的完整编号
     /// 注意：完整编号不可直接比较，需要调用这里提供的静态比较方法
     /// </summary>
-    public int FullNumber => Dsons.MakeFullNumber(Idep, Lnumber);
-
-
-    public static FieldNumber Of(int idep, int lnumber) {
-        if (idep < 0 || idep > byte.MaxValue) {
-            throw InvalidArgs(idep, lnumber);
-        }
-        return new FieldNumber((byte)idep, lnumber);
-    }
+    public int FullNumber => _fullNumber;
 
     /// <summary>
     /// 通过字段本地编号创建结构，默认继承深度0
     /// </summary>
-    /// <param name="lnumber"></param>
+    /// <param name="lnumber">字段本地编号</param>
     /// <returns></returns>
     public static FieldNumber OfLnumber(int lnumber) {
         return new FieldNumber(0, lnumber);
@@ -78,10 +80,10 @@ public struct FieldNumber : IEquatable<FieldNumber>, IComparable<FieldNumber>, I
     /// <summary>
     /// 通过字段的完整编号创建结构
     /// </summary>
-    /// <param name="fullNumber"></param>
+    /// <param name="fullNumber">字段完整编号</param>
     /// <returns></returns>
     public static FieldNumber OfFullNumber(int fullNumber) {
-        return new FieldNumber(Dsons.IdepOfFullNumber(fullNumber), Dsons.LnumberOfFullNumber(fullNumber));
+        return new FieldNumber(fullNumber);
     }
 
     /// <summary>

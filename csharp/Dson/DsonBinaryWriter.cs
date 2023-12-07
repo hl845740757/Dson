@@ -24,9 +24,19 @@ namespace Dson;
 public class DsonBinaryWriter<TName> : AbstractDsonWriter<TName> where TName : IEquatable<TName>
 {
     private IDsonOutput _output;
+    private readonly AbstractDsonWriter<string>? _textWriter;
+    private readonly AbstractDsonWriter<FieldNumber>? _binWriter;
 
     public DsonBinaryWriter(DsonWriterSettings settings, IDsonOutput output) : base(settings) {
         this._output = output;
+        if (DsonInternals.IsStringKey<TName>()) {
+            _textWriter = this as AbstractDsonWriter<string>;
+            _binWriter = null;
+        }
+        else {
+            _textWriter = null;
+            _binWriter = this as AbstractDsonWriter<FieldNumber>;
+        }
     }
 
     protected override Context GetContext() {
@@ -56,11 +66,11 @@ public class DsonBinaryWriter<TName> : AbstractDsonWriter<TName> where TName : I
         if (dsonType != DsonType.HEADER) { // header是匿名属性
             DsonContextType contextType = this.ContextType;
             if (contextType == DsonContextType.OBJECT || contextType == DsonContextType.HEADER) {
-                if (TextWriter != null) { // 避免装箱
-                    output.WriteString(TextWriter._context.curName);
+                if (_textWriter != null) { // 避免装箱
+                    output.WriteString(_textWriter._context.curName);
                 }
                 else {
-                    output.WriteUint32(BinWriter!._context.curName);
+                    output.WriteUint32(_binWriter!._context.curName.FullNumber);
                 }
             }
         }

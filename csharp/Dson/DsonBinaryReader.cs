@@ -23,9 +23,19 @@ namespace Dson;
 public class DsonBinaryReader<TName> : AbstractDsonReader<TName> where TName : IEquatable<TName>
 {
     private IDsonInput _input;
+    private readonly AbstractDsonReader<string>? _textReader;
+    private readonly AbstractDsonReader<FieldNumber>? _binReader;
 
     public DsonBinaryReader(DsonReaderSettings settings, IDsonInput input) : base(settings) {
         this._input = input;
+        if (DsonInternals.IsStringKey<TName>()) {
+            this._textReader = this as AbstractDsonReader<string>;
+            this._binReader = null;
+        }
+        else {
+            this._textReader = null;
+            this._binReader = this as AbstractDsonReader<FieldNumber>;
+        }
     }
 
     protected override Context GetContext() {
@@ -72,15 +82,15 @@ public class DsonBinaryReader<TName> : AbstractDsonReader<TName> where TName : I
     }
 
     protected override void doReadName() {
-        if (TextReader != null) {
+        if (_textReader != null) {
             string filedName = _input.ReadString();
             if (Settings.enableFieldIntern) {
                 filedName = Dsons.InternField(filedName);
             }
-            TextReader.currentName = filedName;
+            _textReader.currentName = filedName;
         }
         else {
-            BinReader!.currentName = _input.ReadUint32();
+            _binReader!.currentName = FieldNumber.OfFullNumber(_input.ReadUint32());
         }
     }
 
@@ -176,7 +186,7 @@ public class DsonBinaryReader<TName> : AbstractDsonReader<TName> where TName : I
     #region 特殊
 
     protected override void doSkipName() {
-        if (TextReader != null) {
+        if (_textReader != null) {
             // 避免构建字符串
             int size = _input.ReadUint32();
             if (size > 0) {
