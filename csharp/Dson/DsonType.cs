@@ -69,12 +69,12 @@ public enum DsonType
     OBJECT = 31,
 }
 
-public static class DsonTypeExt
+public static class DsonTypes
 {
     private static readonly IList<DsonType> LOOK_UP;
     public static readonly DsonType INVALID = (DsonType)(-1);
 
-    static DsonTypeExt() {
+    static DsonTypes() {
         LOOK_UP = new List<DsonType>((int)DsonType.OBJECT + 1);
         foreach (var dsonType in Enum.GetValues<DsonType>()) {
             LOOK_UP[(int)dsonType] = dsonType;

@@ -51,6 +51,31 @@ internal static class DsonInternals
         throw new InvalidCastException("Cant cast TName to string or FieldNumber, type: " + typeof(TName));
     }
 
+    #region datetime
+
+    internal const long TicksPerMillisecond = 10000;
+    internal const long TicksPerSecond = TicksPerMillisecond * 1000;
+
+    /// <summary>
+    /// 转unix秒时间戳
+    /// </summary>
+    /// <param name="dateTime"></param>
+    /// <returns></returns>
+    public static long ToEpochSeconds(this DateTime dateTime) {
+        return (long)dateTime.Subtract(DateTime.UnixEpoch).TotalSeconds;
+    }
+
+    /// <summary>
+    /// 转Unix毫秒时间戳
+    /// </summary>
+    /// <param name="dateTime"></param>
+    /// <returns></returns>
+    public static long ToEpochMillis(this DateTime dateTime) {
+        return (long)dateTime.Subtract(DateTime.UnixEpoch).TotalMilliseconds;
+    }
+
+    #endregion
+
     #region 集合Util
 
     public static IDictionary<TK, DsonValue> NewLinkedDictionary<TK>(int capacity = 0) {

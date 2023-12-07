@@ -30,7 +30,7 @@ public abstract class AbstractDsonReader<TName> : IDsonReader<TName> where TName
     private Context _pooledContext; // 一个额外的缓存，用于写集合等减少上下文创建
 
     protected internal int recursionDepth; // 这些值放外面，不需要上下文隔离，但需要能恢复
-    protected internal DsonType currentDsonType = DsonTypeExt.INVALID;
+    protected internal DsonType currentDsonType = DsonTypes.INVALID;
     protected internal WireType currentWireType;
     protected internal int currentWireTypeBits;
     protected internal TName currentName;
@@ -69,7 +69,7 @@ public abstract class AbstractDsonReader<TName> : IDsonReader<TName> where TName
 
     public DsonType CurrentDsonType {
         get {
-            if (currentDsonType == DsonTypeExt.INVALID) {
+            if (currentDsonType == DsonTypes.INVALID) {
                 Debug.Assert(_context.contextType == DsonContextType.TOP_LEVEL);
                 throw invalidState(DsonInternals.NewList(DsonReaderState.NAME, DsonReaderState.VALUE));
             }
@@ -184,7 +184,7 @@ public abstract class AbstractDsonReader<TName> : IDsonReader<TName> where TName
                 throw invalidState(DsonInternals.NewList(DsonReaderState.VALUE));
             }
         }
-        if (requiredType != DsonTypeExt.INVALID && currentDsonType != requiredType) {
+        if (requiredType != DsonTypes.INVALID && currentDsonType != requiredType) {
             throw DsonIOException.dsonTypeMismatch(requiredType, currentDsonType);
         }
     }
@@ -478,7 +478,7 @@ public abstract class AbstractDsonReader<TName> : IDsonReader<TName> where TName
     }
 
     public byte[] ReadValueAsBytes(TName name) {
-        advanceToValueState(name, DsonTypeExt.INVALID);
+        advanceToValueState(name, DsonTypes.INVALID);
         DsonReaderUtils.checkReadValueAsBytes(currentDsonType);
         byte[] data = doReadValueAsBytes();
         setNextState();
@@ -512,7 +512,7 @@ public abstract class AbstractDsonReader<TName> : IDsonReader<TName> where TName
 #nullable disable
         protected internal Context parent;
         protected internal DsonContextType contextType;
-        protected internal DsonType dsonType = DsonTypeExt.INVALID;
+        protected internal DsonType dsonType = DsonTypes.INVALID;
         protected internal DsonReaderState state = DsonReaderState.INITIAL;
         protected internal TName name;
         protected internal object userData;
@@ -530,7 +530,7 @@ public abstract class AbstractDsonReader<TName> : IDsonReader<TName> where TName
         public virtual void reset() {
             parent = null;
             contextType = default;
-            dsonType = DsonTypeExt.INVALID;
+            dsonType = DsonTypes.INVALID;
             state = default;
             name = default;
             userData = null;

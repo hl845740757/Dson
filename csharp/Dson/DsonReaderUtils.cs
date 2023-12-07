@@ -352,7 +352,7 @@ public class DsonReaderUtils
     public static void writeRef(IDsonOutput output, ObjectRef objectRef) {
         output.WriteString(objectRef.LocalId);
         if (objectRef.hasNamespace) {
-            output.WriteString(objectRef.Namespace);
+            output.WriteString(objectRef.Ns);
         }
         if (objectRef.Type != 0) {
             output.WriteUint32(objectRef.Type);

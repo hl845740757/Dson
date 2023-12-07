@@ -33,7 +33,7 @@ public class DsonObjectWriter<TName> : AbstractDsonWriter<TName> where TName : I
         if (outList == null) throw new ArgumentNullException(nameof(outList));
         // 顶层输出是一个数组
         Context context = new Context();
-        context.init(null, DsonContextType.TOP_LEVEL, DsonTypeExt.INVALID);
+        context.init(null, DsonContextType.TOP_LEVEL, DsonTypes.INVALID);
         context.Container = outList;
         SetContext(context);
     }

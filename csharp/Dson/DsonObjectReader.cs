@@ -30,7 +30,7 @@ public class DsonObjectReader<TName> : AbstractDsonReader<TName> where TName : I
     public DsonObjectReader(DsonReaderSettings settings, DsonArray<TName> dsonArray)
         : base(settings) {
         Context context = new Context();
-        context.init(null, DsonContextType.TOP_LEVEL, DsonTypeExt.INVALID);
+        context.init(null, DsonContextType.TOP_LEVEL, DsonTypes.INVALID);
         context.ArrayIterator = new MarkableIterator<DsonValue>(dsonArray.GetEnumerator());
         SetContext(context);
     }

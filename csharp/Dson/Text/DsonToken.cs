@@ -18,10 +18,11 @@ namespace Dson.Text;
 
 public class DsonToken : IEquatable<DsonToken>
 {
+#nullable disable
     public readonly DsonTokenType Type;
-    public readonly object? Value;
+    public readonly object Value;
     public readonly int Pos;
-
+#nullable enable
     /// <summary>
     /// 
     /// </summary>

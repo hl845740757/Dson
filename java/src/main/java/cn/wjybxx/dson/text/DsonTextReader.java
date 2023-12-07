@@ -77,6 +77,15 @@ public class DsonTextReader extends AbstractDsonReader {
         setContext(new Context().init(null, DsonContextType.TOP_LEVEL, null));
     }
 
+    /**
+     * 用于动态指定成员数据类型
+     * 1.这对于精确解析数组元素和Object的字段十分有用 -- 比如解析一个{@code Vector3}的时候就可以指定字段的默认类型为float。
+     * 2.辅助方法见：{@link DsonTexts#clsNameTokenOfType(DsonType)}
+     */
+    public void setCompClsNameToken(DsonToken dsonToken) {
+        getContext().compClsNameToken = dsonToken;
+    }
+
     @Override
     public void close() {
         if (scanner != null) {
@@ -133,14 +142,6 @@ public class DsonTextReader extends AbstractDsonReader {
         return r;
     }
 
-    /**
-     * 用于动态指定成员数据类型
-     * 辅助方法见：{@link DsonTexts#clsNameTokenOfType(DsonType)}
-     */
-    public void setCompClsNameToken(DsonToken dsonToken) {
-        getContext().compClsNameToken = dsonToken;
-    }
-
     // region state
 
     @Override
@@ -174,7 +175,7 @@ public class DsonTextReader extends AbstractDsonReader {
         markedTokenQueue.addAll(pushedTokenQueue); // 保存既有token
 
         DsonType dsonType = readDsonTypeOfToken();
-        popNextName();
+        popNextName(); // 丢弃临时数据
         popNextValue();
 
         pushedTokenQueue.clear();

@@ -62,8 +62,8 @@ public class DsonBinaryReader<TName> : AbstractDsonReader<TName> where TName : I
 
         int fullType = _input.IsAtEnd() ? 0 : BinaryUtils.ToUint(_input.ReadRawByte());
         int wreTypeBits = Dsons.WireTypeOfFullType(fullType);
-        DsonType dsonType = DsonTypeExt.ForNumber(Dsons.DsonTypeOfFullType(fullType));
-        WireType wireType = dsonType.HasWireType() ? WireTypeExt.ForNumber(wreTypeBits) : WireType.VarInt;
+        DsonType dsonType = DsonTypes.ForNumber(Dsons.DsonTypeOfFullType(fullType));
+        WireType wireType = dsonType.HasWireType() ? WireTypes.ForNumber(wreTypeBits) : WireType.VarInt;
         this.currentDsonType = dsonType;
         this.currentWireType = wireType;
         this.currentWireTypeBits = wreTypeBits;
@@ -78,7 +78,7 @@ public class DsonBinaryReader<TName> : AbstractDsonReader<TName> where TName : I
         checkReadDsonTypeState(context);
 
         int fullType = _input.IsAtEnd() ? 0 : BinaryUtils.ToUint(_input.GetByte(_input.Position));
-        return DsonTypeExt.ForNumber(Dsons.DsonTypeOfFullType(fullType));
+        return DsonTypes.ForNumber(Dsons.DsonTypeOfFullType(fullType));
     }
 
     protected override void doReadName() {

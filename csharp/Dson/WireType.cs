@@ -48,7 +48,7 @@ public enum WireType
     Fixed = 3,
 }
 
-public static class WireTypeExt
+public static class WireTypes
 {
     public static WireType ForNumber(int number) {
         return number switch {

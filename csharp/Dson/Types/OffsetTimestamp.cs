@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+using System.Globalization;
+
 namespace Dson;
 
 /// <summary>
@@ -34,7 +36,8 @@ public struct OffsetTimestamp : IEquatable<OffsetTimestamp>
     public readonly int Offset;
     public readonly int Enables;
 
-    public OffsetTimestamp(long seconds) : this(seconds, 0, 0, MASK_DATETIME) {
+    public OffsetTimestamp(long seconds)
+        : this(seconds, 0, 0, MASK_DATETIME) {
     }
 
     /// <summary>
@@ -96,4 +99,20 @@ public struct OffsetTimestamp : IEquatable<OffsetTimestamp>
     public static readonly int NUMBERS_ENABLES = Dsons.MakeFullNumberZeroIdep(3);
 
     #endregion
+
+    public static DateOnly parseDate(string dateString) {
+        return DateOnly.Parse(dateString, CultureInfo.InvariantCulture);
+    }
+
+    public static TimeOnly parseTime(string timeString) {
+        return TimeOnly.Parse(timeString, CultureInfo.InvariantCulture);
+    }
+
+    public static int parseOffset(string offsetString) {
+        return (int)(TimeOnly.Parse(offsetString, CultureInfo.InvariantCulture).Ticks / DsonInternals.TicksPerSecond);
+    }
+
+    public static DateTime parseDateTime(string datetimeString) {
+        return DateTime.Parse(datetimeString, CultureInfo.InvariantCulture);
+    }
 }

@@ -382,7 +382,7 @@ public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName> where TName
         public virtual void reset() {
             _parent = null;
             contextType = default;
-            dsonType = DsonTypeExt.INVALID;
+            dsonType = DsonTypes.INVALID;
             state = default;
             curName = default;
             userData = null;
