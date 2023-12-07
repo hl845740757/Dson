@@ -370,12 +370,14 @@ public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName> where TName
 #nullable enable
     protected internal class Context
     {
-        protected internal Context? _parent;
+#nullable disable
+        protected internal Context _parent;
         protected internal DsonContextType contextType;
         protected internal DsonType dsonType; // 用于在Object/Array模式下写入内置数据结构
         protected internal DsonWriterState state = DsonWriterState.INITIAL;
-        protected internal TName? curName;
-        protected internal object? userData;
+        protected internal TName curName;
+        protected internal object userData;
+#nullable enable
 
         public Context() {
         }

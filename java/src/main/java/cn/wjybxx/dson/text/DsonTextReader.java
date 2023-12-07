@@ -73,7 +73,7 @@ public class DsonTextReader extends AbstractDsonReader {
 
     public DsonTextReader(DsonTextReaderSettings settings, DsonScanner scanner) {
         super(settings);
-        this.scanner = scanner;
+        this.scanner = Objects.requireNonNull(scanner);
         setContext(new Context().init(null, DsonContextType.TOP_LEVEL, null));
     }
 

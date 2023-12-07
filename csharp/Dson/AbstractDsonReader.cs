@@ -519,13 +519,14 @@ public abstract class AbstractDsonReader<TName> : IDsonReader<TName> where TName
 
     protected internal class Context
     {
-        protected internal Context? parent;
+#nullable disable
+        protected internal Context parent;
         protected internal DsonContextType contextType;
         protected internal DsonType dsonType = DsonTypeExt.INVALID;
         protected internal DsonReaderState state = DsonReaderState.INITIAL;
-        protected internal TName name = default;
-        protected internal object? userData;
-
+        protected internal TName name;
+        protected internal object userData;
+#nullable enable
         public Context() {
         }
 

@@ -197,7 +197,9 @@ public class DsonObjectWriter<TName> : AbstractDsonWriter<TName> where TName : I
 
     protected new class Context : AbstractDsonWriter<TName>.Context
     {
+#nullable disable
         protected internal DsonValue Container;
+#nullable enable
 
         public Context() {
         }

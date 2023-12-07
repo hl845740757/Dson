@@ -28,6 +28,14 @@ public class DsonScanner : IDisposable
     private readonly char[] _hexBuffer = new char[4];
 #nullable enable
 
+    public DsonScanner(string dson, DsonMode dsonMode = DsonMode.STANDARD) {
+        _buffer = new StringCharStream(dson, dsonMode);
+    }
+
+    public DsonScanner(DsonCharStream buffer) {
+        _buffer = buffer ?? throw new ArgumentNullException(nameof(buffer));
+    }
+
     public void Dispose() {
         if (_buffer != null) {
             _buffer.Dispose();
@@ -244,7 +252,7 @@ public class DsonScanner : IDisposable
         }
         return c;
     }
-    
+
     /// <summary>
     /// 扫描无引号字符串，无引号字符串不支持切换到独立行
     /// （该方法只使用扫描元素，不适合扫描标签）
