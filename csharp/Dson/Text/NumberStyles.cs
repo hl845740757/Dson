@@ -23,8 +23,14 @@ namespace Dson.Text;
 /// </summary>
 public class NumberStyles
 {
+    /** 普通打印 */
     public static readonly INumberStyle Simple = new SimpleStyle();
-    public static readonly INumberStyle Typed = new SimpleStyle();
+    /** 总是打印类型 */
+    public static readonly INumberStyle Typed = new TypedStyle();
+    /** 16进制，打印正负号 -- 不支持浮点数 */
+    public static readonly INumberStyle SignedHex = new SignedHexStyle();
+    /** 无符号16进制，按位打印 -- 不支持浮点数 */
+    public static readonly INumberStyle UnsignedHex = new UnsignedHexStyle();
 
     /** double能精确表示的最大整数 */
     private const long DOUBLE_MAX_LONG = (1L << 53) - 1;
@@ -65,6 +71,73 @@ public class NumberStyles
                 string str = value.ToString(CultureInfo.InvariantCulture);
                 return new StyleOut(str, str.IndexOf('E') >= 0);
             }
+        }
+    }
+
+    private class TypedStyle : INumberStyle
+    {
+        public StyleOut ToString(int value) {
+            return new StyleOut(Simple.ToString(value).Value, true);
+        }
+
+        public StyleOut ToString(long value) {
+            return new StyleOut(Simple.ToString(value).Value, true);
+        }
+
+        public StyleOut ToString(float value) {
+            return new StyleOut(Simple.ToString(value).Value, true);
+        }
+
+        public StyleOut ToString(double value) {
+            return new StyleOut(Simple.ToString(value).Value, true);
+        }
+    }
+
+    private class SignedHexStyle : INumberStyle
+    {
+        public StyleOut ToString(int value) {
+            if (value < 0 && value != int.MinValue) {
+                return new StyleOut("-0x" + value.ToString("X"), true);
+            }
+            else {
+                return new StyleOut("0x" + value.ToString("X"), true);
+            }
+        }
+
+        public StyleOut ToString(long value) {
+            if (value < 0 && value != long.MinValue) {
+                return new StyleOut("-0x" + value.ToString("X"), true);
+            }
+            else {
+                return new StyleOut("0x" + value.ToString("X"), true);
+            }
+        }
+
+        public StyleOut ToString(float value) {
+            throw new NotImplementedException();
+        }
+
+        public StyleOut ToString(double value) {
+            throw new NotImplementedException();
+        }
+    }
+
+    private class UnsignedHexStyle : INumberStyle
+    {
+        public StyleOut ToString(int value) {
+            return new StyleOut("0x" + value.ToString("X"), true);
+        }
+
+        public StyleOut ToString(long value) {
+            return new StyleOut("0x" + value.ToString("X"), true);
+        }
+
+        public StyleOut ToString(float value) {
+            throw new NotImplementedException();
+        }
+
+        public StyleOut ToString(double value) {
+            throw new NotImplementedException();
         }
     }
 }

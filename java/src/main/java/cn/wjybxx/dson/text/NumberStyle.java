@@ -165,8 +165,8 @@ public enum NumberStyle implements INumberStyle {
         }
     },
 
-    /** 16进制 -- 一定有标签，对于浮点数要小心使用 */
-    HEX(5) {
+    /** 16进制，打印正负号，只打印绝对值部分 -- 一定有标签，对于浮点数要小心使用 */
+    SIGNED_HEX(5) {
         @Override
         public void toString(int value, StyleOut styleOut) {
             styleOut.setTyped(true);
@@ -200,7 +200,7 @@ public enum NumberStyle implements INumberStyle {
         }
     },
 
-    /** 对于整数来说，无符号的16进制输出不带负号 */
+    /** 无符号16进制，按位打印 -- 对于整数来说，无符号的16进制输出不带负号 */
     UNSIGNED_HEX(6) {
         @Override
         public void toString(int value, StyleOut styleOut) {
@@ -362,7 +362,7 @@ public enum NumberStyle implements INumberStyle {
             case 2 -> SIMPLE_NO_SCI;
             case 3 -> TYPED;
             case 4 -> TYPED_NO_SCI;
-            case 5 -> HEX;
+            case 5 -> SIGNED_HEX;
             case 6 -> UNSIGNED_HEX;
             case 7 -> BINARY;
             case 8 -> UNSIGNED_BINARY;

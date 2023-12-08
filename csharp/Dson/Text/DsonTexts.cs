@@ -179,7 +179,32 @@ public static class DsonTexts
         if (str.Length == 0) {
             throw new ArgumentException("empty string");
         }
-        return int.Parse(str); // c# 原生支持16禁止等解析
+        int lookOffset;
+        int sign;
+        char firstChar = str[0];
+        if (firstChar == '+') {
+            sign = 1;
+            lookOffset = 1;
+        }
+        else if (firstChar == '-') {
+            sign = -1;
+            lookOffset = 1;
+        }
+        else {
+            sign = 1;
+            lookOffset = 0;
+        }
+        if (lookOffset > 0) {
+            str = str.Substring(lookOffset); // 跳过符号位
+        }
+        if (str.StartsWith("0x") || str.StartsWith("0X")) {
+            return sign * Convert.ToInt32(str, 16); // 解析16进制时可带有0x
+        }
+        if (str.StartsWith("0b") || str.StartsWith("0B")) {
+            str = str.Substring(2); // c#解析二进制时不能带有0b...
+            return sign * Convert.ToInt32(str, 2);
+        }
+        return int.Parse(str);
     }
 
     public static long parseLong(in string rawStr) {
@@ -189,6 +214,31 @@ public static class DsonTexts
         }
         if (str.Length == 0) {
             throw new ArgumentException("empty string");
+        }
+        int lookOffset;
+        int sign;
+        char firstChar = str[0];
+        if (firstChar == '+') {
+            sign = 1;
+            lookOffset = 1;
+        }
+        else if (firstChar == '-') {
+            sign = -1;
+            lookOffset = 1;
+        }
+        else {
+            sign = 1;
+            lookOffset = 0;
+        }
+        if (lookOffset > 0) {
+            str = str.Substring(lookOffset); // 跳过符号位
+        }
+        if (str.StartsWith("0x") || str.StartsWith("0X")) {
+            return sign * Convert.ToInt64(str, 16);
+        }
+        if (str.StartsWith("0b") || str.StartsWith("0B")) {
+            str = str.Substring(2);
+            return sign * Convert.ToInt64(str, 2);
         }
         return long.Parse(str);
     }

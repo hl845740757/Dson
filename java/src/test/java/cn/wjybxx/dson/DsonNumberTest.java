@@ -36,7 +36,7 @@ public class DsonNumberTest {
     void testNumber() {
         DsonObject<String> value = Dsons.fromDson(numberString).asObject();
         List<NumberStyle> styleList = List.of(NumberStyle.TYPED, NumberStyle.TYPED_NO_SCI,
-                NumberStyle.HEX, NumberStyle.UNSIGNED_HEX,
+                NumberStyle.SIGNED_HEX, NumberStyle.UNSIGNED_HEX,
                 NumberStyle.BINARY, NumberStyle.UNSIGNED_BINARY, NumberStyle.FIXED_BINARY);
 
         for (NumberStyle style : styleList) {
