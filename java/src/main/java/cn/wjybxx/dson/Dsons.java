@@ -206,7 +206,7 @@ public final class Dsons {
     public static void writeHeader(DsonWriter writer, DsonHeader<String> header) {
         if (header.size() == 1) {
             DsonValue clsName = header.get(DsonHeader.NAMES_CLASS_NAME);
-            if (clsName != null) {
+            if (clsName != null) { // header只包含clsName时打印为简单模式
                 writer.writeSimpleHeader(clsName.asString());
                 return;
             }
@@ -400,16 +400,16 @@ public final class Dsons {
 
     // region 工厂方法
 
+    public static DsonScanner newJsonScanner(CharSequence jsonString) {
+        return new DsonScanner(DsonCharStream.newCharStream(jsonString, DsonMode.RELAXED));
+    }
+
     public static DsonScanner newStringScanner(CharSequence dsonString) {
         return new DsonScanner(DsonCharStream.newCharStream(dsonString, DsonMode.STANDARD));
     }
 
     public static DsonScanner newStringScanner(CharSequence dsonString, DsonMode dsonMode) {
         return new DsonScanner(DsonCharStream.newCharStream(dsonString, dsonMode));
-    }
-
-    public static DsonScanner newJsonScanner(CharSequence jsonString) {
-        return new DsonScanner(DsonCharStream.newCharStream(jsonString, DsonMode.RELAXED));
     }
 
     public static DsonScanner newStreamScanner(Reader reader) {

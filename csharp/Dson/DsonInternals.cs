@@ -55,6 +55,7 @@ internal static class DsonInternals
 
     internal const long TicksPerMillisecond = 10000;
     internal const long TicksPerSecond = TicksPerMillisecond * 1000;
+    internal static readonly DateOnly UtcEpochDate = new DateOnly(1970, 1, 1);
 
     /// <summary>
     /// 转unix秒时间戳

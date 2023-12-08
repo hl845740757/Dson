@@ -2,7 +2,9 @@
 
 class StringCharStream : AbstractCharStream
 {
-    private string? _buffer;
+#nullable disable
+    private string _buffer;
+#nullable enable
 
     public StringCharStream(string buffer, DsonMode dsonMode)
         : base(dsonMode) {

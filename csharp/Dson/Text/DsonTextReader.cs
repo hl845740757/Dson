@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
@@ -29,7 +28,8 @@ public class DsonTextReader : AbstractDsonReader<string>
 {
     private static readonly List<DsonTokenType> ValueSeparatorTokens =
         DsonInternals.NewList(DsonTokenType.COMMA, DsonTokenType.END_OBJECT, DsonTokenType.END_ARRAY);
-    private static readonly List<DsonTokenType> HeaderTokens = DsonInternals.NewList(DsonTokenType.BEGIN_HEADER, DsonTokenType.CLASS_NAME);
+    private static readonly List<DsonTokenType> HeaderTokens =
+        DsonInternals.NewList(DsonTokenType.BEGIN_HEADER, DsonTokenType.CLASS_NAME);
 
     private static readonly DsonToken TokenBeginHeader = new DsonToken(DsonTokenType.BEGIN_HEADER, "@{", -1);
     private static readonly DsonToken TokenClassname = new DsonToken(DsonTokenType.UNQUOTE_STRING, DsonHeaderFields.NAMES_CLASS_NAME, -1);
@@ -294,12 +294,11 @@ public class DsonTextReader : AbstractDsonReader<string>
                 throw DsonIOException.invalidTokenType(context.contextType, valueToken);
             }
         }
-        ;
     }
 
     /** 字符串默认解析规则 */
     private DsonType ParseUnquoteStringToken(Context context, DsonToken valueToken) {
-        String unquotedString = valueToken.castAsString();
+        string unquotedString = valueToken.castAsString();
         if (context.contextType != DsonContextType.HEADER && context.CompClsNameToken != null) {
             switch (context.CompClsNameToken.castAsString()) {
                 case DsonTexts.LABEL_INT32: {
@@ -365,7 +364,7 @@ public class DsonTextReader : AbstractDsonReader<string>
         }
         // 2.object和array的className会在beginObject和beginArray的时候转换为结构体 @{}
         // 因此这里只能出现内置结构体的简写形式
-        String clsName = valueToken.castAsString();
+        string clsName = valueToken.castAsString();
         if (DsonTexts.LABEL_REFERENCE == clsName) { // @ref localId
             DsonToken nextToken = PopToken();
             EnsureStringsToken(context, nextToken);
@@ -540,7 +539,7 @@ public class DsonTextReader : AbstractDsonReader<string>
     }
 
     private OffsetTimestamp ScanTimestamp(Context context) {
-        DateOnly date = new DateOnly(1970, 1, 1);
+        DateOnly date = DsonInternals.UtcEpochDate;
         TimeOnly time = TimeOnly.MinValue;
         int nanos = 0;
         int offset = 0;
@@ -557,19 +556,19 @@ public class DsonTextReader : AbstractDsonReader<string>
             // 根据name校验
             switch (keyToken.castAsString()) {
                 case OffsetTimestamp.NAMES_DATE: {
-                    String dateString = ScanStringUtilComma();
+                    string dateString = ScanStringUtilComma();
                     date = OffsetTimestamp.parseDate(dateString);
                     enables |= OffsetTimestamp.MASK_DATE;
                     break;
                 }
                 case OffsetTimestamp.NAMES_TIME: {
-                    String timeString = ScanStringUtilComma();
+                    string timeString = ScanStringUtilComma();
                     time = OffsetTimestamp.parseTime(timeString);
                     enables |= OffsetTimestamp.MASK_TIME;
                     break;
                 }
                 case OffsetTimestamp.NAMES_OFFSET: {
-                    String offsetString = ScanStringUtilComma();
+                    string offsetString = ScanStringUtilComma();
                     offset = OffsetTimestamp.parseOffset(offsetString);
                     enables |= OffsetTimestamp.MASK_OFFSET;
                     break;
@@ -650,7 +649,7 @@ public class DsonTextReader : AbstractDsonReader<string>
 
         nextToken = PopToken();
         EnsureStringsToken(context, nextToken);
-        String value = nextToken.castAsString();
+        string value = nextToken.castAsString();
         DsonTokenType valueTokenType = nextToken.Type;
 
         nextToken = PopToken();
@@ -658,7 +657,7 @@ public class DsonTextReader : AbstractDsonReader<string>
         return new Tuple2(type, value, valueTokenType);
     }
 
-    private struct Tuple2
+    private readonly struct Tuple2
     {
         internal readonly int Type;
         internal readonly string Value;

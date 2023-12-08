@@ -100,23 +100,24 @@ public interface DsonCharStream : IDisposable
 
     #region 工厂方法
 
-    public static DsonCharStream NewCharStream(string dsonString) {
-        return new StringCharStream(dsonString, DsonMode.STANDARD);
+    public static DsonCharStream NewJsonStream(string jsonString) {
+        return new StringCharStream(jsonString, DsonMode.RELAXED);
     }
 
-    public static DsonCharStream NewCharStream(string dsonString, DsonMode dsonMode) {
+    public static DsonCharStream NewCharStream(string dsonString, DsonMode dsonMode = DsonMode.STANDARD) {
         return new StringCharStream(dsonString, dsonMode);
     }
 
-    public static DsonCharStream NewBufferedCharStream(StreamReader reader) {
-        return new BufferedCharStream(reader, DsonMode.STANDARD);
-    }
-
-    public static DsonCharStream NewBufferedCharStream(StreamReader reader, DsonMode dsonMode) {
-        return new BufferedCharStream(reader, dsonMode);
-    }
-
-    public static DsonCharStream NewBufferedCharStream(StreamReader reader, DsonMode dsonMode, int bufferSize, bool autoClose) {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="reader">Stream流</param>
+    /// <param name="dsonMode">文本模式</param>
+    /// <param name="bufferSize">缓冲区大小</param>
+    /// <param name="autoClose">是否自动关闭Stream</param>
+    /// <returns></returns>
+    public static DsonCharStream NewBufferedCharStream(StreamReader reader, DsonMode dsonMode = DsonMode.STANDARD,
+                                                       int bufferSize = 512, bool autoClose = true) {
         return new BufferedCharStream(reader, dsonMode, bufferSize, autoClose);
     }
 

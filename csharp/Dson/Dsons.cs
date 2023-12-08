@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+using System.Diagnostics;
+using Dson.Text;
+
 namespace Dson;
 
 /// <summary>
@@ -192,6 +195,248 @@ public static class Dsons
             r++;
         }
         return r;
+    }
+
+    #endregion
+
+    #region Read/Write
+
+    public static void writeTopDsonValue<TName>(IDsonWriter<TName> writer,
+                                                DsonValue dsonValue, ObjectStyle style) where TName : IEquatable<TName> {
+        if (dsonValue.DsonType == DsonType.OBJECT) {
+            writeObject(writer, dsonValue.AsObject<TName>(), style);
+        }
+        else if (dsonValue.DsonType == DsonType.ARRAY) {
+            writeArray(writer, dsonValue.AsArray<TName>(), style);
+        }
+        else {
+            writeHeader(writer, dsonValue.AsHeader<TName>());
+        }
+    }
+
+    /** @return 如果到达文件尾部，则返回null */
+    public static DsonValue? readTopDsonValue<TName>(IDsonReader<TName> reader) where TName : IEquatable<TName> {
+        DsonType dsonType = reader.ReadDsonType();
+        if (dsonType == DsonType.END_OF_OBJECT) {
+            return null;
+        }
+        if (dsonType == DsonType.OBJECT) {
+            return readObject(reader);
+        }
+        else if (dsonType == DsonType.ARRAY) {
+            return readArray(reader);
+        }
+        else {
+            Debug.Assert(dsonType == DsonType.HEADER);
+            return readHeader(reader, new DsonHeader<TName>());
+        }
+    }
+
+    /** 如果需要写入名字，外部写入 */
+    public static void writeObject<TName>(IDsonWriter<TName> writer,
+                                          DsonObject<TName> dsonObject, ObjectStyle style) where TName : IEquatable<TName> {
+        writer.WriteStartObject(style);
+        if (dsonObject.Header.Count > 0) {
+            writeHeader(writer, dsonObject.Header);
+        }
+        foreach (var pair in dsonObject) {
+            writeDsonValue(writer, pair.Value, pair.Key);
+        }
+        writer.WriteEndObject();
+    }
+
+    public static DsonObject<TName> readObject<TName>(IDsonReader<TName> reader) where TName : IEquatable<TName> {
+        DsonObject<TName> dsonObject = new DsonObject<TName>();
+        DsonType dsonType;
+        TName name;
+        DsonValue value;
+        reader.ReadStartObject();
+        while ((dsonType = reader.ReadDsonType()) != DsonType.END_OF_OBJECT) {
+            if (dsonType == DsonType.HEADER) {
+                readHeader(reader, dsonObject.Header);
+            }
+            else {
+                name = reader.ReadName();
+                value = readDsonValue(reader);
+                dsonObject[name] = value;
+            }
+        }
+        reader.ReadEndObject();
+        return dsonObject;
+    }
+
+    /** 如果需要写入名字，外部写入 */
+    public static void writeArray<TName>(IDsonWriter<TName> writer,
+                                         DsonArray<TName> dsonArray, ObjectStyle style) where TName : IEquatable<TName> {
+        writer.WriteStartArray(style);
+        if (dsonArray.Header.Count > 0) {
+            writeHeader(writer, dsonArray.Header);
+        }
+        foreach (DsonValue dsonValue in dsonArray) {
+            writeDsonValue(writer, dsonValue, default);
+        }
+        writer.WriteEndArray();
+    }
+
+    public static DsonArray<TName> readArray<TName>(IDsonReader<TName> reader) where TName : IEquatable<TName> {
+        DsonArray<TName> dsonArray = new DsonArray<TName>();
+        DsonType dsonType;
+        DsonValue value;
+        reader.ReadStartArray();
+        while ((dsonType = reader.ReadDsonType()) != DsonType.END_OF_OBJECT) {
+            if (dsonType == DsonType.HEADER) {
+                readHeader(reader, dsonArray.Header);
+            }
+            else {
+                value = readDsonValue(reader);
+                dsonArray.Add(value);
+            }
+        }
+        reader.ReadEndArray();
+        return dsonArray;
+    }
+
+    public static void writeHeader<TName>(IDsonWriter<TName> writer, DsonHeader<TName> header) where TName : IEquatable<TName> {
+        if (header.Count == 1 && typeof(TName) == typeof(string)) {
+            if (header.AsHeader<string>().TryGetValue(DsonHeaderFields.NAMES_CLASS_NAME, out DsonValue clsName)) {
+                writer.WriteSimpleHeader(clsName.AsString()); // header只包含clsName时打印为简单模式
+                return;
+            }
+        }
+        writer.WriteStartHeader();
+        foreach (var pair in header) {
+            writeDsonValue(writer, pair.Value, pair.Key);
+        }
+        writer.WriteEndHeader();
+    }
+
+    public static DsonHeader<TName> readHeader<TName>(IDsonReader<TName> reader, DsonHeader<TName>? header) where TName : IEquatable<TName> {
+        if (header == null) header = new DsonHeader<TName>();
+        DsonType dsonType;
+        TName name;
+        DsonValue value;
+        reader.ReadStartHeader();
+        while ((dsonType = reader.ReadDsonType()) != DsonType.END_OF_OBJECT) {
+            Debug.Assert(dsonType != DsonType.HEADER);
+            name = reader.ReadName();
+            value = readDsonValue(reader);
+            header[name] = value;
+        }
+        reader.ReadEndHeader();
+        return header;
+    }
+
+    public static void writeDsonValue<TName>(IDsonWriter<TName> writer, DsonValue dsonValue, TName? name) where TName : IEquatable<TName> {
+        if (writer.IsAtName) {
+            writer.WriteName(name);
+        }
+        switch (dsonValue.DsonType) {
+            case DsonType.INT32:
+                writer.WriteInt32(name, dsonValue.AsInt32(), WireType.VarInt, NumberStyles.Typed); // 必须能精确反序列化
+                break;
+            case DsonType.INT64:
+                writer.WriteInt64(name, dsonValue.AsInt64(), WireType.VarInt, NumberStyles.Typed);
+                break;
+            case DsonType.FLOAT:
+                writer.WriteFloat(name, dsonValue.AsFloat(), NumberStyles.Typed);
+                break;
+            case DsonType.DOUBLE:
+                writer.WriteDouble(name, dsonValue.AsDouble(), NumberStyles.Simple);
+                break;
+            case DsonType.BOOLEAN:
+                writer.WriteBoolean(name, dsonValue.AsBool());
+                break;
+            case DsonType.STRING:
+                writer.WriteString(name, dsonValue.AsString(), StringStyle.Auto);
+                break;
+            case DsonType.NULL:
+                writer.WriteNull(name);
+                break;
+            case DsonType.BINARY:
+                writer.WriteBinary(name, dsonValue.AsBinary());
+                break;
+            case DsonType.EXT_INT32:
+                writer.WriteExtInt32(name, dsonValue.AsExtInt32(), WireType.VarInt, NumberStyles.Simple);
+                break;
+            case DsonType.EXT_INT64:
+                writer.WriteExtInt64(name, dsonValue.AsExtInt64(), WireType.VarInt, NumberStyles.Simple);
+                break;
+            case DsonType.EXT_DOUBLE:
+                writer.WriteExtDouble(name, dsonValue.AsExtDouble(), NumberStyles.Simple);
+                break;
+            case DsonType.EXT_STRING:
+                writer.WriteExtString(name, dsonValue.AsExtString(), StringStyle.Auto);
+                break;
+            case DsonType.REFERENCE:
+                writer.WriteRef(name, dsonValue.AsReference());
+                break;
+            case DsonType.TIMESTAMP:
+                writer.WriteTimestamp(name, dsonValue.AsTimestamp());
+                break;
+            case DsonType.HEADER:
+                writeHeader(writer, dsonValue.AsHeader<TName>());
+                break;
+            case DsonType.ARRAY:
+                writeArray(writer, dsonValue.AsArray<TName>(), ObjectStyle.Indent);
+                break;
+            case DsonType.OBJECT:
+                writeObject(writer, dsonValue.AsObject<TName>(), ObjectStyle.Indent);
+                break;
+            case DsonType.END_OF_OBJECT:
+            default:
+                throw new InvalidOperationException();
+        }
+    }
+
+    public static DsonValue readDsonValue<TName>(IDsonReader<TName> reader) where TName : IEquatable<TName> {
+        DsonType dsonType = reader.CurrentDsonType;
+        reader.SkipName();
+        TName name = default;
+        switch (dsonType) {
+            case DsonType.INT32: return new DsonInt32(reader.ReadInt32(name));
+            case DsonType.INT64: return new DsonInt64(reader.ReadInt64(name));
+            case DsonType.FLOAT: return new DsonFloat(reader.ReadFloat(name));
+            case DsonType.DOUBLE: return new DsonDouble(reader.ReadDouble(name));
+            case DsonType.BOOLEAN: return new DsonBool(reader.ReadBoolean(name));
+            case DsonType.STRING: return new DsonString(reader.ReadString(name));
+            case DsonType.NULL: {
+                reader.ReadNull(name);
+                return DsonNull.Null;
+            }
+            case DsonType.BINARY: return reader.ReadBinary(name);
+            case DsonType.EXT_INT32: return reader.ReadExtInt32(name);
+            case DsonType.EXT_INT64: return reader.ReadExtInt64(name);
+            case DsonType.EXT_DOUBLE: return reader.ReadExtDouble(name);
+            case DsonType.EXT_STRING: return reader.ReadExtString(name);
+            case DsonType.REFERENCE: return new DsonReference(reader.ReadRef(name));
+            case DsonType.TIMESTAMP: return new DsonTimestamp(reader.ReadTimestamp(name));
+            case DsonType.HEADER: {
+                DsonHeader<TName> header = new DsonHeader<TName>();
+                readHeader(reader, header);
+                return header;
+            }
+            case DsonType.OBJECT: return readObject(reader);
+            case DsonType.ARRAY: return readArray(reader);
+            case DsonType.END_OF_OBJECT:
+            default: throw new InvalidOperationException();
+        }
+    }
+
+    #endregion
+
+    #region 工厂方法
+
+    public static DsonScanner NewJsonScanner(string jsonString) {
+        return new DsonScanner(DsonCharStream.NewCharStream(jsonString, DsonMode.RELAXED));
+    }
+
+    public static DsonScanner NewStringScanner(string dsonString, DsonMode dsonMode = DsonMode.STANDARD) {
+        return new DsonScanner(DsonCharStream.NewCharStream(dsonString, dsonMode));
+    }
+
+    public static DsonScanner NewStreamScanner(StreamReader reader, DsonMode dsonMode = DsonMode.STANDARD,
+                                               int bufferSize = 512, bool autoClose = true) {
+        return new DsonScanner(DsonCharStream.NewBufferedCharStream(reader, dsonMode, bufferSize, autoClose));
     }
 
     #endregion

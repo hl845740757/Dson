@@ -18,7 +18,7 @@ namespace Dson.Text;
 
 public class DsonTextWriterSettings : DsonWriterSettings
 {
-    public readonly String lineSeparator;
+    public readonly string lineSeparator;
     public readonly int softLineLength;
     public readonly DsonMode dsonMode;
 

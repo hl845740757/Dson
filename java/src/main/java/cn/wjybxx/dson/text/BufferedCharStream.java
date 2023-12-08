@@ -46,7 +46,7 @@ final class BufferedCharStream extends AbstractCharStream {
     private boolean readerEof;
 
     BufferedCharStream(Reader reader, DsonMode dsonMode) {
-        this(reader, dsonMode, MIN_BUFFER_SIZE * 2, true);
+        this(reader, dsonMode, 512, true);
     }
 
     BufferedCharStream(Reader reader, DsonMode dsonMode, int bufferSize, boolean autoClose) {

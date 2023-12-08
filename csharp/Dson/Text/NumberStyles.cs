@@ -24,6 +24,7 @@ namespace Dson.Text;
 public class NumberStyles
 {
     public static readonly INumberStyle Simple = new SimpleStyle();
+    public static readonly INumberStyle Typed = new SimpleStyle();
 
     /** double能精确表示的最大整数 */
     private const long DOUBLE_MAX_LONG = (1L << 53) - 1;
