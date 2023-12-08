@@ -108,23 +108,23 @@ public final class OffsetTimestamp {
     }
 
     /** @return 固定格式 yyyy-MM-dd */
-    public static String formatDate(long seconds) {
-        return LocalDateTime.ofEpochSecond(seconds, 0, ZoneOffset.UTC)
+    public static String formatDate(long epochSecond) {
+        return LocalDateTime.ofEpochSecond(epochSecond, 0, ZoneOffset.UTC)
                 .toLocalDate()
                 .toString();
     }
 
     /** @return 固定格式 HH:mm:ss */
-    public static String formatTime(long seconds) {
-        return LocalDateTime.ofEpochSecond(seconds, 1, ZoneOffset.UTC)
+    public static String formatTime(long epochSecond) {
+        return LocalDateTime.ofEpochSecond(epochSecond, 1, ZoneOffset.UTC)
                 .toLocalTime()
                 .toString()
                 .substring(0, 8);
     }
 
     /** @return 固定格式 yyyy-MM-dd'T'HH:mm:ss */
-    public static String formatDateTime(long seconds) {
-        return formatDate(seconds) + "T" + formatTime(seconds);
+    public static String formatDateTime(long epochSecond) {
+        return formatDate(epochSecond) + "T" + formatTime(epochSecond);
     }
 
     /**
@@ -132,12 +132,12 @@ public final class OffsetTimestamp {
      * +HH:mm
      * +HH:mm:ss
      */
-    public static String formatOffset(int offset) {
-        if (offset == 0) {
+    public static String formatOffset(int offsetSeconds) {
+        if (offsetSeconds == 0) {
             return "Z";
         }
-        String pre = offset < 0 ? "-" : "+";
-        return pre + LocalTime.ofSecondOfDay(offset).toString();
+        String pre = offsetSeconds < 0 ? "-" : "+";
+        return pre + LocalTime.ofSecondOfDay(Math.abs(offsetSeconds)).toString();
     }
 
     /** @param dateString 限定格式 yyyy-MM-dd */

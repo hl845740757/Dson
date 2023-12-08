@@ -15,6 +15,8 @@
  */
 
 using System.Globalization;
+using System.Text;
+using Dson.Text;
 
 namespace Dson;
 
@@ -104,36 +106,82 @@ public struct OffsetTimestamp : IEquatable<OffsetTimestamp>
 
     #region 解析
 
+    public static DateTime parseDateTime(string datetimeString) {
+        return DateTime.ParseExact(datetimeString, "yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture);
+    }
+
     public static DateOnly parseDate(string dateString) {
-        return DateOnly.Parse(dateString, CultureInfo.InvariantCulture);
+        return DateOnly.ParseExact(dateString, "yyyy-MM-dd", CultureInfo.InvariantCulture);
     }
 
     public static TimeOnly parseTime(string timeString) {
-        return TimeOnly.Parse(timeString, CultureInfo.InvariantCulture);
+        return TimeOnly.ParseExact(timeString, "HH:mm:ss", CultureInfo.InvariantCulture);
     }
 
     public static int parseOffset(string offsetString) {
-        return (int)(TimeOnly.Parse(offsetString, CultureInfo.InvariantCulture).Ticks / DsonInternals.TicksPerSecond);
-    }
-
-    public static DateTime parseDateTime(string datetimeString) {
-        return DateTime.Parse(datetimeString, CultureInfo.InvariantCulture);
+        if (offsetString == "Z" || offsetString == "z") {
+            return 0;
+        }
+        if (offsetString[0] != '+' && offsetString[0] != '-') {
+            throw new DsonParseException("Invalid offsetString, plus/minus not found when expected: " + offsetString);
+        }
+        // 不想写得太复杂，补全后解析
+        switch (offsetString.Length) {
+            case 2: { // ±H
+                offsetString = offsetString + "0:00:00";
+                break;
+            }
+            case 3: { // ±HH
+                offsetString = offsetString + ":00:00";
+                break;
+            }
+            case 5: { // ±H:mm
+                offsetString = new StringBuilder(offsetString, 9)
+                    .Insert(1, '0')
+                    .Append(":00")
+                    .ToString();
+                break;
+            }
+            case 6: { // ±HH:mm
+                offsetString = offsetString + ":00";
+                break;
+            }
+            case 9: { // ±HH:mm:ss
+                break;
+            }
+        }
+        long seconds = (parseTime(offsetString.Substring(1)).Ticks / DsonInternals.TicksPerSecond);
+        if (offsetString[0] == '+') {
+            return (int)seconds;
+        }
+        return (int)(-1 * seconds);
     }
 
     public static string formatDateTime(long seconds) {
-        throw new NotImplementedException();
+        return DateTime.UnixEpoch.AddSeconds(seconds).ToString("s");
     }
 
-    public static string formatDate(long seconds) {
-        throw new NotImplementedException();
+    public static string formatDate(long epochSeconds) {
+        string fullDate = DateTime.UnixEpoch.AddSeconds(epochSeconds).ToString("s");
+        return fullDate.Substring(0, fullDate.IndexOf('T'));
     }
 
-    public static string formatTime(long seconds) {
-        throw new NotImplementedException();
+    public static string formatTime(long epochSeconds) {
+        string fullDate = DateTime.UnixEpoch.AddSeconds(epochSeconds).ToString("s");
+        return fullDate.Substring(fullDate.IndexOf('T') + 1);
     }
 
-    public static string formatOffset(int offset) {
-        throw new NotImplementedException();
+    public static string formatOffset(int offsetSeconds) {
+        if (offsetSeconds == 0) {
+            return "Z";
+        }
+        string sign = offsetSeconds < 0 ? "-" : "+";
+        if (offsetSeconds % 60 == 0) { // 没有秒部分
+            return sign + formatTime(Math.Abs(offsetSeconds)).Substring(0, 5);
+        }
+        else {
+            return sign + formatTime(Math.Abs(offsetSeconds));
+        }
     }
 
     #endregion

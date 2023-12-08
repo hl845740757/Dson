@@ -41,3 +41,4 @@ build/
 .flattened*
 testres/
 /csharp/obj
+csharp/bin/

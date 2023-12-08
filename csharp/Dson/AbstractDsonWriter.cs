@@ -327,6 +327,14 @@ public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName> where TName
 
     #region 特殊
 
+    public virtual void WriteSimpleHeader(string clsName) {
+        if (clsName == null) throw new ArgumentNullException(nameof(clsName));
+        IDsonWriter<string> textWrite = (IDsonWriter<string>)this;
+        textWrite.WriteStartHeader();
+        textWrite.WriteString(DsonHeaderFields.NAMES_CLASS_NAME, clsName, StringStyle.AUTO_QUOTE);
+        textWrite.WriteEndHeader();
+    }
+
     public void WriteMessage(TName name, int binaryType, IMessage message) {
         Dsons.CheckSubType(binaryType);
         advanceToValueState(name);

@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using Dson.IO;
 using Dson.Types;
+using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 
 namespace Dson.Text;
@@ -453,6 +454,82 @@ public class DsonTextWriter : AbstractDsonWriter<string>
             printer.printFastPath(OffsetTimestamp.formatOffset(timestamp.Offset));
         }
         printer.print('}');
+    }
+
+    #endregion
+
+    #region 容器
+
+    protected override void doWriteStartContainer(DsonContextType contextType, DsonType dsonType, ObjectStyle style) {
+        DsonPrinter printer = this.printer;
+        writeCurrentName(printer, dsonType);
+
+        Context newContext = NewContext(GetContext(), contextType, dsonType);
+        newContext.style = style;
+
+        printer.printFastPath(contextType.startSymbol()!);
+        if (style == ObjectStyle.Indent) {
+            printer.Indent(); // 调整缩进
+        }
+
+        SetContext(newContext);
+        this.RecursionDepth++;
+    }
+
+    protected override void doWriteEndContainer() {
+        Context context = GetContext();
+        DsonPrinter printer = this.printer;
+
+        if (context.style == ObjectStyle.Indent) {
+            printer.retract(); // 恢复缩进
+            // 打印了内容的情况下才换行结束
+            if (printer.hasContent() && (context.headerCount > 0 || context.count > 0)) {
+                printer.println();
+                printLineHead(LineHead.APPEND_LINE);
+                printer.printIndent();
+            }
+        }
+        printer.printFastPath(context.contextType.endSymbol()!);
+
+        this.RecursionDepth--;
+        SetContext(context.Parent);
+        PoolContext(context);
+    }
+
+    #endregion
+
+    #region 特殊
+
+    public override void WriteSimpleHeader(string clsName) {
+        if (clsName == null) throw new ArgumentNullException(nameof(clsName));
+        Context context = GetContext();
+        if (!canPrintAsUnquote(clsName, settings)) {
+            base.WriteSimpleHeader(clsName);
+            return;
+        }
+        if (context.contextType == DsonContextType.OBJECT && context.state == DsonWriterState.NAME) {
+            context.setState(DsonWriterState.VALUE);
+        }
+        autoStartTopLevel(context);
+        ensureValueState(context);
+
+        DsonPrinter printer = this.printer;
+        writeCurrentName(printer, DsonType.HEADER);
+
+        printer.print('@');
+        printer.printFastPath(clsName);
+        if (context.style != ObjectStyle.Indent) {
+            printer.print(' ');
+        }
+        setNextState();
+    }
+
+    protected override void doWriteMessage(int binaryType, IMessage message) {
+        doWriteBinary(new DsonBinary(binaryType, message.ToByteArray()));
+    }
+
+    protected override void doWriteValueBytes(DsonType type, byte[] data) {
+        throw new InvalidOperationException("UnsupportedOperation");
     }
 
     #endregion
