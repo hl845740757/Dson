@@ -198,11 +198,11 @@ public static class DsonTexts
             str = str.Substring(lookOffset); // 跳过符号位
         }
         if (str.StartsWith("0x") || str.StartsWith("0X")) {
-            return sign * Convert.ToInt32(str, 16); // 解析16进制时可带有0x
+            return (int)(sign * Convert.ToUInt32(str, 16)); // 解析16进制时可带有0x
         }
         if (str.StartsWith("0b") || str.StartsWith("0B")) {
             str = str.Substring(2); // c#解析二进制时不能带有0b...
-            return sign * Convert.ToInt32(str, 2);
+            return (int)(sign * Convert.ToUInt32(str, 2));
         }
         return int.Parse(str);
     }
@@ -231,14 +231,14 @@ public static class DsonTexts
             lookOffset = 0;
         }
         if (lookOffset > 0) {
-            str = str.Substring(lookOffset); // 跳过符号位
+            str = str.Substring(lookOffset);
         }
         if (str.StartsWith("0x") || str.StartsWith("0X")) {
-            return sign * Convert.ToInt64(str, 16);
+            return sign * (int)Convert.ToUInt64(str, 16);
         }
         if (str.StartsWith("0b") || str.StartsWith("0B")) {
             str = str.Substring(2);
-            return sign * Convert.ToInt64(str, 2);
+            return sign * (int)Convert.ToUInt64(str, 2);
         }
         return long.Parse(str);
     }

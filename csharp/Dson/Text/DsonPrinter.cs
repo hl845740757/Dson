@@ -31,7 +31,7 @@ public class DsonPrinter : IDisposable
     }
 
     /** 如果当前行尚未打印行首，则返回null */
-    public String getHeadLabel() {
+    public string? getHeadLabel() {
         return headLabel;
     }
 

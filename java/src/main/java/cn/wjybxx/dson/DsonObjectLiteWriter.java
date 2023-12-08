@@ -92,23 +92,23 @@ public class DsonObjectLiteWriter extends AbstractDsonLiteWriter {
     }
 
     @Override
-    protected void doWriteExtInt32(DsonExtInt32 value, WireType wireType) {
-        getContext().add(value); // 不可变对象
+    protected void doWriteExtInt32(DsonExtInt32 extInt32, WireType wireType) {
+        getContext().add(extInt32); // 不可变对象
     }
 
     @Override
-    protected void doWriteExtInt64(DsonExtInt64 value, WireType wireType) {
-        getContext().add(value);
+    protected void doWriteExtInt64(DsonExtInt64 extInt64, WireType wireType) {
+        getContext().add(extInt64);
     }
 
     @Override
-    protected void doWriteExtDouble(DsonExtDouble value) {
-        getContext().add(value);
+    protected void doWriteExtDouble(DsonExtDouble extDouble) {
+        getContext().add(extDouble);
     }
 
     @Override
-    protected void doWriteExtString(DsonExtString value) {
-        getContext().add(value);
+    protected void doWriteExtString(DsonExtString extString) {
+        getContext().add(extString);
     }
 
     @Override

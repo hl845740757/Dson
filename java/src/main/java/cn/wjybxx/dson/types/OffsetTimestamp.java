@@ -103,7 +103,7 @@ public final class OffsetTimestamp {
         return (nanos % 1000_000) == 0;
     }
 
-    public int getMillisOfNanos() {
+    public int convertNanosToMillis() {
         return nanos / 1000_000;
     }
 
@@ -214,7 +214,7 @@ public final class OffsetTimestamp {
         if (nanos != 0) {
             sb.append(", ");
             if (canConvertNanosToMillis()) {
-                sb.append("millis: ").append(getMillisOfNanos());
+                sb.append("millis: ").append(convertNanosToMillis());
             } else {
                 sb.append("nanos: ").append(nanos);
             }

@@ -257,13 +257,13 @@ public abstract class AbstractDsonLiteWriter implements DsonLiteWriter {
 
     protected abstract void doWriteBinary(int type, DsonChunk chunk);
 
-    protected abstract void doWriteExtInt32(DsonExtInt32 value, WireType wireType);
+    protected abstract void doWriteExtInt32(DsonExtInt32 extInt32, WireType wireType);
 
-    protected abstract void doWriteExtInt64(DsonExtInt64 value, WireType wireType);
+    protected abstract void doWriteExtInt64(DsonExtInt64 extInt64, WireType wireType);
 
-    protected abstract void doWriteExtDouble(DsonExtDouble value);
+    protected abstract void doWriteExtDouble(DsonExtDouble extDouble);
 
-    protected abstract void doWriteExtString(DsonExtString value);
+    protected abstract void doWriteExtString(DsonExtString extString);
 
     protected abstract void doWriteRef(ObjectRef objectRef);
 

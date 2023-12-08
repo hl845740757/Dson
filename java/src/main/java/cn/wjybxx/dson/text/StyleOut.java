@@ -63,4 +63,11 @@ public class StyleOut {
         return this;
     }
 
+    @Override
+    public String toString() {
+        return "StyleOut{" +
+                "value='" + value + '\'' +
+                ", typed=" + typed +
+                '}';
+    }
 }

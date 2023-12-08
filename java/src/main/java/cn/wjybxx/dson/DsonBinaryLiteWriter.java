@@ -144,32 +144,32 @@ public class DsonBinaryLiteWriter extends AbstractDsonLiteWriter {
     }
 
     @Override
-    protected void doWriteExtInt32(DsonExtInt32 value, WireType wireType) {
+    protected void doWriteExtInt32(DsonExtInt32 extInt32, WireType wireType) {
         DsonOutput output = this.output;
         writeFullTypeAndCurrentName(output, DsonType.EXT_INT32, wireType.getNumber());
-        DsonReaderUtils.writeExtInt32(output, value, wireType);
+        DsonReaderUtils.writeExtInt32(output, extInt32, wireType);
     }
 
     @Override
-    protected void doWriteExtInt64(DsonExtInt64 value, WireType wireType) {
+    protected void doWriteExtInt64(DsonExtInt64 extInt64, WireType wireType) {
         DsonOutput output = this.output;
         writeFullTypeAndCurrentName(output, DsonType.EXT_INT64, wireType.getNumber());
-        DsonReaderUtils.writeExtInt64(output, value, wireType);
+        DsonReaderUtils.writeExtInt64(output, extInt64, wireType);
     }
 
     @Override
-    protected void doWriteExtDouble(DsonExtDouble value) {
-        int wireType = DsonReaderUtils.wireTypeOfDouble(value.getValue());
+    protected void doWriteExtDouble(DsonExtDouble extDouble) {
+        int wireType = DsonReaderUtils.wireTypeOfDouble(extDouble.getValue());
         DsonOutput output = this.output;
         writeFullTypeAndCurrentName(output, DsonType.EXT_DOUBLE, wireType);
-        DsonReaderUtils.writeExtDouble(output, value, wireType);
+        DsonReaderUtils.writeExtDouble(output, extDouble, wireType);
     }
 
     @Override
-    protected void doWriteExtString(DsonExtString value) {
+    protected void doWriteExtString(DsonExtString extString) {
         DsonOutput output = this.output;
-        writeFullTypeAndCurrentName(output, DsonType.EXT_STRING, DsonReaderUtils.wireTypeOfExtString(value));
-        DsonReaderUtils.writeExtString(output, value);
+        writeFullTypeAndCurrentName(output, DsonType.EXT_STRING, DsonReaderUtils.wireTypeOfExtString(extString));
+        DsonReaderUtils.writeExtString(output, extString);
     }
 
     @Override

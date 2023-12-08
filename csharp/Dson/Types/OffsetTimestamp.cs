@@ -54,6 +54,26 @@ public struct OffsetTimestamp : IEquatable<OffsetTimestamp>
         this.Enables = enables;
     }
 
+    public bool hasDate() {
+        return DsonInternals.isEnabled(Enables, MASK_DATE);
+    }
+
+    public bool hasTime() {
+        return DsonInternals.isEnabled(Enables, MASK_TIME);
+    }
+
+    public bool hasOffset() {
+        return DsonInternals.isEnabled(Enables, MASK_OFFSET);
+    }
+
+    public bool canConvertNanosToMillis() {
+        return (Nanos % 1000_000) == 0;
+    }
+
+    public int convertNanosToMillis() {
+        return Nanos / 1000_000;
+    }
+
     #region equals
 
     public bool Equals(OffsetTimestamp other) {
@@ -82,6 +102,43 @@ public struct OffsetTimestamp : IEquatable<OffsetTimestamp>
         return $"{nameof(Seconds)}: {Seconds}, {nameof(Nanos)}: {Nanos}, {nameof(Offset)}: {Offset}, {nameof(Enables)}: {Enables}";
     }
 
+    #region 解析
+
+    public static DateOnly parseDate(string dateString) {
+        return DateOnly.Parse(dateString, CultureInfo.InvariantCulture);
+    }
+
+    public static TimeOnly parseTime(string timeString) {
+        return TimeOnly.Parse(timeString, CultureInfo.InvariantCulture);
+    }
+
+    public static int parseOffset(string offsetString) {
+        return (int)(TimeOnly.Parse(offsetString, CultureInfo.InvariantCulture).Ticks / DsonInternals.TicksPerSecond);
+    }
+
+    public static DateTime parseDateTime(string datetimeString) {
+        return DateTime.Parse(datetimeString, CultureInfo.InvariantCulture);
+    }
+
+    public static string formatDateTime(long seconds) {
+        throw new NotImplementedException();
+    }
+
+    public static string formatDate(long seconds) {
+        throw new NotImplementedException();
+    }
+
+    public static string formatTime(long seconds) {
+        throw new NotImplementedException();
+    }
+
+    public static string formatOffset(int offset) {
+        throw new NotImplementedException();
+    }
+
+    #endregion
+
+
     #region 常量
 
     public const string NAMES_DATE = "date";
@@ -99,20 +156,4 @@ public struct OffsetTimestamp : IEquatable<OffsetTimestamp>
     public static readonly int NUMBERS_ENABLES = Dsons.MakeFullNumberZeroIdep(3);
 
     #endregion
-
-    public static DateOnly parseDate(string dateString) {
-        return DateOnly.Parse(dateString, CultureInfo.InvariantCulture);
-    }
-
-    public static TimeOnly parseTime(string timeString) {
-        return TimeOnly.Parse(timeString, CultureInfo.InvariantCulture);
-    }
-
-    public static int parseOffset(string offsetString) {
-        return (int)(TimeOnly.Parse(offsetString, CultureInfo.InvariantCulture).Ticks / DsonInternals.TicksPerSecond);
-    }
-
-    public static DateTime parseDateTime(string datetimeString) {
-        return DateTime.Parse(datetimeString, CultureInfo.InvariantCulture);
-    }
 }

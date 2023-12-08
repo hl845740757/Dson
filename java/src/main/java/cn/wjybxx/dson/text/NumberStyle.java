@@ -200,7 +200,7 @@ public enum NumberStyle implements INumberStyle {
         }
     },
 
-    /** 无符号16进制，按位打印 -- 对于整数来说，无符号的16进制输出不带负号 */
+    /** 无符号16进制，按有效位打印 -- 对于整数来说，无符号的16进制输出不带负号 */
     UNSIGNED_HEX(6) {
         @Override
         public void toString(int value, StyleOut styleOut) {
@@ -227,8 +227,8 @@ public enum NumberStyle implements INumberStyle {
         }
     },
 
-    /** 二进制 -- 一定有标签，不支持浮点数 */
-    BINARY(7) {
+    /** 二进制，打印正负号 -- 一定有标签，不支持浮点数 */
+    SIGNED_BINARY(7) {
         @Override
         public void toString(int value, StyleOut styleOut) {
             styleOut.setTyped(true);
@@ -260,7 +260,7 @@ public enum NumberStyle implements INumberStyle {
         }
     },
 
-    /** 对于整数来说，无符号的2进制输出不带负号 */
+    /** 无符号2进制，按有效位打印;对于整数来说，无符号的2进制输出不带负号 */
     UNSIGNED_BINARY(8) {
         @Override
         public void toString(int value, StyleOut styleOut) {
@@ -349,7 +349,7 @@ public enum NumberStyle implements INumberStyle {
     /** 是否支持浮点数 */
     public boolean supportFloat() {
         return switch (this) {
-            case BINARY, UNSIGNED_BINARY, FIXED_BINARY -> false;
+            case SIGNED_BINARY, UNSIGNED_BINARY, FIXED_BINARY -> false;
             default -> true;
         };
     }
@@ -364,7 +364,7 @@ public enum NumberStyle implements INumberStyle {
             case 4 -> TYPED_NO_SCI;
             case 5 -> SIGNED_HEX;
             case 6 -> UNSIGNED_HEX;
-            case 7 -> BINARY;
+            case 7 -> SIGNED_BINARY;
             case 8 -> UNSIGNED_BINARY;
             case 9 -> FIXED_BINARY;
             default -> throw new IllegalArgumentException("invalid number " + number);

@@ -238,13 +238,13 @@ public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName> where TName
 
     protected abstract void doWriteBinary(int type, DsonChunk chunk);
 
-    protected abstract void doWriteExtInt32(DsonExtInt32 value, WireType wireType, INumberStyle style);
+    protected abstract void doWriteExtInt32(DsonExtInt32 extInt32, WireType wireType, INumberStyle style);
 
-    protected abstract void doWriteExtInt64(DsonExtInt64 value, WireType wireType, INumberStyle style);
+    protected abstract void doWriteExtInt64(DsonExtInt64 extInt64, WireType wireType, INumberStyle style);
 
-    protected abstract void doWriteExtDouble(DsonExtDouble value, INumberStyle style);
+    protected abstract void doWriteExtDouble(DsonExtDouble extDouble, INumberStyle style);
 
-    protected abstract void doWriteExtString(DsonExtString value, StringStyle style);
+    protected abstract void doWriteExtString(DsonExtString extString, StringStyle style);
 
     protected abstract void doWriteRef(ObjectRef objectRef);
 

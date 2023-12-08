@@ -100,20 +100,20 @@ public class DsonObjectWriter<TName> : AbstractDsonWriter<TName> where TName : I
         GetContext().Add(new DsonBinary(type, chunk));
     }
 
-    protected override void doWriteExtInt32(DsonExtInt32 value, WireType wireType, INumberStyle style) {
-        GetContext().Add(value); // 不可变对象
+    protected override void doWriteExtInt32(DsonExtInt32 extInt32, WireType wireType, INumberStyle style) {
+        GetContext().Add(extInt32); // 不可变对象
     }
 
-    protected override void doWriteExtInt64(DsonExtInt64 value, WireType wireType, INumberStyle style) {
-        GetContext().Add(value);
+    protected override void doWriteExtInt64(DsonExtInt64 extInt64, WireType wireType, INumberStyle style) {
+        GetContext().Add(extInt64);
     }
 
-    protected override void doWriteExtDouble(DsonExtDouble value, INumberStyle style) {
-        GetContext().Add(value);
+    protected override void doWriteExtDouble(DsonExtDouble extDouble, INumberStyle style) {
+        GetContext().Add(extDouble);
     }
 
-    protected override void doWriteExtString(DsonExtString value, StringStyle style) {
-        GetContext().Add(value);
+    protected override void doWriteExtString(DsonExtString extString, StringStyle style) {
+        GetContext().Add(extString);
     }
 
     protected override void doWriteRef(ObjectRef objectRef) {

@@ -49,6 +49,10 @@ public class DsonTextWriter extends AbstractDsonWriter {
         setContext(new Context().init(null, DsonContextType.TOP_LEVEL, null));
     }
 
+    public Writer getWriter() {
+        return writer;
+    }
+
     @Override
     protected Context getContext() {
         return (Context) super.getContext();
@@ -72,10 +76,6 @@ public class DsonTextWriter extends AbstractDsonWriter {
         }
         styleOut.reset();
         super.close();
-    }
-
-    public Writer getWriter() {
-        return writer;
     }
 
     //
@@ -160,13 +160,13 @@ public class DsonTextWriter extends AbstractDsonWriter {
         }
     }
 
-    private static boolean canPrintAsUnquote(String text, DsonTextWriterSettings settings) {
-        return DsonTexts.canUnquoteString(text, settings.maxLengthOfUnquoteString)
-                && (!settings.unicodeChar || DsonTexts.isASCIIText(text));
+    private static boolean canPrintAsUnquote(String str, DsonTextWriterSettings settings) {
+        return DsonTexts.canUnquoteString(str, settings.maxLengthOfUnquoteString)
+                && (!settings.unicodeChar || DsonTexts.isASCIIText(str));
     }
 
-    private static boolean canPrintAsText(String value, DsonTextWriterSettings settings) {
-        return settings.enableText && (value.length() > settings.softLineLength * settings.lengthFactorOfText);
+    private static boolean canPrintAsText(String str, DsonTextWriterSettings settings) {
+        return settings.enableText && (str.length() > settings.softLineLength * settings.lengthFactorOfText);
     }
 
     /** 打印双引号String */
@@ -343,14 +343,14 @@ public class DsonTextWriter extends AbstractDsonWriter {
     }
 
     @Override
-    protected void doWriteExtInt32(DsonExtInt32 value, WireType wireType, INumberStyle style) {
+    protected void doWriteExtInt32(DsonExtInt32 extInt32, WireType wireType, INumberStyle style) {
         DsonPrinter printer = this.printer;
         writeCurrentName(printer, DsonType.EXT_INT32);
         printer.printFastPath("[@ei ");
-        printer.printFastPath(Integer.toString(value.getType()));
+        printer.printFastPath(Integer.toString(extInt32.getType()));
         printer.printFastPath(", ");
-        if (value.hasValue()) {
-            style.toString(value.getValue(), styleOut.reset());
+        if (extInt32.hasValue()) {
+            style.toString(extInt32.getValue(), styleOut.reset());
             printer.printFastPath(styleOut.getValue());
         } else {
             printer.printFastPath("null");
@@ -359,14 +359,14 @@ public class DsonTextWriter extends AbstractDsonWriter {
     }
 
     @Override
-    protected void doWriteExtInt64(DsonExtInt64 value, WireType wireType, INumberStyle style) {
+    protected void doWriteExtInt64(DsonExtInt64 extInt64, WireType wireType, INumberStyle style) {
         DsonPrinter printer = this.printer;
         writeCurrentName(printer, DsonType.EXT_INT64);
         printer.printFastPath("[@eL ");
-        printer.printFastPath(Integer.toString(value.getType()));
+        printer.printFastPath(Integer.toString(extInt64.getType()));
         printer.printFastPath(", ");
-        if (value.hasValue()) {
-            style.toString(value.getValue(), styleOut.reset());
+        if (extInt64.hasValue()) {
+            style.toString(extInt64.getValue(), styleOut.reset());
             printer.printFastPath(styleOut.getValue());
         } else {
             printer.printFastPath("null");
@@ -375,14 +375,14 @@ public class DsonTextWriter extends AbstractDsonWriter {
     }
 
     @Override
-    protected void doWriteExtDouble(DsonExtDouble value, INumberStyle style) {
+    protected void doWriteExtDouble(DsonExtDouble extDouble, INumberStyle style) {
         DsonPrinter printer = this.printer;
         writeCurrentName(printer, DsonType.EXT_DOUBLE);
         printer.printFastPath("[@ed ");
-        printer.printFastPath(Integer.toString(value.getType()));
+        printer.printFastPath(Integer.toString(extDouble.getType()));
         printer.printFastPath(", ");
-        if (value.hasValue()) {
-            style.toString(value.getValue(), styleOut.reset());
+        if (extDouble.hasValue()) {
+            style.toString(extDouble.getValue(), styleOut.reset());
             printer.printFastPath(styleOut.getValue());
         } else {
             printer.printFastPath("null");
@@ -391,14 +391,14 @@ public class DsonTextWriter extends AbstractDsonWriter {
     }
 
     @Override
-    protected void doWriteExtString(DsonExtString value, StringStyle style) {
+    protected void doWriteExtString(DsonExtString extString, StringStyle style) {
         DsonPrinter printer = this.printer;
         writeCurrentName(printer, DsonType.EXT_STRING);
         printer.printFastPath("[@es ");
-        printer.printFastPath(Integer.toString(value.getType()));
+        printer.printFastPath(Integer.toString(extString.getType()));
         printer.printFastPath(", ");
-        if (value.hasValue()) {
-            printString(printer, value.getValue(), style);
+        if (extString.hasValue()) {
+            printString(printer, extString.getValue(), style);
         } else {
             printer.printFastPath("null");
         }
@@ -412,7 +412,7 @@ public class DsonTextWriter extends AbstractDsonWriter {
         writeCurrentName(printer, DsonType.REFERENCE);
         if (StringUtils.isBlank(objectRef.getNamespace())
                 && objectRef.getType() == 0 && objectRef.getPolicy() == 0) {
-            printer.printFastPath("@ref ");
+            printer.printFastPath("@ref "); // 只有localId时简写
             printString(printer, objectRef.getLocalId(), StringStyle.AUTO_QUOTE);
             return;
         }
@@ -479,7 +479,7 @@ public class DsonTextWriter extends AbstractDsonWriter {
             if (timestamp.canConvertNanosToMillis()) {
                 printer.printFastPath(OffsetTimestamp.NAMES_MILLIS);
                 printer.printFastPath(": ");
-                printer.printFastPath(Integer.toString(timestamp.getMillisOfNanos()));
+                printer.printFastPath(Integer.toString(timestamp.convertNanosToMillis()));
             } else {
                 printer.printFastPath(OffsetTimestamp.NAMES_NANOS);
                 printer.printFastPath(": ");

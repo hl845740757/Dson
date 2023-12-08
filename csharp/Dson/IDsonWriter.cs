@@ -162,7 +162,7 @@ public interface IDsonWriter<in TName> : IDisposable where TName : IEquatable<TN
         if (clsName == null) throw new ArgumentNullException(nameof(clsName));
         IDsonWriter<string> textWrite = (IDsonWriter<string>)this;
         textWrite.WriteStartHeader();
-        textWrite.WriteString(DsonHeaderFields.NAMES_CLASS_NAME, clsName, StringStyle.AutoQuote);
+        textWrite.WriteString(DsonHeaderFields.NAMES_CLASS_NAME, clsName, StringStyle.AUTO_QUOTE);
         textWrite.WriteEndHeader();
     }
 

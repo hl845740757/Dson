@@ -19,18 +19,42 @@ namespace Dson.Text;
 /// <summary>
 /// C#这里用值类型是非常方便的
 /// </summary>
-public struct StyleOut
+public readonly struct StyleOut : IEquatable<StyleOut>
 {
     public readonly string Value;
-    public readonly bool Typed;
+    public readonly bool IsTyped;
 
     /// <summary>
     /// 
     /// </summary>
     /// <param name="value">文本</param>
-    /// <param name="typed">输出是否需要加类型</param>
-    public StyleOut(string value, bool typed) {
+    /// <param name="isTyped">输出是否需要加类型</param>
+    public StyleOut(string value, bool isTyped) {
         Value = value;
-        Typed = typed;
+        IsTyped = isTyped;
+    }
+
+    public bool Equals(StyleOut other) {
+        return Value == other.Value && IsTyped == other.IsTyped;
+    }
+
+    public override bool Equals(object? obj) {
+        return obj is StyleOut other && Equals(other);
+    }
+
+    public override int GetHashCode() {
+        return HashCode.Combine(Value, IsTyped);
+    }
+
+    public static bool operator ==(StyleOut left, StyleOut right) {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(StyleOut left, StyleOut right) {
+        return !left.Equals(right);
+    }
+
+    public override string ToString() {
+        return $"{nameof(Value)}: {Value}, {nameof(IsTyped)}: {IsTyped}";
     }
 }

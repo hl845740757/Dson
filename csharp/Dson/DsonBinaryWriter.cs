@@ -134,29 +134,29 @@ public class DsonBinaryWriter<TName> : AbstractDsonWriter<TName> where TName : I
         DsonReaderUtils.writeBinary(output, type, chunk);
     }
 
-    protected override void doWriteExtInt32(DsonExtInt32 value, WireType wireType, INumberStyle style) {
+    protected override void doWriteExtInt32(DsonExtInt32 extInt32, WireType wireType, INumberStyle style) {
         IDsonOutput output = this._output;
         WriteFullTypeAndCurrentName(output, DsonType.EXT_INT32, (int)wireType);
-        DsonReaderUtils.writeExtInt32(output, value, wireType);
+        DsonReaderUtils.writeExtInt32(output, extInt32, wireType);
     }
 
-    protected override void doWriteExtInt64(DsonExtInt64 value, WireType wireType, INumberStyle style) {
+    protected override void doWriteExtInt64(DsonExtInt64 extInt64, WireType wireType, INumberStyle style) {
         IDsonOutput output = this._output;
         WriteFullTypeAndCurrentName(output, DsonType.EXT_INT64, (int)wireType);
-        DsonReaderUtils.writeExtInt64(output, value, wireType);
+        DsonReaderUtils.writeExtInt64(output, extInt64, wireType);
     }
 
-    protected override void doWriteExtDouble(DsonExtDouble value, INumberStyle style) {
-        int wireType = DsonReaderUtils.wireTypeOfDouble(value.Value);
+    protected override void doWriteExtDouble(DsonExtDouble extDouble, INumberStyle style) {
+        int wireType = DsonReaderUtils.wireTypeOfDouble(extDouble.Value);
         IDsonOutput output = this._output;
         WriteFullTypeAndCurrentName(output, DsonType.EXT_DOUBLE, wireType);
-        DsonReaderUtils.writeExtDouble(output, value, wireType);
+        DsonReaderUtils.writeExtDouble(output, extDouble, wireType);
     }
 
-    protected override void doWriteExtString(DsonExtString value, StringStyle style) {
+    protected override void doWriteExtString(DsonExtString extString, StringStyle style) {
         IDsonOutput output = this._output;
-        WriteFullTypeAndCurrentName(output, DsonType.EXT_STRING, DsonReaderUtils.wireTypeOfExtString(value));
-        DsonReaderUtils.writeExtString(output, value);
+        WriteFullTypeAndCurrentName(output, DsonType.EXT_STRING, DsonReaderUtils.wireTypeOfExtString(extString));
+        DsonReaderUtils.writeExtString(output, extString);
     }
 
     protected override void doWriteRef(ObjectRef objectRef) {

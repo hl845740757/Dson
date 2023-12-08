@@ -23,17 +23,25 @@ namespace Dson.Text;
 /// </summary>
 public class NumberStyles
 {
-    /** 普通打印 */
+    /** 普通打印 -- 超过表示范围时会添加类型标签 */
     public static readonly INumberStyle Simple = new SimpleStyle();
     /** 总是打印类型 */
     public static readonly INumberStyle Typed = new TypedStyle();
+
     /** 16进制，打印正负号 -- 不支持浮点数 */
     public static readonly INumberStyle SignedHex = new SignedHexStyle();
     /** 无符号16进制，按位打印 -- 不支持浮点数 */
     public static readonly INumberStyle UnsignedHex = new UnsignedHexStyle();
 
+    /** 2进制，打印正负号 -- 不支持浮点数；需要 .Net8+ */
+    public static readonly INumberStyle SignedBinary = new SignedBinaryStyle();
+    /** 无符号2进制，按位打印 -- 不支持浮点数；需要 .Net8+  */
+    public static readonly INumberStyle UnsignedBinary = new UnsignedBinaryStyle();
+
     /** double能精确表示的最大整数 */
     private const long DOUBLE_MAX_LONG = (1L << 53) - 1;
+
+    #region simple
 
     private class SimpleStyle : INumberStyle
     {
@@ -93,11 +101,15 @@ public class NumberStyles
         }
     }
 
+    #endregion
+
+    #region 16进制
+
     private class SignedHexStyle : INumberStyle
     {
         public StyleOut ToString(int value) {
             if (value < 0 && value != int.MinValue) {
-                return new StyleOut("-0x" + value.ToString("X"), true);
+                return new StyleOut("-0x" + (-1 * value).ToString("X"), true);
             }
             else {
                 return new StyleOut("0x" + value.ToString("X"), true);
@@ -106,7 +118,7 @@ public class NumberStyles
 
         public StyleOut ToString(long value) {
             if (value < 0 && value != long.MinValue) {
-                return new StyleOut("-0x" + value.ToString("X"), true);
+                return new StyleOut("-0x" + (-1 * value).ToString("X"), true);
             }
             else {
                 return new StyleOut("0x" + value.ToString("X"), true);
@@ -140,4 +152,58 @@ public class NumberStyles
             throw new NotImplementedException();
         }
     }
+
+    #endregion
+
+    #region 二进制
+
+    private class SignedBinaryStyle : INumberStyle
+    {
+        public StyleOut ToString(int value) {
+            if (value < 0 && value != int.MinValue) {
+                return new StyleOut("-0b" + (-1 * value).ToString("B"), true);
+            }
+            else {
+                return new StyleOut("0b" + value.ToString("B"), true);
+            }
+        }
+
+        public StyleOut ToString(long value) {
+            if (value < 0 && value != long.MinValue) {
+                return new StyleOut("-0b" + (-1 * value).ToString("B"), true);
+            }
+            else {
+                return new StyleOut("0b" + value.ToString("B"), true);
+            }
+        }
+
+        public StyleOut ToString(float value) {
+            throw new NotImplementedException();
+        }
+
+        public StyleOut ToString(double value) {
+            throw new NotImplementedException();
+        }
+    }
+
+    private class UnsignedBinaryStyle : INumberStyle
+    {
+        public StyleOut ToString(int value) {
+            return new StyleOut("0b" + value.ToString("B"), true);
+        }
+
+        public StyleOut ToString(long value) {
+            return new StyleOut("0b" + value.ToString("B"), true);
+        }
+
+        public StyleOut ToString(float value) {
+            throw new NotImplementedException();
+        }
+
+        public StyleOut ToString(double value) {
+            throw new NotImplementedException();
+        }
+    }
+
+    #endregion
 }
