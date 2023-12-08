@@ -22,7 +22,7 @@ public class DsonNull : DsonValue, IEquatable<DsonNull>
     /** 可用于特殊情况下的测试 -- 一般不建议使用 */
     public static readonly DsonNull Undefine = new DsonNull();
 
-    public override DsonType DsonType => DsonType.NULL;
+    public override DsonType DsonType => DsonType.Null;
 
     #region equals
 

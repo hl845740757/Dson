@@ -18,14 +18,14 @@ namespace Dson;
 
 public class DsonReaderSettings
 {
-    public readonly int recursionLimit;
-    public readonly bool autoClose;
-    public readonly bool enableFieldIntern;
+    public readonly int RecursionLimit;
+    public readonly bool AutoClose;
+    public readonly bool EnableFieldIntern;
 
     public DsonReaderSettings(Builder builder) {
-        recursionLimit = builder.RecursionLimit;
-        autoClose = builder.AutoClose;
-        enableFieldIntern = builder.EnableFieldIntern;
+        RecursionLimit = builder.RecursionLimit;
+        AutoClose = builder.AutoClose;
+        EnableFieldIntern = builder.EnableFieldIntern;
     }
 
     public static Builder NewBuilder() {

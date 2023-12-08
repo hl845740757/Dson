@@ -24,11 +24,11 @@ namespace Dson;
 public enum DsonWriterState
 {
     /** 顶层上下文初始状态 */
-    INITIAL,
+    Initial,
 
     /** 等待写入name(fullNumber) */
-    NAME,
+    Name,
 
     /** 等待写入Value */
-    VALUE,
+    Value,
 }

@@ -44,7 +44,7 @@ public class DsonBinary : DsonValue, IEquatable<DsonBinary>
         this._data = (byte[])src._data.Clone();
     }
 
-    public override DsonType DsonType => DsonType.BINARY;
+    public override DsonType DsonType => DsonType.Binary;
     public int Type => _type;
 
     /// <summary>

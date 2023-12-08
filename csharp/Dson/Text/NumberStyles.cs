@@ -39,7 +39,7 @@ public class NumberStyles
     public static readonly INumberStyle UnsignedBinary = new UnsignedBinaryStyle();
 
     /** double能精确表示的最大整数 */
-    private const long DOUBLE_MAX_LONG = (1L << 53) - 1;
+    private const long DoubleMaxLong = (1L << 53) - 1;
 
     #region simple
 
@@ -50,7 +50,7 @@ public class NumberStyles
         }
 
         public StyleOut ToString(long value) {
-            return new StyleOut(value.ToString(), value >= DOUBLE_MAX_LONG);
+            return new StyleOut(value.ToString(), value >= DoubleMaxLong);
         }
 
         public StyleOut ToString(float value) {

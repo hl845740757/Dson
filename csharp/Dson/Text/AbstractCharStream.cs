@@ -84,7 +84,7 @@ public abstract class AbstractCharStream : DsonCharStream
 
     private int OnReadEndOfLine(LineInfo curLine) {
         // 这里不可以修改position，否则unread可能出错
-        if (curLine.State == LineInfo.STATE_EOF) {
+        if (curLine.State == LineInfo.StateEof) {
             _eof = true;
             return -1;
         }

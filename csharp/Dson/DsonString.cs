@@ -24,7 +24,7 @@ public class DsonString : DsonValue, IEquatable<DsonString>, IComparable<DsonStr
         _value = value ?? throw new ArgumentNullException(nameof(value));
     }
 
-    public override DsonType DsonType => DsonType.STRING;
+    public override DsonType DsonType => DsonType.String;
     public string Value => _value;
 
     #region equals

@@ -30,7 +30,7 @@ public class DsonHeader<TK> : AbstractDsonObject<TK>
         : base(DsonInternals.NewLinkedDictionary(valueMap)) {
     }
 
-    public override DsonType DsonType => DsonType.HEADER;
+    public override DsonType DsonType => DsonType.Header;
 
     public override DsonHeader<TK> Append(TK key, DsonValue value) {
         return (DsonHeader<TK>)base.Append(key, value);
@@ -40,22 +40,22 @@ public class DsonHeader<TK> : AbstractDsonObject<TK>
 /// <summary>
 /// 定义常量
 /// </summary>
-public static class DsonHeaderFields
+public static class DsonHeaders
 {
     // header常见属性名
-    public const string NAMES_CLASS_NAME = "clsName";
-    public const string NAMES_COMP_CLASS_NAME = "compClsName";
-    public const string NAMES_CLASS_ID = "clsId";
-    public const string NAMES_COMP_CLASS_ID = "compClsId";
-    public const string NAMES_LOCAL_ID = "localId";
-    public const string NAMES_TAGS = "tags";
-    public const string NAMES_NAMESPACE = "ns";
+    public const string NamesClassName = "clsName";
+    public const string NamesCompClassName = "compClsName";
+    public const string NamesClassId = "clsId";
+    public const string NamesCompClassId = "compClsId";
+    public const string NamesLocalId = "localId";
+    public const string NamesTags = "tags";
+    public const string NamesNamespace = "ns";
 
-    public static readonly int NUMBERS_CLASS_NAME = Dsons.MakeFullNumberZeroIdep(0);
-    public static readonly int NUMBERS_COMP_CLASS_NAME = Dsons.MakeFullNumberZeroIdep(1);
-    public static readonly int NUMBERS_CLASS_ID = Dsons.MakeFullNumberZeroIdep(2);
-    public static readonly int NUMBERS_COMP_CLASS_ID = Dsons.MakeFullNumberZeroIdep(3);
-    public static readonly int NUMBERS_LOCAL_ID = Dsons.MakeFullNumberZeroIdep(4);
-    public static readonly int NUMBERS_TAGS = Dsons.MakeFullNumberZeroIdep(5);
-    public static readonly int NUMBERS_NAMESPACE = Dsons.MakeFullNumberZeroIdep(6);
+    public static readonly FieldNumber NumbersClassName = FieldNumber.OfLnumber(0);
+    public static readonly FieldNumber NumbersCompClassName = FieldNumber.OfLnumber(1);
+    public static readonly FieldNumber NumbersClassId = FieldNumber.OfLnumber(2);
+    public static readonly FieldNumber NumbersCompClassId = FieldNumber.OfLnumber(3);
+    public static readonly FieldNumber NumbersLocalId = FieldNumber.OfLnumber(4);
+    public static readonly FieldNumber NumbersTags = FieldNumber.OfLnumber(5);
+    public static readonly FieldNumber NumbersNamespace = FieldNumber.OfLnumber(6);
 }

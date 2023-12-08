@@ -22,13 +22,13 @@ namespace Dson;
 public enum DsonContextType
 {
     /** 当前在最顶层，尚未开始读写（topLevel相当于一个数组） */
-    TOP_LEVEL,
+    TopLevel,
     /** 当前是一个普通对象结构 */
-    OBJECT,
+    Object,
     /** 当前是一个数组结构 */
-    ARRAY,
+    Array,
     /** 当前是一个Header结构 - 类似Object */
-    HEADER,
+    Header,
 }
 
 public static class DsonContextTypes
@@ -36,12 +36,12 @@ public static class DsonContextTypes
     /// <summary>
     /// 上下文的开始符号
     /// </summary>
-    public static string? startSymbol(this DsonContextType contextType) {
+    public static string? GetStartSymbol(this DsonContextType contextType) {
         return contextType switch {
-            DsonContextType.TOP_LEVEL => null,
-            DsonContextType.OBJECT => "{",
-            DsonContextType.ARRAY => "[",
-            DsonContextType.HEADER => "@{",
+            DsonContextType.TopLevel => null,
+            DsonContextType.Object => "{",
+            DsonContextType.Array => "[",
+            DsonContextType.Header => "@{",
             _ => throw new ArgumentException(nameof(contextType))
         };
     }
@@ -49,25 +49,25 @@ public static class DsonContextTypes
     /// <summary>
     /// 上下文的结束符号
     /// </summary>
-    public static string? endSymbol(this DsonContextType contextType) {
+    public static string? GetEndSymbol(this DsonContextType contextType) {
         return contextType switch {
-            DsonContextType.TOP_LEVEL => null,
-            DsonContextType.OBJECT => "}",
-            DsonContextType.ARRAY => "]",
-            DsonContextType.HEADER => "}",
+            DsonContextType.TopLevel => null,
+            DsonContextType.Object => "}",
+            DsonContextType.Array => "]",
+            DsonContextType.Header => "}",
             _ => throw new ArgumentException(nameof(contextType))
         };
     }
 
-    public static bool isContainer(this DsonContextType contextType) {
-        return contextType == DsonContextType.OBJECT || contextType == DsonContextType.ARRAY;
+    public static bool IsContainer(this DsonContextType contextType) {
+        return contextType == DsonContextType.Object || contextType == DsonContextType.Array;
     }
 
-    public static bool isLikeArray(this DsonContextType contextType) {
-        return contextType == DsonContextType.ARRAY || contextType == DsonContextType.TOP_LEVEL;
+    public static bool IsLikeArray(this DsonContextType contextType) {
+        return contextType == DsonContextType.Array || contextType == DsonContextType.TopLevel;
     }
 
-    public static bool isLikeObject(this DsonContextType contextType) {
-        return contextType == DsonContextType.OBJECT || contextType == DsonContextType.HEADER;
+    public static bool IsLikeObject(this DsonContextType contextType) {
+        return contextType == DsonContextType.Object || contextType == DsonContextType.Header;
     }
 }

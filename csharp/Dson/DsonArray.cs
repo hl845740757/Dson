@@ -41,7 +41,7 @@ public class DsonArray<TK> : AbstractDsonArray
         _header = header;
     }
 
-    public override DsonType DsonType => DsonType.ARRAY;
+    public override DsonType DsonType => DsonType.Array;
     public DsonHeader<TK> Header => _header;
 
     public override DsonArray<TK> Append(DsonValue item) {

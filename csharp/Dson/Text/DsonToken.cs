@@ -35,16 +35,16 @@ public class DsonToken : IEquatable<DsonToken>
         this.Pos = pos;
     }
 
-    public string castAsString() {
+    public string CastAsString() {
         return (string)Value!;
     }
 
-    public char firstChar() {
-        String value = (String)this.Value!;
+    public char FirstChar() {
+        var value = (string)this.Value!;
         return value[0];
     }
 
-    public char lastChar() {
+    public char LastChar() {
         string value = (string)this.Value!;
         return value[value.Length - 1];
     }

@@ -34,7 +34,7 @@ public class DsonExtDouble : DsonValue, IEquatable<DsonExtDouble>, IComparable<D
         _hasVal = hasVal;
     }
 
-    public override DsonType DsonType => DsonType.EXT_DOUBLE;
+    public override DsonType DsonType => DsonType.ExtDouble;
     public int Type => _type;
     public bool HasValue => _hasVal;
     public double Value => _value;

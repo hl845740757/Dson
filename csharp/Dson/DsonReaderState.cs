@@ -22,25 +22,25 @@ namespace Dson;
 public enum DsonReaderState
 {
     /** 顶层上下文的初始状态 */
-    INITIAL,
+    Initial,
 
     /**
      * 已确定是一个Array/Object，等待用户调用readStartXXX方法
      * 正常情况下不会出现该状态，Object/Array由于存在Header，我们通常需要读取header之后才能正确解码，
      * 我们需要能在读取header之后重新恢复到需要调用readStartXXX的方法，才不会影响业务代码，也避免数据流回退
-     * <p>
+     *
      * 简单说，用于peek一部分数据之后，重新设置为等待readStartXXX状态，避免数据流的回滚
      */
-    WAIT_START_OBJECT,
+    WaitStartObject,
     /** 等待读取类型 */
-    TYPE,
+    Type,
     /** 等待用户读取name(fullNumber) */
-    NAME,
+    Name,
     /** 等待读取value */
-    VALUE,
+    Value,
     /** 当前对象读取完毕；等待用户调用writeEndXXX */
-    WAIT_END_OBJECT,
+    WaitEndObject,
 
     /** 到达输入的尾部 */
-    END_OF_FILE,
+    EndOfFile,
 }

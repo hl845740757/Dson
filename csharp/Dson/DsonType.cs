@@ -19,98 +19,98 @@ namespace Dson;
 public enum DsonType
 {
     /** 对象的结束标识 */
-    END_OF_OBJECT = 0,
+    EndOfObject = 0,
 
-    INT32 = 1,
-    INT64 = 2,
-    FLOAT = 3,
-    DOUBLE = 4,
-    BOOLEAN = 5,
-    STRING = 6,
-    NULL = 7,
+    Int32 = 1,
+    Int64 = 2,
+    Float = 3,
+    Double = 4,
+    Boolean = 5,
+    String = 6,
+    Null = 7,
 
     /// <summary>
     /// 二进制字节数组
     /// 我们为二进制字节数组也提供了一个扩展子类型，实现一定程度上的自解释
     /// </summary>
-    BINARY = 8,
+    Binary = 8,
 
     /// <summary>
     /// Int32的扩展类型
     /// 基本类型的int无法直接表达其使用目的，需要额外的类型支持；
     /// 通过扩展类型，可避免破坏业务代码，可避免用户自行封装
     /// </summary>
-    EXT_INT32 = 9,
-    EXT_INT64 = 10,
-    EXT_DOUBLE = 11,
-    EXT_STRING = 12,
+    ExtInt32 = 9,
+    ExtInt64 = 10,
+    ExtDouble = 11,
+    ExtString = 12,
 
     /// <summary>
     /// 对象引用
     /// </summary>
-    REFERENCE = 13,
+    Reference = 13,
     /// <summary>
     /// 时间戳
     /// </summary>
-    TIMESTAMP = 14,
+    Timestamp = 14,
 
     /// <summary>
     /// 对象头信息，与Object类型编码格式类似
     /// 但header不可以再直接嵌入header
     /// </summary>
-    HEADER = 29,
+    Header = 29,
     /// <summary>
     /// 数组(v,v,v...)
     /// </summary>
-    ARRAY = 30,
+    Array = 30,
     /// <summary>
     /// 普通对象(k,v,k,v...)
     /// </summary>
-    OBJECT = 31,
+    Object = 31,
 }
 
 public static class DsonTypes
 {
-    private static readonly DsonType[] LOOK_UP;
-    public static readonly DsonType INVALID = (DsonType)(-1);
+    private static readonly DsonType[] LookUp;
+    public static readonly DsonType Invalid = (DsonType)(-1);
 
     static DsonTypes() {
-        LOOK_UP = new DsonType[(int)DsonType.OBJECT + 1];
+        LookUp = new DsonType[(int)DsonType.Object + 1];
         foreach (var dsonType in Enum.GetValues<DsonType>()) {
-            LOOK_UP[(int)dsonType] = dsonType;
+            LookUp[(int)dsonType] = dsonType;
         }
     }
 
     public static bool IsNumber(this DsonType dsonType) {
         return dsonType switch {
-            DsonType.INT32 => true,
-            DsonType.INT64 => true,
-            DsonType.FLOAT => true,
-            DsonType.DOUBLE => true,
+            DsonType.Int32 => true,
+            DsonType.Int64 => true,
+            DsonType.Float => true,
+            DsonType.Double => true,
             _ => false
         };
     }
 
     public static bool HasWireType(this DsonType dsonType) {
         return dsonType switch {
-            DsonType.INT32 => true,
-            DsonType.INT64 => true,
-            DsonType.EXT_INT32 => true,
-            DsonType.EXT_INT64 => true,
+            DsonType.Int32 => true,
+            DsonType.Int64 => true,
+            DsonType.ExtInt32 => true,
+            DsonType.ExtInt64 => true,
             _ => false
         };
     }
 
     /** header不属于普通意义上的容器 */
     public static bool IsContainer(this DsonType dsonType) {
-        return dsonType == DsonType.OBJECT || dsonType == DsonType.ARRAY;
+        return dsonType == DsonType.Object || dsonType == DsonType.Array;
     }
 
     public static bool IsContainerOrHeader(this DsonType dsonType) {
-        return dsonType == DsonType.OBJECT || dsonType == DsonType.ARRAY || dsonType == DsonType.HEADER;
+        return dsonType == DsonType.Object || dsonType == DsonType.Array || dsonType == DsonType.Header;
     }
 
     public static DsonType ForNumber(int number) {
-        return LOOK_UP[number];
+        return LookUp[number];
     }
 }

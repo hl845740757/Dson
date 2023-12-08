@@ -162,7 +162,7 @@ public interface IDsonWriter<in TName> : IDisposable where TName : IEquatable<TN
         if (clsName == null) throw new ArgumentNullException(nameof(clsName));
         IDsonWriter<string> textWrite = (IDsonWriter<string>)this;
         textWrite.WriteStartHeader();
-        textWrite.WriteString(DsonHeaderFields.NAMES_CLASS_NAME, clsName, StringStyle.AUTO_QUOTE);
+        textWrite.WriteString(DsonHeaders.NamesClassName, clsName, StringStyle.AutoQuote);
         textWrite.WriteEndHeader();
     }
 
@@ -191,13 +191,13 @@ public interface IDsonWriter<in TName> : IDisposable where TName : IEquatable<TN
     /// </summary>
     /// <param name="userData">用户自定义数据</param>
     /// <returns>旧值</returns>
-    object Attach(object userData);
+    object? Attach(object userData);
 
     /// <summary>
     /// 获取附加到当前上下文的数据
     /// </summary>
     /// <returns></returns>
-    object? Attachment();
+    object Attachment();
 
     #endregion
 }

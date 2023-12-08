@@ -18,8 +18,8 @@ namespace Dson;
 
 public class DsonExtString : DsonValue, IEquatable<DsonExtString>, IComparable<DsonExtString>, IComparable
 {
-    public const int MASK_TYPE = 1;
-    public const int MASK_VALUE = 1 << 1;
+    public const int MaskType = 1;
+    public const int MaskValue = 1 << 1;
 
     private readonly int _type;
     private readonly string? _value;
@@ -29,7 +29,7 @@ public class DsonExtString : DsonValue, IEquatable<DsonExtString>, IComparable<D
         _value = value;
     }
 
-    public override DsonType DsonType => DsonType.EXT_STRING;
+    public override DsonType DsonType => DsonType.ExtString;
     public int Type => _type;
     public bool HasValue => _value != null;
 

@@ -24,7 +24,7 @@ public class DsonTimestamp : DsonValue, IEquatable<DsonTimestamp>
         _value = value;
     }
 
-    public override DsonType DsonType => DsonType.TIMESTAMP;
+    public override DsonType DsonType => DsonType.Timestamp;
     public OffsetTimestamp Value => _value;
 
     #region equals

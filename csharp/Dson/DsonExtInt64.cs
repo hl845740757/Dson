@@ -34,7 +34,7 @@ public class DsonExtInt64 : DsonValue, IEquatable<DsonExtInt64>, IComparable<Dso
         _hasVal = hasVal;
     }
 
-    public override DsonType DsonType => DsonType.EXT_INT64;
+    public override DsonType DsonType => DsonType.ExtInt64;
     public int Type => _type;
     public bool HasValue => _hasVal;
     public long Value => _value;

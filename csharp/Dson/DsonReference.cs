@@ -26,7 +26,7 @@ public class DsonReference : DsonValue, IEquatable<DsonReference>
         _value = value;
     }
 
-    public override DsonType DsonType => DsonType.REFERENCE;
+    public override DsonType DsonType => DsonType.Reference;
     public ObjectRef Value => _value;
 
     #region equals

@@ -37,7 +37,7 @@ public class DsonObject<TK> : AbstractDsonObject<TK>
         _header = header;
     }
 
-    public override DsonType DsonType => DsonType.OBJECT;
+    public override DsonType DsonType => DsonType.Object;
     public DsonHeader<TK> Header => _header;
 
     public override DsonObject<TK> Append(TK key, DsonValue value) {

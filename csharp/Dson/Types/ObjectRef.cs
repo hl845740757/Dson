@@ -21,9 +21,9 @@ namespace Dson.Types;
 /// </summary>
 public struct ObjectRef : IEquatable<ObjectRef>
 {
-    public const int MASK_NAMESPACE = 1;
-    public const int MASK_TYPE = 1 << 1;
-    public const int MASK_POLICY = 1 << 2;
+    public const int MaskNamespace = 1;
+    public const int MaskType = 1 << 1;
+    public const int MaskPolicy = 1 << 2;
 
     /** 引用对象的本地id - 如果目标对象是容器中的一员，该值是其容器内编号 */
     public readonly string LocalId;
@@ -77,15 +77,15 @@ public struct ObjectRef : IEquatable<ObjectRef>
 
     #region 常量
 
-    public const string NAMES_NAMESPACE = "ns";
-    public const string NAMES_LOCAL_ID = "localId";
-    public const string NAMES_TYPE = "type";
-    public const string NAMES_POLICY = "policy";
+    public const string NamesNamespace = "ns";
+    public const string NamesLocalId = "localId";
+    public const string NamesType = "type";
+    public const string NamesPolicy = "policy";
 
-    public static readonly int NUMBERS_NAMESPACE = Dsons.MakeFullNumberZeroIdep(0);
-    public static readonly int NUMBERS_LOCAL_ID = Dsons.MakeFullNumberZeroIdep(1);
-    public static readonly int NUMBERS_TYPE = Dsons.MakeFullNumberZeroIdep(2);
-    public static readonly int NUMBERS_POLICY = Dsons.MakeFullNumberZeroIdep(3);
+    public static readonly FieldNumber NumbersNamespace = FieldNumber.OfLnumber(0);
+    public static readonly FieldNumber NumbersLocalId = FieldNumber.OfLnumber(1);
+    public static readonly FieldNumber NumbersType = FieldNumber.OfLnumber(2);
+    public static readonly FieldNumber NumbersPolicy = FieldNumber.OfLnumber(3);
 
     #endregion
 }

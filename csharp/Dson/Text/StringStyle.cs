@@ -27,14 +27,14 @@ public enum StringStyle
     Auto = 0,
 
     /** 自动加引号模式 -- 优先无引号，如果不可以无引号则加引号 */
-    AUTO_QUOTE,
+    AutoQuote,
 
     /** 双引号模式 -- 内容可能包含特殊字符，且想保持流式输入 */
-    QUOTE,
+    Quote,
 
     /** 无引号模式 -- 内容不包含特殊字符，且内容较短；要小心使用 */
-    UNQUOTE,
+    Unquote,
 
     /** 纯文本模式 -- 内容可能包含特殊字符，或内容较长 */
-    TEXT,
+    Text,
 }

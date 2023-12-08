@@ -36,7 +36,7 @@ class StringCharStream : AbstractCharStream
         string buffer = this._buffer;
         int bufferLength = buffer.Length;
 
-        LineInfo curLine = CurLine;
+        LineInfo? curLine = CurLine;
         int startPos;
         int ln;
         if (curLine == null) {
@@ -51,43 +51,43 @@ class StringCharStream : AbstractCharStream
             return false;
         }
 
-        int state = LineInfo.STATE_SCAN;
+        int state = LineInfo.StateScan;
         int endPos = startPos;
         int headPos = -1;
 
         for (; endPos < bufferLength; endPos++) {
             char c = buffer[endPos];
             // 需要放在switch-case之前，否则可能漏掉\r的非法head
-            if (headPos == -1 && !DsonTexts.isIndentChar(c)) {
+            if (headPos == -1 && !DsonTexts.IsIndentChar(c)) {
                 headPos = endPos;
             }
             if (c == '\n') {
-                state = LineInfo.STATE_LF;
+                state = LineInfo.StateLf;
                 break;
             }
             if (c == '\r') {
                 if (endPos == bufferLength - 1) { // eof
-                    state = LineInfo.STATE_EOF;
+                    state = LineInfo.StateEof;
                     break;
                 }
                 c = buffer[++endPos];
                 if (c == '\n') { // CRLF
-                    state = LineInfo.STATE_CRLF;
+                    state = LineInfo.StateCrlf;
                     break;
                 }
             }
             if (endPos == bufferLength - 1) { // eof
-                state = LineInfo.STATE_EOF;
+                state = LineInfo.StateEof;
                 break;
             }
         }
 
-        LineHead? lineHead = LineHead.COMMENT;
+        LineHead? lineHead = LineHead.Comment;
         int contentStartPos = -1;
         int lastReadablePos = LineInfo.LastReadablePosition(state, endPos);
-        if (DsonMode == DsonMode.RELAXED) {
+        if (DsonMode == DsonMode.Relaxed) {
             if (startPos <= lastReadablePos) {
-                lineHead = LineHead.APPEND;
+                lineHead = LineHead.Append;
                 contentStartPos = startPos;
             }
         }

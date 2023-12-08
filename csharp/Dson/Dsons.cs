@@ -15,6 +15,7 @@
  */
 
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using Dson.Text;
 
 namespace Dson;
@@ -27,41 +28,41 @@ public static class Dsons
     #region 基础常量
 
     /** {@link DsonType}占用的比特位 */
-    public const int DSON_TYPE_BITES = 5;
+    public const int DsonTypeBites = 5;
     /** {@link DsonType}的最大类型编号 */
-    public const int DSON_TYPE_MAX_VALUE = 31;
+    public const int DsonTypeMaxValue = 31;
 
     /** {@link WireType}占位的比特位数 */
-    public const int WIRETYPE_BITS = 3;
-    public const int WIRETYPE_MASK = (1 << WIRETYPE_BITS) - 1;
+    public const int WireTypeBits = 3;
+    public const int WireTypeMask = (1 << WireTypeBits) - 1;
     /** wireType看做数值时的最大值 */
-    public const int WIRETYPE_MAX_VALUE = 7;
+    public const int WireTypeMaxValue = 7;
 
     /** 完整类型信息占用的比特位数 */
-    public const int FULL_TYPE_BITS = DSON_TYPE_BITES + WIRETYPE_BITS;
-    public const int FULL_TYPE_MASK = (1 << FULL_TYPE_BITS) - 1;
+    public const int FullTypeBits = DsonTypeBites + WireTypeBits;
+    public const int FullTypeMask = (1 << FullTypeBits) - 1;
 
     /** 二进制数据的最大长度 -- type使用 varint编码，最大占用5个字节 */
-    public const int MAX_BINARY_LENGTH = int.MaxValue - 5;
+    public const int MaxBinaryLength = int.MaxValue - 5;
 
     #endregion
 
     #region 二进制常量
 
     /** 继承深度占用的比特位 */
-    private const int IDEP_BITS = 3;
-    private const int IDEP_MASK = (1 << IDEP_BITS) - 1;
+    private const int IdepBits = 3;
+    private const int IdepMask = (1 << IdepBits) - 1;
     /**
      * 支持的最大继承深度 - 7
      * 1.idep的深度不包含Object，没有显式继承其它类的类，idep为0
      * 2.超过7层我认为是你的代码有问题，而不是框架问题
      */
-    public const int IDEP_MAX_VALUE = IDEP_MASK;
+    public const int IdepMaxValue = IdepMask;
 
     /** 类字段最大number */
-    private const short LNUMBER_MAX_VALUE = 8191;
+    private const short LnumberMaxValue = 8191;
     /** 类字段占用的最大比特位数 - 暂不对外开放 */
-    private const int LNUMBER_MAX_BITS = 13;
+    private const int LnumberMaxBits = 13;
 
     #endregion
 
@@ -84,8 +85,8 @@ public static class Dsons
     }
 
     public static void CheckBinaryLength(int length) {
-        if (length > MAX_BINARY_LENGTH) {
-            throw new ArgumentException($"the length of data must between[0, {MAX_BINARY_LENGTH}], but found: {length}");
+        if (length > MaxBinaryLength) {
+            throw new ArgumentException($"the length of data must between[0, {MaxBinaryLength}], but found: {length}");
         }
     }
 
@@ -117,8 +118,9 @@ public static class Dsons
     /// <param name="dsonType">Dson数据类型</param>
     /// <param name="wireType">特殊编码类型</param>
     /// <returns>完整类型</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int MakeFullType(DsonType dsonType, WireType wireType) {
-        return ((int)dsonType << WIRETYPE_BITS) | (int)wireType;
+        return ((int)dsonType << WireTypeBits) | (int)wireType;
     }
 
     /// <summary>
@@ -127,16 +129,19 @@ public static class Dsons
     /// <param name="dsonType">Dson数据类型 5bits[0~31]</param>
     /// <param name="wireType">特殊编码类型 3bits[0~7]</param>
     /// <returns>完整类型</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int MakeFullType(int dsonType, int wireType) {
-        return (dsonType << WIRETYPE_BITS) | wireType;
+        return (dsonType << WireTypeBits) | wireType;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int DsonTypeOfFullType(int fullType) {
-        return DsonInternals.LogicalShiftRight(fullType, WIRETYPE_BITS);
+        return DsonInternals.LogicalShiftRight(fullType, WireTypeBits);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int WireTypeOfFullType(int fullType) {
-        return (fullType & WIRETYPE_MASK);
+        return (fullType & WireTypeMask);
     }
 
     #endregion
@@ -149,20 +154,24 @@ public static class Dsons
     /// <param name="idep">继承深度[0~7]</param>
     /// <param name="lnumber">字段在类本地的编号</param>
     /// <returns>字段的完整编号</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int MakeFullNumber(int idep, int lnumber) {
-        return (lnumber << IDEP_BITS) | idep;
+        return (lnumber << IdepBits) | idep;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int LnumberOfFullNumber(int fullNumber) {
-        return DsonInternals.LogicalShiftRight(fullNumber, IDEP_BITS);
+        return DsonInternals.LogicalShiftRight(fullNumber, IdepBits);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static byte IdepOfFullNumber(int fullNumber) {
-        return (byte)(fullNumber & IDEP_MASK);
+        return (byte)(fullNumber & IdepMask);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int MakeFullNumberZeroIdep(int lnumber) {
-        return lnumber << IDEP_BITS;
+        return lnumber << IdepBits;
     }
 
     // classId
@@ -201,63 +210,63 @@ public static class Dsons
 
     #region Read/Write
 
-    public static void writeTopDsonValue<TName>(IDsonWriter<TName> writer,
+    public static void WriteTopDsonValue<TName>(IDsonWriter<TName> writer,
                                                 DsonValue dsonValue, ObjectStyle style) where TName : IEquatable<TName> {
-        if (dsonValue.DsonType == DsonType.OBJECT) {
-            writeObject(writer, dsonValue.AsObject<TName>(), style);
+        if (dsonValue.DsonType == DsonType.Object) {
+            WriteObject(writer, dsonValue.AsObject<TName>(), style);
         }
-        else if (dsonValue.DsonType == DsonType.ARRAY) {
-            writeArray(writer, dsonValue.AsArray<TName>(), style);
+        else if (dsonValue.DsonType == DsonType.Array) {
+            WriteArray(writer, dsonValue.AsArray<TName>(), style);
         }
         else {
-            writeHeader(writer, dsonValue.AsHeader<TName>());
+            WriteHeader(writer, dsonValue.AsHeader<TName>());
         }
     }
 
     /** @return 如果到达文件尾部，则返回null */
-    public static DsonValue? readTopDsonValue<TName>(IDsonReader<TName> reader) where TName : IEquatable<TName> {
+    public static DsonValue? ReadTopDsonValue<TName>(IDsonReader<TName> reader) where TName : IEquatable<TName> {
         DsonType dsonType = reader.ReadDsonType();
-        if (dsonType == DsonType.END_OF_OBJECT) {
+        if (dsonType == DsonType.EndOfObject) {
             return null;
         }
-        if (dsonType == DsonType.OBJECT) {
-            return readObject(reader);
+        if (dsonType == DsonType.Object) {
+            return ReadObject(reader);
         }
-        else if (dsonType == DsonType.ARRAY) {
-            return readArray(reader);
+        else if (dsonType == DsonType.Array) {
+            return ReadArray(reader);
         }
         else {
-            Debug.Assert(dsonType == DsonType.HEADER);
-            return readHeader(reader, new DsonHeader<TName>());
+            Debug.Assert(dsonType == DsonType.Header);
+            return ReadHeader(reader, new DsonHeader<TName>());
         }
     }
 
     /** 如果需要写入名字，外部写入 */
-    public static void writeObject<TName>(IDsonWriter<TName> writer,
+    public static void WriteObject<TName>(IDsonWriter<TName> writer,
                                           DsonObject<TName> dsonObject, ObjectStyle style) where TName : IEquatable<TName> {
         writer.WriteStartObject(style);
         if (dsonObject.Header.Count > 0) {
-            writeHeader(writer, dsonObject.Header);
+            WriteHeader(writer, dsonObject.Header);
         }
         foreach (var pair in dsonObject) {
-            writeDsonValue(writer, pair.Value, pair.Key);
+            WriteDsonValue(writer, pair.Value, pair.Key);
         }
         writer.WriteEndObject();
     }
 
-    public static DsonObject<TName> readObject<TName>(IDsonReader<TName> reader) where TName : IEquatable<TName> {
+    public static DsonObject<TName> ReadObject<TName>(IDsonReader<TName> reader) where TName : IEquatable<TName> {
         DsonObject<TName> dsonObject = new DsonObject<TName>();
         DsonType dsonType;
         TName name;
         DsonValue value;
         reader.ReadStartObject();
-        while ((dsonType = reader.ReadDsonType()) != DsonType.END_OF_OBJECT) {
-            if (dsonType == DsonType.HEADER) {
-                readHeader(reader, dsonObject.Header);
+        while ((dsonType = reader.ReadDsonType()) != DsonType.EndOfObject) {
+            if (dsonType == DsonType.Header) {
+                ReadHeader(reader, dsonObject.Header);
             }
             else {
                 name = reader.ReadName();
-                value = readDsonValue(reader);
+                value = ReadDsonValue(reader);
                 dsonObject[name] = value;
             }
         }
@@ -266,29 +275,29 @@ public static class Dsons
     }
 
     /** 如果需要写入名字，外部写入 */
-    public static void writeArray<TName>(IDsonWriter<TName> writer,
+    public static void WriteArray<TName>(IDsonWriter<TName> writer,
                                          DsonArray<TName> dsonArray, ObjectStyle style) where TName : IEquatable<TName> {
         writer.WriteStartArray(style);
         if (dsonArray.Header.Count > 0) {
-            writeHeader(writer, dsonArray.Header);
+            WriteHeader(writer, dsonArray.Header);
         }
         foreach (DsonValue dsonValue in dsonArray) {
-            writeDsonValue(writer, dsonValue, default);
+            WriteDsonValue(writer, dsonValue, default);
         }
         writer.WriteEndArray();
     }
 
-    public static DsonArray<TName> readArray<TName>(IDsonReader<TName> reader) where TName : IEquatable<TName> {
+    public static DsonArray<TName> ReadArray<TName>(IDsonReader<TName> reader) where TName : IEquatable<TName> {
         DsonArray<TName> dsonArray = new DsonArray<TName>();
         DsonType dsonType;
         DsonValue value;
         reader.ReadStartArray();
-        while ((dsonType = reader.ReadDsonType()) != DsonType.END_OF_OBJECT) {
-            if (dsonType == DsonType.HEADER) {
-                readHeader(reader, dsonArray.Header);
+        while ((dsonType = reader.ReadDsonType()) != DsonType.EndOfObject) {
+            if (dsonType == DsonType.Header) {
+                ReadHeader(reader, dsonArray.Header);
             }
             else {
-                value = readDsonValue(reader);
+                value = ReadDsonValue(reader);
                 dsonArray.Add(value);
             }
         }
@@ -296,128 +305,128 @@ public static class Dsons
         return dsonArray;
     }
 
-    public static void writeHeader<TName>(IDsonWriter<TName> writer, DsonHeader<TName> header) where TName : IEquatable<TName> {
+    public static void WriteHeader<TName>(IDsonWriter<TName> writer, DsonHeader<TName> header) where TName : IEquatable<TName> {
         if (header.Count == 1 && typeof(TName) == typeof(string)) {
-            if (header.AsHeader<string>().TryGetValue(DsonHeaderFields.NAMES_CLASS_NAME, out DsonValue clsName)) {
+            if (header.AsHeader<string>().TryGetValue(DsonHeaders.NamesClassName, out DsonValue clsName)) {
                 writer.WriteSimpleHeader(clsName.AsString()); // header只包含clsName时打印为简单模式
                 return;
             }
         }
         writer.WriteStartHeader();
         foreach (var pair in header) {
-            writeDsonValue(writer, pair.Value, pair.Key);
+            WriteDsonValue(writer, pair.Value, pair.Key);
         }
         writer.WriteEndHeader();
     }
 
-    public static DsonHeader<TName> readHeader<TName>(IDsonReader<TName> reader, DsonHeader<TName>? header) where TName : IEquatable<TName> {
+    public static DsonHeader<TName> ReadHeader<TName>(IDsonReader<TName> reader, DsonHeader<TName>? header) where TName : IEquatable<TName> {
         if (header == null) header = new DsonHeader<TName>();
         DsonType dsonType;
         TName name;
         DsonValue value;
         reader.ReadStartHeader();
-        while ((dsonType = reader.ReadDsonType()) != DsonType.END_OF_OBJECT) {
-            Debug.Assert(dsonType != DsonType.HEADER);
+        while ((dsonType = reader.ReadDsonType()) != DsonType.EndOfObject) {
+            Debug.Assert(dsonType != DsonType.Header);
             name = reader.ReadName();
-            value = readDsonValue(reader);
+            value = ReadDsonValue(reader);
             header[name] = value;
         }
         reader.ReadEndHeader();
         return header;
     }
 
-    public static void writeDsonValue<TName>(IDsonWriter<TName> writer, DsonValue dsonValue, TName? name) where TName : IEquatable<TName> {
+    public static void WriteDsonValue<TName>(IDsonWriter<TName> writer, DsonValue dsonValue, TName? name) where TName : IEquatable<TName> {
         if (writer.IsAtName) {
             writer.WriteName(name);
         }
         switch (dsonValue.DsonType) {
-            case DsonType.INT32:
+            case DsonType.Int32:
                 writer.WriteInt32(name, dsonValue.AsInt32(), WireType.VarInt, NumberStyles.Typed); // 必须能精确反序列化
                 break;
-            case DsonType.INT64:
+            case DsonType.Int64:
                 writer.WriteInt64(name, dsonValue.AsInt64(), WireType.VarInt, NumberStyles.Typed);
                 break;
-            case DsonType.FLOAT:
+            case DsonType.Float:
                 writer.WriteFloat(name, dsonValue.AsFloat(), NumberStyles.Typed);
                 break;
-            case DsonType.DOUBLE:
+            case DsonType.Double:
                 writer.WriteDouble(name, dsonValue.AsDouble(), NumberStyles.Simple);
                 break;
-            case DsonType.BOOLEAN:
+            case DsonType.Boolean:
                 writer.WriteBoolean(name, dsonValue.AsBool());
                 break;
-            case DsonType.STRING:
-                writer.WriteString(name, dsonValue.AsString(), StringStyle.Auto);
+            case DsonType.String:
+                writer.WriteString(name, dsonValue.AsString());
                 break;
-            case DsonType.NULL:
+            case DsonType.Null:
                 writer.WriteNull(name);
                 break;
-            case DsonType.BINARY:
+            case DsonType.Binary:
                 writer.WriteBinary(name, dsonValue.AsBinary());
                 break;
-            case DsonType.EXT_INT32:
+            case DsonType.ExtInt32:
                 writer.WriteExtInt32(name, dsonValue.AsExtInt32(), WireType.VarInt, NumberStyles.Simple);
                 break;
-            case DsonType.EXT_INT64:
+            case DsonType.ExtInt64:
                 writer.WriteExtInt64(name, dsonValue.AsExtInt64(), WireType.VarInt, NumberStyles.Simple);
                 break;
-            case DsonType.EXT_DOUBLE:
+            case DsonType.ExtDouble:
                 writer.WriteExtDouble(name, dsonValue.AsExtDouble(), NumberStyles.Simple);
                 break;
-            case DsonType.EXT_STRING:
-                writer.WriteExtString(name, dsonValue.AsExtString(), StringStyle.Auto);
+            case DsonType.ExtString:
+                writer.WriteExtString(name, dsonValue.AsExtString());
                 break;
-            case DsonType.REFERENCE:
+            case DsonType.Reference:
                 writer.WriteRef(name, dsonValue.AsReference());
                 break;
-            case DsonType.TIMESTAMP:
+            case DsonType.Timestamp:
                 writer.WriteTimestamp(name, dsonValue.AsTimestamp());
                 break;
-            case DsonType.HEADER:
-                writeHeader(writer, dsonValue.AsHeader<TName>());
+            case DsonType.Header:
+                WriteHeader(writer, dsonValue.AsHeader<TName>());
                 break;
-            case DsonType.ARRAY:
-                writeArray(writer, dsonValue.AsArray<TName>(), ObjectStyle.Indent);
+            case DsonType.Array:
+                WriteArray(writer, dsonValue.AsArray<TName>(), ObjectStyle.Indent);
                 break;
-            case DsonType.OBJECT:
-                writeObject(writer, dsonValue.AsObject<TName>(), ObjectStyle.Indent);
+            case DsonType.Object:
+                WriteObject(writer, dsonValue.AsObject<TName>(), ObjectStyle.Indent);
                 break;
-            case DsonType.END_OF_OBJECT:
+            case DsonType.EndOfObject:
             default:
                 throw new InvalidOperationException();
         }
     }
 
-    public static DsonValue readDsonValue<TName>(IDsonReader<TName> reader) where TName : IEquatable<TName> {
+    public static DsonValue ReadDsonValue<TName>(IDsonReader<TName> reader) where TName : IEquatable<TName> {
         DsonType dsonType = reader.CurrentDsonType;
         reader.SkipName();
         TName name = default;
         switch (dsonType) {
-            case DsonType.INT32: return new DsonInt32(reader.ReadInt32(name));
-            case DsonType.INT64: return new DsonInt64(reader.ReadInt64(name));
-            case DsonType.FLOAT: return new DsonFloat(reader.ReadFloat(name));
-            case DsonType.DOUBLE: return new DsonDouble(reader.ReadDouble(name));
-            case DsonType.BOOLEAN: return new DsonBool(reader.ReadBoolean(name));
-            case DsonType.STRING: return new DsonString(reader.ReadString(name));
-            case DsonType.NULL: {
+            case DsonType.Int32: return new DsonInt32(reader.ReadInt32(name));
+            case DsonType.Int64: return new DsonInt64(reader.ReadInt64(name));
+            case DsonType.Float: return new DsonFloat(reader.ReadFloat(name));
+            case DsonType.Double: return new DsonDouble(reader.ReadDouble(name));
+            case DsonType.Boolean: return new DsonBool(reader.ReadBoolean(name));
+            case DsonType.String: return new DsonString(reader.ReadString(name));
+            case DsonType.Null: {
                 reader.ReadNull(name);
                 return DsonNull.Null;
             }
-            case DsonType.BINARY: return reader.ReadBinary(name);
-            case DsonType.EXT_INT32: return reader.ReadExtInt32(name);
-            case DsonType.EXT_INT64: return reader.ReadExtInt64(name);
-            case DsonType.EXT_DOUBLE: return reader.ReadExtDouble(name);
-            case DsonType.EXT_STRING: return reader.ReadExtString(name);
-            case DsonType.REFERENCE: return new DsonReference(reader.ReadRef(name));
-            case DsonType.TIMESTAMP: return new DsonTimestamp(reader.ReadTimestamp(name));
-            case DsonType.HEADER: {
+            case DsonType.Binary: return reader.ReadBinary(name);
+            case DsonType.ExtInt32: return reader.ReadExtInt32(name);
+            case DsonType.ExtInt64: return reader.ReadExtInt64(name);
+            case DsonType.ExtDouble: return reader.ReadExtDouble(name);
+            case DsonType.ExtString: return reader.ReadExtString(name);
+            case DsonType.Reference: return new DsonReference(reader.ReadRef(name));
+            case DsonType.Timestamp: return new DsonTimestamp(reader.ReadTimestamp(name));
+            case DsonType.Header: {
                 DsonHeader<TName> header = new DsonHeader<TName>();
-                readHeader(reader, header);
+                ReadHeader(reader, header);
                 return header;
             }
-            case DsonType.OBJECT: return readObject(reader);
-            case DsonType.ARRAY: return readArray(reader);
-            case DsonType.END_OF_OBJECT:
+            case DsonType.Object: return ReadObject(reader);
+            case DsonType.Array: return ReadArray(reader);
+            case DsonType.EndOfObject:
             default: throw new InvalidOperationException();
         }
     }
@@ -427,14 +436,14 @@ public static class Dsons
     #region 工厂方法
 
     public static DsonScanner NewJsonScanner(string jsonString) {
-        return new DsonScanner(DsonCharStream.NewCharStream(jsonString, DsonMode.RELAXED));
+        return new DsonScanner(DsonCharStream.NewCharStream(jsonString, DsonMode.Relaxed));
     }
 
-    public static DsonScanner NewStringScanner(string dsonString, DsonMode dsonMode = DsonMode.STANDARD) {
+    public static DsonScanner NewStringScanner(string dsonString, DsonMode dsonMode = DsonMode.Standard) {
         return new DsonScanner(DsonCharStream.NewCharStream(dsonString, dsonMode));
     }
 
-    public static DsonScanner NewStreamScanner(StreamReader reader, DsonMode dsonMode = DsonMode.STANDARD,
+    public static DsonScanner NewStreamScanner(StreamReader reader, DsonMode dsonMode = DsonMode.Standard,
                                                int bufferSize = 512, bool autoClose = true) {
         return new DsonScanner(DsonCharStream.NewBufferedCharStream(reader, dsonMode, bufferSize, autoClose));
     }

@@ -223,7 +223,7 @@ public interface IDsonReader<TName> : IDisposable where TName : IEquatable<TName
     /// </summary>
     /// <param name="userData">用户自定义数据</param>
     /// <returns>旧值</returns>
-    object Attach(object userData);
+    object? Attach(object userData);
 
     /// <summary>
     /// 获取附加到当前上下文的数据

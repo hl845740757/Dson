@@ -22,43 +22,43 @@ namespace Dson.Text;
 public enum DsonTokenType
 {
     /** 到达文件尾部 */
-    EOF,
+    Eof,
 
     /** 对象开始符， '{' */
-    BEGIN_OBJECT,
+    BeginObject,
     /** 对象结束符， '}' */
-    END_OBJECT,
+    EndObject,
 
     /** 数组开始符，'[' */
-    BEGIN_ARRAY,
+    BeginArray,
     /** 数组结束符，']' */
-    END_ARRAY,
+    EndArray,
 
     /** 对象头开始符 '@{' */
-    BEGIN_HEADER,
+    BeginHeader,
     /** Header的简写形式 '@clsName' -- clsName不是基础类型 */
-    CLASS_NAME,
+    ClassName,
 
     /** KV分隔符，冒号 ':' */
-    COLON,
+    Colon,
     /** 元素分隔符，英文逗号 ',' */
-    COMMA,
+    Comma,
 
     /** 显式声明 '@i' */
-    INT32,
+    Int32,
     /** 显式声明 '@L' */
-    INT64,
+    Int64,
     /** 显式声明 '@f' */
-    FLOAT,
+    Float,
     /** 显式声明 '@d' */
-    DOUBLE,
+    Double,
     /** 显式声明 '@b' */
-    BOOL,
+    Bool,
     /** 显式声明 双引号 或 '@s' 或 '@ss' */
-    STRING,
+    String,
     /** 显式声明 '@N' */
-    NULL,
+    Null,
 
     /** 无引号字符串，scan的时候不解析，使得返回后可以根据上下文推断其类型 */
-    UNQUOTE_STRING,
+    UnquoteString,
 }

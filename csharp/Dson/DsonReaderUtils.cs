@@ -24,13 +24,13 @@ namespace Dson;
 public class DsonReaderUtils
 {
     /** 支持读取为bytes和直接写入bytes的数据类型 -- 这些类型不可以存储额外数据在WireType上 */
-    public static readonly IList<DsonType> VALUE_BYTES_TYPES = new[] {
-        DsonType.STRING, DsonType.BINARY, DsonType.ARRAY, DsonType.OBJECT, DsonType.HEADER
+    public static readonly IList<DsonType> ValueBytesTypes = new[] {
+        DsonType.String, DsonType.Binary, DsonType.Array, DsonType.Object, DsonType.Header
     }.ToImmutableList();
 
-    // region number
+    #region number
 
-    public static void writeInt32(IDsonOutput output, int value, WireType wireType) {
+    public static void WriteInt32(IDsonOutput output, int value, WireType wireType) {
         switch (wireType) {
             case WireType.VarInt: {
                 output.WriteInt32(value);
@@ -53,7 +53,7 @@ public class DsonReaderUtils
         }
     }
 
-    public static int readInt32(IDsonInput input, WireType wireType) {
+    public static int ReadInt32(IDsonInput input, WireType wireType) {
         switch (wireType) {
             case WireType.VarInt: {
                 return input.ReadInt32();
@@ -72,7 +72,7 @@ public class DsonReaderUtils
         }
     }
 
-    public static void writeInt64(IDsonOutput output, long value, WireType wireType) {
+    public static void WriteInt64(IDsonOutput output, long value, WireType wireType) {
         switch (wireType) {
             case WireType.VarInt: {
                 output.WriteInt64(value);
@@ -95,7 +95,7 @@ public class DsonReaderUtils
         }
     }
 
-    public static long readInt64(IDsonInput input, WireType wireType) {
+    public static long ReadInt64(IDsonInput input, WireType wireType) {
         switch (wireType) {
             case WireType.VarInt: {
                 return input.ReadInt64();
@@ -119,7 +119,7 @@ public class DsonReaderUtils
      * 2.wireType表示后导0对应的字节数
      * 3.由于编码依赖了上层的wireType比特位，因此不能写在Output接口中
      */
-    public static int wireTypeOfFloat(float value) {
+    public static int WireTypeOfFloat(float value) {
         int rawBits = BitConverter.SingleToInt32Bits(value);
         if ((rawBits & 0xFF) != 0) {
             return 0;
@@ -131,7 +131,7 @@ public class DsonReaderUtils
     }
 
     /** 小端编码，从末尾非0开始写入 */
-    public static void writeFloat(IDsonOutput output, float value, int wireType) {
+    public static void WriteFloat(IDsonOutput output, float value, int wireType) {
         if (wireType == 0) {
             output.WriteFloat(value);
             return;
@@ -147,7 +147,7 @@ public class DsonReaderUtils
         }
     }
 
-    public static float readFloat(IDsonInput input, int wireType) {
+    public static float ReadFloat(IDsonInput input, int wireType) {
         if (wireType == 0) {
             return input.ReadFloat();
         }
@@ -162,7 +162,7 @@ public class DsonReaderUtils
     /**
      * 浮点数的前16位固定写入，因此只统计后48位
      */
-    public static int wireTypeOfDouble(double value) {
+    public static int WireTypeOfDouble(double value) {
         long rawBits = BitConverter.DoubleToInt64Bits(value);
         for (int i = 0; i < 6; i++) {
             byte v = (byte)rawBits;
@@ -174,7 +174,7 @@ public class DsonReaderUtils
         return 6;
     }
 
-    public static void writeDouble(IDsonOutput output, double value, int wireType) {
+    public static void WriteDouble(IDsonOutput output, double value, int wireType) {
         if (wireType == 0) {
             output.WriteDouble(value);
             return;
@@ -190,7 +190,7 @@ public class DsonReaderUtils
         }
     }
 
-    public static double readDouble(IDsonInput input, int wireType) {
+    public static double ReadDouble(IDsonInput input, int wireType) {
         if (wireType == 0) {
             return input.ReadDouble();
         }
@@ -202,7 +202,7 @@ public class DsonReaderUtils
         return BitConverter.Int64BitsToDouble(rawBits);
     }
 
-    public static bool readBool(IDsonInput input, int wireTypeBits) {
+    public static bool ReadBool(IDsonInput input, int wireTypeBits) {
         if (wireTypeBits == 1) {
             return true;
         }
@@ -211,25 +211,26 @@ public class DsonReaderUtils
         }
         throw new DsonIOException("invalid wireType for bool, bits: " + wireTypeBits);
     }
-    // endregion
 
-    // region binary
+    #endregion
 
-    public static void writeBinary(IDsonOutput output, DsonBinary binary) {
+    #region binary
+
+    public static void WriteBinary(IDsonOutput output, DsonBinary binary) {
         int sizeOfBinaryType = CodedOutputStream.ComputeUInt32Size((uint)binary.Type);
         output.WriteFixed32(sizeOfBinaryType + binary.Data.Length);
         output.WriteUint32(binary.Type);
         output.WriteRawBytes(binary.Data);
     }
 
-    public static void writeBinary(IDsonOutput output, int type, DsonChunk chunk) {
+    public static void WriteBinary(IDsonOutput output, int type, DsonChunk chunk) {
         int sizeOfBinaryType = CodedOutputStream.ComputeUInt32Size((uint)type);
         output.WriteFixed32(sizeOfBinaryType + chunk.Length);
         output.WriteUint32(type);
         output.WriteRawBytes(chunk.Buffer, chunk.Offset, chunk.Length);
     }
 
-    public static DsonBinary readDsonBinary(IDsonInput input) {
+    public static DsonBinary ReadDsonBinary(IDsonInput input) {
         int size = input.ReadFixed32();
         int oldLimit = input.PushLimit(size);
         DsonBinary binary;
@@ -242,14 +243,14 @@ public class DsonReaderUtils
         return binary;
     }
 
-    public static void writeMessage(IDsonOutput output, int binaryType, IMessage messageLite) {
+    public static void WriteMessage(IDsonOutput output, int binaryType, IMessage messageLite) {
         int sizeOfBinaryType = CodedOutputStream.ComputeUInt32Size((uint)binaryType);
         output.WriteFixed32(sizeOfBinaryType + messageLite.CalculateSize()); // CalculateSize，因此这里调用不会增加开销
         output.WriteUint32(binaryType);
         output.WriteMessage(messageLite);
     }
 
-    public static T readMessage<T>(IDsonInput input, int binaryType, MessageParser<T> parser) where T : IMessage<T> {
+    public static T ReadMessage<T>(IDsonInput input, int binaryType, MessageParser<T> parser) where T : IMessage<T> {
         int size = input.ReadFixed32();
         int oldLimit = input.PushLimit(size);
         T value;
@@ -262,65 +263,67 @@ public class DsonReaderUtils
         return value;
     }
 
-    // endregion
+    #endregion
 
-    public static void writeExtInt32(IDsonOutput output, DsonExtInt32 extInt32, WireType wireType) {
+    #region 内置二元组
+
+    public static void WriteExtInt32(IDsonOutput output, DsonExtInt32 extInt32, WireType wireType) {
         output.WriteUint32(extInt32.Type);
         output.WriteBool(extInt32.HasValue);
         if (extInt32.HasValue) {
-            writeInt32(output, extInt32.Value, wireType);
+            WriteInt32(output, extInt32.Value, wireType);
         }
     }
 
-    public static DsonExtInt32 readDsonExtInt32(IDsonInput input, WireType wireType) {
+    public static DsonExtInt32 ReadDsonExtInt32(IDsonInput input, WireType wireType) {
         int type = input.ReadUint32();
         bool hasValue = input.ReadBool();
-        int value = hasValue ? readInt32(input, wireType) : 0;
+        int value = hasValue ? ReadInt32(input, wireType) : 0;
         return new DsonExtInt32(type, value, hasValue);
     }
 
-    public static void writeExtInt64(IDsonOutput output, DsonExtInt64 extInt64, WireType wireType) {
+    public static void WriteExtInt64(IDsonOutput output, DsonExtInt64 extInt64, WireType wireType) {
         output.WriteUint32(extInt64.Type);
         output.WriteBool(extInt64.HasValue);
         if (extInt64.HasValue) {
-            writeInt64(output, extInt64.Value, wireType);
+            WriteInt64(output, extInt64.Value, wireType);
         }
     }
 
-    public static DsonExtInt64 readDsonExtInt64(IDsonInput input, WireType wireType) {
+    public static DsonExtInt64 ReadDsonExtInt64(IDsonInput input, WireType wireType) {
         int type = input.ReadUint32();
         bool hasValue = input.ReadBool();
-        long value = hasValue ? readInt64(input, wireType) : 0;
+        long value = hasValue ? ReadInt64(input, wireType) : 0;
         return new DsonExtInt64(type, value, hasValue);
     }
 
-    public static void writeExtDouble(IDsonOutput output, DsonExtDouble extDouble, int wireType) {
+    public static void WriteExtDouble(IDsonOutput output, DsonExtDouble extDouble, int wireType) {
         output.WriteUint32(extDouble.Type);
         output.WriteBool(extDouble.HasValue);
         if (extDouble.HasValue) {
-            writeDouble(output, extDouble.Value, wireType);
+            WriteDouble(output, extDouble.Value, wireType);
         }
     }
 
-    public static DsonExtDouble readDsonExtDouble(IDsonInput input, int wireType) {
+    public static DsonExtDouble ReadDsonExtDouble(IDsonInput input, int wireType) {
         int type = input.ReadUint32();
         bool hasValue = input.ReadBool();
-        double value = hasValue ? readDouble(input, wireType) : 0;
+        double value = hasValue ? ReadDouble(input, wireType) : 0;
         return new DsonExtDouble(type, value, hasValue);
     }
 
-    public static int wireTypeOfExtString(DsonExtString extString) {
+    public static int WireTypeOfExtString(DsonExtString extString) {
         int v = 0;
         if (extString.Type != 0) {
-            v |= DsonExtString.MASK_TYPE;
+            v |= DsonExtString.MaskType;
         }
         if (extString.HasValue) {
-            v |= DsonExtString.MASK_VALUE;
+            v |= DsonExtString.MaskValue;
         }
         return v;
     }
 
-    public static void writeExtString(IDsonOutput output, DsonExtString extString) {
+    public static void WriteExtString(IDsonOutput output, DsonExtString extString) {
         if (extString.Type != 0) {
             output.WriteUint32(extString.Type);
         }
@@ -329,27 +332,31 @@ public class DsonReaderUtils
         }
     }
 
-    public static DsonExtString readDsonExtString(IDsonInput input, int wireTypeBits) {
-        int type = DsonInternals.isEnabled(wireTypeBits, DsonExtString.MASK_TYPE) ? input.ReadUint32() : 0;
-        string value = DsonInternals.isEnabled(wireTypeBits, DsonExtString.MASK_VALUE) ? input.ReadString() : null;
+    public static DsonExtString ReadDsonExtString(IDsonInput input, int wireTypeBits) {
+        int type = DsonInternals.IsEnabled(wireTypeBits, DsonExtString.MaskType) ? input.ReadUint32() : 0;
+        string value = DsonInternals.IsEnabled(wireTypeBits, DsonExtString.MaskValue) ? input.ReadString() : null;
         return new DsonExtString(type, value);
     }
 
-    public static int wireTypeOfRef(ObjectRef objectRef) {
+    #endregion
+
+    #region 内置结构体
+
+    public static int WireTypeOfRef(ObjectRef objectRef) {
         int v = 0;
         if (objectRef.hasNamespace) {
-            v |= ObjectRef.MASK_NAMESPACE;
+            v |= ObjectRef.MaskNamespace;
         }
         if (objectRef.Type != 0) {
-            v |= ObjectRef.MASK_TYPE;
+            v |= ObjectRef.MaskType;
         }
         if (objectRef.Policy != 0) {
-            v |= ObjectRef.MASK_POLICY;
+            v |= ObjectRef.MaskPolicy;
         }
         return v;
     }
 
-    public static void writeRef(IDsonOutput output, ObjectRef objectRef) {
+    public static void WriteRef(IDsonOutput output, ObjectRef objectRef) {
         output.WriteString(objectRef.LocalId);
         if (objectRef.hasNamespace) {
             output.WriteString(objectRef.Ns);
@@ -362,22 +369,22 @@ public class DsonReaderUtils
         }
     }
 
-    public static ObjectRef readRef(IDsonInput input, int wireTypeBits) {
+    public static ObjectRef ReadRef(IDsonInput input, int wireTypeBits) {
         string localId = input.ReadString();
-        string ns = DsonInternals.isEnabled(wireTypeBits, ObjectRef.MASK_NAMESPACE) ? input.ReadString() : null;
-        int type = DsonInternals.isEnabled(wireTypeBits, ObjectRef.MASK_TYPE) ? input.ReadUint32() : 0;
-        int policy = DsonInternals.isEnabled(wireTypeBits, ObjectRef.MASK_POLICY) ? input.ReadUint32() : 0;
+        string ns = DsonInternals.IsEnabled(wireTypeBits, ObjectRef.MaskNamespace) ? input.ReadString() : null;
+        int type = DsonInternals.IsEnabled(wireTypeBits, ObjectRef.MaskType) ? input.ReadUint32() : 0;
+        int policy = DsonInternals.IsEnabled(wireTypeBits, ObjectRef.MaskPolicy) ? input.ReadUint32() : 0;
         return new ObjectRef(localId, ns, type, policy);
     }
 
-    public static void writeTimestamp(IDsonOutput output, OffsetTimestamp timestamp) {
+    public static void WriteTimestamp(IDsonOutput output, OffsetTimestamp timestamp) {
         output.WriteUint64(timestamp.Seconds);
         output.WriteUint32(timestamp.Nanos);
         output.WriteSint32(timestamp.Offset);
         output.WriteUint32(timestamp.Enables);
     }
 
-    public static OffsetTimestamp readTimestamp(IDsonInput input) {
+    public static OffsetTimestamp ReadTimestamp(IDsonInput input) {
         return new OffsetTimestamp(
             input.ReadUint64(),
             input.ReadUint32(),
@@ -385,8 +392,12 @@ public class DsonReaderUtils
             input.ReadUint32());
     }
 
-    public static void writeValueBytes(IDsonOutput output, DsonType type, byte[] data) {
-        if (type == DsonType.STRING) {
+    #endregion
+
+    #region 特殊
+
+    public static void WriteValueBytes(IDsonOutput output, DsonType type, byte[] data) {
+        if (type == DsonType.String) {
             output.WriteUint32(data.Length);
         }
         else {
@@ -395,9 +406,9 @@ public class DsonReaderUtils
         output.WriteRawBytes(data);
     }
 
-    public static byte[] readValueAsBytes(IDsonInput input, DsonType dsonType) {
+    public static byte[] ReadValueAsBytes(IDsonInput input, DsonType dsonType) {
         int size;
-        if (dsonType == DsonType.STRING) {
+        if (dsonType == DsonType.String) {
             size = input.ReadUint32();
         }
         else {
@@ -406,114 +417,112 @@ public class DsonReaderUtils
         return input.ReadRawBytes(size);
     }
 
-    public static void checkReadValueAsBytes(DsonType dsonType) {
-        if (!VALUE_BYTES_TYPES.Contains(dsonType)) {
-            throw DsonIOException.invalidDsonType(VALUE_BYTES_TYPES, dsonType);
+    public static void CheckReadValueAsBytes(DsonType dsonType) {
+        if (!ValueBytesTypes.Contains(dsonType)) {
+            throw DsonIOException.invalidDsonType(ValueBytesTypes, dsonType);
         }
     }
 
-    public static void checkWriteValueAsBytes(DsonType dsonType) {
-        if (!VALUE_BYTES_TYPES.Contains(dsonType)) {
-            throw DsonIOException.invalidDsonType(VALUE_BYTES_TYPES, dsonType);
+    public static void CheckWriteValueAsBytes(DsonType dsonType) {
+        if (!ValueBytesTypes.Contains(dsonType)) {
+            throw DsonIOException.invalidDsonType(ValueBytesTypes, dsonType);
         }
     }
 
-    public static void skipToEndOfObject(IDsonInput input) {
+    public static void SkipToEndOfObject(IDsonInput input) {
         int size = input.GetBytesUntilLimit();
         if (size > 0) {
             input.SkipRawBytes(size);
         }
     }
 
-    public static void skipValue(IDsonInput input, DsonContextType contextType,
+    #endregion
+
+    public static void SkipValue(IDsonInput input, DsonContextType contextType,
                                  DsonType dsonType, WireType wireType, int wireTypeBits) {
         int skip;
         switch (dsonType) {
-            case DsonType.FLOAT: {
+            case DsonType.Float: {
                 skip = 4 - wireTypeBits;
                 break;
             }
-            case DsonType.DOUBLE: {
+            case DsonType.Double: {
                 skip = 8 - wireTypeBits;
                 break;
             }
-            case DsonType.BOOLEAN:
-            case DsonType.NULL: {
+            case DsonType.Boolean:
+            case DsonType.Null: {
                 return;
             }
-            case DsonType.INT32: {
-                readInt32(input, wireType);
+            case DsonType.Int32: {
+                ReadInt32(input, wireType);
                 return;
             }
-            case DsonType.INT64: {
-                readInt64(input, wireType);
+            case DsonType.Int64: {
+                ReadInt64(input, wireType);
                 return;
             }
-            case DsonType.STRING: {
+            case DsonType.String: {
                 skip = input.ReadUint32(); // string长度
                 break;
             }
-            case DsonType.EXT_INT32: {
+            case DsonType.ExtInt32: {
                 input.ReadUint32(); // 子类型
                 if (input.ReadBool()) {
-                    readInt32(input, wireType);
+                    ReadInt32(input, wireType);
                 }
                 return;
             }
-            case DsonType.EXT_INT64: {
+            case DsonType.ExtInt64: {
                 input.ReadUint32(); // 子类型
                 if (input.ReadBool()) {
-                    readInt64(input, wireType);
+                    ReadInt64(input, wireType);
                 }
                 return;
             }
-            case DsonType.EXT_DOUBLE: {
+            case DsonType.ExtDouble: {
                 input.ReadUint32(); // 子类型
-                if (input.ReadBool()) {
-                    skip = 8 - wireTypeBits;
-                }
-                else {
-                    skip = 0;
-                }
-                break;
+                skip = input.ReadBool() ? (8 - wireTypeBits) : 0;
+                input.SkipRawBytes(skip);
+                return;
             }
-            case DsonType.EXT_STRING: {
-                if (DsonInternals.isEnabled(wireTypeBits, DsonExtString.MASK_TYPE)) {
+            case DsonType.ExtString: {
+                if (DsonInternals.IsEnabled(wireTypeBits, DsonExtString.MaskType)) {
                     input.ReadUint32(); // 子类型
                 }
-                if (DsonInternals.isEnabled(wireTypeBits, DsonExtString.MASK_VALUE)) {
+                if (DsonInternals.IsEnabled(wireTypeBits, DsonExtString.MaskValue)) {
                     skip = input.ReadUint32(); // string长度
                     input.SkipRawBytes(skip);
                 }
                 return;
             }
-            case DsonType.REFERENCE: {
+            case DsonType.Reference: {
                 skip = input.ReadUint32(); // localId
                 input.SkipRawBytes(skip);
 
-                if (DsonInternals.isEnabled(wireTypeBits, ObjectRef.MASK_NAMESPACE)) {
+                if (DsonInternals.IsEnabled(wireTypeBits, ObjectRef.MaskNamespace)) {
                     skip = input.ReadUint32(); // namespace
                     input.SkipRawBytes(skip);
                 }
-                if (DsonInternals.isEnabled(wireTypeBits, ObjectRef.MASK_TYPE)) {
+                if (DsonInternals.IsEnabled(wireTypeBits, ObjectRef.MaskType)) {
                     input.ReadUint32();
                 }
-                if (DsonInternals.isEnabled(wireTypeBits, ObjectRef.MASK_POLICY)) {
+                if (DsonInternals.IsEnabled(wireTypeBits, ObjectRef.MaskPolicy)) {
                     input.ReadUint32();
                 }
                 return;
             }
-            case DsonType.TIMESTAMP: {
+            case DsonType.Timestamp: {
                 input.ReadUint64();
                 input.ReadUint32();
                 input.ReadSint32();
                 input.ReadUint32();
                 return;
             }
-            case DsonType.BINARY:
-            case DsonType.ARRAY:
-            case DsonType.OBJECT:
-            case DsonType.HEADER: {
+            case DsonType.Binary:
+            case DsonType.Array:
+            case DsonType.Object:
+            case DsonType.Header: {
                 skip = input.ReadFixed32();
                 break;
             }

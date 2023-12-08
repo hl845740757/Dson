@@ -24,7 +24,7 @@ public class DsonFloat : DsonNumber, IEquatable<DsonFloat>, IComparable<DsonFloa
         this._value = value;
     }
 
-    public override DsonType DsonType => DsonType.FLOAT;
+    public override DsonType DsonType => DsonType.Float;
     public override int IntValue => (int)_value;
     public override long LongValue => (long)_value;
     public override float FloatValue => _value;

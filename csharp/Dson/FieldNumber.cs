@@ -36,7 +36,7 @@ public readonly struct FieldNumber : IEquatable<FieldNumber>, IComparable<FieldN
     /// <param name="idep">继承深度</param>
     /// <param name="lnumber">字段本地编号</param>
     public FieldNumber(byte idep, int lnumber) {
-        if (idep > Dsons.IDEP_MAX_VALUE) {
+        if (idep > Dsons.IdepMaxValue) {
             throw InvalidArgs(idep, lnumber);
         }
         if (lnumber < 0) {

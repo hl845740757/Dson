@@ -68,7 +68,7 @@ public interface IDsonInput : IDisposable
     /// <summary>
     /// 跳过指定数量的字节
     /// </summary>
-    /// <param name="n">要跳过的字节数</param>
+    /// <param name="n">要跳过的字节数；0安全</param>
     void SkipRawBytes(int n);
 
     /// <summary>

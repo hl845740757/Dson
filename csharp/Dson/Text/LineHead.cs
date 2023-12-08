@@ -22,13 +22,13 @@ namespace Dson.Text;
 public enum LineHead
 {
     /** 注释 */
-    COMMENT,
+    Comment,
     /** 添加新行 */
-    APPEND_LINE,
+    AppendLine,
     /** 与上一行合并 */
-    APPEND,
+    Append,
     /** 切换模式 */
-    SWITCH_MODE,
+    SwitchMode,
     /** 文本输入结束 */
-    END_OF_TEXT
+    EndOfText
 }

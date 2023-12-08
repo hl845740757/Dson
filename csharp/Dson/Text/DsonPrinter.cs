@@ -6,79 +6,71 @@ namespace Dson.Text;
 public class DsonPrinter : IDisposable
 {
 #nullable disable
-    private readonly StreamWriter writer;
-    private readonly string lineSeparator;
-    private readonly bool autoClose;
+    private readonly StreamWriter _writer;
+    private readonly string _lineSeparator;
+    private readonly bool _autoClose;
 
     /** 行缓冲，减少同步写操作 */
-    private readonly StringBuilder builder = new StringBuilder(150);
-    private char[] indentionArray = new char[0];
-    private int indent = 0;
+    private readonly StringBuilder _builder = new StringBuilder(150);
+    private char[] _indentionArray = new char[0];
+    private int _indent = 0;
 
-    private string headLabel;
-    private int column;
+    private string _headLabel;
+    private int _column;
 #nullable enable
 
     public DsonPrinter(StreamWriter writer, string lineSeparator, bool autoClose) {
-        this.writer = writer;
-        this.lineSeparator = lineSeparator;
-        this.autoClose = autoClose;
+        this._writer = writer;
+        this._lineSeparator = lineSeparator;
+        this._autoClose = autoClose;
     }
 
     /** 当前列数 */
-    public int getColumn() {
-        return column;
-    }
+    public int Column => _column;
 
     /** 如果当前行尚未打印行首，则返回null */
-    public string? getHeadLabel() {
-        return headLabel;
-    }
+    public string? HeadLabel => _headLabel;
 
     /** 当前行是否有内容 */
-    public bool hasContent() {
-        return getContentLength() > 0;
-    }
+    public bool HasContent => ContentLength > 0;
 
     /** 当前行内容的长度 */
-    public int getContentLength() {
-        return headLabel == null ? column : column - headLabel.Length - 1;
-    }
+    public int ContentLength => _headLabel == null ? _column : _column - _headLabel.Length - 1;
 
-    public StreamWriter Writer => writer;
+    public StreamWriter Writer => _writer;
 
     #region 普通打印
 
     /**
      * @apiNote tab增加的列不是固定的...所以其它打印字符串的方法都必须调用该方法，一定程度上降低了性能，不能批量拷贝
      */
-    public void print(char c) {
-        builder.Append(c);
+    public void Print(char c) {
+        _builder.Append(c);
         if (c == '\t') {
-            column--;
-            column += (4 - (column % 4));
+            _column--;
+            _column += (4 - (_column % 4));
         }
         else {
-            column += 1;
+            _column += 1;
         }
     }
 
-    public void print(char[] cBuffer) {
+    public void Print(char[] cBuffer) {
         foreach (char c in cBuffer) {
-            print(c);
+            Print(c);
         }
     }
 
-    public void print(char[] cBuffer, int offset, int len) {
+    public void Print(char[] cBuffer, int offset, int len) {
         BinaryUtils.CheckBuffer(cBuffer.Length, offset, len);
         for (int idx = offset, end = offset + len; idx < end; idx++) {
-            print(cBuffer[idx]);
+            Print(cBuffer[idx]);
         }
     }
 
-    public void print(string text) {
+    public void Print(string text) {
         for (int idx = 0, end = text.Length; idx < end; idx++) {
-            print(text[idx]);
+            Print(text[idx]);
         }
     }
 
@@ -86,14 +78,14 @@ public class DsonPrinter : IDisposable
      * @param start the starting index of the subsequence to be appended.
      * @param end   the end index of the subsequence to be appended.
      */
-    public void printRange(string text, int start, int end) {
-        checkRange(start, end, text.Length);
+    public void PrintRange(string text, int start, int end) {
+        CheckRange(start, end, text.Length);
         for (int idx = start; idx < end; idx++) {
-            print(text[idx]);
+            Print(text[idx]);
         }
     }
 
-    private static void checkRange(int start, int end, int len) {
+    private static void CheckRange(int start, int end, int len) {
         if (start < 0 || start > end || end > len) {
             throw new IndexOutOfRangeException(
                 "start " + start + ", end " + end + ", length " + len);
@@ -101,27 +93,27 @@ public class DsonPrinter : IDisposable
     }
 
     /** @param cBuffer 内容中无tab字符 */
-    public void printFastPath(char[] cBuffer) {
-        builder.Append(cBuffer);
-        column += cBuffer.Length;
+    public void PrintFastPath(char[] cBuffer) {
+        _builder.Append(cBuffer);
+        _column += cBuffer.Length;
     }
 
     /** @param cBuffer 内容中无tab字符 */
-    public void printFastPath(char[] cBuffer, int offset, int len) {
-        builder.Append(cBuffer, offset, len);
-        column += len;
+    public void PrintFastPath(char[] cBuffer, int offset, int len) {
+        _builder.Append(cBuffer, offset, len);
+        _column += len;
     }
 
     /** @param text 内容中无tab字符 */
-    public void printFastPath(string text) {
-        builder.Append(text);
-        column += text.Length;
+    public void PrintFastPath(string text) {
+        _builder.Append(text);
+        _column += text.Length;
     }
 
     /** @param text 内容中无tab字符 */
-    public void printRangeFastPath(string text, int start, int end) {
-        builder.Append(text, start, end);
-        column += (end - start);
+    public void PrintRangeFastPath(string text, int start, int end) {
+        _builder.Append(text, start, end);
+        _column += (end - start);
     }
 
     #endregion
@@ -129,89 +121,89 @@ public class DsonPrinter : IDisposable
     #region dson
 
     /** 打印行首 */
-    public void printHead(LineHead lineHead) {
-        printHead(DsonTexts.GetLabel(lineHead));
+    public void PrintHead(LineHead lineHead) {
+        PrintHead(DsonTexts.GetLabel(lineHead));
     }
 
     /** 打印行首 */
-    public void printHead(String label) {
-        if (headLabel != null) {
+    public void PrintHead(String label) {
+        if (_headLabel != null) {
             throw new InvalidOperationException();
         }
-        builder.Append(label);
-        builder.Append(' ');
-        column += label.Length + 1;
-        headLabel = label;
+        _builder.Append(label);
+        _builder.Append(' ');
+        _column += label.Length + 1;
+        _headLabel = label;
     }
 
-    public void printBeginObject() {
-        builder.Append('{');
-        column += 1;
+    public void PrintBeginObject() {
+        _builder.Append('{');
+        _column += 1;
     }
 
-    public void printEndObject() {
-        builder.Append('}');
-        column += 1;
+    public void PrintEndObject() {
+        _builder.Append('}');
+        _column += 1;
     }
 
-    public void printBeginArray() {
-        builder.Append('[');
-        column += 1;
+    public void PrintBeginArray() {
+        _builder.Append('[');
+        _column += 1;
     }
 
-    public void printEndArray() {
-        builder.Append(']');
-        column += 1;
+    public void PrintEndArray() {
+        _builder.Append(']');
+        _column += 1;
     }
 
-    public void printBeginHeader() {
-        builder.Append("@{");
-        column += 2;
+    public void PrintBeginHeader() {
+        _builder.Append("@{");
+        _column += 2;
     }
 
     /** 打印冒号 */
-    public void printColon() {
-        builder.Append(':');
-        column += 1;
+    public void PrintColon() {
+        _builder.Append(':');
+        _column += 1;
     }
 
     /** 打印逗号 */
-    public void printComma() {
-        builder.Append(',');
-        column += 1;
+    public void PrintComma() {
+        _builder.Append(',');
+        _column += 1;
     }
 
     /** 打印可能需要转义的字符 */
-    public void printEscaped(char c, bool unicodeChar) {
+    public void PrintEscaped(char c, bool unicodeChar) {
         switch (c) {
             case '\"':
-                printFastPath("\\\"");
+                PrintFastPath("\\\"");
                 break;
             case '\\':
-                printFastPath("\\\\");
+                PrintFastPath("\\\\");
                 break;
             case '\b':
-                printFastPath("\\b");
+                PrintFastPath("\\b");
                 break;
             case '\f':
-                printFastPath("\\f");
+                PrintFastPath("\\f");
                 break;
             case '\n':
-                printFastPath("\\n");
+                PrintFastPath("\\n");
                 break;
             case '\r':
-                printFastPath("\\r");
+                PrintFastPath("\\r");
                 break;
             case '\t':
-                printFastPath("\\t");
+                PrintFastPath("\\t");
                 break;
             default: {
                 if (unicodeChar && (c < 32 || c > 126)) {
-                    printFastPath("\\u");
-                    printRangeFastPath((0x10000 + c).ToString("X"), 1, 5);
+                    PrintFastPath("\\u");
+                    PrintRangeFastPath((0x10000 + c).ToString("X"), 1, 5);
                 }
                 else {
-                    print(c);
+                    Print(c);
                 }
                 break;
             }
@@ -223,57 +215,57 @@ public class DsonPrinter : IDisposable
     #region 缩进
 
     /** 换行 */
-    public void println() {
-        builder.Append(lineSeparator);
-        flush();
-        column = 0;
-        headLabel = null;
+    public void Println() {
+        _builder.Append(_lineSeparator);
+        Flush();
+        _column = 0;
+        _headLabel = null;
     }
 
     /** 打印缩进 */
-    public void printIndent() {
-        builder.Append(indentionArray, 0, indent);
-        column += indent;
+    public void PrintIndent() {
+        _builder.Append(_indentionArray, 0, _indent);
+        _column += _indent;
     }
 
     /** 打印缩进，可指定一个偏移量 */
-    public void printIndent(int offset) {
-        int len = indent - offset;
+    public void PrintIndent(int offset) {
+        int len = _indent - offset;
         if (len <= 0) {
-            throw new ArgumentException($"invalid offset, indent: {indent}, offset: {offset}");
+            throw new ArgumentException($"invalid offset, indent: {_indent}, offset: {offset}");
         }
-        builder.Append(indentionArray, offset, len);
-        column += len;
+        _builder.Append(_indentionArray, offset, len);
+        _column += len;
     }
 
     /** 打印一个空格 */
-    public void printSpace() {
-        builder.Append(' ');
-        column += 1;
+    public void PrintSpace() {
+        _builder.Append(' ');
+        _column += 1;
     }
 
     /** 当前的缩进长度 */
-    public int indentLength() {
-        return indent;
+    public int IndentLength() {
+        return _indent;
     }
 
     public void Indent() {
-        indent += 2;
-        updateIndent();
+        _indent += 2;
+        UpdateIndent();
     }
 
-    public void retract() {
-        if (indent < 2) {
+    public void Retract() {
+        if (_indent < 2) {
             throw new InvalidOperationException("indent must be called before retract");
         }
-        indent -= 2;
-        updateIndent();
+        _indent -= 2;
+        UpdateIndent();
     }
 
-    private void updateIndent() {
-        if (indent > indentionArray.Length) {
-            indentionArray = new char[indent];
-            Array.Fill(indentionArray, ' ');
+    private void UpdateIndent() {
+        if (_indent > _indentionArray.Length) {
+            _indentionArray = new char[_indent];
+            Array.Fill(_indentionArray, ' ');
         }
     }
 
@@ -281,19 +273,19 @@ public class DsonPrinter : IDisposable
 
     #region io
 
-    public void flush() {
-        StringBuilder builder = this.builder;
+    public void Flush() {
+        StringBuilder builder = this._builder;
         if (builder.Length > 0) {
-            writer.Write(this.builder);
+            _writer.Write(this._builder);
             builder.Length = 0;
         }
-        writer.Flush();
+        _writer.Flush();
     }
 
     public void Dispose() {
-        flush();
-        if (autoClose) {
-            writer.Dispose();
+        Flush();
+        if (_autoClose) {
+            _writer.Dispose();
         }
     }
 

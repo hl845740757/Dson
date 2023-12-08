@@ -635,23 +635,20 @@ public class DsonTextReader extends AbstractDsonReader {
         nextToken = popToken();
         ensureStringsToken(context, nextToken);
         String value = nextToken.castAsString();
-        DsonTokenType valueTokenType = nextToken.getType();
 
         nextToken = popToken();
         verifyTokenType(context, nextToken, DsonTokenType.END_ARRAY);
-        return new Tuple2(type, value, valueTokenType);
+        return new Tuple2(type, value);
     }
 
     private static class Tuple2 {
 
         int type;
         String value;
-        DsonTokenType tokenType;
 
-        public Tuple2(int type, String value, DsonTokenType tokenType) {
+        public Tuple2(int type, String value) {
             this.type = type;
             this.value = value;
-            this.tokenType = tokenType;
         }
 
         boolean isUnquoteNull() {

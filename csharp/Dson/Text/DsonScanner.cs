@@ -20,7 +20,7 @@ namespace Dson.Text;
 
 public class DsonScanner : IDisposable
 {
-    private static readonly List<DsonTokenType> STRING_TOKEN_TYPES = DsonInternals.NewList(DsonTokenType.STRING, DsonTokenType.UNQUOTE_STRING);
+    private static readonly List<DsonTokenType> STRING_TOKEN_TYPES = DsonInternals.NewList(DsonTokenType.String, DsonTokenType.UnquoteString);
 
 #nullable disable
     private DsonCharStream _buffer;
@@ -28,7 +28,7 @@ public class DsonScanner : IDisposable
     private readonly char[] _hexBuffer = new char[4];
 #nullable enable
 
-    public DsonScanner(string dson, DsonMode dsonMode = DsonMode.STANDARD) {
+    public DsonScanner(string dson, DsonMode dsonMode = DsonMode.Standard) {
         _buffer = new StringCharStream(dson, dsonMode);
     }
 
@@ -50,7 +50,7 @@ public class DsonScanner : IDisposable
         }
         int c = SkipWhitespace();
         if (c == -1) {
-            return new DsonToken(DsonTokenType.EOF, "eof", Position);
+            return new DsonToken(DsonTokenType.Eof, "eof", Position);
         }
         switch (c) {
             case '{': {
@@ -58,29 +58,29 @@ public class DsonScanner : IDisposable
                 int nextChar = _buffer.Read();
                 _buffer.Unread();
                 if (nextChar == '@') {
-                    return new DsonToken(DsonTokenType.BEGIN_OBJECT, "{@", Position);
+                    return new DsonToken(DsonTokenType.BeginObject, "{@", Position);
                 }
                 else {
-                    return new DsonToken(DsonTokenType.BEGIN_OBJECT, "{", Position);
+                    return new DsonToken(DsonTokenType.BeginObject, "{", Position);
                 }
             }
             case '[': {
                 int nextChar = _buffer.Read();
                 _buffer.Unread();
                 if (nextChar == '@') {
-                    return new DsonToken(DsonTokenType.BEGIN_ARRAY, "[@", Position);
+                    return new DsonToken(DsonTokenType.BeginArray, "[@", Position);
                 }
                 else {
-                    return new DsonToken(DsonTokenType.BEGIN_ARRAY, "[", Position);
+                    return new DsonToken(DsonTokenType.BeginArray, "[", Position);
                 }
             }
-            case '}': return new DsonToken(DsonTokenType.END_OBJECT, "}", Position);
-            case ']': return new DsonToken(DsonTokenType.END_ARRAY, "]", Position);
-            case ':': return new DsonToken(DsonTokenType.COLON, ":", Position);
-            case ',': return new DsonToken(DsonTokenType.COMMA, ",", Position);
+            case '}': return new DsonToken(DsonTokenType.EndObject, "}", Position);
+            case ']': return new DsonToken(DsonTokenType.EndArray, "]", Position);
+            case ':': return new DsonToken(DsonTokenType.Colon, ":", Position);
+            case ',': return new DsonToken(DsonTokenType.Comma, ",", Position);
             case '@': return ParseHeaderToken();
-            case '"': return new DsonToken(DsonTokenType.STRING, ScanString((char)c), Position);
-            default: return new DsonToken(DsonTokenType.UNQUOTE_STRING, ScanUnquotedString((char)c), Position);
+            case '"': return new DsonToken(DsonTokenType.String, ScanString((char)c), Position);
+            default: return new DsonToken(DsonTokenType.UnquoteString, ScanUnquotedString((char)c), Position);
         }
     }
 
@@ -129,7 +129,7 @@ public class DsonScanner : IDisposable
         try {
             string className = ScanClassName();
             if (className == "{") {
-                return new DsonToken(DsonTokenType.BEGIN_HEADER, "@{", Position);
+                return new DsonToken(DsonTokenType.BeginHeader, "@{", Position);
             }
             return OnReadClassName(className);
         }
@@ -154,7 +154,7 @@ public class DsonScanner : IDisposable
         }
         else {
             // 非双引号模式下，只能由安全字符构成
-            if (DsonTexts.isUnsafeStringChar(firstChar)) {
+            if (DsonTexts.IsUnsafeStringChar(firstChar)) {
                 throw InvalidClassName(char.ToString((char)firstChar), Position);
             }
             // 非双引号模式下，不支持换行继续输入，且clsName后必须是空格或换行符
@@ -163,7 +163,7 @@ public class DsonScanner : IDisposable
             sb.Append((char)firstChar);
             int c;
             while ((c = buffer.Read()) >= 0) {
-                if (DsonTexts.isUnsafeStringChar(c)) {
+                if (DsonTexts.IsUnsafeStringChar(c)) {
                     break;
                 }
                 sb.Append((char)c);
@@ -185,47 +185,47 @@ public class DsonScanner : IDisposable
     private DsonToken OnReadClassName(string className) {
         int position = Position;
         switch (className) {
-            case DsonTexts.LABEL_INT32: {
+            case DsonTexts.LabelInt32: {
                 DsonToken nextToken = NextToken();
                 CheckToken(STRING_TOKEN_TYPES, nextToken.Type, position);
-                return new DsonToken(DsonTokenType.INT32, DsonTexts.parseInt(nextToken.castAsString()), Position);
+                return new DsonToken(DsonTokenType.Int32, DsonTexts.ParseInt(nextToken.CastAsString()), Position);
             }
-            case DsonTexts.LABEL_INT64: {
+            case DsonTexts.LabelInt64: {
                 DsonToken nextToken = NextToken();
                 CheckToken(STRING_TOKEN_TYPES, nextToken.Type, position);
-                return new DsonToken(DsonTokenType.INT64, DsonTexts.parseLong(nextToken.castAsString()), Position);
+                return new DsonToken(DsonTokenType.Int64, DsonTexts.ParseLong(nextToken.CastAsString()), Position);
             }
-            case DsonTexts.LABEL_FLOAT: {
+            case DsonTexts.LabelFloat: {
                 DsonToken nextToken = NextToken();
                 CheckToken(STRING_TOKEN_TYPES, nextToken.Type, position);
-                return new DsonToken(DsonTokenType.FLOAT, DsonTexts.parseFloat(nextToken.castAsString()), Position);
+                return new DsonToken(DsonTokenType.Float, DsonTexts.ParseFloat(nextToken.CastAsString()), Position);
             }
-            case DsonTexts.LABEL_DOUBLE: {
+            case DsonTexts.LabelDouble: {
                 DsonToken nextToken = NextToken();
                 CheckToken(STRING_TOKEN_TYPES, nextToken.Type, position);
-                return new DsonToken(DsonTokenType.DOUBLE, DsonTexts.parseDouble(nextToken.castAsString()), Position);
+                return new DsonToken(DsonTokenType.Double, DsonTexts.ParseDouble(nextToken.CastAsString()), Position);
             }
-            case DsonTexts.LABEL_BOOL: {
+            case DsonTexts.LabelBool: {
                 DsonToken nextToken = NextToken();
                 CheckToken(STRING_TOKEN_TYPES, nextToken.Type, position);
-                return new DsonToken(DsonTokenType.BOOL, DsonTexts.parseBool(nextToken.castAsString()), Position);
+                return new DsonToken(DsonTokenType.Bool, DsonTexts.ParseBool(nextToken.CastAsString()), Position);
             }
-            case DsonTexts.LABEL_NULL: {
+            case DsonTexts.LabelNull: {
                 DsonToken nextToken = NextToken();
                 CheckToken(STRING_TOKEN_TYPES, nextToken.Type, position);
-                DsonTexts.checkNullString(nextToken.castAsString());
-                return new DsonToken(DsonTokenType.NULL, null, Position);
+                DsonTexts.CheckNullString(nextToken.CastAsString());
+                return new DsonToken(DsonTokenType.Null, null, Position);
             }
-            case DsonTexts.LABEL_STRING: {
+            case DsonTexts.LabelString: {
                 DsonToken nextToken = NextToken();
                 CheckToken(STRING_TOKEN_TYPES, nextToken.Type, position);
-                return new DsonToken(DsonTokenType.STRING, nextToken.castAsString(), Position);
+                return new DsonToken(DsonTokenType.String, nextToken.CastAsString(), Position);
             }
-            case DsonTexts.LABEL_TEXT: {
-                return new DsonToken(DsonTokenType.STRING, ScanText(), Position);
+            case DsonTexts.LabelText: {
+                return new DsonToken(DsonTokenType.String, ScanText(), Position);
             }
         }
-        return new DsonToken(DsonTokenType.CLASS_NAME, className, Position);
+        return new DsonToken(DsonTokenType.ClassName, className, Position);
     }
 
     #endregion
@@ -241,12 +241,12 @@ public class DsonScanner : IDisposable
         int c;
         while ((c = buffer.Read()) != -1) {
             if (c == -2) {
-                if (buffer.LineHead == LineHead.COMMENT) {
+                if (buffer.LineHead == LineHead.Comment) {
                     buffer.SkipLine();
                 }
                 continue;
             }
-            if (!DsonTexts.isIndentChar(c)) {
+            if (!DsonTexts.IsIndentChar(c)) {
                 break;
             }
         }
@@ -266,12 +266,12 @@ public class DsonScanner : IDisposable
         int c;
         while ((c = buffer.Read()) != -1) {
             if (c == -2) {
-                if (buffer.LineHead == LineHead.COMMENT) {
+                if (buffer.LineHead == LineHead.Comment) {
                     buffer.SkipLine();
                 }
                 continue;
             }
-            if (DsonTexts.isUnsafeStringChar(c)) {
+            if (DsonTexts.IsUnsafeStringChar(c)) {
                 break;
             }
             sb.Append((char)c);
@@ -291,18 +291,18 @@ public class DsonScanner : IDisposable
         int c;
         while ((c = buffer.Read()) != -1) {
             if (c == -2) {
-                if (buffer.LineHead == LineHead.COMMENT) {
+                if (buffer.LineHead == LineHead.Comment) {
                     buffer.SkipLine();
                 }
-                else if (buffer.LineHead == LineHead.APPEND_LINE) { // 开启新行
+                else if (buffer.LineHead == LineHead.AppendLine) { // 开启新行
                     sb.Append('\n');
                 }
-                else if (buffer.LineHead == LineHead.SWITCH_MODE) { // 进入纯文本模式
+                else if (buffer.LineHead == LineHead.SwitchMode) { // 进入纯文本模式
                     Switch2TextMode(buffer, sb);
                 }
             }
             else if (c == '\\') { // 处理转义字符
-                DoEscape(buffer, sb, LineHead.APPEND);
+                DoEscape(buffer, sb, LineHead.Append);
             }
             else if (c == quoteChar) { // 结束
                 return sb.ToString();
@@ -324,16 +324,16 @@ public class DsonScanner : IDisposable
         int c;
         while ((c = buffer.Read()) != -1) {
             if (c == -2) {
-                if (buffer.LineHead == LineHead.COMMENT) {
+                if (buffer.LineHead == LineHead.Comment) {
                     buffer.SkipLine();
                 }
-                else if (buffer.LineHead == LineHead.END_OF_TEXT) { // 读取结束
+                else if (buffer.LineHead == LineHead.EndOfText) { // 读取结束
                     return sb.ToString();
                 }
-                if (buffer.LineHead == LineHead.APPEND_LINE) { // 开启新行
+                if (buffer.LineHead == LineHead.AppendLine) { // 开启新行
                     sb.Append('\n');
                 }
-                else if (buffer.LineHead == LineHead.SWITCH_MODE) { // 进入转义模式
+                else if (buffer.LineHead == LineHead.SwitchMode) { // 进入转义模式
                     Switch2EscapeMode(buffer, sb);
                 }
             }
@@ -348,7 +348,7 @@ public class DsonScanner : IDisposable
         int c;
         while ((c = buffer.Read()) != -1) {
             if (c == -2) {
-                if (buffer.LineHead != LineHead.SWITCH_MODE) { // 退出模式切换
+                if (buffer.LineHead != LineHead.SwitchMode) { // 退出模式切换
                     buffer.Unread();
                     break;
                 }
@@ -363,13 +363,13 @@ public class DsonScanner : IDisposable
         int c;
         while ((c = buffer.Read()) != -1) {
             if (c == -2) {
-                if (buffer.LineHead != LineHead.SWITCH_MODE) { // 退出模式切换
+                if (buffer.LineHead != LineHead.SwitchMode) { // 退出模式切换
                     buffer.Unread();
                     break;
                 }
             }
             else if (c == '\\') {
-                DoEscape(buffer, sb, LineHead.SWITCH_MODE);
+                DoEscape(buffer, sb, LineHead.SwitchMode);
             }
             else {
                 sb.Append((char)c);

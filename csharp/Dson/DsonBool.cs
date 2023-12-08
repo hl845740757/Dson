@@ -31,7 +31,7 @@ public class DsonBool : DsonValue, IComparable<DsonBool>, IEquatable<DsonBool>, 
         return value ? True : False;
     }
 
-    public override DsonType DsonType => DsonType.BOOLEAN;
+    public override DsonType DsonType => DsonType.Boolean;
     public bool Value => _value;
 
     #region equals

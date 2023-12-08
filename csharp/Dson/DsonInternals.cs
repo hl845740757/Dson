@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+using System.Runtime.CompilerServices;
+
 namespace Dson;
 
 internal static class DsonInternals
@@ -33,11 +35,12 @@ internal static class DsonInternals
         return (long)(uval >> offset);
     }
 
-    public static bool isEnabled(int value, int mask) {
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsEnabled(int value, int mask) {
         return (value & mask) == mask;
     }
 
-    public static bool isDisabled(int value, int mask) {
+    public static bool IsDisabled(int value, int mask) {
         return (value & mask) != mask;
     }
 

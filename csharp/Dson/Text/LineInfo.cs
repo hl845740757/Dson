@@ -20,14 +20,13 @@ namespace Dson.Text;
 
 public class LineInfo
 {
-    public const int STATE_SCAN = 0;
-    public const int STATE_LF = 1;
-    public const int STATE_CRLF = 2;
-    public const int STATE_EOF = 3;
+    public const int StateScan = 0;
+    public const int StateLf = 1;
+    public const int StateCrlf = 2;
+    public const int StateEof = 3;
 
     /** 行号 */
     public readonly int Ln;
-
     /** 行全局起始位置， 0-based */
     public readonly int StartPos;
     /**
@@ -39,7 +38,7 @@ public class LineInfo
      */
     public int EndPos;
     /** 行在字符流中的状态 -- endPos是否到达行尾 */
-    public int State = STATE_SCAN;
+    public int State = StateScan;
 
     /** 行首类型 */
     public readonly LineHead LineHead;
@@ -59,7 +58,7 @@ public class LineInfo
 
     /** 当前行是否已扫描完成 */
     public bool IsScanCompleted() {
-        return State != STATE_SCAN;
+        return State != StateScan;
     }
 
     /** 最后一个可读取的位置 */
@@ -69,10 +68,10 @@ public class LineInfo
 
     /** 最后一个可读取的位置 -- 不包含换行符；可能小于startPos */
     public static int LastReadablePosition(int state, int endPos) {
-        if (state == STATE_LF) {
+        if (state == StateLf) {
             return endPos - 1;
         }
-        if (state == STATE_CRLF) {
+        if (state == StateCrlf) {
             return endPos - 2;
         }
         return endPos;

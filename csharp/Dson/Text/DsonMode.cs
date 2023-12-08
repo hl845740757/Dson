@@ -25,11 +25,11 @@ public enum DsonMode
      * 标准的Dson模式
      * 每一行由 行首 + 内容构成。
      */
-    STANDARD,
+    Standard,
 
     /**
      * 宽松模式
      * 没有行首的文本，支持读取Json
      */
-    RELAXED,
+    Relaxed,
 }

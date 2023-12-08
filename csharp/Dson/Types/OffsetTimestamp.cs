@@ -25,13 +25,13 @@ namespace Dson;
 /// </summary>
 public struct OffsetTimestamp : IEquatable<OffsetTimestamp>
 {
-    public const int MASK_DATE = 1;
-    public const int MASK_TIME = 1 << 1;
-    public const int MASK_OFFSET = 1 << 2;
-    public const int MASK_NANOS = 1 << 3;
+    public const int MaskDate = 1;
+    public const int MaskTime = 1 << 1;
+    public const int MaskOffset = 1 << 2;
+    public const int MaskNanos = 1 << 3;
 
-    public const int MASK_DATETIME = MASK_DATE | MASK_TIME;
-    public const int MASK_OFFSET_DATETIME = MASK_DATE | MASK_TIME | MASK_OFFSET;
+    public const int MaskDatetime = MaskDate | MaskTime;
+    public const int MaskOffsetDatetime = MaskDate | MaskTime | MaskOffset;
 
     public readonly long Seconds;
     public readonly int Nanos;
@@ -39,7 +39,7 @@ public struct OffsetTimestamp : IEquatable<OffsetTimestamp>
     public readonly int Enables;
 
     public OffsetTimestamp(long seconds)
-        : this(seconds, 0, 0, MASK_DATETIME) {
+        : this(seconds, 0, 0, MaskDatetime) {
     }
 
     /// <summary>
@@ -56,23 +56,17 @@ public struct OffsetTimestamp : IEquatable<OffsetTimestamp>
         this.Enables = enables;
     }
 
-    public bool hasDate() {
-        return DsonInternals.isEnabled(Enables, MASK_DATE);
-    }
+    public bool HasDate => DsonInternals.IsEnabled(Enables, MaskDate);
 
-    public bool hasTime() {
-        return DsonInternals.isEnabled(Enables, MASK_TIME);
-    }
+    public bool HasTime => DsonInternals.IsEnabled(Enables, MaskTime);
 
-    public bool hasOffset() {
-        return DsonInternals.isEnabled(Enables, MASK_OFFSET);
-    }
+    public bool HasOffset => DsonInternals.IsEnabled(Enables, MaskOffset);
 
-    public bool canConvertNanosToMillis() {
+    public bool CanConvertNanosToMillis() {
         return (Nanos % 1000_000) == 0;
     }
 
-    public int convertNanosToMillis() {
+    public int ConvertNanosToMillis() {
         return Nanos / 1000_000;
     }
 
@@ -106,19 +100,19 @@ public struct OffsetTimestamp : IEquatable<OffsetTimestamp>
 
     #region 解析
 
-    public static DateTime parseDateTime(string datetimeString) {
+    public static DateTime ParseDateTime(string datetimeString) {
         return DateTime.ParseExact(datetimeString, "yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture);
     }
 
-    public static DateOnly parseDate(string dateString) {
+    public static DateOnly ParseDate(string dateString) {
         return DateOnly.ParseExact(dateString, "yyyy-MM-dd", CultureInfo.InvariantCulture);
     }
 
-    public static TimeOnly parseTime(string timeString) {
+    public static TimeOnly ParseTime(string timeString) {
         return TimeOnly.ParseExact(timeString, "HH:mm:ss", CultureInfo.InvariantCulture);
     }
 
-    public static int parseOffset(string offsetString) {
+    public static int ParseOffset(string offsetString) {
         if (offsetString == "Z" || offsetString == "z") {
             return 0;
         }
@@ -150,37 +144,37 @@ public struct OffsetTimestamp : IEquatable<OffsetTimestamp>
                 break;
             }
         }
-        long seconds = (parseTime(offsetString.Substring(1)).Ticks / DsonInternals.TicksPerSecond);
+        long seconds = (ParseTime(offsetString.Substring(1)).Ticks / DsonInternals.TicksPerSecond);
         if (offsetString[0] == '+') {
             return (int)seconds;
         }
         return (int)(-1 * seconds);
     }
 
-    public static string formatDateTime(long seconds) {
+    public static string FormatDateTime(long seconds) {
         return DateTime.UnixEpoch.AddSeconds(seconds).ToString("s");
     }
 
-    public static string formatDate(long epochSeconds) {
+    public static string FormatDate(long epochSeconds) {
         string fullDate = DateTime.UnixEpoch.AddSeconds(epochSeconds).ToString("s");
         return fullDate.Substring(0, fullDate.IndexOf('T'));
     }
 
-    public static string formatTime(long epochSeconds) {
+    public static string FormatTime(long epochSeconds) {
         string fullDate = DateTime.UnixEpoch.AddSeconds(epochSeconds).ToString("s");
         return fullDate.Substring(fullDate.IndexOf('T') + 1);
     }
 
-    public static string formatOffset(int offsetSeconds) {
+    public static string FormatOffset(int offsetSeconds) {
         if (offsetSeconds == 0) {
             return "Z";
         }
         string sign = offsetSeconds < 0 ? "-" : "+";
         if (offsetSeconds % 60 == 0) { // 没有秒部分
-            return sign + formatTime(Math.Abs(offsetSeconds)).Substring(0, 5);
+            return sign + FormatTime(Math.Abs(offsetSeconds)).Substring(0, 5);
         }
         else {
-            return sign + formatTime(Math.Abs(offsetSeconds));
+            return sign + FormatTime(Math.Abs(offsetSeconds));
         }
     }
 
@@ -189,19 +183,19 @@ public struct OffsetTimestamp : IEquatable<OffsetTimestamp>
 
     #region 常量
 
-    public const string NAMES_DATE = "date";
-    public const string NAMES_TIME = "time";
-    public const string NAMES_MILLIS = "millis";
+    public const string NamesDate = "date";
+    public const string NamesTime = "time";
+    public const string NamesMillis = "millis";
 
-    public const string NAMES_SECONDS = "seconds";
-    public const string NAMES_NANOS = "nanos";
-    public const string NAMES_OFFSET = "offset";
-    public const string NAMES_ENABLES = "enables";
+    public const string NamesSeconds = "seconds";
+    public const string NamesNanos = "nanos";
+    public const string NamesOffset = "offset";
+    public const string NamesEnables = "enables";
 
-    public static readonly int NUMBERS_SECONDS = Dsons.MakeFullNumberZeroIdep(0);
-    public static readonly int NUMBERS_NANOS = Dsons.MakeFullNumberZeroIdep(1);
-    public static readonly int NUMBERS_OFFSET = Dsons.MakeFullNumberZeroIdep(2);
-    public static readonly int NUMBERS_ENABLES = Dsons.MakeFullNumberZeroIdep(3);
+    public static readonly FieldNumber NumbersSeconds = FieldNumber.OfLnumber(0);
+    public static readonly FieldNumber NumbersNanos = FieldNumber.OfLnumber(1);
+    public static readonly FieldNumber NumbersOffset = FieldNumber.OfLnumber(2);
+    public static readonly FieldNumber NumbersEnables = FieldNumber.OfLnumber(3);
 
     #endregion
 }

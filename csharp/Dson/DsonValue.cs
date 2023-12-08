@@ -103,10 +103,10 @@ public abstract class DsonValue
     public bool IsNumber {
         get {
             switch (DsonType) {
-                case DsonType.INT32:
-                case DsonType.INT64:
-                case DsonType.FLOAT:
-                case DsonType.DOUBLE:
+                case DsonType.Int32:
+                case DsonType.Int64:
+                case DsonType.Float:
+                case DsonType.Double:
                     return true;
                 default:
                     return false;

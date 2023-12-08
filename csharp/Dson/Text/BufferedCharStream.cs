@@ -99,7 +99,7 @@ class BufferedCharStream : AbstractCharStream
                     buffer.Write(c);
 
                     if (c == '\n') { // LF
-                        line.State = LineInfo.STATE_LF;
+                        line.State = LineInfo.StateLf;
                         return;
                     }
                     if (c == '\r') {
@@ -109,20 +109,20 @@ class BufferedCharStream : AbstractCharStream
                         }
                         if (!nextBuffer.IsReadable) {
                             Debug.Assert(_readerEof);
-                            line.State = LineInfo.STATE_EOF;
+                            line.State = LineInfo.StateEof;
                             return;
                         }
                         c = nextBuffer.Read();
                         line.EndPos++;
                         buffer.Write(c);
                         if (c == '\n') { // CRLF
-                            line.State = LineInfo.STATE_CRLF;
+                            line.State = LineInfo.StateCrlf;
                             return;
                         }
                     }
                 }
                 if (_readerEof && !nextBuffer.IsReadable) {
-                    line.State = LineInfo.STATE_EOF;
+                    line.State = LineInfo.StateEof;
                     return;
                 }
             }
@@ -168,14 +168,14 @@ class BufferedCharStream : AbstractCharStream
         }
 
         // startPos指向的是下一个位置，而endPos是在scan的时候增加，因此endPos需要回退一个位置
-        LineInfo tempLine = new LineInfo(ln, startPos, startPos - 1, LineHead.APPEND, startPos);
+        LineInfo tempLine = new LineInfo(ln, startPos, startPos - 1, LineHead.Append, startPos);
         ScanMoreChars(tempLine);
         if (tempLine.StartPos > tempLine.EndPos) { // 无效行，没有输入
             return false;
         }
-        if (DsonMode == DsonMode.RELAXED) {
+        if (DsonMode == DsonMode.Relaxed) {
             if (startPos > tempLine.LastReadablePosition()) { // 空行(仅换行符)
-                tempLine = new LineInfo(ln, startPos, tempLine.EndPos, LineHead.APPEND, -1);
+                tempLine = new LineInfo(ln, startPos, tempLine.EndPos, LineHead.Append, -1);
             }
             AddLine(tempLine);
             return true;
@@ -190,7 +190,7 @@ class BufferedCharStream : AbstractCharStream
             if (headPos == -1) {
                 for (; indexStartPos <= tempLine.EndPos; indexStartPos++) {
                     int ridx = indexStartPos - bufferStartPos;
-                    if (!DsonTexts.isIndentChar(buffer.CharAt(ridx))) {
+                    if (!DsonTexts.IsIndentChar(buffer.CharAt(ridx))) {
                         headPos = indexStartPos;
                         break;
                     }
@@ -236,7 +236,7 @@ class BufferedCharStream : AbstractCharStream
         }
         else {
             Debug.Assert(tempLine.IsScanCompleted());
-            tempLine = new LineInfo(ln, startPos, tempLine.EndPos, LineHead.COMMENT, -1);
+            tempLine = new LineInfo(ln, startPos, tempLine.EndPos, LineHead.Comment, -1);
             tempLine.State = state;
         }
         AddLine(tempLine);

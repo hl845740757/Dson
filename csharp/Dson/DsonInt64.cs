@@ -24,7 +24,7 @@ public class DsonInt64 : DsonNumber, IEquatable<DsonInt64>, IComparable<DsonInt6
         this._value = value;
     }
 
-    public override DsonType DsonType => DsonType.INT64;
+    public override DsonType DsonType => DsonType.Int64;
     public override int IntValue => (int)_value;
     public override long LongValue => _value;
     public override float FloatValue => _value;

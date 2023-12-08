@@ -191,6 +191,7 @@ public class DsonReaderUtils {
 
     // endregion
 
+    // region 内置二元组
     public static void writeExtInt32(DsonOutput output, DsonExtInt32 extInt32, WireType wireType) {
         output.writeUint32(extInt32.getType());
         output.writeBool(extInt32.hasValue());
@@ -261,7 +262,9 @@ public class DsonReaderUtils {
         String value = DsonInternals.isEnabled(wireTypeBits, DsonExtString.MASK_VALUE) ? input.readString() : null;
         return new DsonExtString(type, value);
     }
+    // endregion
 
+    // region 内置结构体
     public static int wireTypeOfRef(ObjectRef objectRef) {
         int v = 0;
         if (objectRef.hasNamespace()) {
@@ -311,7 +314,9 @@ public class DsonReaderUtils {
                 input.readSint32(),
                 input.readUint32());
     }
+    // endregion
 
+    // region 特殊
     public static void writeValueBytes(DsonOutput output, DsonType type, byte[] data) {
         if (type == DsonType.STRING) {
             output.writeUint32(data.length);
@@ -349,6 +354,7 @@ public class DsonReaderUtils {
             input.skipRawBytes(size);
         }
     }
+    // endregion
 
     public static void skipValue(DsonInput input, DsonContextType contextType,
                                  DsonType dsonType, WireType wireType, int wireTypeBits) {
@@ -390,11 +396,9 @@ public class DsonReaderUtils {
             }
             case EXT_DOUBLE -> {
                 input.readUint32(); // 子类型
-                if (input.readBool()) {
-                    skip = 8 - wireTypeBits;
-                } else {
-                    skip = 0;
-                }
+                skip = input.readBool() ? (8 - wireTypeBits) : 0;
+                input.skipRawBytes(skip);
+                return;
             }
             case EXT_STRING -> {
                 if (DsonInternals.isEnabled(wireTypeBits, DsonExtString.MASK_TYPE)) {

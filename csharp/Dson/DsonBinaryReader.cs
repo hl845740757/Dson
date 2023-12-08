@@ -43,11 +43,11 @@ public class DsonBinaryReader<TName> : AbstractDsonReader<TName> where TName : I
     }
 
     protected override Context? GetPooledContext() {
-        return (Context)base.GetPooledContext();
+        return (Context?)base.GetPooledContext();
     }
 
     public override void Dispose() {
-        if (Settings.autoClose) {
+        if (Settings.AutoClose) {
             _input?.Dispose();
             _input = null!;
         }
@@ -58,39 +58,39 @@ public class DsonBinaryReader<TName> : AbstractDsonReader<TName> where TName : I
 
     public override DsonType ReadDsonType() {
         Context context = GetContext();
-        checkReadDsonTypeState(context);
+        CheckReadDsonTypeState(context);
 
         int fullType = _input.IsAtEnd() ? 0 : BinaryUtils.ToUint(_input.ReadRawByte());
         int wreTypeBits = Dsons.WireTypeOfFullType(fullType);
         DsonType dsonType = DsonTypes.ForNumber(Dsons.DsonTypeOfFullType(fullType));
         WireType wireType = dsonType.HasWireType() ? WireTypes.ForNumber(wreTypeBits) : WireType.VarInt;
-        this.currentDsonType = dsonType;
-        this.currentWireType = wireType;
-        this.currentWireTypeBits = wreTypeBits;
-        this.currentName = default;
+        this._currentDsonType = dsonType;
+        this._currentWireType = wireType;
+        this._currentWireTypeBits = wreTypeBits;
+        this._currentName = default;
 
-        onReadDsonType(context, dsonType);
+        OnReadDsonType(context, dsonType);
         return dsonType;
     }
 
     public override DsonType PeekDsonType() {
         Context context = GetContext();
-        checkReadDsonTypeState(context);
+        CheckReadDsonTypeState(context);
 
         int fullType = _input.IsAtEnd() ? 0 : BinaryUtils.ToUint(_input.GetByte(_input.Position));
         return DsonTypes.ForNumber(Dsons.DsonTypeOfFullType(fullType));
     }
 
-    protected override void doReadName() {
+    protected override void DoReadName() {
         if (_textReader != null) {
             string filedName = _input.ReadString();
-            if (Settings.enableFieldIntern) {
+            if (Settings.EnableFieldIntern) {
                 filedName = Dsons.InternField(filedName);
             }
-            _textReader.currentName = filedName;
+            _textReader._currentName = filedName;
         }
         else {
-            _binReader!.currentName = FieldNumber.OfFullNumber(_input.ReadUint32());
+            _binReader!._currentName = FieldNumber.OfFullNumber(_input.ReadUint32());
         }
     }
 
@@ -98,86 +98,86 @@ public class DsonBinaryReader<TName> : AbstractDsonReader<TName> where TName : I
 
     #region 简单值
 
-    protected override int doReadInt32() {
-        return DsonReaderUtils.readInt32(_input, currentWireType);
+    protected override int DoReadInt32() {
+        return DsonReaderUtils.ReadInt32(_input, _currentWireType);
     }
 
-    protected override long doReadInt64() {
-        return DsonReaderUtils.readInt64(_input, currentWireType);
+    protected override long DoReadInt64() {
+        return DsonReaderUtils.ReadInt64(_input, _currentWireType);
     }
 
-    protected override float doReadFloat() {
-        return DsonReaderUtils.readFloat(_input, currentWireTypeBits);
+    protected override float DoReadFloat() {
+        return DsonReaderUtils.ReadFloat(_input, _currentWireTypeBits);
     }
 
-    protected override double doReadDouble() {
-        return DsonReaderUtils.readDouble(_input, currentWireTypeBits);
+    protected override double DoReadDouble() {
+        return DsonReaderUtils.ReadDouble(_input, _currentWireTypeBits);
     }
 
-    protected override bool doReadBool() {
-        return DsonReaderUtils.readBool(_input, currentWireTypeBits);
+    protected override bool DoReadBool() {
+        return DsonReaderUtils.ReadBool(_input, _currentWireTypeBits);
     }
 
-    protected override String doReadString() {
+    protected override String DoReadString() {
         return _input.ReadString();
     }
 
-    protected override void doReadNull() {
+    protected override void DoReadNull() {
     }
 
-    protected override DsonBinary doReadBinary() {
-        return DsonReaderUtils.readDsonBinary(_input);
+    protected override DsonBinary DoReadBinary() {
+        return DsonReaderUtils.ReadDsonBinary(_input);
     }
 
-    protected override DsonExtInt32 doReadExtInt32() {
-        return DsonReaderUtils.readDsonExtInt32(_input, currentWireType);
+    protected override DsonExtInt32 DoReadExtInt32() {
+        return DsonReaderUtils.ReadDsonExtInt32(_input, _currentWireType);
     }
 
-    protected override DsonExtInt64 doReadExtInt64() {
-        return DsonReaderUtils.readDsonExtInt64(_input, currentWireType);
+    protected override DsonExtInt64 DoReadExtInt64() {
+        return DsonReaderUtils.ReadDsonExtInt64(_input, _currentWireType);
     }
 
-    protected override DsonExtDouble doReadExtDouble() {
-        return DsonReaderUtils.readDsonExtDouble(_input, currentWireTypeBits);
+    protected override DsonExtDouble DoReadExtDouble() {
+        return DsonReaderUtils.ReadDsonExtDouble(_input, _currentWireTypeBits);
     }
 
-    protected override DsonExtString doReadExtString() {
-        return DsonReaderUtils.readDsonExtString(_input, currentWireTypeBits);
+    protected override DsonExtString DoReadExtString() {
+        return DsonReaderUtils.ReadDsonExtString(_input, _currentWireTypeBits);
     }
 
-    protected override ObjectRef doReadRef() {
-        return DsonReaderUtils.readRef(_input, currentWireTypeBits);
+    protected override ObjectRef DoReadRef() {
+        return DsonReaderUtils.ReadRef(_input, _currentWireTypeBits);
     }
 
-    protected override OffsetTimestamp doReadTimestamp() {
-        return DsonReaderUtils.readTimestamp(_input);
+    protected override OffsetTimestamp DoReadTimestamp() {
+        return DsonReaderUtils.ReadTimestamp(_input);
     }
 
     #endregion
 
     #region 容器
 
-    protected override void doReadStartContainer(DsonContextType contextType, DsonType dsonType) {
+    protected override void DoReadStartContainer(DsonContextType contextType, DsonType dsonType) {
         Context newContext = NewContext(GetContext(), contextType, dsonType);
         int length = _input.ReadFixed32();
-        newContext.OldLimit = _input.PushLimit(length);
-        newContext.name = currentName;
+        newContext._oldLimit = _input.PushLimit(length);
+        newContext._name = _currentName;
 
-        this.recursionDepth++;
+        this._recursionDepth++;
         SetContext(newContext);
     }
 
-    protected override void doReadEndContainer() {
+    protected override void DoReadEndContainer() {
         if (!_input.IsAtEnd()) {
             throw DsonIOException.bytesRemain(_input.GetBytesUntilLimit());
         }
         Context context = GetContext();
-        _input.PopLimit(context.OldLimit);
+        _input.PopLimit(context._oldLimit);
 
         // 恢复上下文
-        recoverDsonType(context);
-        this.recursionDepth--;
-        SetContext(context.parent!);
+        RecoverDsonType(context);
+        this._recursionDepth--;
+        SetContext(context._parent!);
         PoolContext(context);
     }
 
@@ -185,7 +185,7 @@ public class DsonBinaryReader<TName> : AbstractDsonReader<TName> where TName : I
 
     #region 特殊
 
-    protected override void doSkipName() {
+    protected override void DoSkipName() {
         if (_textReader != null) {
             // 避免构建字符串
             int size = _input.ReadUint32();
@@ -198,20 +198,20 @@ public class DsonBinaryReader<TName> : AbstractDsonReader<TName> where TName : I
         }
     }
 
-    protected override void doSkipValue() {
-        DsonReaderUtils.skipValue(_input, ContextType, currentDsonType, currentWireType, currentWireTypeBits);
+    protected override void DoSkipValue() {
+        DsonReaderUtils.SkipValue(_input, ContextType, _currentDsonType, _currentWireType, _currentWireTypeBits);
     }
 
-    protected override void doSkipToEndOfObject() {
-        DsonReaderUtils.skipToEndOfObject(_input);
+    protected override void DoSkipToEndOfObject() {
+        DsonReaderUtils.SkipToEndOfObject(_input);
     }
 
-    protected override T doReadMessage<T>(int binaryType, MessageParser<T> parser) {
-        return DsonReaderUtils.readMessage(_input, binaryType, parser);
+    protected override T DoReadMessage<T>(int binaryType, MessageParser<T> parser) {
+        return DsonReaderUtils.ReadMessage(_input, binaryType, parser);
     }
 
-    protected override byte[] doReadValueAsBytes() {
-        return DsonReaderUtils.readValueAsBytes(_input, currentDsonType);
+    protected override byte[] DoReadValueAsBytes() {
+        return DsonReaderUtils.ReadValueAsBytes(_input, _currentDsonType);
     }
 
     #endregion
@@ -226,25 +226,25 @@ public class DsonBinaryReader<TName> : AbstractDsonReader<TName> where TName : I
         else {
             context = new Context();
         }
-        context.init(parent, contextType, dsonType);
+        context.Init(parent, contextType, dsonType);
         return context;
     }
 
     private void PoolContext(Context context) {
-        context.reset();
+        context.Reset();
         SetPooledContext(context);
     }
 
     protected new class Context : AbstractDsonReader<TName>.Context
     {
-        protected internal int OldLimit = -1;
+        protected internal int _oldLimit = -1;
 
         public Context() {
         }
 
-        public override void reset() {
-            base.reset();
-            OldLimit = -1;
+        public override void Reset() {
+            base.Reset();
+            _oldLimit = -1;
         }
     }
 
