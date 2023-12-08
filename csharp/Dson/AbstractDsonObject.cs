@@ -139,4 +139,8 @@ public abstract class AbstractDsonObject<TK> : DsonValue, IDictionary<TK, DsonVa
     }
 
     #endregion
+
+    public override string ToString() {
+        return $"{nameof(DsonType)}: {DsonType}, {nameof(_valueMap)}: {_valueMap}";
+    }
 }

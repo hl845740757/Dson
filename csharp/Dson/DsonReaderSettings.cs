@@ -50,5 +50,9 @@ public class DsonReaderSettings
         /// 池化字段名可以降低字符串内存占用，有一定的查找开销。
         /// </summary>
         public bool EnableFieldIntern { get; set; } = true;
+
+        public virtual DsonReaderSettings Build() {
+            return new DsonReaderSettings(this);
+        }
     }
 }

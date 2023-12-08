@@ -71,11 +71,11 @@ public enum DsonType
 
 public static class DsonTypes
 {
-    private static readonly IList<DsonType> LOOK_UP;
+    private static readonly DsonType[] LOOK_UP;
     public static readonly DsonType INVALID = (DsonType)(-1);
 
     static DsonTypes() {
-        LOOK_UP = new List<DsonType>((int)DsonType.OBJECT + 1);
+        LOOK_UP = new DsonType[(int)DsonType.OBJECT + 1];
         foreach (var dsonType in Enum.GetValues<DsonType>()) {
             LOOK_UP[(int)dsonType] = dsonType;
         }

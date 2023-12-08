@@ -90,6 +90,6 @@ public class DsonBinary : DsonValue, IEquatable<DsonBinary>
     #endregion
 
     public override string ToString() {
-        return $"{nameof(_type)}: {_type}, {nameof(_data)}: {Convert.ToHexString(_data)}, {nameof(DsonType)}: {DsonType}";
+        return $"{nameof(DsonType)}: {DsonType}, {nameof(_type)}: {_type}, {nameof(_data)}: {Convert.ToHexString(_data)}";
     }
 }

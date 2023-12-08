@@ -40,6 +40,10 @@ public class DsonWriterSettings
         internal Builder() {
         }
 
+        public virtual DsonWriterSettings Build() {
+            return new DsonWriterSettings(this);
+        }
+
         public int RecursionLimit {
             get => _recursionLimit;
             set => _recursionLimit = value;

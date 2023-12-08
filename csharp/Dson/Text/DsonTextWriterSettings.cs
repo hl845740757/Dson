@@ -81,6 +81,10 @@ public class DsonTextWriterSettings : DsonWriterSettings
         internal Builder() {
         }
 
+        public override DsonTextWriterSettings Build() {
+            return new DsonTextWriterSettings(this);
+        }
+
         public string LineSeparator {
             get => lineSeparator;
             set => lineSeparator = value ?? throw new ArgumentNullException(nameof(value));

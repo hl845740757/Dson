@@ -90,7 +90,10 @@ public static class DsonTexts
 
     /** 是否是不安全的字符，不能省略引号的字符 */
     public static bool isUnsafeStringChar(int c) {
-        return unsafeCharSet.Get(c) || char.IsWhiteSpace((char)c);
+        if (c < 128) { // BitArray不能访问索引外的字符
+            return unsafeCharSet.Get(c) || char.IsWhiteSpace((char)c);
+        }
+        return char.IsWhiteSpace((char)c);
     }
 
     /**
@@ -99,7 +102,10 @@ public static class DsonTexts
      * 因此不能因为每个字符安全，就认为整个字符串安全
      */
     public static bool isSafeStringChar(int c) {
-        return !unsafeCharSet.Get(c) && !char.IsWhiteSpace((char)c);
+        if (c < 128) {
+            return !unsafeCharSet.Get(c) && !char.IsWhiteSpace((char)c);
+        }
+        return !char.IsWhiteSpace((char)c);
     }
 
     /**

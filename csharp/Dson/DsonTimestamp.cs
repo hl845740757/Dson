@@ -57,6 +57,7 @@ public class DsonTimestamp : DsonValue, IEquatable<DsonTimestamp>
     #endregion
 
     public override string ToString() {
-        return $"{nameof(_value)}: {_value}, {nameof(DsonType)}: {DsonType}";
+        return $"{nameof(DsonType)}: {DsonType}, {nameof(_value)}: {_value}";
     }
+    
 }

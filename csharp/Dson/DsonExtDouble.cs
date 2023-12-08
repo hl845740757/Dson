@@ -101,6 +101,6 @@ public class DsonExtDouble : DsonValue, IEquatable<DsonExtDouble>, IComparable<D
     #endregion
 
     public override string ToString() {
-        return $"{nameof(Type)}: {Type}, {nameof(Value)}: {Value}, {nameof(HasValue)}: {HasValue}, {nameof(DsonType)}: {DsonType}";
+        return $"{nameof(DsonType)}: {DsonType}, {nameof(_type)}: {_type}, {nameof(_hasVal)}: {_hasVal}, {nameof(_value)}: {_value}";
     }
 }

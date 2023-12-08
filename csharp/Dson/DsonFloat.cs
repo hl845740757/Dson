@@ -88,6 +88,6 @@ public class DsonFloat : DsonNumber, IEquatable<DsonFloat>, IComparable<DsonFloa
     #endregion
 
     public override string ToString() {
-        return $"{nameof(_value)}: {_value}, {nameof(DsonType)}: {DsonType}";
+        return $"{nameof(DsonType)}: {DsonType}, {nameof(_value)}: {_value}";
     }
 }

@@ -132,4 +132,8 @@ public abstract class AbstractDsonArray : DsonValue, IList<DsonValue>, IEquatabl
     }
 
     #endregion
+
+    public override string ToString() {
+        return $"{nameof(DsonType)}: {DsonType}, {nameof(_values)}: {_values}";
+    }
 }

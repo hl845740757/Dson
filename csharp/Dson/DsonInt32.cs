@@ -88,6 +88,7 @@ public class DsonInt32 : DsonNumber, IEquatable<DsonInt32>, IComparable<DsonInt3
     #endregion
 
     public override string ToString() {
-        return $"{nameof(_value)}: {_value}, {nameof(DsonType)}: {DsonType}";
+        return $"{nameof(DsonType)}: {DsonType}, {nameof(_value)}: {_value}";
     }
+    
 }

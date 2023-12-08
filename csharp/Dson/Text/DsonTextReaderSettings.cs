@@ -27,5 +27,8 @@ public class DsonTextReaderSettings : DsonReaderSettings
 
     public new class Builder : DsonReaderSettings.Builder
     {
+        public override DsonTextReaderSettings Build() {
+            return new DsonTextReaderSettings(this);
+        }
     }
 }

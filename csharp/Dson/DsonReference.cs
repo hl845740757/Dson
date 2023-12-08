@@ -59,6 +59,6 @@ public class DsonReference : DsonValue, IEquatable<DsonReference>
     #endregion
 
     public override string ToString() {
-        return $"{nameof(_value)}: {_value}, {nameof(DsonType)}: {DsonType}";
+        return $"{nameof(DsonType)}: {DsonType}, {nameof(_value)}: {_value}";
     }
 }
