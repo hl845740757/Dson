@@ -207,14 +207,14 @@ final class BufferedCharStream extends AbstractCharStream {
         }
 
         // startPos指向的是下一个位置，而endPos是在scan的时候增加，因此endPos需要回退一个位置
-        LineInfo tempLine = new LineInfo(ln, startPos, startPos - 1, LheadType.APPEND, startPos);
+        LineInfo tempLine = new LineInfo(ln, startPos, startPos - 1, LineHead.APPEND, startPos);
         scanMoreChars(tempLine);
         if (tempLine.startPos > tempLine.endPos) { // 无效行，没有输入
             return false;
         }
         if (dsonMode == DsonMode.RELAXED) {
             if (startPos > tempLine.lastReadablePosition()) { // 空行(仅换行符)
-                tempLine = new LineInfo(ln, startPos, tempLine.endPos, LheadType.APPEND, -1);
+                tempLine = new LineInfo(ln, startPos, tempLine.endPos, LineHead.APPEND, -1);
             }
             addLine(tempLine);
             return true;
@@ -257,8 +257,8 @@ final class BufferedCharStream extends AbstractCharStream {
         int lastReadablePos = tempLine.lastReadablePosition();
         if (headPos >= startPos && headPos <= lastReadablePos) {
             String label = Character.toString(buffer.charAt(headPos - bufferStartPos));
-            LheadType lheadType = LheadType.forLabel(label);
-            if (lheadType == null) {
+            LineHead lineHead = LineHead.forLabel(label);
+            if (lineHead == null) {
                 throw new DsonParseException("Unknown head %s, pos: %d".formatted(label, headPos));
             }
             // 检查缩进
@@ -270,11 +270,11 @@ final class BufferedCharStream extends AbstractCharStream {
             if (headPos + 2 <= lastReadablePos) {
                 contentStartPos = headPos + 2;
             }
-            tempLine = new LineInfo(ln, tempLine.startPos, tempLine.endPos, lheadType, contentStartPos);
+            tempLine = new LineInfo(ln, tempLine.startPos, tempLine.endPos, lineHead, contentStartPos);
             tempLine.state = state;
         } else {
             assert tempLine.isScanCompleted();
-            tempLine = new LineInfo(ln, startPos, tempLine.endPos, LheadType.COMMENT, -1);
+            tempLine = new LineInfo(ln, startPos, tempLine.endPos, LineHead.COMMENT, -1);
             tempLine.state = state;
         }
         addLine(tempLine);

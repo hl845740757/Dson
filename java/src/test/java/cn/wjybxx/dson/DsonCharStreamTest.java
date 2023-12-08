@@ -81,7 +81,7 @@ public class DsonCharStreamTest {
                     }
                     LineInfo curLine = charStream.getCurLine();
                     if (curLine.startPos < curLine.endPos) {
-                        sb.append(curLine.lheadType.label);
+                        sb.append(curLine.lineHead.label);
                     }
                 } else {
                     if (charStream.getPosition() - charStream.getCurLine().startPos == 2) {
@@ -156,7 +156,7 @@ public class DsonCharStreamTest {
         if (self.startPos != lineInfo.startPos) return false;
         if (self.endPos != lineInfo.endPos) return false;
         if (self.contentStartPos != lineInfo.contentStartPos) return false;
-        return self.lheadType == lineInfo.lheadType;
+        return self.lineHead == lineInfo.lineHead;
     }
 
     private static void pullToList(DsonCharStream buffer, List<LineInfo> outList) {

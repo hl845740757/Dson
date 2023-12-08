@@ -241,7 +241,7 @@ public class DsonScanner : IDisposable
         int c;
         while ((c = buffer.Read()) != -1) {
             if (c == -2) {
-                if (buffer.Lhead == LheadType.COMMENT) {
+                if (buffer.LineHead == LineHead.COMMENT) {
                     buffer.SkipLine();
                 }
                 continue;
@@ -266,7 +266,7 @@ public class DsonScanner : IDisposable
         int c;
         while ((c = buffer.Read()) != -1) {
             if (c == -2) {
-                if (buffer.Lhead == LheadType.COMMENT) {
+                if (buffer.LineHead == LineHead.COMMENT) {
                     buffer.SkipLine();
                 }
                 continue;
@@ -291,18 +291,18 @@ public class DsonScanner : IDisposable
         int c;
         while ((c = buffer.Read()) != -1) {
             if (c == -2) {
-                if (buffer.Lhead == LheadType.COMMENT) {
+                if (buffer.LineHead == LineHead.COMMENT) {
                     buffer.SkipLine();
                 }
-                else if (buffer.Lhead == LheadType.APPEND_LINE) { // 开启新行
+                else if (buffer.LineHead == LineHead.APPEND_LINE) { // 开启新行
                     sb.Append('\n');
                 }
-                else if (buffer.Lhead == LheadType.SWITCH_MODE) { // 进入纯文本模式
+                else if (buffer.LineHead == LineHead.SWITCH_MODE) { // 进入纯文本模式
                     Switch2TextMode(buffer, sb);
                 }
             }
             else if (c == '\\') { // 处理转义字符
-                DoEscape(buffer, sb, LheadType.APPEND);
+                DoEscape(buffer, sb, LineHead.APPEND);
             }
             else if (c == quoteChar) { // 结束
                 return sb.ToString();
@@ -324,16 +324,16 @@ public class DsonScanner : IDisposable
         int c;
         while ((c = buffer.Read()) != -1) {
             if (c == -2) {
-                if (buffer.Lhead == LheadType.COMMENT) {
+                if (buffer.LineHead == LineHead.COMMENT) {
                     buffer.SkipLine();
                 }
-                else if (buffer.Lhead == LheadType.END_OF_TEXT) { // 读取结束
+                else if (buffer.LineHead == LineHead.END_OF_TEXT) { // 读取结束
                     return sb.ToString();
                 }
-                if (buffer.Lhead == LheadType.APPEND_LINE) { // 开启新行
+                if (buffer.LineHead == LineHead.APPEND_LINE) { // 开启新行
                     sb.Append('\n');
                 }
-                else if (buffer.Lhead == LheadType.SWITCH_MODE) { // 进入转义模式
+                else if (buffer.LineHead == LineHead.SWITCH_MODE) { // 进入转义模式
                     Switch2EscapeMode(buffer, sb);
                 }
             }
@@ -348,7 +348,7 @@ public class DsonScanner : IDisposable
         int c;
         while ((c = buffer.Read()) != -1) {
             if (c == -2) {
-                if (buffer.Lhead != LheadType.SWITCH_MODE) { // 退出模式切换
+                if (buffer.LineHead != LineHead.SWITCH_MODE) { // 退出模式切换
                     buffer.Unread();
                     break;
                 }
@@ -363,13 +363,13 @@ public class DsonScanner : IDisposable
         int c;
         while ((c = buffer.Read()) != -1) {
             if (c == -2) {
-                if (buffer.Lhead != LheadType.SWITCH_MODE) { // 退出模式切换
+                if (buffer.LineHead != LineHead.SWITCH_MODE) { // 退出模式切换
                     buffer.Unread();
                     break;
                 }
             }
             else if (c == '\\') {
-                DoEscape(buffer, sb, LheadType.SWITCH_MODE);
+                DoEscape(buffer, sb, LineHead.SWITCH_MODE);
             }
             else {
                 sb.Append((char)c);
@@ -377,8 +377,8 @@ public class DsonScanner : IDisposable
         }
     }
 
-    private void DoEscape(DsonCharStream buffer, StringBuilder sb, LheadType lockLhead) {
-        int c = ReadEscapeChar(buffer, lockLhead);
+    private void DoEscape(DsonCharStream buffer, StringBuilder sb, LineHead lockHead) {
+        int c = ReadEscapeChar(buffer, lockHead);
         switch (c) {
             case '"':
                 sb.Append('"');
@@ -404,10 +404,10 @@ public class DsonScanner : IDisposable
             case 'u': {
                 // unicode字符，char是2字节，固定编码为4个16进制数，从高到底
                 char[] hexBuffer = this._hexBuffer;
-                hexBuffer[0] = (char)ReadEscapeChar(buffer, lockLhead);
-                hexBuffer[1] = (char)ReadEscapeChar(buffer, lockLhead);
-                hexBuffer[2] = (char)ReadEscapeChar(buffer, lockLhead);
-                hexBuffer[3] = (char)ReadEscapeChar(buffer, lockLhead);
+                hexBuffer[0] = (char)ReadEscapeChar(buffer, lockHead);
+                hexBuffer[1] = (char)ReadEscapeChar(buffer, lockHead);
+                hexBuffer[2] = (char)ReadEscapeChar(buffer, lockHead);
+                hexBuffer[3] = (char)ReadEscapeChar(buffer, lockHead);
                 string hex = new string(hexBuffer);
                 sb.Append((char)Convert.ToInt32(hex, 16));
                 break;
@@ -417,7 +417,7 @@ public class DsonScanner : IDisposable
     }
 
     /** 读取下一个要转义的字符 -- 只能换行到合并行 */
-    private int ReadEscapeChar(DsonCharStream buffer, LheadType lockHead) {
+    private int ReadEscapeChar(DsonCharStream buffer, LineHead lockHead) {
         int c;
         while (true) {
             c = buffer.Read();
@@ -428,7 +428,7 @@ public class DsonScanner : IDisposable
                 throw InvalidEscapeSequence('\\', Position);
             }
             // c == -2 转义模式下，不可以切换到其它行
-            if (buffer.Lhead != lockHead) {
+            if (buffer.LineHead != lockHead) {
                 throw InvalidEscapeSequence('\\', Position);
             }
         }

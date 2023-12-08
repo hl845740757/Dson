@@ -129,12 +129,12 @@ public class DsonPrinter : IDisposable
     #region dson
 
     /** 打印行首 */
-    public void printLhead(LheadType lheadType) {
-        printLhead(DsonTexts.GetLabel(lheadType));
+    public void printHead(LineHead lineHead) {
+        printHead(DsonTexts.GetLabel(lineHead));
     }
 
     /** 打印行首 */
-    public void printLhead(String label) {
+    public void printHead(String label) {
         if (headLabel != null) {
             throw new InvalidOperationException();
         }

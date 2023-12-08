@@ -86,7 +86,7 @@ public class DsonTextWriter extends AbstractDsonWriter {
         Context context = getContext();
         // 打印元素前先检查是否打印了行首
         if (printer.getHeadLabel() == null) {
-            printLhead(LheadType.APPEND_LINE);
+            printLineHead(LineHead.APPEND_LINE);
         }
         // header与外层对象无缩进，且是匿名属性 -- 如果打印多个header，将保持连续
         if (dsonType == DsonType.HEADER) {
@@ -101,7 +101,7 @@ public class DsonTextWriter extends AbstractDsonWriter {
         // 先处理长度超出，再处理缩进
         if (printer.getColumn() >= settings.softLineLength) {
             printer.println();
-            printLhead(LheadType.APPEND_LINE);
+            printLineHead(LineHead.APPEND_LINE);
         }
         if (context.style == ObjectStyle.INDENT) {
             if (context.count > 0 && printer.getContentLength() < printer.indentLength()) {
@@ -110,7 +110,7 @@ public class DsonTextWriter extends AbstractDsonWriter {
             } else if (printer.hasContent()) {
                 // 当前行有内容了才换行缩进
                 printer.println();
-                printLhead(LheadType.APPEND_LINE);
+                printLineHead(LineHead.APPEND_LINE);
                 printer.printIndent();
             }
         } else if (context.count > 0) {
@@ -179,7 +179,7 @@ public class DsonTextWriter extends AbstractDsonWriter {
             printer.printEscaped(text.charAt(i), unicodeChar);
             if (printer.getColumn() >= softLineLength && (i + 1 < length)) {
                 printer.println();
-                printLhead(LheadType.APPEND);
+                printLineHead(LineHead.APPEND);
             }
         }
         printer.print('"');
@@ -195,23 +195,23 @@ public class DsonTextWriter extends AbstractDsonWriter {
             // 要执行文本中的换行符
             if (c == '\n') {
                 printer.println();
-                printLhead(LheadType.APPEND_LINE);
+                printLineHead(LineHead.APPEND_LINE);
                 continue;
             }
             if (c == '\r' && (i + 1 < length && text.charAt(i + 1) == '\n')) {
                 printer.println();
-                printLhead(LheadType.APPEND_LINE);
+                printLineHead(LineHead.APPEND_LINE);
                 i++;
                 continue;
             }
             printer.print(c);
             if (printer.getColumn() > softLineLength && (i + 1 < length)) {
                 printer.println();
-                printLhead(LheadType.APPEND);
+                printLineHead(LineHead.APPEND);
             }
         }
         printer.println();
-        printLhead(LheadType.END_OF_TEXT);  // 结束符
+        printLineHead(LineHead.END_OF_TEXT);  // 结束符
     }
 
     private void printBinary(byte[] buffer, int offset, int length) {
@@ -222,28 +222,28 @@ public class DsonTextWriter extends AbstractDsonWriter {
         char[] cBuffer = new char[segment * 2];
         int loop = length / segment;
         for (int i = 0; i < loop; i++) {
-            checkLineLength(printer, softLineLength, LheadType.APPEND_LINE);
+            checkLineLength(printer, softLineLength, LineHead.APPEND_LINE);
             DsonTexts.encodeHex(buffer, offset + i * segment, segment, cBuffer, 0);
             printer.printFastPath(cBuffer, 0, cBuffer.length);
         }
         int remain = length - loop * segment;
         if (remain > 0) {
-            checkLineLength(printer, softLineLength, LheadType.APPEND_LINE);
+            checkLineLength(printer, softLineLength, LineHead.APPEND_LINE);
             DsonTexts.encodeHex(buffer, offset + loop * segment, remain, cBuffer, 0);
             printer.printFastPath(cBuffer, 0, remain * 2);
         }
     }
 
-    private void checkLineLength(DsonPrinter printer, int softLineLength, LheadType lheadType) {
+    private void checkLineLength(DsonPrinter printer, int softLineLength, LineHead lineHead) {
         if (printer.getColumn() >= softLineLength) {
             printer.println();
-            printLhead(lheadType);
+            printLineHead(lineHead);
         }
     }
 
-    private void printLhead(LheadType lheadType) {
+    private void printLineHead(LineHead lineHead) {
         if (settings.dsonMode == DsonMode.STANDARD) {
-            printer.printLhead(lheadType);
+            printer.printHead(lineHead);
         }
     }
 
@@ -427,21 +427,21 @@ public class DsonTextWriter extends AbstractDsonWriter {
         }
         if (objectRef.hasLocalId()) {
             if (count++ > 0) printer.printFastPath(", ");
-            checkLineLength(printer, softLineLength, LheadType.APPEND_LINE);
+            checkLineLength(printer, softLineLength, LineHead.APPEND_LINE);
             printer.printFastPath(ObjectRef.NAMES_LOCAL_ID);
             printer.printFastPath(": ");
             printString(printer, objectRef.getLocalId(), StringStyle.AUTO_QUOTE);
         }
         if (objectRef.getType() != 0) {
             if (count++ > 0) printer.printFastPath(", ");
-            checkLineLength(printer, softLineLength, LheadType.APPEND_LINE);
+            checkLineLength(printer, softLineLength, LineHead.APPEND_LINE);
             printer.printFastPath(ObjectRef.NAMES_TYPE);
             printer.printFastPath(": ");
             printer.printFastPath(Integer.toString(objectRef.getType()));
         }
         if (objectRef.getPolicy() != 0) {
             if (count > 0) printer.printFastPath(", ");
-            checkLineLength(printer, softLineLength, LheadType.APPEND_LINE);
+            checkLineLength(printer, softLineLength, LineHead.APPEND_LINE);
             printer.printFastPath(ObjectRef.NAMES_POLICY);
             printer.printFastPath(": ");
             printer.printFastPath(Integer.toString(objectRef.getPolicy()));
@@ -468,14 +468,14 @@ public class DsonTextWriter extends AbstractDsonWriter {
         }
         if (timestamp.hasTime()) {
             if (timestamp.hasDate()) printer.printFastPath(", ");
-            checkLineLength(printer, softLineLength, LheadType.APPEND_LINE);
+            checkLineLength(printer, softLineLength, LineHead.APPEND_LINE);
             printer.printFastPath(OffsetTimestamp.NAMES_TIME);
             printer.printFastPath(": ");
             printer.printFastPath(OffsetTimestamp.formatTime(timestamp.getSeconds()));
         }
         if (timestamp.getNanos() > 0) {
             printer.printFastPath(", ");
-            checkLineLength(printer, softLineLength, LheadType.APPEND_LINE);
+            checkLineLength(printer, softLineLength, LineHead.APPEND_LINE);
             if (timestamp.canConvertNanosToMillis()) {
                 printer.printFastPath(OffsetTimestamp.NAMES_MILLIS);
                 printer.printFastPath(": ");
@@ -488,7 +488,7 @@ public class DsonTextWriter extends AbstractDsonWriter {
         }
         if (timestamp.hasOffset()) {
             printer.printFastPath(", ");
-            checkLineLength(printer, softLineLength, LheadType.APPEND_LINE);
+            checkLineLength(printer, softLineLength, LineHead.APPEND_LINE);
             printer.printFastPath(OffsetTimestamp.NAMES_OFFSET);
             printer.printFastPath(": ");
             printer.printFastPath(OffsetTimestamp.formatOffset(timestamp.getOffset()));
@@ -527,7 +527,7 @@ public class DsonTextWriter extends AbstractDsonWriter {
             // 打印了内容的情况下才换行结束
             if (printer.hasContent() && (context.headerCount > 0 || context.count > 0)) {
                 printer.println();
-                printLhead(LheadType.APPEND_LINE);
+                printLineHead(LineHead.APPEND_LINE);
                 printer.printIndent();
             }
         }

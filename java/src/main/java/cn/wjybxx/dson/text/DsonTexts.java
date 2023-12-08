@@ -59,11 +59,11 @@ public class DsonTexts {
     public static final String LABEL_BEGIN_HEADER = "@{";
 
     // 行首标签
-    public static final String LHEAD_COMMENT = "#";
-    public static final String LHEAD_APPEND_LINE = "-";
-    public static final String LHEAD_APPEND = "|";
-    public static final String LHEAD_SWITCH_MODE = "^";
-    public static final String LHEAD_END_OF_TEXT = "~";
+    public static final String HEAD_COMMENT = "#";
+    public static final String HEAD_APPEND_LINE = "-";
+    public static final String HEAD_APPEND = "|";
+    public static final String HEAD_SWITCH_MODE = "^";
+    public static final String HEAD_END_OF_TEXT = "~";
 
     /** 有特殊含义的字符串 */
     private static final Set<String> PARSABLE_STRINGS = Set.of("true", "false",

@@ -42,18 +42,18 @@ public class LineInfo
     public int State = STATE_SCAN;
 
     /** 行首类型 */
-    public readonly LheadType LheadType;
+    public readonly LineHead LineHead;
     /**
      * 内容全局起始位置 -- -1表示无内容
      * 由于文件可能是没有行首的，因此不能记录行首的开始位置;
      */
     public readonly int ContentStartPos;
 
-    public LineInfo(int ln, int startPos, int endPos, LheadType lheadType, int contentStartPos) {
+    public LineInfo(int ln, int startPos, int endPos, LineHead lineHead, int contentStartPos) {
         this.Ln = ln;
         this.StartPos = startPos;
         this.EndPos = endPos;
-        this.LheadType = lheadType;
+        this.LineHead = lineHead;
         this.ContentStartPos = contentStartPos;
     }
 
@@ -110,7 +110,7 @@ public class LineInfo
             .Append(", startPos=").Append(StartPos)
             .Append(", endPos=").Append(EndPos)
             .Append(", state=").Append(State)
-            .Append(", lheadType=").Append(LheadType)
+            .Append(", lineHead=").Append(LineHead)
             .Append(", contentStartPos=").Append(ContentStartPos)
             .Append('}').ToString();
     }

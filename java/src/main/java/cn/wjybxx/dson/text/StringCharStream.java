@@ -24,11 +24,11 @@ import java.util.Objects;
  * @author wjybxx
  * date - 2023/6/5
  */
-final class CharSequenceCharStream extends AbstractCharStream {
+final class StringCharStream extends AbstractCharStream {
 
     private CharSequence buffer;
 
-    public CharSequenceCharStream(CharSequence buffer, DsonMode dsonMode) {
+    public StringCharStream(CharSequence buffer, DsonMode dsonMode) {
         super(dsonMode);
         this.buffer = Objects.requireNonNull(buffer);
     }
@@ -110,19 +110,19 @@ final class CharSequenceCharStream extends AbstractCharStream {
             }
         }
 
-        LheadType lheadType = LheadType.COMMENT;
+        LineHead lineHead = LineHead.COMMENT;
         int contentStartPos = -1;
         int lastReadablePos = LineInfo.lastReadablePosition(state, endPos);
         if (dsonMode == DsonMode.RELAXED) {
             if (startPos <= lastReadablePos) {
-                lheadType = LheadType.APPEND;
+                lineHead = LineHead.APPEND;
                 contentStartPos = startPos;
             }
         } else {
             if (headPos >= startPos && headPos <= lastReadablePos) {
                 String label = Character.toString(buffer.charAt(headPos));
-                lheadType = LheadType.forLabel(label);
-                if (lheadType == null) {
+                lineHead = LineHead.forLabel(label);
+                if (lineHead == null) {
                     throw new DsonParseException("Unknown head %s, pos: %d".formatted(label, headPos));
                 }
                 // 检查缩进
@@ -135,7 +135,7 @@ final class CharSequenceCharStream extends AbstractCharStream {
                 }
             }
         }
-        LineInfo tempLine = new LineInfo(ln, startPos, endPos, lheadType, contentStartPos);
+        LineInfo tempLine = new LineInfo(ln, startPos, endPos, lineHead, contentStartPos);
         tempLine.state = state;
         addLine(tempLine);
         return true;

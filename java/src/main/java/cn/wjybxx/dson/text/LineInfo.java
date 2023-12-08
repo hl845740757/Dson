@@ -21,7 +21,7 @@ import javax.annotation.Nonnull;
 /**
  * 缓存一定的行信息可以有效避免unread时反向扫描整行
  * 行的基础信息 ln、startPos、endPos等由{@link DsonCharStream}维护。
- * 行的业务信息 contentStartPos、contentEndPos、lheadType由{@link DsonScanner}维护。
+ * 行的业务信息 contentStartPos、contentEndPos、lineHead由{@link DsonScanner}维护。
  *
  * @author wjybxx
  * date - 2023/6/3
@@ -49,18 +49,18 @@ public class LineInfo {
     public int state = STATE_SCAN;
 
     /** 行首类型 */
-    public final LheadType lheadType;
+    public final LineHead lineHead;
     /**
      * 内容全局起始位置 -- -1表示无内容
      * 由于文件可能是没有行首的，因此不能记录行首的开始位置;
      */
     public final int contentStartPos;
 
-    public LineInfo(int ln, int startPos, int endPos, LheadType lheadType, int contentStartPos) {
+    public LineInfo(int ln, int startPos, int endPos, LineHead lineHead, int contentStartPos) {
         this.ln = ln;
         this.startPos = startPos;
         this.endPos = endPos;
-        this.lheadType = lheadType;
+        this.lineHead = lineHead;
         this.contentStartPos = contentStartPos;
     }
 
@@ -118,7 +118,7 @@ public class LineInfo {
                 .append(", endPos=").append(endPos)
                 .append(", state=").append(state)
 
-                .append(", lheadType=").append(lheadType)
+                .append(", lineHead=").append(lineHead)
                 .append(", contentStartPos=").append(contentStartPos)
                 .append('}').toString();
     }

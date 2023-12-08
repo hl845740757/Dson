@@ -19,7 +19,7 @@ namespace Dson.Text;
 /// <summary>
 /// 行首类型（Line Head Type）
 /// </summary>
-public enum LheadType
+public enum LineHead
 {
     /** 注释 */
     COMMENT,

@@ -73,10 +73,10 @@ public interface DsonCharStream extends AutoCloseable {
     /**
      * 获取行首
      */
-    default LheadType getLhead() {
+    default LineHead getLineHead() {
         LineInfo curLine = getCurLine();
-        if (curLine == null) throw new IllegalStateException("read must be called before lhead");
-        return curLine.lheadType;
+        if (curLine == null) throw new IllegalStateException("read must be called before getLineHead");
+        return curLine.lineHead;
     }
 
     /**
@@ -103,11 +103,11 @@ public interface DsonCharStream extends AutoCloseable {
     // region 工厂方法
 
     static DsonCharStream newCharStream(CharSequence dsonString) {
-        return new CharSequenceCharStream(dsonString, DsonMode.STANDARD);
+        return new StringCharStream(dsonString, DsonMode.STANDARD);
     }
 
     static DsonCharStream newCharStream(CharSequence dsonString, DsonMode dsonMode) {
-        return new CharSequenceCharStream(dsonString, dsonMode);
+        return new StringCharStream(dsonString, dsonMode);
     }
 
     static DsonCharStream newBufferedCharStream(Reader reader) {

@@ -68,11 +68,11 @@ public interface DsonCharStream : IDisposable
     /// 获取行首
     /// </summary>
     /// <value></value>
-    LheadType Lhead {
+    LineHead LineHead {
         get {
             LineInfo curLine = CurLine;
-            if (curLine == null) throw new InvalidOperationException("read must be called before lhead");
-            return curLine.LheadType;
+            if (curLine == null) throw new InvalidOperationException("read must be called before LineHead");
+            return curLine.LineHead;
         }
     }
 

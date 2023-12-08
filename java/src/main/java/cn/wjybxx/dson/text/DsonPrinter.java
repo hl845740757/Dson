@@ -156,12 +156,12 @@ public final class DsonPrinter implements AutoCloseable {
     // region dson
 
     /** 打印行首 */
-    public void printLhead(LheadType lheadType) {
-        printLhead(lheadType.label);
+    public void printHead(LineHead lineHead) {
+        printHead(lineHead.label);
     }
 
     /** 打印行首 */
-    public void printLhead(String label) {
+    public void printHead(String label) {
         if (headLabel != null) {
             throw new IllegalStateException();
         }

@@ -241,7 +241,7 @@ public class DsonScanner implements AutoCloseable {
         int c;
         while ((c = buffer.read()) != -1) {
             if (c == -2) {
-                if (buffer.getLhead() == LheadType.COMMENT) {
+                if (buffer.getLineHead() == LineHead.COMMENT) {
                     buffer.skipLine();
                 }
                 continue;
@@ -266,7 +266,7 @@ public class DsonScanner implements AutoCloseable {
         int c;
         while ((c = buffer.read()) != -1) {
             if (c == -2) {
-                if (buffer.getLhead() == LheadType.COMMENT) {
+                if (buffer.getLineHead() == LineHead.COMMENT) {
                     buffer.skipLine();
                 }
                 continue;
@@ -291,15 +291,15 @@ public class DsonScanner implements AutoCloseable {
         int c;
         while ((c = buffer.read()) != -1) {
             if (c == -2) {
-                if (buffer.getLhead() == LheadType.COMMENT) {
+                if (buffer.getLineHead() == LineHead.COMMENT) {
                     buffer.skipLine();
-                } else if (buffer.getLhead() == LheadType.APPEND_LINE) { // 开启新行
+                } else if (buffer.getLineHead() == LineHead.APPEND_LINE) { // 开启新行
                     sb.append('\n');
-                } else if (buffer.getLhead() == LheadType.SWITCH_MODE) { // 进入纯文本模式
+                } else if (buffer.getLineHead() == LineHead.SWITCH_MODE) { // 进入纯文本模式
                     switch2TextMode(buffer, sb);
                 }
             } else if (c == '\\') { // 处理转义字符
-                doEscape(buffer, sb, LheadType.APPEND);
+                doEscape(buffer, sb, LineHead.APPEND);
             } else if (c == quoteChar) { // 结束
                 return sb.toString();
             } else {
@@ -316,14 +316,14 @@ public class DsonScanner implements AutoCloseable {
         int c;
         while ((c = buffer.read()) != -1) {
             if (c == -2) {
-                if (buffer.getLhead() == LheadType.COMMENT) {
+                if (buffer.getLineHead() == LineHead.COMMENT) {
                     buffer.skipLine();
-                } else if (buffer.getLhead() == LheadType.END_OF_TEXT) { // 读取结束
+                } else if (buffer.getLineHead() == LineHead.END_OF_TEXT) { // 读取结束
                     return sb.toString();
                 }
-                if (buffer.getLhead() == LheadType.APPEND_LINE) { // 开启新行
+                if (buffer.getLineHead() == LineHead.APPEND_LINE) { // 开启新行
                     sb.append('\n');
-                } else if (buffer.getLhead() == LheadType.SWITCH_MODE) { // 进入转义模式
+                } else if (buffer.getLineHead() == LineHead.SWITCH_MODE) { // 进入转义模式
                     switch2EscapeMode(buffer, sb);
                 }
             } else {
@@ -337,7 +337,7 @@ public class DsonScanner implements AutoCloseable {
         int c;
         while ((c = buffer.read()) != -1) {
             if (c == -2) {
-                if (buffer.getLhead() != LheadType.SWITCH_MODE) { // 退出模式切换
+                if (buffer.getLineHead() != LineHead.SWITCH_MODE) { // 退出模式切换
                     buffer.unread();
                     break;
                 }
@@ -351,20 +351,20 @@ public class DsonScanner implements AutoCloseable {
         int c;
         while ((c = buffer.read()) != -1) {
             if (c == -2) {
-                if (buffer.getLhead() != LheadType.SWITCH_MODE) { // 退出模式切换
+                if (buffer.getLineHead() != LineHead.SWITCH_MODE) { // 退出模式切换
                     buffer.unread();
                     break;
                 }
             } else if (c == '\\') {
-                doEscape(buffer, sb, LheadType.SWITCH_MODE);
+                doEscape(buffer, sb, LineHead.SWITCH_MODE);
             } else {
                 sb.append((char) c);
             }
         }
     }
 
-    private void doEscape(DsonCharStream buffer, StringBuilder sb, LheadType lockLhead) {
-        int c = readEscapeChar(buffer, lockLhead);
+    private void doEscape(DsonCharStream buffer, StringBuilder sb, LineHead lockHead) {
+        int c = readEscapeChar(buffer, lockHead);
         switch (c) {
             case '"' -> sb.append('"'); // 双引号字符串下，双引号需要转义
             case '\\' -> sb.append('\\');
@@ -376,10 +376,10 @@ public class DsonScanner implements AutoCloseable {
             case 'u' -> {
                 // unicode字符，char是2字节，固定编码为4个16进制数，从高到底
                 char[] hexBuffer = this.hexBuffer;
-                hexBuffer[0] = (char) readEscapeChar(buffer, lockLhead);
-                hexBuffer[1] = (char) readEscapeChar(buffer, lockLhead);
-                hexBuffer[2] = (char) readEscapeChar(buffer, lockLhead);
-                hexBuffer[3] = (char) readEscapeChar(buffer, lockLhead);
+                hexBuffer[0] = (char) readEscapeChar(buffer, lockHead);
+                hexBuffer[1] = (char) readEscapeChar(buffer, lockHead);
+                hexBuffer[2] = (char) readEscapeChar(buffer, lockHead);
+                hexBuffer[3] = (char) readEscapeChar(buffer, lockHead);
                 String hex = new String(hexBuffer);
                 sb.append((char) Integer.parseInt(hex, 16));
             }
@@ -388,7 +388,7 @@ public class DsonScanner implements AutoCloseable {
     }
 
     /** 读取下一个要转义的字符 -- 只能换行到合并行 */
-    private int readEscapeChar(DsonCharStream buffer, LheadType lockHead) {
+    private int readEscapeChar(DsonCharStream buffer, LineHead lockHead) {
         int c;
         while (true) {
             c = buffer.read();
@@ -399,7 +399,7 @@ public class DsonScanner implements AutoCloseable {
                 throw invalidEscapeSequence('\\', getPosition());
             }
             // c == -2 转义模式下，不可以切换到其它行
-            if (buffer.getLhead() != lockHead) {
+            if (buffer.getLineHead() != lockHead) {
                 throw invalidEscapeSequence('\\', getPosition());
             }
         }

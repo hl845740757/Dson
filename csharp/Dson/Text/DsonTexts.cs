@@ -48,11 +48,11 @@ public static class DsonTexts
     public const string LABEL_BEGIN_HEADER = "@{";
 
     // 行首标签
-    public const string LHEAD_COMMENT = "#";
-    public const string LHEAD_APPEND_LINE = "-";
-    public const string LHEAD_APPEND = "|";
-    public const string LHEAD_SWITCH_MODE = "^";
-    public const string LHEAD_END_OF_TEXT = "~";
+    public const string HEAD_COMMENT = "#";
+    public const string HEAD_APPEND_LINE = "-";
+    public const string HEAD_APPEND = "|";
+    public const string HEAD_SWITCH_MODE = "^";
+    public const string HEAD_END_OF_TEXT = "~";
 
     /** 有特殊含义的字符串 */
     private static readonly ISet<string> PARSABLE_STRINGS = new[] {
@@ -237,24 +237,24 @@ public static class DsonTexts
     /// </summary>
     /// <param name="label">行首标签</param>
     /// <returns>行首值</returns>
-    public static LheadType? LheadTypeOfLabel(string label) {
+    public static LineHead? LineHeadOfLabel(string label) {
         return label switch {
-            DsonTexts.LHEAD_COMMENT => LheadType.COMMENT,
-            DsonTexts.LHEAD_APPEND_LINE => LheadType.APPEND_LINE,
-            DsonTexts.LHEAD_APPEND => LheadType.APPEND,
-            DsonTexts.LHEAD_SWITCH_MODE => LheadType.SWITCH_MODE,
-            DsonTexts.LHEAD_END_OF_TEXT => LheadType.END_OF_TEXT,
+            DsonTexts.HEAD_COMMENT => LineHead.COMMENT,
+            DsonTexts.HEAD_APPEND_LINE => LineHead.APPEND_LINE,
+            DsonTexts.HEAD_APPEND => LineHead.APPEND,
+            DsonTexts.HEAD_SWITCH_MODE => LineHead.SWITCH_MODE,
+            DsonTexts.HEAD_END_OF_TEXT => LineHead.END_OF_TEXT,
             _ => null
         };
     }
 
-    public static string GetLabel(LheadType lheadType) {
-        return lheadType switch {
-            LheadType.COMMENT => DsonTexts.LHEAD_COMMENT,
-            LheadType.APPEND_LINE => DsonTexts.LHEAD_APPEND_LINE,
-            LheadType.APPEND => DsonTexts.LHEAD_APPEND,
-            LheadType.SWITCH_MODE => DsonTexts.LHEAD_SWITCH_MODE,
-            LheadType.END_OF_TEXT => DsonTexts.LHEAD_END_OF_TEXT,
+    public static string GetLabel(LineHead lineHead) {
+        return lineHead switch {
+            LineHead.COMMENT => DsonTexts.HEAD_COMMENT,
+            LineHead.APPEND_LINE => DsonTexts.HEAD_APPEND_LINE,
+            LineHead.APPEND => DsonTexts.HEAD_APPEND,
+            LineHead.SWITCH_MODE => DsonTexts.HEAD_SWITCH_MODE,
+            LineHead.END_OF_TEXT => DsonTexts.HEAD_END_OF_TEXT,
             _ => throw new InvalidOperationException()
         };
     }

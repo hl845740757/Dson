@@ -80,20 +80,20 @@ class StringCharStream : AbstractCharStream
             }
         }
 
-        LheadType? lheadType = LheadType.COMMENT;
+        LineHead? lineHead = LineHead.COMMENT;
         int contentStartPos = -1;
         int lastReadablePos = LineInfo.LastReadablePosition(state, endPos);
         if (DsonMode == DsonMode.RELAXED) {
             if (startPos <= lastReadablePos) {
-                lheadType = LheadType.APPEND;
+                lineHead = LineHead.APPEND;
                 contentStartPos = startPos;
             }
         }
         else {
             if (headPos >= startPos && headPos <= lastReadablePos) {
                 string label = buffer[headPos].ToString();
-                lheadType = DsonTexts.LheadTypeOfLabel(label);
-                if (!lheadType.HasValue) {
+                lineHead = DsonTexts.LineHeadOfLabel(label);
+                if (!lineHead.HasValue) {
                     throw new DsonParseException($"Unknown head {label}, pos: {headPos}");
                 }
                 // 检查缩进
@@ -106,7 +106,7 @@ class StringCharStream : AbstractCharStream
                 }
             }
         }
-        LineInfo tempLine = new LineInfo(ln, startPos, endPos, lheadType.Value, contentStartPos);
+        LineInfo tempLine = new LineInfo(ln, startPos, endPos, lineHead.Value, contentStartPos);
         tempLine.State = state;
         AddLine(tempLine);
         return true;

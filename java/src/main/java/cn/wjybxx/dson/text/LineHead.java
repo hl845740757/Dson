@@ -22,32 +22,32 @@ package cn.wjybxx.dson.text;
  * @author wjybxx
  * date - 2023/6/2
  */
-public enum LheadType {
+public enum LineHead {
 
     /** 注释 */
-    COMMENT(DsonTexts.LHEAD_COMMENT),
+    COMMENT(DsonTexts.HEAD_COMMENT),
     /** 添加新行 */
-    APPEND_LINE(DsonTexts.LHEAD_APPEND_LINE),
+    APPEND_LINE(DsonTexts.HEAD_APPEND_LINE),
     /** 与上一行合并 */
-    APPEND(DsonTexts.LHEAD_APPEND),
+    APPEND(DsonTexts.HEAD_APPEND),
     /** 切换模式 */
-    SWITCH_MODE(DsonTexts.LHEAD_SWITCH_MODE),
+    SWITCH_MODE(DsonTexts.HEAD_SWITCH_MODE),
     /** 文本输入结束 */
-    END_OF_TEXT(DsonTexts.LHEAD_END_OF_TEXT);
+    END_OF_TEXT(DsonTexts.HEAD_END_OF_TEXT);
 
     public final String label;
 
-    LheadType(String label) {
+    LineHead(String label) {
         this.label = label;
     }
 
-    public static LheadType forLabel(String label) {
+    public static LineHead forLabel(String label) {
         return switch (label) {
-            case DsonTexts.LHEAD_COMMENT -> COMMENT;
-            case DsonTexts.LHEAD_APPEND_LINE -> APPEND_LINE;
-            case DsonTexts.LHEAD_APPEND -> APPEND;
-            case DsonTexts.LHEAD_SWITCH_MODE -> SWITCH_MODE;
-            case DsonTexts.LHEAD_END_OF_TEXT -> END_OF_TEXT;
+            case DsonTexts.HEAD_COMMENT -> COMMENT;
+            case DsonTexts.HEAD_APPEND_LINE -> APPEND_LINE;
+            case DsonTexts.HEAD_APPEND -> APPEND;
+            case DsonTexts.HEAD_SWITCH_MODE -> SWITCH_MODE;
+            case DsonTexts.HEAD_END_OF_TEXT -> END_OF_TEXT;
             default -> null;
         };
     }

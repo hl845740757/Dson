@@ -168,14 +168,14 @@ class BufferedCharStream : AbstractCharStream
         }
 
         // startPos指向的是下一个位置，而endPos是在scan的时候增加，因此endPos需要回退一个位置
-        LineInfo tempLine = new LineInfo(ln, startPos, startPos - 1, LheadType.APPEND, startPos);
+        LineInfo tempLine = new LineInfo(ln, startPos, startPos - 1, LineHead.APPEND, startPos);
         ScanMoreChars(tempLine);
         if (tempLine.StartPos > tempLine.EndPos) { // 无效行，没有输入
             return false;
         }
         if (DsonMode == DsonMode.RELAXED) {
             if (startPos > tempLine.LastReadablePosition()) { // 空行(仅换行符)
-                tempLine = new LineInfo(ln, startPos, tempLine.EndPos, LheadType.APPEND, -1);
+                tempLine = new LineInfo(ln, startPos, tempLine.EndPos, LineHead.APPEND, -1);
             }
             AddLine(tempLine);
             return true;
@@ -218,8 +218,8 @@ class BufferedCharStream : AbstractCharStream
         int lastReadablePos = tempLine.LastReadablePosition();
         if (headPos >= startPos && headPos <= lastReadablePos) {
             String label = buffer.CharAt(headPos - bufferStartPos).ToString();
-            LheadType? lheadType = DsonTexts.LheadTypeOfLabel(label);
-            if (!lheadType.HasValue) {
+            LineHead? lineHead = DsonTexts.LineHeadOfLabel(label);
+            if (!lineHead.HasValue) {
                 throw new DsonParseException($"Unknown head {label}, pos: {headPos}");
             }
             // 检查缩进
@@ -231,12 +231,12 @@ class BufferedCharStream : AbstractCharStream
             if (headPos + 2 <= lastReadablePos) {
                 contentStartPos = headPos + 2;
             }
-            tempLine = new LineInfo(ln, tempLine.StartPos, tempLine.EndPos, lheadType.Value, contentStartPos);
+            tempLine = new LineInfo(ln, tempLine.StartPos, tempLine.EndPos, lineHead.Value, contentStartPos);
             tempLine.State = state;
         }
         else {
             Debug.Assert(tempLine.IsScanCompleted());
-            tempLine = new LineInfo(ln, startPos, tempLine.EndPos, LheadType.COMMENT, -1);
+            tempLine = new LineInfo(ln, startPos, tempLine.EndPos, LineHead.COMMENT, -1);
             tempLine.State = state;
         }
         AddLine(tempLine);
