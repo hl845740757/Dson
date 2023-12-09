@@ -18,13 +18,33 @@
 
 namespace Dson;
 
-public abstract class DsonNumber : DsonValue
+/// <summary>
+/// 读操作指导
+/// </summary>
+public enum DsonReaderGuide
 {
-    public abstract int IntValue { get; }
+    /** 当前应该读取type */
+    ReadType,
+    /** 当前应该读取name或fullNumber */
+    ReadName,
+    /** 当前应该根据type决定应该怎样读值 */
+    ReadValue,
 
-    public abstract long LongValue { get; }
+    /** 当前应该读数组 */
+    StartArray,
+    /** 当前应该结束读数组 */
+    EndArray,
 
-    public abstract float FloatValue { get; }
+    /** 当前应该读Object */
+    StartObject,
+    /** 当前应该结束读Object */
+    EndObject,
 
-    public abstract double DoubleValue { get; }
+    /** 当前应该读Object */
+    StartHeader,
+    /** 当前应该结束读Object */
+    EndHeader,
+
+    /** 当前应该关闭Reader */
+    Close,
 }
