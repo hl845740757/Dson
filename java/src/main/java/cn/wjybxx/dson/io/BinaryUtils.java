@@ -32,6 +32,8 @@ public class BinaryUtils {
     }
 
     /**
+     * 允许{@code offset + length == bufferLength}
+     *
      * @param bufferLength buffer数组的长度
      * @param offset       数据的起始索引
      * @param length       数据的长度
@@ -40,6 +42,13 @@ public class BinaryUtils {
         if ((offset | length | (bufferLength - (offset + length))) < 0) {
             throw new IllegalArgumentException(String.format("Array range is invalid. Buffer.length=%d, offset=%d, length=%d",
                     bufferLength, offset, length));
+        }
+    }
+
+    public static void checkBuffer(int bufferLength, int offset) {
+        if (offset < 0 || offset > bufferLength) {
+            throw new IllegalArgumentException(String.format("Array range is invalid. Buffer.length=%d, offset=%d",
+                    bufferLength, offset));
         }
     }
 

@@ -69,7 +69,7 @@ public interface IDsonOutput : IDisposable
     void WriteBool(bool value);
 
     /// <summary>
-    /// 该接口先以Uint32格式写入String的长度，再写入String以UTF8编码后的内容
+    /// 该接口先以Uint32格式写入String以UTF8编码后的字节长度，再写入String以UTF8编码后的内容
     /// </summary>
     /// <param name="value">要写入的字符串</param>
     void WriteString(string value);
@@ -77,15 +77,15 @@ public interface IDsonOutput : IDisposable
     /// <summary>
     /// 仅写入内容，不会写入数组的长度
     /// </summary>
-    /// <param name="value">要写入的字节数组</param>
-    void WriteRawBytes(byte[] value) {
-        WriteRawBytes(value, 0, value.Length);
+    /// <param name="data">要写入的字节数组</param>
+    void WriteRawBytes(byte[] data) {
+        WriteRawBytes(data, 0, data.Length);
     }
 
     /// <summary>
     /// 仅写入内容，不会写入数组的长度
     /// </summary>
-    void WriteRawBytes(byte[] value, int offset, int length);
+    void WriteRawBytes(byte[] data, int offset, int length);
 
     /// <summary>
     /// 写入一个Protobuf消息
@@ -97,15 +97,15 @@ public interface IDsonOutput : IDisposable
     ///    output.writeRawBytes(data);
     /// </code>
     /// </summary>
-    /// <param name="value"></param>
-    void WriteMessage(IMessage value);
+    /// <param name="message"></param>
+    void WriteMessage(IMessage message);
 
     #endregion
 
     #region Advance
 
     /// <summary>
-    /// 当前写索引
+    /// 当前写索引(也等于写入的字节数)
     /// </summary>
     int Position { get; set; }
 

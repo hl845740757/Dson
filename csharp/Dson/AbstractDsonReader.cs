@@ -249,7 +249,7 @@ public abstract class AbstractDsonReader<TName> : IDsonReader<TName> where TName
 
     public string ReadString(TName name) {
         AdvanceToValueState(name, DsonType.String);
-        String value = DoReadString();
+        string value = DoReadString();
         SetNextState();
         return value;
     }

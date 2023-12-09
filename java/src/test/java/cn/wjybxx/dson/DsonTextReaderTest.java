@@ -16,13 +16,16 @@
 
 package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.text.*;
+import cn.wjybxx.dson.io.DsonInput;
+import cn.wjybxx.dson.io.DsonInputs;
+import cn.wjybxx.dson.io.DsonOutput;
+import cn.wjybxx.dson.io.DsonOutputs;
+import cn.wjybxx.dson.text.DsonTextReader;
+import cn.wjybxx.dson.text.DsonTextReaderSettings;
+import cn.wjybxx.dson.text.DsonTextWriterSettings;
+import cn.wjybxx.dson.text.ObjectStyle;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author wjybxx
@@ -33,7 +36,7 @@ public class DsonTextReaderTest {
     static final String dsonString = """
             - @{clsName: FileHeader, intro: 预留设计，允许定义文件头}
             -
-            - {@MyStruct\s
+            - {@MyStruct
             - \tname : wjybxx,
             - \tage:28,
             - \t介绍: 这是一段中文而且非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常长 ,
@@ -43,7 +46,7 @@ public class DsonTextReaderTest {
             - \tbin : [@bin 0, 35df2e75e6a4be9e6f4571c64cb6d08b],
             - }
             -
-            - {@MyStruct\s
+            - {@MyStruct
             - \tname : wjybxx,
             - \tintro: "hello world",
             - \tref1 : {@ref localId: 10001, ns: 16148b3b4e7b8923d398},
@@ -70,30 +73,61 @@ public class DsonTextReaderTest {
             - ]
             """;
 
+    /**
+     * 程序生成的无法保证和手写的文本相同
+     * 但程序反复读写，以及不同方式之间的读写结果应当相同。
+     */
     @Test
     void test() {
-        List<DsonValue> topObjects = new ArrayList<>(4);
+        DsonArray<String> topObjects = new DsonArray<>(6);
         try (DsonReader reader = new DsonTextReader(DsonTextReaderSettings.DEFAULT, dsonString)) {
             DsonValue dsonValue;
             while ((dsonValue = Dsons.readTopDsonValue(reader)) != null) {
                 topObjects.add(dsonValue);
             }
         }
+        String dsonString1 = Dsons.toDson(topObjects, ObjectStyle.INDENT);
 
-        StringWriter stringWriter = new StringWriter();
-        DsonTextWriterSettings settings = DsonTextWriterSettings.newBuilder()
-                .setSoftLineLength(40)
-                .setUnicodeChar(false)
-                .build();
+        // Binary
+        {
+            byte[] buffer = new byte[8192];
+            DsonOutput output = DsonOutputs.newInstance(buffer);
+            try (DsonWriter writer = new DsonBinaryWriter(DsonTextWriterSettings.DEFAULT, output)) {
+                for (var dsonValue : topObjects) {
+                    Dsons.writeTopDsonValue(writer, dsonValue, ObjectStyle.INDENT);
+                }
+            }
 
-        DsonValue fileHeaderObj = topObjects.get(0);
-        try (DsonTextWriter writer = new DsonTextWriter(settings, stringWriter)) {
-            Dsons.writeTopDsonValue(writer, fileHeaderObj, ObjectStyle.INDENT);
-            writer.flush();
+            DsonInput input = DsonInputs.newInstance(buffer, 0, output.getPosition());
+            DsonArray<String> decodedDsonArray = new DsonArray<String>();
+            try (DsonReader reader = new DsonBinaryReader(DsonTextReaderSettings.DEFAULT, input)) {
+                DsonValue dsonValue;
+                while ((dsonValue = Dsons.readTopDsonValue(reader)) != null) {
+                    decodedDsonArray.add(dsonValue);
+                }
+            }
+            String dsonString2 = Dsons.toDson(decodedDsonArray, ObjectStyle.INDENT);
+            Assertions.assertEquals(dsonString1, dsonString2, "BinaryReader/BinaryWriter");
         }
-        String fileHeaderString = stringWriter.toString();
-        Assertions.assertEquals(fileHeaderObj, Dsons.fromDson(fileHeaderString));
-        System.out.println(fileHeaderString);
+        // Object
+        {
+            DsonArray<String> outList = new DsonArray<>();
+            try (DsonWriter writer = new DsonObjectWriter(DsonTextWriterSettings.DEFAULT, outList)) {
+                for (var dsonValue : topObjects) {
+                    Dsons.writeTopDsonValue(writer, dsonValue, ObjectStyle.INDENT);
+                }
+            }
+
+            DsonArray<String> decodedDsonArray = new DsonArray<>();
+            try (DsonReader reader = new DsonObjectReader(DsonTextReaderSettings.DEFAULT, outList)) {
+                DsonValue dsonValue;
+                while ((dsonValue = Dsons.readTopDsonValue(reader)) != null) {
+                    decodedDsonArray.add(dsonValue);
+                }
+            }
+            String dsonString3 = Dsons.toDson(decodedDsonArray, ObjectStyle.INDENT);
+            Assertions.assertEquals(dsonString1, dsonString3, "ObjectReader/ObjectWriter");
+        }
     }
 
     @Test

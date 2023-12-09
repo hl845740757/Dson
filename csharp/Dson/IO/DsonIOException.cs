@@ -35,11 +35,11 @@ public class DsonIOException : Exception
     public DsonIOException(string? message, Exception? innerException) : base(message, innerException) {
     }
 
-    public static DsonIOException wrap(Exception e) {
+    public static DsonIOException Wrap(Exception e, string? message = null) {
         if (e is DsonIOException exception) {
             return exception;
         }
-        return new DsonIOException(null, e);
+        return new DsonIOException(message, e);
     }
 
     // reader/writer

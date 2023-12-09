@@ -232,7 +232,7 @@ public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName> where TName
 
     protected abstract void DoWriteBool(bool value);
 
-    protected abstract void DoWriteString(String value, StringStyle style);
+    protected abstract void DoWriteString(string value, StringStyle style);
 
     protected abstract void DoWriteNull();
 

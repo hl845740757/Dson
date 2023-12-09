@@ -61,16 +61,16 @@ public interface DsonOutput extends AutoCloseable {
     /** 该接口固定写入1个字节 */
     void writeBool(boolean value);
 
-    /** 该接口先以Uint32格式写入String的长度，再写入String以UTF8编码后的内容 */
+    /** 该接口先以Uint32格式写入String以UTF8编码后的字节长度，再写入String以UTF8编码后的内容 */
     void writeString(String value);
 
     /** 仅写入内容，不会写入数组的长度 */
-    default void writeRawBytes(byte[] value) {
-        writeRawBytes(value, 0, value.length);
+    default void writeRawBytes(byte[] data) {
+        writeRawBytes(data, 0, data.length);
     }
 
     /** 仅写入内容，不会写入数组的长度 */
-    void writeRawBytes(byte[] value, int offset, int length);
+    void writeRawBytes(byte[] data, int offset, int length);
 
     /**
      * 写入一个protoBuf消息
@@ -82,7 +82,7 @@ public interface DsonOutput extends AutoCloseable {
      *      output.writeRawBytes(data);
      * }</pre>
      */
-    void writeMessage(MessageLite value);
+    void writeMessage(MessageLite message);
 
     /** 当前写索引位置 - 已写字节数 */
     int getPosition();

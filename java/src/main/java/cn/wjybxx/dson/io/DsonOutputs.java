@@ -179,27 +179,27 @@ public class DsonOutputs {
         }
 
         @Override
-        public void writeRawBytes(byte[] value) {
+        public void writeRawBytes(byte[] data) {
             try {
-                codedOutputStream.writeRawBytes(value, 0, value.length);
+                codedOutputStream.writeRawBytes(data, 0, data.length);
             } catch (IOException e) {
                 throw DsonIOException.wrap(e);
             }
         }
 
         @Override
-        public void writeRawBytes(byte[] value, int offset, int length) {
+        public void writeRawBytes(byte[] data, int offset, int length) {
             try {
-                codedOutputStream.writeRawBytes(value, offset, length);
+                codedOutputStream.writeRawBytes(data, offset, length);
             } catch (IOException e) {
                 throw DsonIOException.wrap(e);
             }
         }
 
         @Override
-        public void writeMessage(MessageLite value) {
+        public void writeMessage(MessageLite message) {
             try {
-                value.writeTo(codedOutputStream);
+                message.writeTo(codedOutputStream);
             } catch (IOException e) {
                 throw DsonIOException.wrap(e);
             }

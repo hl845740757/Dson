@@ -132,7 +132,7 @@ public static class DsonTexts
     }
 
     /** 是否是ASCII码中的可打印字符构成的文本 */
-    public static bool IsAsciiText(String text) {
+    public static bool IsAsciiText(string text) {
         for (int i = 0, len = text.Length; i < len; i++) {
             char c = text[i];
             if (c < 32 || c > 126) {
@@ -148,7 +148,7 @@ public static class DsonTexts
         throw new ArgumentException("invalid bool str: " + str);
     }
 
-    public static void CheckNullString(String str) {
+    public static void CheckNullString(string str) {
         if ("null" == str) {
             return;
         }

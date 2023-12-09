@@ -183,7 +183,7 @@ public class DsonReaderUtils {
         {
             int type = input.readUint32();
             if (type != binaryType) throw DsonIOException.unexpectedSubType(binaryType, type);
-            value = input.readMessage(parser);
+            value = input.readMessage(parser, CodedOutputStream.computeUInt32SizeNoTag(type));
         }
         input.popLimit(oldLimit);
         return value;

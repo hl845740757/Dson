@@ -56,14 +56,14 @@ public interface DsonInput extends AutoCloseable {
     /** 该接口固定读取8字节 */
     double readDouble();
 
-    /** 该接口固定只读取一个字节 */
+    /** 该接口固定只读取一个字节；字节对应值不为0则表示true */
     boolean readBool();
 
     /** 该接口先读取一个uint32编码的长度，再读取相应字节数 */
     String readString();
 
-    /** @param size 要读取的字节数 */
-    byte[] readRawBytes(int size);
+    /** @param count 要读取的字节数 */
+    byte[] readRawBytes(int count);
 
     /** @param n 要跳过的字节数 */
     void skipRawBytes(int n);
@@ -78,7 +78,7 @@ public interface DsonInput extends AutoCloseable {
      *      return parser.parseFrom(data);
      * }</pre>
      */
-    <T> T readMessage(@Nonnull Parser<T> parser);
+    <T> T readMessage(@Nonnull Parser<T> parser, int len);
 
     /** 当前读索引位置 - 已读字节数 */
     int getPosition();
@@ -114,7 +114,7 @@ public interface DsonInput extends AutoCloseable {
      * 限制接下来可读取的字节数
      *
      * @param byteLimit 可用字节数
-     * @return oldLimit 前一次设置的限制点
+     * @return oldLimit 前一次设置的限制点；业务层避免使用
      */
     int pushLimit(int byteLimit);
 

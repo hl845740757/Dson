@@ -39,7 +39,7 @@ public class DsonWriterSettings
         /** 是否自动关闭底层的输入输出流 */
         public bool AutoClose = true;
 
-        internal Builder() {
+        public Builder() {
         }
 
         public virtual DsonWriterSettings Build() {

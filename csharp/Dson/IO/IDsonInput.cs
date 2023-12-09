@@ -71,9 +71,9 @@ public interface IDsonInput : IDisposable
     /// <summary>
     /// 读取原始的bytes
     /// </summary>
-    /// <param name="size">要读取的字节数</param>
+    /// <param name="count">要读取的字节数</param>
     /// <returns></returns>
-    byte[] ReadRawBytes(int size);
+    byte[] ReadRawBytes(int count);
 
     /// <summary>
     /// 跳过指定数量的字节
@@ -85,16 +85,17 @@ public interface IDsonInput : IDisposable
     /// 从输入中读取一个protobuf消息
     /// 1.只读取message的内容部分，不包含长度信息
     /// 2.该方法用于避免创建临时的字节数组
-    ///
+    /// 
     /// <code>
     ///    byte[] data = input.readRawBytes(len);
     ///    return parser.parseFrom(data);
     /// </code>
     /// </summary>
     /// <param name="parser">消息的解析器</param>
+    /// <param name="len">消息的长度</param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    T ReadMessage<T>(MessageParser<T> parser) where T : IMessage<T>;
+    T ReadMessage<T>(MessageParser<T> parser, int len) where T : IMessage<T>;
 
     #endregion
 
@@ -125,7 +126,7 @@ public interface IDsonInput : IDisposable
     /// 限制接下来可读取的字节数
     /// </summary>
     /// <param name="byteLimit">可用字节数</param>
-    /// <returns>前一次设置的限制点</returns>
+    /// <returns>用于恢复Limit的token；用户应避免使用</returns>
     int PushLimit(int byteLimit);
 
     /// <summary>

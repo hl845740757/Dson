@@ -114,7 +114,7 @@ public class DsonBinaryWriter<TName> : AbstractDsonWriter<TName> where TName : I
         WriteFullTypeAndCurrentName(output, DsonType.Boolean, value ? 1 : 0);
     }
 
-    protected override void DoWriteString(String value, StringStyle style) {
+    protected override void DoWriteString(string value, StringStyle style) {
         IDsonOutput output = this._output;
         WriteFullTypeAndCurrentName(output, DsonType.String, 0);
         output.WriteString(value);

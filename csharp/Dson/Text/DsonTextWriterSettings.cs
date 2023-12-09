@@ -91,7 +91,7 @@ public class DsonTextWriterSettings : DsonWriterSettings
          */
         public int MaxLengthOfUnquoteString = 66;
 
-        internal Builder() {
+        public Builder() {
         }
 
         public override DsonTextWriterSettings Build() {

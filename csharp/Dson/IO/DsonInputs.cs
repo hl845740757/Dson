@@ -1,0 +1,271 @@
+﻿#region LICENSE
+
+//  Copyright 2023 wjybxx
+// 
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+// 
+//      http://www.apache.org/licenses/LICENSE-2.0
+// 
+//  Unless required by applicable law or agreed to iBn writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+
+#endregion
+
+using System.Runtime.CompilerServices;
+using System.Text;
+using Google.Protobuf;
+
+namespace Dson.IO;
+
+/// <summary>
+/// 
+/// </summary>
+public class DsonInputs
+{
+    public static IDsonInput NewInstance(byte[] buffer) {
+        return new ArrayDsonInput(buffer, 0, buffer.Length);
+    }
+
+    public static IDsonInput NewInstance(byte[] buffer, int offset, int length) {
+        return new ArrayDsonInput(buffer, offset, length);
+    }
+
+    internal class ArrayDsonInput : IDsonInput
+    {
+        private readonly byte[] _buffer;
+        private readonly int _rawOffset;
+        private readonly int _rawLimit;
+
+        private int _bufferPos;
+        private int _bufferPosLimit;
+
+        internal ArrayDsonInput(byte[] buffer, int offset, int length) {
+            BinaryUtils.CheckBuffer(buffer, offset, length);
+            this._buffer = buffer;
+            this._rawOffset = offset;
+            this._rawLimit = offset + length;
+
+            this._bufferPos = offset;
+            this._bufferPosLimit = offset + length;
+        }
+
+        #region check
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private int CheckNewBufferPos(int newBufferPos) {
+            if (newBufferPos < _rawOffset || newBufferPos > _bufferPosLimit) {
+                throw new DsonIOException($"BytesLimited, LimitPos: {_bufferPosLimit}," +
+                                          $" position: {_bufferPos}," +
+                                          $" newPosition: {newBufferPos}");
+            }
+            return newBufferPos;
+        }
+
+        #endregion
+
+        public byte ReadRawByte() {
+            CheckNewBufferPos(_bufferPos + 1);
+            return _buffer[_bufferPos++];
+        }
+
+        public int ReadInt32() {
+            try {
+                int r = BinaryUtils.ReadInt32(_buffer, _bufferPos, out int newPos);
+                _bufferPos = CheckNewBufferPos(newPos);
+                return r;
+            }
+            catch (Exception e) {
+                throw DsonIOException.Wrap(e, "buffer overflow");
+            }
+        }
+
+        public int ReadUint32() {
+            try {
+                int r = BinaryUtils.ReadUint32(_buffer, _bufferPos, out int newPos);
+                _bufferPos = CheckNewBufferPos(newPos);
+                return r;
+            }
+            catch (Exception e) {
+                throw DsonIOException.Wrap(e, "buffer overflow");
+            }
+        }
+
+        public int ReadSint32() {
+            try {
+                int r = BinaryUtils.ReadSint32(_buffer, _bufferPos, out int newPos);
+                _bufferPos = CheckNewBufferPos(newPos);
+                return r;
+            }
+            catch (Exception e) {
+                throw DsonIOException.Wrap(e, "buffer overflow");
+            }
+        }
+
+        public int ReadFixed32() {
+            try {
+                int r = BinaryUtils.ReadFixed32(_buffer, _bufferPos, out int newPos);
+                _bufferPos = CheckNewBufferPos(newPos);
+                return r;
+            }
+            catch (Exception e) {
+                throw DsonIOException.Wrap(e, "buffer overflow");
+            }
+        }
+
+        public long ReadInt64() {
+            try {
+                long r = BinaryUtils.ReadInt64(_buffer, _bufferPos, out int newPos);
+                _bufferPos = CheckNewBufferPos(newPos);
+                return r;
+            }
+            catch (Exception e) {
+                throw DsonIOException.Wrap(e, "buffer overflow");
+            }
+        }
+
+        public long ReadUint64() {
+            try {
+                long r = BinaryUtils.ReadUint64(_buffer, _bufferPos, out int newPos);
+                _bufferPos = CheckNewBufferPos(newPos);
+                return r;
+            }
+            catch (Exception e) {
+                throw DsonIOException.Wrap(e, "buffer overflow");
+            }
+        }
+
+        public long ReadSint64() {
+            try {
+                long r = BinaryUtils.ReadSint64(_buffer, _bufferPos, out int newPos);
+                _bufferPos = CheckNewBufferPos(newPos);
+                return r;
+            }
+            catch (Exception e) {
+                throw DsonIOException.Wrap(e, "buffer overflow");
+            }
+        }
+
+        public long ReadFixed64() {
+            try {
+                long r = BinaryUtils.ReadFixed64(_buffer, _bufferPos, out int newPos);
+                _bufferPos = CheckNewBufferPos(newPos);
+                return r;
+            }
+            catch (Exception e) {
+                throw DsonIOException.Wrap(e, "buffer overflow");
+            }
+        }
+
+        public float ReadFloat() {
+            try {
+                float r = BinaryUtils.ReadFloat(_buffer, _bufferPos, out int newPos);
+                _bufferPos = CheckNewBufferPos(newPos);
+                return r;
+            }
+            catch (Exception e) {
+                throw DsonIOException.Wrap(e, "buffer overflow");
+            }
+        }
+
+        public double ReadDouble() {
+            try {
+                double r = BinaryUtils.ReadDouble(_buffer, _bufferPos, out int newPos);
+                _bufferPos = CheckNewBufferPos(newPos);
+                return r;
+            }
+            catch (Exception e) {
+                throw DsonIOException.Wrap(e, "buffer overflow");
+            }
+        }
+
+        public bool ReadBool() {
+            CheckNewBufferPos(_bufferPos + 1);
+            return _buffer[_bufferPos++] != 0; // c#字节是无符号，判断不等于0与Java更统一
+        }
+
+        public string ReadString() {
+            try {
+                int len = BinaryUtils.ReadUint32(_buffer, _bufferPos, out int newPos); // 字符串长度
+                CheckNewBufferPos(newPos + len); // 先检查，避免构建无效字符串
+
+                string r = Encoding.UTF8.GetString(_buffer, newPos, len);
+                _bufferPos = newPos + len;
+                return r;
+            }
+            catch (Exception e) {
+                throw DsonIOException.Wrap(e, "buffer overflow");
+            }
+        }
+
+        public byte[] ReadRawBytes(int count) {
+            CheckNewBufferPos(_bufferPos + count);
+            byte[] bytes = new byte[count];
+            Array.Copy(_buffer, _bufferPos, bytes, 0, count);
+            _bufferPos += count;
+            return bytes;
+        }
+
+        public virtual void SkipRawBytes(int n) {
+            if (n < 0) throw new ArgumentException(nameof(n));
+            if (n == 0) return;
+            Position += n;
+        }
+
+        public T ReadMessage<T>(MessageParser<T> parser, int len) where T : IMessage<T> {
+            CheckNewBufferPos(_bufferPos + len);
+            T message = parser.ParseFrom(_buffer, _bufferPos, len);
+            _bufferPos += len;
+            return message;
+        }
+
+        //
+        public int Position {
+            get => _bufferPos - _rawOffset;
+            set {
+                BinaryUtils.CheckBuffer(_rawLimit - _rawOffset, value);
+                _bufferPos = _rawOffset + value;
+            }
+        }
+
+        public byte GetByte(int pos) {
+            BinaryUtils.CheckBuffer(_rawLimit - _rawOffset, pos, 1);
+            int bufferPos = _rawOffset + pos;
+            return _buffer[bufferPos];
+        }
+
+        public int GetFixed32(int pos) {
+            BinaryUtils.CheckBuffer(_rawLimit - _rawOffset, pos, 4);
+            int bufferPos = _rawOffset + pos;
+            return BinaryUtils.GetIntLe(_buffer, bufferPos);
+        }
+
+        public int PushLimit(int byteLimit) {
+            if (byteLimit < 0) throw new ArgumentException(nameof(byteLimit));
+            int oldPosLimit = _bufferPosLimit;
+            int newPosLimit = _bufferPos + byteLimit;
+
+            // 不可超过原始限制
+            BinaryUtils.CheckBuffer(_rawLimit, _rawOffset, newPosLimit - _rawOffset);
+            _bufferPosLimit = newPosLimit;
+            return oldPosLimit;
+        }
+
+        public void PopLimit(int oldLimit) {
+            // 不可超过原始限制
+            BinaryUtils.CheckBuffer(_rawLimit, _rawOffset, oldLimit - _rawOffset);
+            _bufferPosLimit = oldLimit;
+        }
+
+        public int GetBytesUntilLimit() => (_bufferPosLimit - _bufferPos);
+
+        public bool IsAtEnd() => _bufferPos >= _bufferPosLimit;
+
+        public void Dispose() {
+        }
+    }
+}

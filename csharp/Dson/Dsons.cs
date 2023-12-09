@@ -213,8 +213,8 @@ public static class Dsons
 
     #region Read/Write
 
-    public static void WriteTopDsonValue<TName>(IDsonWriter<TName> writer,
-                                                DsonValue dsonValue, ObjectStyle style) where TName : IEquatable<TName> {
+    public static void WriteTopDsonValue<TName>(IDsonWriter<TName> writer, DsonValue dsonValue,
+                                                ObjectStyle style = ObjectStyle.Indent) where TName : IEquatable<TName> {
         if (dsonValue.DsonType == DsonType.Object) {
             WriteObject(writer, dsonValue.AsObject<TName>(), style);
         }
@@ -245,8 +245,8 @@ public static class Dsons
     }
 
     /** 如果需要写入名字，外部写入 */
-    public static void WriteObject<TName>(IDsonWriter<TName> writer,
-                                          DsonObject<TName> dsonObject, ObjectStyle style) where TName : IEquatable<TName> {
+    public static void WriteObject<TName>(IDsonWriter<TName> writer, DsonObject<TName> dsonObject,
+                                          ObjectStyle style = ObjectStyle.Indent) where TName : IEquatable<TName> {
         writer.WriteStartObject(style);
         if (dsonObject.Header.Count > 0) {
             WriteHeader(writer, dsonObject.Header);
@@ -278,8 +278,8 @@ public static class Dsons
     }
 
     /** 如果需要写入名字，外部写入 */
-    public static void WriteArray<TName>(IDsonWriter<TName> writer,
-                                         DsonArray<TName> dsonArray, ObjectStyle style) where TName : IEquatable<TName> {
+    public static void WriteArray<TName>(IDsonWriter<TName> writer, DsonArray<TName> dsonArray,
+                                         ObjectStyle style = ObjectStyle.Indent) where TName : IEquatable<TName> {
         writer.WriteStartArray(style);
         if (dsonArray.Header.Count > 0) {
             WriteHeader(writer, dsonArray.Header);
@@ -438,13 +438,13 @@ public static class Dsons
 
     #region 快捷方法
 
-    public static String ToDson(DsonValue dsonValue, ObjectStyle style, DsonMode dsonMode = DsonMode.Standard) {
+    public static string ToDson(DsonValue dsonValue, ObjectStyle style, DsonMode dsonMode = DsonMode.Standard) {
         return ToDson(dsonValue, style, dsonMode == DsonMode.Relaxed
             ? DsonTextWriterSettings.RelaxedDefault
             : DsonTextWriterSettings.Default);
     }
 
-    public static String ToDson(DsonValue dsonValue, ObjectStyle style, DsonTextWriterSettings settings) {
+    public static string ToDson(DsonValue dsonValue, ObjectStyle style, DsonTextWriterSettings settings) {
         if (!dsonValue.DsonType.IsContainerOrHeader()) {
             throw new InvalidOperationException("invalid dsonType " + dsonValue.DsonType);
         }
@@ -471,7 +471,7 @@ public static class Dsons
     /** 获取dsonValue的localId -- dson的约定之一 */
     public static string? GetLocalId(DsonValue dsonValue) {
         DsonHeader<string> header;
-        if (dsonValue is DsonObject<String> dsonObject) {
+        if (dsonValue is DsonObject<string> dsonObject) {
             header = dsonObject.Header;
         }
         else if (dsonValue is DsonArray<string> dsonArray) {

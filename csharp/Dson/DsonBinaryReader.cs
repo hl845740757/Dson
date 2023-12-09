@@ -121,7 +121,7 @@ public class DsonBinaryReader<TName> : AbstractDsonReader<TName> where TName : I
         return DsonReaderUtils.ReadBool(_input, _currentWireTypeBits);
     }
 
-    protected override String DoReadString() {
+    protected override string DoReadString() {
         return _input.ReadString();
     }
 

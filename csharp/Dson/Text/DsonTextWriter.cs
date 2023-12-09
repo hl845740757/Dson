@@ -107,7 +107,7 @@ public class DsonTextWriter : AbstractDsonWriter<string>
         context._count++;
     }
 
-    private void PrintString(DsonPrinter printer, String value, StringStyle style) {
+    private void PrintString(DsonPrinter printer, string value, StringStyle style) {
         DsonTextWriterSettings settings = this._settings;
         switch (style) {
             case StringStyle.Auto: {
@@ -162,7 +162,7 @@ public class DsonTextWriter : AbstractDsonWriter<string>
     }
 
     /** 打印双引号String */
-    private void PrintEscaped(String text) {
+    private void PrintEscaped(string text) {
         bool unicodeChar = _settings.UnicodeChar;
         int softLineLength = _settings.SoftLineLength;
         DsonPrinter printer = this._printer;
@@ -178,7 +178,7 @@ public class DsonTextWriter : AbstractDsonWriter<string>
     }
 
     /** 纯文本模式打印，要执行换行符 */
-    private void PrintText(String text) {
+    private void PrintText(string text) {
         int softLineLength = _settings.SoftLineLength;
         DsonPrinter printer = this._printer;
         printer.PrintFastPath("@ss "); // 开始符
@@ -289,7 +289,7 @@ public class DsonTextWriter : AbstractDsonWriter<string>
         printer.PrintFastPath(value ? "true" : "false");
     }
 
-    protected override void DoWriteString(String value, StringStyle style) {
+    protected override void DoWriteString(string value, StringStyle style) {
         DsonPrinter printer = this._printer;
         WriteCurrentName(printer, DsonType.String);
         PrintString(printer, value, style);

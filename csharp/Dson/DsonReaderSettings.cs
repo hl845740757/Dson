@@ -53,6 +53,9 @@ public class DsonReaderSettings
         /// </summary>
         public bool EnableFieldIntern { get; set; } = true;
 
+        public Builder() {
+        }
+
         public virtual DsonReaderSettings Build() {
             return new DsonReaderSettings(this);
         }

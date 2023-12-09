@@ -235,7 +235,7 @@ class BufferedCharStream : AbstractCharStream
         int state = tempLine.State; // 可能已完成，也可能未完成
         int lastReadablePos = tempLine.LastReadablePosition();
         if (headPos >= startPos && headPos <= lastReadablePos) {
-            String label = buffer.CharAt(headPos - bufferStartPos).ToString();
+            string label = buffer.CharAt(headPos - bufferStartPos).ToString();
             LineHead? lineHead = DsonTexts.LineHeadOfLabel(label);
             if (!lineHead.HasValue) {
                 throw new DsonParseException($"Unknown head {label}, pos: {headPos}");

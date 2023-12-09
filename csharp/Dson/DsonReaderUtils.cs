@@ -219,14 +219,14 @@ public class DsonReaderUtils
     #region binary
 
     public static void WriteBinary(IDsonOutput output, DsonBinary binary) {
-        int sizeOfBinaryType = CodedOutputStream.ComputeUInt32Size((uint)binary.Type);
+        int sizeOfBinaryType = BinaryUtils.ComputeUInt32Size((uint)binary.Type);
         output.WriteFixed32(sizeOfBinaryType + binary.Data.Length);
         output.WriteUint32(binary.Type);
         output.WriteRawBytes(binary.Data);
     }
 
     public static void WriteBinary(IDsonOutput output, int type, DsonChunk chunk) {
-        int sizeOfBinaryType = CodedOutputStream.ComputeUInt32Size((uint)type);
+        int sizeOfBinaryType = BinaryUtils.ComputeUInt32Size((uint)type);
         output.WriteFixed32(sizeOfBinaryType + chunk.Length);
         output.WriteUint32(type);
         output.WriteRawBytes(chunk.Buffer, chunk.Offset, chunk.Length);
@@ -259,7 +259,7 @@ public class DsonReaderUtils
         {
             int type = input.ReadUint32();
             if (type != binaryType) throw DsonIOException.unexpectedSubType(binaryType, type);
-            value = input.ReadMessage(parser);
+            value = input.ReadMessage(parser, size - BinaryUtils.ComputeUInt32Size((uint)type));
         }
         input.PopLimit(oldLimit);
         return value;

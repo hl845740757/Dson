@@ -133,7 +133,7 @@ public class DsonObjectWriter extends AbstractDsonWriter {
         Context parent = getContext();
         Context newContext = newContext(parent, contextType, dsonType);
         newContext.container = switch (contextType) {
-            case HEADER -> parent.getHeader();
+            case HEADER -> new DsonHeader<>();
             case ARRAY -> new DsonArray<>();
             case OBJECT -> new DsonObject<>();
             default -> throw new AssertionError();
@@ -146,12 +146,21 @@ public class DsonObjectWriter extends AbstractDsonWriter {
     @Override
     protected void doWriteEndContainer() {
         Context context = getContext();
-        if (context.contextType != DsonContextType.HEADER) {
-            context.getParent().add(context.container);
+        Context parent = context.getParent();
+        if (context.contextType == DsonContextType.HEADER) {
+            if (parent.contextType == DsonContextType.TOP_LEVEL) {
+                parent.add(context.container); // TopLevel的Header看做独立元素
+            } else {
+                // 普通对象的Header则合并
+                DsonHeader<String> parentHeader = parent.getHeader();
+                parentHeader.putAll(context.container.asHeader());
+            }
+        } else {
+            parent.add(context.container);
         }
 
         this.recursionDepth--;
-        setContext(context.parent);
+        setContext(parent);
         poolContext(context);
     }
     // endregion

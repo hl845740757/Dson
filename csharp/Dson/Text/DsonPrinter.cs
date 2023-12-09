@@ -144,7 +144,7 @@ public class DsonPrinter : IDisposable
     }
 
     /** 打印行首 */
-    public void PrintHead(String label) {
+    public void PrintHead(string label) {
         if (_headLabel != null) {
             throw new InvalidOperationException();
         }
