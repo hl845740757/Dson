@@ -52,14 +52,11 @@ public class Program
     /// </summary>
     /// <param name="args"></param>
     public static void Main(string[] args) {
-        DsonArray<string> topObjects = new DsonArray<string>();
+        DsonArray<string> topContainer1;
         using (IDsonReader<string> reader = new DsonTextReader(DsonTextReaderSettings.Default, dsonString)) {
-            DsonValue dsonValue;
-            while ((dsonValue = Dsons.ReadTopDsonValue(reader)) != null) {
-                topObjects.Add(dsonValue);
-            }
+            topContainer1 = Dsons.ReadTopContainer(reader);
         }
-        string dsonString1 = Dsons.ToDson(topObjects, ObjectStyle.Indent);
+        string dsonString1 = Dsons.ToFlatDson(topContainer1);
         Console.WriteLine(dsonString1);
 
         // BinaryWriter
@@ -67,41 +64,29 @@ public class Program
             byte[] buffer = new byte[8192];
             IDsonOutput output = DsonOutputs.NewInstance(buffer);
             using (IDsonWriter<string> writer = new DsonBinaryWriter<string>(DsonTextWriterSettings.Default, output)) {
-                foreach (var dsonValue in topObjects) {
-                    Dsons.WriteTopDsonValue(writer, dsonValue);
-                }
+                Dsons.WriteTopContainer(writer, topContainer1);
             }
-
             IDsonInput input = DsonInputs.NewInstance(buffer, 0, output.Position);
-            DsonArray<string> decodedDsonArray = new DsonArray<string>();
             using (IDsonReader<string> reader = new DsonBinaryReader<string>(DsonTextReaderSettings.Default, input)) {
-                DsonValue dsonValue;
-                while ((dsonValue = Dsons.ReadTopDsonValue(reader)) != null) {
-                    decodedDsonArray.Add(dsonValue);
-                }
+                DsonArray<string> topContainer2 = Dsons.ReadTopContainer(reader);
+
+                string dsonString2 = Dsons.ToFlatDson(topContainer2);
+                Debug.Assert(dsonString1 == dsonString2, "BinaryReader/BinaryWriter");
             }
-            string dsonString2 = Dsons.ToDson(decodedDsonArray, ObjectStyle.Indent);
-            Debug.Assert(dsonString1 == dsonString2, "BinaryReader/BinaryWriter");
         }
 
         // ObjectWriter
         {
             DsonArray<string> outList = new DsonArray<string>();
             using (IDsonWriter<string> writer = new DsonObjectWriter<string>(DsonTextWriterSettings.Default, outList)) {
-                foreach (var dsonValue in topObjects) {
-                    Dsons.WriteTopDsonValue(writer, dsonValue);
-                }
+                Dsons.WriteTopContainer(writer, topContainer1);
             }
-
-            DsonArray<string> decodedDsonArray = new DsonArray<string>();
             using (IDsonReader<string> reader = new DsonObjectReader<string>(DsonTextReaderSettings.Default, outList)) {
-                DsonValue dsonValue;
-                while ((dsonValue = Dsons.ReadTopDsonValue(reader)) != null) {
-                    decodedDsonArray.Add(dsonValue);
-                }
+                DsonArray<string> topContainer3 = Dsons.ReadTopContainer(reader);
+
+                string dsonString3 = Dsons.ToFlatDson(topContainer3);
+                Debug.Assert(dsonString1 == dsonString3, "ObjectReader/ObjectWriter");
             }
-            string dsonString3 = Dsons.ToDson(decodedDsonArray, ObjectStyle.Indent);
-            Debug.Assert(dsonString1 == dsonString3, "ObjectReader/ObjectWriter");
         }
     }
 }

@@ -54,9 +54,8 @@ public abstract class AbstractDsonArray extends DsonValue implements List<DsonVa
 
     // region 安全检查
     static void checkElement(DsonValue value) {
-        if (value == null) {
-            throw new IllegalArgumentException("value cant be null");
-        }
+        if (value == null) throw new IllegalArgumentException("value cant be null");
+        if (value.getDsonType() == DsonType.HEADER) throw new IllegalArgumentException("add Header");
     }
 
     @Override

@@ -80,4 +80,12 @@ public class DsonObject<K> extends AbstractDsonObject<K> {
         put(key, value);
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "DsonObject{" +
+                "header=" + header +
+                ", valueMap=" + valueMap +
+                '}';
+    }
 }

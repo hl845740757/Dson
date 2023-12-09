@@ -26,55 +26,63 @@ namespace Wjybxx.Dson;
 /// </summary>
 public class DsonRepository
 {
-    private readonly Dictionary<string, DsonValue> indexMap = new();
-    private readonly List<DsonValue> valueList = new List<DsonValue>();
+    private readonly Dictionary<string, DsonValue> _indexMap = new();
+    private readonly DsonArray<string> _container;
 
     public DsonRepository() {
+        _container = new();
     }
 
-    public DsonArray<string> ToDsonArray() {
-        DsonArray<string> dsonArray = new DsonArray<string>(valueList.Count);
-        dsonArray.AddAll(valueList);
-        return dsonArray;
+    public DsonRepository(DsonArray<string> container) {
+        _container = container ?? throw new ArgumentNullException(nameof(container));
+        foreach (var dsonValue in container) {
+            string localId = Dsons.GetLocalId(dsonValue);
+            if (localId != null) {
+                _indexMap[localId] = dsonValue;
+            }
+        }
     }
 
-    public Dictionary<string, DsonValue> IndexMap => indexMap;
+    public Dictionary<string, DsonValue> IndexMap => _indexMap;
 
-    public List<DsonValue> Values => valueList;
+    /// <summary>
+    /// 顶层容器
+    /// </summary>
+    public DsonArray<string> Container => _container;
 
-    public int Count => valueList.Count;
+    public int Count => _container.Count;
 
-    public DsonValue this[int index] => valueList[index];
+    public DsonValue this[int index] => _container[index];
 
     public DsonRepository Add(DsonValue value) {
         if (!value.DsonType.IsContainerOrHeader()) {
             throw new ArgumentException();
         }
-        valueList.Add(value);
+        _container.Add(value);
 
         string localId = Dsons.GetLocalId(value);
         if (localId != null) {
-            if (indexMap.Remove(localId, out DsonValue? exist)) {
-                DsonInternals.RemoveRef(valueList, exist);
+            if (_indexMap.Remove(localId, out DsonValue exist)) {
+                DsonInternals.RemoveRef(_container, exist);
             }
-            indexMap[localId] = value;
+            _indexMap[localId] = value;
         }
         return this;
     }
 
     public DsonValue RemoveAt(int idx) {
-        DsonValue dsonValue = valueList[idx];
-        valueList.RemoveAt(idx); // 居然没返回值...
+        DsonValue dsonValue = _container[idx];
+        _container.RemoveAt(idx); // 居然没返回值...
 
         string localId = Dsons.GetLocalId(dsonValue);
         if (localId != null) {
-            indexMap.Remove(localId, out DsonValue _);
+            _indexMap.Remove(localId, out DsonValue _);
         }
         return dsonValue;
     }
 
     public bool Remove(DsonValue dsonValue) {
-        int idx = DsonInternals.IndexOfRef(valueList, dsonValue);
+        int idx = DsonInternals.IndexOfRef(_container, dsonValue);
         if (idx >= 0) {
             RemoveAt(idx);
             return true;
@@ -86,22 +94,23 @@ public class DsonRepository
 
     public DsonValue? RemoveById(string localId) {
         if (localId == null) throw new ArgumentNullException(nameof(localId));
-        if (indexMap.Remove(localId, out DsonValue exist)) {
-            DsonInternals.RemoveRef(valueList, exist);
+        if (_indexMap.Remove(localId, out DsonValue exist)) {
+            DsonInternals.RemoveRef(_container, exist);
         }
         return exist;
     }
 
     public DsonValue? Find(string localId) {
         if (localId == null) throw new ArgumentNullException(nameof(localId));
-        indexMap.TryGetValue(localId, out DsonValue exist);
+        _indexMap.TryGetValue(localId, out DsonValue exist);
         return exist;
     }
 
-    public void ResolveReference() {
-        foreach (DsonValue dsonValue in valueList) {
+    public DsonRepository ResolveReference() {
+        foreach (DsonValue dsonValue in _container) {
             ResolveReference(dsonValue);
         }
+        return this;
     }
 
     private void ResolveReference(DsonValue dsonValue) {
@@ -111,7 +120,7 @@ public class DsonRepository
                 DsonValue value = entry.Value;
                 if (value.DsonType == DsonType.Reference) {
                     ObjectRef objectRef = value.AsReference();
-                    if (indexMap.TryGetValue(objectRef.LocalId, out DsonValue targetObj)) {
+                    if (_indexMap.TryGetValue(objectRef.LocalId, out DsonValue targetObj)) {
                         dsonObject[entry.Key] = targetObj; // 迭代时覆盖值是安全的
                     }
                 }
@@ -125,7 +134,7 @@ public class DsonRepository
                 DsonValue value = dsonArray[i];
                 if (value.DsonType == DsonType.Reference) {
                     ObjectRef objectRef = value.AsReference();
-                    if (indexMap.TryGetValue(objectRef.LocalId, out DsonValue targetObj)) {
+                    if (_indexMap.TryGetValue(objectRef.LocalId, out DsonValue targetObj)) {
                         dsonArray[i] = targetObj;
                     }
                 }
@@ -138,18 +147,15 @@ public class DsonRepository
 
     //
 
-    public static DsonRepository FromDson(string dsonString, bool resolveRef = false) {
-        DsonRepository repository = new DsonRepository();
-        using (DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.Default, dsonString)) {
-            DsonValue value;
-            while ((value = Dsons.ReadTopDsonValue(reader)) != null) {
-                repository.Add(value);
+    public static DsonRepository FromDson(IDsonReader<string> reader, bool resolveRef = false) {
+        using (reader) {
+            DsonArray<string> topContainer = Dsons.ReadTopContainer(reader);
+            DsonRepository repository = new DsonRepository(topContainer);
+            if (resolveRef) {
+                repository.ResolveReference();
             }
+            return repository;
         }
-        if (resolveRef) {
-            repository.ResolveReference();
-        }
-        return repository;
     }
 
     // 解析引用后可能导致循环，因此equals等不实现

@@ -17,6 +17,7 @@
 #endregion
 
 using System.Text;
+using Wjybxx.Dson.IO;
 
 namespace Wjybxx.Dson.Text;
 
@@ -136,7 +137,7 @@ public class DsonScanner : IDisposable
             return OnReadClassName(className);
         }
         catch (Exception e) {
-            throw DsonParseException.wrap(e);
+            throw DsonParseException.Wrap(e);
         }
     }
 

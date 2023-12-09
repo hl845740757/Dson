@@ -16,6 +16,7 @@
 
 package cn.wjybxx.dson;
 
+import cn.wjybxx.dson.io.DsonIOException;
 import cn.wjybxx.dson.text.*;
 
 import javax.annotation.Nullable;
@@ -119,18 +120,77 @@ public final class Dsons {
 
     // region read/write
 
+    /**
+     * 读取顶层容器
+     * 会将独立的header合并到容器中，会将分散的元素读取存入数组
+     */
+    public static DsonArray<String> readTopContainer(DsonReader reader) {
+        final DsonArray<String> topContainer = new DsonArray<>(4);
+        DsonType dsonType;
+        while ((dsonType = reader.readDsonType()) != DsonType.END_OF_OBJECT) {
+            if (dsonType == DsonType.HEADER) {
+                readHeader(reader, topContainer.getHeader());
+            } else if (dsonType == DsonType.OBJECT) {
+                topContainer.add(readObject(reader));
+            } else if (dsonType == DsonType.ARRAY) {
+                topContainer.add(readArray(reader));
+            } else {
+                throw DsonIOException.invalidTopDsonType(dsonType);
+            }
+        }
+        return topContainer;
+    }
+
+    /**
+     * 写入顶层容器
+     * 顶层容器的header和元素将被展开，而不是嵌套在数组中
+     */
+    public static void writeTopContainer(DsonWriter writer, DsonArray<String> topContainer) {
+        if (!topContainer.getHeader().isEmpty()) {
+            writeHeader(writer, topContainer.getHeader());
+        }
+        for (DsonValue dsonValue : topContainer) {
+            if (dsonValue.getDsonType() == DsonType.OBJECT) {
+                writeObject(writer, dsonValue.asObject(), ObjectStyle.INDENT);
+            } else if (dsonValue.getDsonType() == DsonType.ARRAY) {
+                writeArray(writer, dsonValue.asArray(), ObjectStyle.INDENT);
+            } else {
+                throw DsonIOException.invalidTopDsonType(dsonValue.getDsonType());
+            }
+        }
+    }
+
+    /** @param dsonValue 顶层对象；可以是Header */
+    public static void writeTopDsonValue(DsonWriter writer, DsonValue dsonValue) {
+        writeTopDsonValue(writer, dsonValue, ObjectStyle.INDENT);
+    }
+
+    /**
+     * @param dsonValue 顶层对象；可以是Header
+     * @param style     文本编码时的格式
+     */
     public static void writeTopDsonValue(DsonWriter writer, DsonValue dsonValue, ObjectStyle style) {
         if (dsonValue.getDsonType() == DsonType.OBJECT) {
             writeObject(writer, dsonValue.asObject(), style);
         } else if (dsonValue.getDsonType() == DsonType.ARRAY) {
             writeArray(writer, dsonValue.asArray(), style);
-        } else {
+        } else if (dsonValue.getDsonType() == DsonType.HEADER) {
             writeHeader(writer, dsonValue.asHeader());
+        } else {
+            throw DsonIOException.invalidTopDsonType(dsonValue.getDsonType());
         }
     }
 
     /** @return 如果到达文件尾部，则返回null */
     public static DsonValue readTopDsonValue(DsonReader reader) {
+        return readTopDsonValue(reader, null);
+    }
+
+    /**
+     * @param fileHeader 用于接收文件头信息
+     * @return 如果到达文件尾部，则返回null；如果读取到header，则存储给定参数中，并返回给定对象
+     */
+    public static DsonValue readTopDsonValue(DsonReader reader, DsonHeader<String> fileHeader) {
         DsonType dsonType = reader.readDsonType();
         if (dsonType == DsonType.END_OF_OBJECT) {
             return null;
@@ -139,10 +199,13 @@ public final class Dsons {
             return readObject(reader);
         } else if (dsonType == DsonType.ARRAY) {
             return readArray(reader);
-        } else {
-            assert dsonType == DsonType.HEADER;
-            return readHeader(reader, new DsonHeader<>());
+        } else if (dsonType == DsonType.HEADER) {
+            if (fileHeader == null) {
+                fileHeader = new DsonHeader<>();
+            }
+            return readHeader(reader, fileHeader);
         }
+        throw DsonIOException.invalidTopDsonType(dsonType);
     }
 
     /** 如果需要写入名字，外部写入 */
@@ -348,6 +411,22 @@ public final class Dsons {
 
     // region 快捷方法
 
+    public static String toFlatDson(DsonArray<String> topContainer) {
+        return toFlatDson(topContainer, null);
+    }
+
+    /** 该接口用于写顶层数组容器，所有元素将被展开 */
+    public static String toFlatDson(DsonArray<String> topContainer, DsonTextWriterSettings settings) {
+        if (settings == null) {
+            settings = DsonTextWriterSettings.DEFAULT;
+        }
+        StringWriter stringWriter = new StringWriter(1024);
+        try (DsonTextWriter writer = new DsonTextWriter(settings, stringWriter)) {
+            writeTopContainer(writer, topContainer);
+        }
+        return stringWriter.toString();
+    }
+
     public static String toDson(DsonValue dsonValue, ObjectStyle style) {
         return toDson(dsonValue, style, DsonTextWriterSettings.DEFAULT);
     }
@@ -358,6 +437,7 @@ public final class Dsons {
                 : DsonTextWriterSettings.DEFAULT);
     }
 
+    /** 简单转写为Dson，数组就是数组 */
     public static String toDson(DsonValue dsonValue, ObjectStyle style, DsonTextWriterSettings settings) {
         if (!dsonValue.getDsonType().isContainerOrHeader()) {
             throw new IllegalArgumentException("invalid dsonType " + dsonValue.getDsonType());
@@ -369,6 +449,7 @@ public final class Dsons {
         return stringWriter.toString();
     }
 
+    /** 默认只读取第一个值 */
     public static DsonValue fromDson(CharSequence dsonString) {
         try (DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.DEFAULT, dsonString)) {
             return readTopDsonValue(reader);

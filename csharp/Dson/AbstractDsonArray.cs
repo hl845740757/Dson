@@ -45,6 +45,7 @@ public abstract class AbstractDsonArray : DsonValue, IList<DsonValue>, IEquatabl
 
     protected static void CheckElement(DsonValue? value) {
         if (value == null) throw new ArgumentException("value cant be null");
+        if (value.DsonType == DsonType.Header) throw new ArgumentException("add Header");
     }
 
     public DsonValue this[int index] {

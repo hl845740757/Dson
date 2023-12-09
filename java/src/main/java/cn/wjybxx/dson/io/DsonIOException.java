@@ -125,5 +125,9 @@ public class DsonIOException extends RuntimeException {
                 contextType, expected, token));
     }
 
+    public static DsonIOException invalidTopDsonType(DsonType dsonType) {
+        return new DsonIOException("invalid topDsonValue, dsonType: " + dsonType);
+    }
+
     // endregion
 }

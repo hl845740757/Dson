@@ -67,7 +67,13 @@ public class DsonHeader<K> extends AbstractDsonObject<K> {
         return this;
     }
 
-    //
+    @Override
+    public String toString() {
+        return "DsonHeader{" +
+                "valueMap=" + valueMap +
+                '}';
+    }
+//
 
     // header常见属性名
     public static final String NAMES_CLASS_NAME = "clsName";

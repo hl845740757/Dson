@@ -49,4 +49,8 @@ public class DsonArray<TK> : AbstractDsonArray
     public override DsonArray<TK> Append(DsonValue item) {
         return (DsonArray<TK>)base.Append(item);
     }
+
+    public override string ToString() {
+        return $"{base.ToString()}, {nameof(Header)}: {Header}";
+    }
 }

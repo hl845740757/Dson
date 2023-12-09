@@ -135,7 +135,7 @@ public class DsonObjectWriter<TName> : AbstractDsonWriter<TName> where TName : I
         Context newContext = NewContext(parent, contextType, dsonType);
         switch (contextType) {
             case DsonContextType.Header: {
-                newContext._container = new DsonHeader<TName>();
+                newContext._container = parent.GetHeader();
                 break;
             }
             case DsonContextType.Array: {
@@ -155,20 +155,7 @@ public class DsonObjectWriter<TName> : AbstractDsonWriter<TName> where TName : I
 
     protected override void DoWriteEndContainer() {
         Context context = GetContext();
-        Context parent = context.Parent!;
-        if (context._contextType == DsonContextType.Header) {
-            if (parent._contextType == DsonContextType.TopLevel) {
-                parent.Add(context._container); // TopLevel的Header看做独立元素
-            }
-            else {
-                // 普通对象的Header则合并
-                DsonHeader<TName> parentHeader = parent.GetHeader();
-                foreach (KeyValuePair<TName, DsonValue> pair in context._container.AsHeader<TName>()) {
-                    parentHeader[pair.Key] = pair.Value;
-                }
-            }
-        }
-        else {
+        if (context._contextType != DsonContextType.Header) {
             context.Parent!.Add(context._container);
         }
 

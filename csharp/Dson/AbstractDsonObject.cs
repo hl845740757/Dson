@@ -45,6 +45,7 @@ public abstract class AbstractDsonObject<TK> : DsonValue, IDictionary<TK, DsonVa
     protected static void CheckElement(TK? key, DsonValue? value) {
         if (key == null) throw new ArgumentException("key cant be null");
         if (value == null) throw new ArgumentException("value cant be null");
+        if (value.DsonType == DsonType.Header) throw new ArgumentException("add Header");
     }
 
     public DsonValue this[TK key] {

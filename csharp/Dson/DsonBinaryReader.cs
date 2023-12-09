@@ -172,7 +172,7 @@ public class DsonBinaryReader<TName> : AbstractDsonReader<TName> where TName : I
 
     protected override void DoReadEndContainer() {
         if (!_input.IsAtEnd()) {
-            throw DsonIOException.bytesRemain(_input.GetBytesUntilLimit());
+            throw DsonIOException.BytesRemain(_input.GetBytesUntilLimit());
         }
         Context context = GetContext();
         _input.PopLimit(context._oldLimit);

@@ -1,6 +1,6 @@
 package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.text.ObjectStyle;
+import cn.wjybxx.dson.io.DsonIOException;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
@@ -81,18 +81,69 @@ public class DsonLites {
 
     // region read/write
 
-    public static void writeTopDsonValue(DsonLiteWriter writer, DsonValue dsonValue, ObjectStyle style) {
+    /**
+     * 读取顶层容器
+     * 会将独立的header合并到容器中，会将分散的元素读取存入数组
+     */
+    public static DsonArray<FieldNumber> readTopContainer(DsonLiteReader reader) {
+        final DsonArray<FieldNumber> topContainer = new DsonArray<>(4);
+        DsonType dsonType;
+        while ((dsonType = reader.readDsonType()) != DsonType.END_OF_OBJECT) {
+            if (dsonType == DsonType.HEADER) {
+                readHeader(reader, topContainer.getHeader());
+            } else if (dsonType == DsonType.OBJECT) {
+                topContainer.add(readObject(reader));
+            } else if (dsonType == DsonType.ARRAY) {
+                topContainer.add(readArray(reader));
+            } else {
+                throw DsonIOException.invalidTopDsonType(dsonType);
+            }
+        }
+        return topContainer;
+    }
+
+    /**
+     * 写入顶层容器
+     * 顶层容器的header和元素将被展开，而不是嵌套在数组中
+     */
+    public static void writeTopContainer(DsonLiteWriter writer, DsonArray<FieldNumber> topContainer) {
+        if (!topContainer.getHeader().isEmpty()) {
+            writeHeader(writer, topContainer.getHeader());
+        }
+        for (DsonValue dsonValue : topContainer) {
+            if (dsonValue.getDsonType() == DsonType.OBJECT) {
+                writeObject(writer, dsonValue.asObjectLite());
+            } else if (dsonValue.getDsonType() == DsonType.ARRAY) {
+                writeArray(writer, dsonValue.asArrayLite());
+            } else {
+                throw DsonIOException.invalidTopDsonType(dsonValue.getDsonType());
+            }
+        }
+    }
+
+    /** @param dsonValue 顶层对象；可以是Header */
+    public static void writeTopDsonValue(DsonLiteWriter writer, DsonValue dsonValue) {
         if (dsonValue.getDsonType() == DsonType.OBJECT) {
-            writeObject(writer, dsonValue.asObjectLite(), style);
+            writeObject(writer, dsonValue.asObjectLite());
         } else if (dsonValue.getDsonType() == DsonType.ARRAY) {
-            writeArray(writer, dsonValue.asArrayLite(), style);
-        } else {
+            writeArray(writer, dsonValue.asArrayLite());
+        } else if (dsonValue.getDsonType() == DsonType.HEADER) {
             writeHeader(writer, dsonValue.asHeaderLite());
+        } else {
+            throw DsonIOException.invalidTopDsonType(dsonValue.getDsonType());
         }
     }
 
     /** @return 如果到达文件尾部，则返回null */
     public static DsonValue readTopDsonValue(DsonLiteReader reader) {
+        return readTopDsonValue(reader, null);
+    }
+
+    /**
+     * @param fileHeader 用于接收文件头信息;如果读取到header，则存储给定参数中，并返回给定对象
+     * @return 如果到达文件尾部，则返回null
+     */
+    public static DsonValue readTopDsonValue(DsonLiteReader reader, DsonHeader<FieldNumber> fileHeader) {
         DsonType dsonType = reader.readDsonType();
         if (dsonType == DsonType.END_OF_OBJECT) {
             return null;
@@ -101,14 +152,17 @@ public class DsonLites {
             return readObject(reader);
         } else if (dsonType == DsonType.ARRAY) {
             return readArray(reader);
-        } else {
-            assert dsonType == DsonType.HEADER;
-            return readHeader(reader, new DsonHeader<>());
+        } else if (dsonType == DsonType.HEADER) {
+            if (fileHeader == null) {
+                fileHeader = new DsonHeader<>();
+            }
+            return readHeader(reader, fileHeader);
         }
+        throw DsonIOException.invalidTopDsonType(dsonType);
     }
 
     /** 如果需要写入名字，外部写入 */
-    public static void writeObject(DsonLiteWriter writer, DsonObject<FieldNumber> dsonObject, ObjectStyle style) {
+    public static void writeObject(DsonLiteWriter writer, DsonObject<FieldNumber> dsonObject) {
         writer.writeStartObject();
         if (!dsonObject.getHeader().isEmpty()) {
             writeHeader(writer, dsonObject.getHeader());
@@ -137,7 +191,7 @@ public class DsonLites {
     }
 
     /** 如果需要写入名字，外部写入 */
-    public static void writeArray(DsonLiteWriter writer, DsonArray<FieldNumber> dsonArray, ObjectStyle style) {
+    public static void writeArray(DsonLiteWriter writer, DsonArray<FieldNumber> dsonArray) {
         writer.writeStartArray();
         if (!dsonArray.getHeader().isEmpty()) {
             writeHeader(writer, dsonArray.getHeader());
@@ -207,8 +261,8 @@ public class DsonLites {
             case REFERENCE -> writer.writeRef(name, dsonValue.asReference());
             case TIMESTAMP -> writer.writeTimestamp(name, dsonValue.asTimestamp());
             case HEADER -> writeHeader(writer, dsonValue.asHeaderLite());
-            case ARRAY -> writeArray(writer, dsonValue.asArrayLite(), ObjectStyle.INDENT);
-            case OBJECT -> writeObject(writer, dsonValue.asObjectLite(), ObjectStyle.INDENT);
+            case ARRAY -> writeArray(writer, dsonValue.asArrayLite());
+            case OBJECT -> writeObject(writer, dsonValue.asObjectLite());
             case END_OF_OBJECT -> throw new AssertionError();
         }
     }

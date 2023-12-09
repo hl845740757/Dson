@@ -46,6 +46,7 @@ public abstract class AbstractDsonReader implements DsonReader {
     protected DsonType currentDsonType;
     protected WireType currentWireType;
     protected int currentWireTypeBits;
+
     public AbstractDsonReader(DsonReaderSettings setting) {
         this.setting = Objects.requireNonNull(setting);
     }

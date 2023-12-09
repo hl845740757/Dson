@@ -116,7 +116,7 @@ public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName> where TName
     }
 
     private DsonIOException InvalidState(List<DsonWriterState> expected, DsonWriterState state) {
-        return DsonIOException.invalidState(_context._contextType, expected, state);
+        return DsonIOException.InvalidState(_context._contextType, expected, state);
     }
 
     #endregion
@@ -287,7 +287,7 @@ public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName> where TName
 
     private void WriteStartContainer(DsonContextType contextType, DsonType dsonType, ObjectStyle style) {
         if (_recursionDepth >= Settings.RecursionLimit) {
-            throw DsonIOException.recursionLimitExceeded();
+            throw DsonIOException.RecursionLimitExceeded();
         }
         Context context = this._context;
         AutoStartTopLevel(context);
@@ -312,7 +312,7 @@ public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName> where TName
 
     protected void CheckEndContext(Context context, DsonContextType contextType, DsonWriterState state) {
         if (context._contextType != contextType) {
-            throw DsonIOException.contextError(contextType, context._contextType);
+            throw DsonIOException.ContextError(contextType, context._contextType);
         }
         if (context._state != state) {
             throw InvalidState(DsonInternals.NewList(state), context._state);

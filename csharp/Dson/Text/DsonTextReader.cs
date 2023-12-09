@@ -215,7 +215,7 @@ public class DsonTextReader : AbstractDsonReader<string>
                 }
                 case DsonTokenType.BeginHeader: {
                     if (context._contextType == DsonContextType.Header) {
-                        throw DsonIOException.containsHeaderDirectly(nameToken);
+                        throw DsonIOException.ContainsHeaderDirectly(nameToken);
                     }
                     EnsureCountIsZero(context, nameToken);
                     PushNextValue(nameToken);
@@ -225,7 +225,7 @@ public class DsonTextReader : AbstractDsonReader<string>
                     return DsonType.EndOfObject;
                 }
                 default: {
-                    throw DsonIOException.invalidTokenType(context._contextType, nameToken,
+                    throw DsonIOException.InvalidTokenType(context._contextType, nameToken,
                         DsonInternals.NewList(DsonTokenType.String, DsonTokenType.UnquoteString, DsonTokenType.EndObject));
                 }
             }
@@ -272,7 +272,7 @@ public class DsonTextReader : AbstractDsonReader<string>
             case DsonTokenType.BeginHeader: {
                 // object的header已经处理，这里只有topLevel和array可以再出现header
                 if (context._contextType.IsLikeObject()) {
-                    throw DsonIOException.invalidTokenType(context._contextType, valueToken);
+                    throw DsonIOException.InvalidTokenType(context._contextType, valueToken);
                 }
                 EnsureCountIsZero(context, valueToken);
                 PushNextValue(valueToken);
@@ -283,17 +283,17 @@ public class DsonTextReader : AbstractDsonReader<string>
                 if (context._contextType == DsonContextType.Array) {
                     return DsonType.EndOfObject;
                 }
-                throw DsonIOException.invalidTokenType(context._contextType, valueToken);
+                throw DsonIOException.InvalidTokenType(context._contextType, valueToken);
             }
             case DsonTokenType.Eof: {
                 // eof 只能在顶层上下文出现
                 if (context._contextType == DsonContextType.TopLevel) {
                     return DsonType.EndOfObject;
                 }
-                throw DsonIOException.invalidTokenType(context._contextType, valueToken);
+                throw DsonIOException.InvalidTokenType(context._contextType, valueToken);
             }
             default: {
-                throw DsonIOException.invalidTokenType(context._contextType, valueToken);
+                throw DsonIOException.InvalidTokenType(context._contextType, valueToken);
             }
         }
     }
@@ -362,7 +362,7 @@ public class DsonTextReader : AbstractDsonReader<string>
     private DsonType ParseClassNameToken(Context context, in DsonToken valueToken) {
         // 1.className不能出现在topLevel，topLevel只能出现header结构体 @{}
         if (context._contextType == DsonContextType.TopLevel) {
-            throw DsonIOException.invalidTokenType(context._contextType, valueToken);
+            throw DsonIOException.InvalidTokenType(context._contextType, valueToken);
         }
         // 2.object和array的className会在beginObject和beginArray的时候转换为结构体 @{}
         // 因此这里只能出现内置结构体的简写形式
@@ -378,7 +378,7 @@ public class DsonTextReader : AbstractDsonReader<string>
             PushNextValue(new OffsetTimestamp(dateTime.ToEpochSeconds()));
             return DsonType.Timestamp;
         }
-        throw DsonIOException.invalidTokenType(context._contextType, valueToken);
+        throw DsonIOException.InvalidTokenType(context._contextType, valueToken);
     }
 
     /** 处理内置结构体 */
@@ -618,7 +618,7 @@ public class DsonTextReader : AbstractDsonReader<string>
                     break;
                 }
                 default: {
-                    throw DsonIOException.invalidTokenType(ContextType, valueToken);
+                    throw DsonIOException.InvalidTokenType(ContextType, valueToken);
                 }
             }
         }
@@ -629,7 +629,7 @@ public class DsonTextReader : AbstractDsonReader<string>
         DsonToken keyToken;
         if ((keyToken = PopToken()).Type == DsonTokenType.Comma
             && (keyToken = PopToken()).Type == DsonTokenType.Comma) {
-            throw DsonIOException.invalidTokenType(context._contextType, keyToken);
+            throw DsonIOException.InvalidTokenType(context._contextType, keyToken);
         }
         else {
             PushToken(keyToken);
@@ -678,34 +678,34 @@ public class DsonTextReader : AbstractDsonReader<string>
     /** header不可以在中途出现 */
     private static void EnsureCountIsZero(Context context, DsonToken headerToken) {
         if (context._count > 0) {
-            throw DsonIOException.invalidTokenType(context._contextType, headerToken,
+            throw DsonIOException.InvalidTokenType(context._contextType, headerToken,
                 DsonInternals.NewList(DsonTokenType.String, DsonTokenType.UnquoteString, DsonTokenType.EndObject));
         }
     }
 
     private static void EnsureStringsToken(Context context, DsonToken token) {
         if (token.Type != DsonTokenType.String && token.Type != DsonTokenType.UnquoteString) {
-            throw DsonIOException.invalidTokenType(context._contextType, token,
+            throw DsonIOException.InvalidTokenType(context._contextType, token,
                 DsonInternals.NewList(DsonTokenType.String, DsonTokenType.UnquoteString));
         }
     }
 
     private static void EnsureHeadersToken(Context context, DsonToken token) {
         if (token.Type != DsonTokenType.BeginHeader && token.Type != DsonTokenType.ClassName) {
-            throw DsonIOException.invalidTokenType(context._contextType, token,
+            throw DsonIOException.InvalidTokenType(context._contextType, token,
                 DsonInternals.NewList(DsonTokenType.BeginHeader, DsonTokenType.ClassName));
         }
     }
 
     private static void VerifyTokenType(Context context, DsonToken token, DsonTokenType expected) {
         if (token.Type != expected) {
-            throw DsonIOException.invalidTokenType(context._contextType, token, DsonInternals.NewList(expected));
+            throw DsonIOException.InvalidTokenType(context._contextType, token, DsonInternals.NewList(expected));
         }
     }
 
     private static void VerifyTokenType(Context context, DsonToken token, List<DsonTokenType> expected) {
         if (!expected.Contains(token.Type)) {
-            throw DsonIOException.invalidTokenType(context._contextType, token, expected);
+            throw DsonIOException.InvalidTokenType(context._contextType, token, expected);
         }
     }
 
@@ -893,7 +893,7 @@ public class DsonTextReader : AbstractDsonReader<string>
                     break;
                 }
                 case DsonTokenType.Eof: {
-                    throw DsonIOException.invalidTokenType(ContextType, token);
+                    throw DsonIOException.InvalidTokenType(ContextType, token);
                 }
             }
         }
@@ -903,7 +903,7 @@ public class DsonTextReader : AbstractDsonReader<string>
     protected override T DoReadMessage<T>(int binaryType, MessageParser<T> parser) {
         DsonBinary dsonBinary = (DsonBinary)PopNextValue() ?? throw new InvalidOperationException();
         if (dsonBinary.Type != binaryType) {
-            throw DsonIOException.unexpectedSubType(binaryType, dsonBinary.Type);
+            throw DsonIOException.UnexpectedSubType(binaryType, dsonBinary.Type);
         }
         return parser.ParseFrom(dsonBinary.Data);
     }

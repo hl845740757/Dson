@@ -1,11 +1,11 @@
 package cn.wjybxx.dson;
 
 import cn.wjybxx.dson.internal.DsonInternals;
-import cn.wjybxx.dson.text.DsonTextReader;
-import cn.wjybxx.dson.text.DsonTextReaderSettings;
 import cn.wjybxx.dson.types.ObjectRef;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * 简单的Dson对象仓库实现 -- 提供简单的引用解析功能。
@@ -16,51 +16,58 @@ import java.util.*;
 public class DsonRepository {
 
     private final Map<String, DsonValue> indexMap = new HashMap<>();
-    private final List<DsonValue> valueList = new ArrayList<>();
+    private final DsonArray<String> container;
 
     public DsonRepository() {
+        container = new DsonArray<>();
     }
 
-    public DsonArray<String> toDsonArray() {
-        DsonArray<String> dsonArray = new DsonArray<>(valueList.size());
-        dsonArray.addAll(valueList);
-        return dsonArray;
+    public DsonRepository(DsonArray<String> container) {
+        this.container = Objects.requireNonNull(container);
+        for (DsonValue dsonValue : container) {
+            String localId = Dsons.getLocalId(dsonValue);
+            if (localId != null) {
+                indexMap.put(localId, dsonValue);
+            }
+        }
     }
 
+    /** 勿修改返回的对象 */
     public Map<String, DsonValue> getIndexMap() {
-        return Collections.unmodifiableMap(indexMap);
+        return indexMap;
     }
 
-    public List<DsonValue> getValues() {
-        return Collections.unmodifiableList(valueList);
+    /** 勿修改返回的对象 */
+    public DsonArray<String> getContainer() {
+        return container;
     }
 
     public int size() {
-        return valueList.size();
+        return container.size();
     }
 
     public DsonValue get(int idx) {
-        return valueList.get(idx);
+        return container.get(idx);
     }
 
     public DsonRepository add(DsonValue value) {
         if (!value.getDsonType().isContainerOrHeader()) {
             throw new IllegalArgumentException();
         }
-        valueList.add(value);
+        container.add(value);
 
         String localId = Dsons.getLocalId(value);
         if (localId != null) {
             DsonValue exist = indexMap.put(localId, value);
             if (exist != null) {
-                DsonInternals.removeRef(valueList, exist);
+                DsonInternals.removeRef(container, exist);
             }
         }
         return this;
     }
 
     public DsonValue removeAt(int idx) {
-        DsonValue dsonValue = valueList.remove(idx);
+        DsonValue dsonValue = container.remove(idx);
         String localId = Dsons.getLocalId(dsonValue);
         if (localId != null) {
             indexMap.remove(localId);
@@ -69,7 +76,7 @@ public class DsonRepository {
     }
 
     public boolean remove(DsonValue dsonValue) {
-        int idx = DsonInternals.indexOfRef(valueList, dsonValue);
+        int idx = DsonInternals.indexOfRef(container, dsonValue);
         if (idx >= 0) {
             removeAt(idx);
             return true;
@@ -82,7 +89,7 @@ public class DsonRepository {
         Objects.requireNonNull(localId);
         DsonValue exist = indexMap.remove(localId);
         if (exist != null) {
-            DsonInternals.removeRef(valueList, exist);
+            DsonInternals.removeRef(container, exist);
         }
         return exist;
     }
@@ -92,10 +99,11 @@ public class DsonRepository {
         return indexMap.get(localId);
     }
 
-    public void resolveReference() {
-        for (DsonValue dsonValue : valueList) {
+    public DsonRepository resolveReference() {
+        for (DsonValue dsonValue : container) {
             resolveReference(dsonValue);
         }
+        return this;
     }
 
     private void resolveReference(DsonValue dsonValue) {
@@ -129,23 +137,18 @@ public class DsonRepository {
     }
 
     //
-
-    public static DsonRepository fromDson(String dsonString) {
-        return fromDson(dsonString, false);
+    public static DsonRepository fromDson(DsonReader reader) {
+        return fromDson(reader, false);
     }
 
-    public static DsonRepository fromDson(String dsonString, boolean resolveRef) {
-        DsonRepository repository = new DsonRepository();
-        try (DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.DEFAULT, dsonString)) {
-            DsonValue value;
-            while ((value = Dsons.readTopDsonValue(reader)) != null) {
-                repository.add(value);
+    public static DsonRepository fromDson(DsonReader reader, boolean resolveRef) {
+        try (reader) {
+            DsonRepository repository = new DsonRepository(Dsons.readTopContainer(reader));
+            if (resolveRef) {
+                repository.resolveReference();
             }
+            return repository;
         }
-        if (resolveRef) {
-            repository.resolveReference();
-        }
-        return repository;
     }
 
     // 解析引用后可能导致循环，因此equals等不实现

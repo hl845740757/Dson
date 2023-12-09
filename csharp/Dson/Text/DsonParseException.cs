@@ -35,10 +35,10 @@ public class DsonParseException : DsonIOException
     public DsonParseException(string? message, Exception? innerException) : base(message, innerException) {
     }
 
-    public new static DsonParseException wrap(Exception e) {
+    public new static DsonParseException Wrap(Exception e, string? message = null) {
         if (e is DsonParseException dsonParseException) {
             return dsonParseException;
         }
-        return new DsonParseException(null, e);
+        return new DsonParseException(message, e);
     }
 }

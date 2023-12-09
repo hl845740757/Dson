@@ -258,7 +258,7 @@ public class DsonReaderUtils
         T value;
         {
             int type = input.ReadUint32();
-            if (type != binaryType) throw DsonIOException.unexpectedSubType(binaryType, type);
+            if (type != binaryType) throw DsonIOException.UnexpectedSubType(binaryType, type);
             value = input.ReadMessage(parser, size - BinaryUtils.ComputeUInt32Size((uint)type));
         }
         input.PopLimit(oldLimit);
@@ -421,13 +421,13 @@ public class DsonReaderUtils
 
     public static void CheckReadValueAsBytes(DsonType dsonType) {
         if (!ValueBytesTypes.Contains(dsonType)) {
-            throw DsonIOException.invalidDsonType(ValueBytesTypes, dsonType);
+            throw DsonIOException.InvalidDsonType(ValueBytesTypes, dsonType);
         }
     }
 
     public static void CheckWriteValueAsBytes(DsonType dsonType) {
         if (!ValueBytesTypes.Contains(dsonType)) {
-            throw DsonIOException.invalidDsonType(ValueBytesTypes, dsonType);
+            throw DsonIOException.InvalidDsonType(ValueBytesTypes, dsonType);
         }
     }
 
@@ -529,7 +529,7 @@ public class DsonReaderUtils
                 break;
             }
             default: {
-                throw DsonIOException.invalidDsonType(contextType, dsonType);
+                throw DsonIOException.InvalidDsonType(contextType, dsonType);
             }
         }
         if (skip > 0) {

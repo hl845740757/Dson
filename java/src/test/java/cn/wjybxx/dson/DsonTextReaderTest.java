@@ -23,7 +23,6 @@ import cn.wjybxx.dson.io.DsonOutputs;
 import cn.wjybxx.dson.text.DsonTextReader;
 import cn.wjybxx.dson.text.DsonTextReaderSettings;
 import cn.wjybxx.dson.text.DsonTextWriterSettings;
-import cn.wjybxx.dson.text.ObjectStyle;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -79,60 +78,48 @@ public class DsonTextReaderTest {
      */
     @Test
     void test() {
-        DsonArray<String> topObjects = new DsonArray<>(6);
-        try (DsonReader reader = new DsonTextReader(DsonTextReaderSettings.DEFAULT, dsonString)) {
-            DsonValue dsonValue;
-            while ((dsonValue = Dsons.readTopDsonValue(reader)) != null) {
-                topObjects.add(dsonValue);
-            }
+        DsonArray<String> topContainer1;
+        try (DsonTextReader textReader = new DsonTextReader(DsonTextReaderSettings.DEFAULT, DsonTextReaderTest.dsonString)) {
+            topContainer1 = Dsons.readTopContainer(textReader);
         }
-        String dsonString1 = Dsons.toDson(topObjects, ObjectStyle.INDENT);
+        String dsonString1 = Dsons.toFlatDson(topContainer1);
+        System.out.println(dsonString1);
 
         // Binary
         {
             byte[] buffer = new byte[8192];
             DsonOutput output = DsonOutputs.newInstance(buffer);
             try (DsonWriter writer = new DsonBinaryWriter(DsonTextWriterSettings.DEFAULT, output)) {
-                for (var dsonValue : topObjects) {
-                    Dsons.writeTopDsonValue(writer, dsonValue, ObjectStyle.INDENT);
-                }
+                Dsons.writeTopContainer(writer, topContainer1);
             }
-
             DsonInput input = DsonInputs.newInstance(buffer, 0, output.getPosition());
-            DsonArray<String> decodedDsonArray = new DsonArray<String>();
             try (DsonReader reader = new DsonBinaryReader(DsonTextReaderSettings.DEFAULT, input)) {
-                DsonValue dsonValue;
-                while ((dsonValue = Dsons.readTopDsonValue(reader)) != null) {
-                    decodedDsonArray.add(dsonValue);
-                }
+                DsonArray<String> topContainer2 = Dsons.readTopContainer(reader);
+
+                String dsonString2 = Dsons.toFlatDson(topContainer2);
+                Assertions.assertEquals(dsonString1, dsonString2, "BinaryReader/BinaryWriter");
             }
-            String dsonString2 = Dsons.toDson(decodedDsonArray, ObjectStyle.INDENT);
-            Assertions.assertEquals(dsonString1, dsonString2, "BinaryReader/BinaryWriter");
         }
         // Object
         {
             DsonArray<String> outList = new DsonArray<>();
             try (DsonWriter writer = new DsonObjectWriter(DsonTextWriterSettings.DEFAULT, outList)) {
-                for (var dsonValue : topObjects) {
-                    Dsons.writeTopDsonValue(writer, dsonValue, ObjectStyle.INDENT);
-                }
+                Dsons.writeTopContainer(writer, topContainer1);
             }
-
-            DsonArray<String> decodedDsonArray = new DsonArray<>();
             try (DsonReader reader = new DsonObjectReader(DsonTextReaderSettings.DEFAULT, outList)) {
-                DsonValue dsonValue;
-                while ((dsonValue = Dsons.readTopDsonValue(reader)) != null) {
-                    decodedDsonArray.add(dsonValue);
-                }
+                DsonArray<String> topContainer3 = Dsons.readTopContainer(reader);
+
+                String dsonString3 = Dsons.toFlatDson(topContainer3);
+                Assertions.assertEquals(dsonString1, dsonString3, "ObjectReader/ObjectWriter");
             }
-            String dsonString3 = Dsons.toDson(decodedDsonArray, ObjectStyle.INDENT);
-            Assertions.assertEquals(dsonString1, dsonString3, "ObjectReader/ObjectWriter");
         }
     }
 
     @Test
     void testRef() {
-        DsonRepository repository = DsonRepository.fromDson(dsonString, true);
+        DsonRepository repository = DsonRepository
+                .fromDson(new DsonTextReader(DsonTextReaderSettings.DEFAULT, dsonString))
+                .resolveReference();
         Assertions.assertInstanceOf(DsonArray.class, repository.find("10001"));
         Assertions.assertInstanceOf(DsonArray.class, repository.find("17630eb4f916148b"));
     }

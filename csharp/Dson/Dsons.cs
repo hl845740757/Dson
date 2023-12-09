@@ -19,6 +19,7 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Wjybxx.Dson.IO;
 using Wjybxx.Dson.Text;
 
 namespace Wjybxx.Dson;
@@ -213,6 +214,60 @@ public static class Dsons
 
     #region Read/Write
 
+    /**
+     * 读取顶层容器
+     * 会将独立的header合并到容器中，会将分散的元素读取存入数组
+     */
+    public static DsonArray<TName> ReadTopContainer<TName>(IDsonReader<TName> reader) where TName : IEquatable<TName> {
+        DsonArray<TName> topContainer = new DsonArray<TName>(4);
+        DsonType dsonType;
+        while ((dsonType = reader.ReadDsonType()) != DsonType.EndOfObject) {
+            if (dsonType == DsonType.Header) {
+                ReadHeader(reader, topContainer.Header);
+            }
+            else if (dsonType == DsonType.Object) {
+                topContainer.Add(ReadObject(reader));
+            }
+            else if (dsonType == DsonType.Array) {
+                topContainer.Add(ReadArray(reader));
+            }
+            else {
+                throw DsonIOException.InvalidTopDsonType(dsonType);
+            }
+        }
+        return topContainer;
+    }
+
+    /**
+     * 写入顶层容器
+     * 顶层容器的header和元素将被展开，而不是嵌套在数组中
+     */
+    public static void WriteTopContainer<TName>(IDsonWriter<TName> writer,
+                                                DsonArray<TName> topContainer) where TName : IEquatable<TName> {
+        if (topContainer.Header.Count > 0) {
+            WriteHeader(writer, topContainer.Header);
+        }
+        foreach (DsonValue dsonValue in topContainer) {
+            if (dsonValue.DsonType == DsonType.Object) {
+                WriteObject(writer, dsonValue.AsObject<TName>());
+            }
+            else if (dsonValue.DsonType == DsonType.Array) {
+                WriteArray(writer, dsonValue.AsArray<TName>());
+            }
+            else {
+                throw DsonIOException.InvalidTopDsonType(dsonValue.DsonType);
+            }
+        }
+    }
+
+
+    /// <summary>
+    /// 写入一个顶层值
+    /// </summary>
+    /// <param name="writer"></param>
+    /// <param name="dsonValue">顶层对象，可以是Header</param>
+    /// <param name="style">文本格式</param>
+    /// <typeparam name="TName"></typeparam>
     public static void WriteTopDsonValue<TName>(IDsonWriter<TName> writer, DsonValue dsonValue,
                                                 ObjectStyle style = ObjectStyle.Indent) where TName : IEquatable<TName> {
         if (dsonValue.DsonType == DsonType.Object) {
@@ -221,13 +276,23 @@ public static class Dsons
         else if (dsonValue.DsonType == DsonType.Array) {
             WriteArray(writer, dsonValue.AsArray<TName>(), style);
         }
-        else {
+        else if (dsonValue.DsonType == DsonType.Header) {
             WriteHeader(writer, dsonValue.AsHeader<TName>());
+        }
+        else {
+            throw DsonIOException.InvalidTopDsonType(dsonValue.DsonType);
         }
     }
 
-    /** @return 如果到达文件尾部，则返回null */
-    public static DsonValue? ReadTopDsonValue<TName>(IDsonReader<TName> reader) where TName : IEquatable<TName> {
+    /// <summary>
+    /// 读取一个顶层对象值
+    /// </summary>
+    /// <param name="reader"></param>
+    /// <param name="fileHeader">用于接收文件头信息;如果读取到header，则存储给定参数中，并返回给定对象</param>
+    /// <typeparam name="TName"></typeparam>
+    /// <returns>如果到达文件尾部，则返回null</returns>
+    public static DsonValue? ReadTopDsonValue<TName>(IDsonReader<TName> reader,
+                                                     DsonHeader<TName>? fileHeader = null) where TName : IEquatable<TName> {
         DsonType dsonType = reader.ReadDsonType();
         if (dsonType == DsonType.EndOfObject) {
             return null;
@@ -238,10 +303,10 @@ public static class Dsons
         else if (dsonType == DsonType.Array) {
             return ReadArray(reader);
         }
-        else {
-            Debug.Assert(dsonType == DsonType.Header);
-            return ReadHeader(reader, new DsonHeader<TName>());
+        else if (dsonType == DsonType.Header) {
+            return ReadHeader(reader, fileHeader ?? new DsonHeader<TName>());
         }
+        throw DsonIOException.InvalidTopDsonType(dsonType);
     }
 
     /** 如果需要写入名字，外部写入 */
@@ -437,6 +502,16 @@ public static class Dsons
     #endregion
 
     #region 快捷方法
+
+    /** 该接口用于写顶层数组容器，所有元素将被展开 */
+    public static string ToFlatDson(DsonArray<string> topContainer, DsonTextWriterSettings? settings = null) {
+        settings = settings ?? DsonTextWriterSettings.Default;
+        StringWriter stringWriter = new StringWriter(new StringBuilder(1024));
+        using (DsonTextWriter writer = new DsonTextWriter(settings, stringWriter)) {
+            WriteTopContainer(writer, topContainer);
+        }
+        return stringWriter.ToString();
+    }
 
     public static string ToDson(DsonValue dsonValue, ObjectStyle style, DsonMode dsonMode = DsonMode.Standard) {
         return ToDson(dsonValue, style, dsonMode == DsonMode.Relaxed

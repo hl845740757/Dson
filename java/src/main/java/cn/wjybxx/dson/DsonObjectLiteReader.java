@@ -38,6 +38,7 @@ public class DsonObjectLiteReader extends AbstractDsonLiteReader {
         super(settings);
         Context context = new Context();
         context.init(null, DsonContextType.TOP_LEVEL, null);
+        context.header = dsonArray.getHeader().size() > 0 ? dsonArray.getHeader() : null;
         context.arrayIterator = new MarkableIterator<>(dsonArray.iterator());
         setContext(context);
     }

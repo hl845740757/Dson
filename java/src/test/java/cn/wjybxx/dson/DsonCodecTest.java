@@ -49,9 +49,9 @@ public class DsonCodecTest {
                 .append("time", new DsonInt64(System.currentTimeMillis() + RandomUtils.nextLong(1, 1000)));
 
 
-        DsonRepository repository = DsonRepository.fromDson(DsonTextReaderTest.dsonString);
-        repository.removeAt(0); // 文件头
-        obj1.append("wrapped1", repository.toDsonArray());
+        DsonTextReader textReader = new DsonTextReader(DsonTextReaderSettings.DEFAULT, DsonTextReaderTest.dsonString);
+        DsonArray<String> topContainer = Dsons.readTopContainer(textReader);
+        obj1.append("wrapped1", topContainer);
         obj1.append("wrapped2", Dsons.fromDson(DsonTextReaderTest2.dsonString));
         obj1.append("wrapped3", Dsons.fromDson(DsonNumberTest.numberString));
         obj1.append("wrapped4", Dsons.fromDson(DsonEscapeTest.dsonString));
@@ -154,7 +154,7 @@ public class DsonCodecTest {
                         .append(FieldNumber.ofLnumber(2), new DsonString("www.wjybxx.cn"))
                         .append(FieldNumber.ofLnumber(3), new DsonInt64(System.currentTimeMillis() + RandomUtils.nextLong(0, 1000)));
                 srcList.add(obj1);
-                DsonLites.writeObject(writer, obj1, ObjectStyle.INDENT);
+                DsonLites.writeObject(writer, obj1);
             }
             totalBytesWritten = dsonOutput.getPosition();
         }

@@ -43,73 +43,76 @@ public class DsonIOException : Exception
     }
 
     // reader/writer
-    public static DsonIOException recursionLimitExceeded() {
+    public static DsonIOException RecursionLimitExceeded() {
         return new DsonIOException("Object had too many levels of nesting.");
     }
 
-    public static DsonIOException contextError(DsonContextType expected, DsonContextType contextType) {
+    public static DsonIOException ContextError(DsonContextType expected, DsonContextType contextType) {
         return new DsonIOException($"context error, expected {expected}, but found {contextType}");
     }
 
-    public static DsonIOException contextError(IList<DsonContextType> expected, DsonContextType contextType) {
+    public static DsonIOException ContextError(IList<DsonContextType> expected, DsonContextType contextType) {
         return new DsonIOException($"context error, expected {expected}, but found {contextType}");
     }
 
-    public static DsonIOException contextErrorTopLevel() {
+    public static DsonIOException ContextErrorTopLevel() {
         return new DsonIOException("context error, current state is TopLevel");
     }
 
-    public static DsonIOException unexpectedName(int expected, int name) {
+    public static DsonIOException UnexpectedName(int expected, int name) {
         return new DsonIOException($"The number of the field does not match, expected {expected}, but found {name}");
     }
 
-    public static DsonIOException unexpectedName(string? expected, string name) {
+    public static DsonIOException UnexpectedName(string? expected, string name) {
         return new DsonIOException($"The name of the field does not match, expected {expected}, but found {name}");
     }
 
-    public static DsonIOException unexpectedName<T>(T? expected, T name) where T : IEquatable<T> {
+    public static DsonIOException UnexpectedName<T>(T? expected, T name) where T : IEquatable<T> {
         return new DsonIOException($"The name of the field does not match, expected {expected}, but found {name}");
     }
 
-    public static DsonIOException dsonTypeMismatch(DsonType expected, DsonType dsonType) {
+    public static DsonIOException DsonTypeMismatch(DsonType expected, DsonType dsonType) {
         return new DsonIOException($"The dsonType does not match, expected {expected}, but found {dsonType}");
     }
 
-    public static DsonIOException invalidDsonType(IList<DsonType> dsonTypeList, DsonType dsonType) {
+    public static DsonIOException InvalidDsonType(IList<DsonType> dsonTypeList, DsonType dsonType) {
         return new DsonIOException($"The dson type is invalid in context, context: {dsonTypeList}, dsonType: {dsonType}");
     }
 
-    public static DsonIOException invalidDsonType(DsonContextType contextType, DsonType dsonType) {
+    public static DsonIOException InvalidDsonType(DsonContextType contextType, DsonType dsonType) {
         return new DsonIOException($"The dson type is invalid in context, context: {contextType}, dsonType: {dsonType}");
     }
 
-    public static DsonIOException unexpectedSubType(int expected, int subType) {
+    public static DsonIOException UnexpectedSubType(int expected, int subType) {
         return new DsonIOException($"Unexpected subType, expected {expected}, but found {subType}");
     }
 
-    public static DsonIOException invalidState(DsonContextType contextType, IList<DsonReaderState> expected, DsonReaderState state) {
+    public static DsonIOException InvalidState(DsonContextType contextType, IList<DsonReaderState> expected, DsonReaderState state) {
         return new DsonIOException($"invalid state, contextType {contextType}, expected {expected}, but found {state}.");
     }
 
-    public static DsonIOException invalidState(DsonContextType contextType, IList<DsonWriterState> expected, DsonWriterState state) {
+    public static DsonIOException InvalidState(DsonContextType contextType, IList<DsonWriterState> expected, DsonWriterState state) {
         return new DsonIOException($"invalid state, contextType {contextType}, expected {expected}, but found {state}.");
     }
 
-    public static DsonIOException bytesRemain(int bytesUntilLimit) {
+    public static DsonIOException BytesRemain(int bytesUntilLimit) {
         return new DsonIOException("bytes remain " + bytesUntilLimit);
     }
 
-    public static DsonIOException containsHeaderDirectly(DsonToken token) {
+    public static DsonIOException ContainsHeaderDirectly(DsonToken token) {
         return new DsonIOException($"header contains another header directly, token {token}.");
     }
 
-    public static DsonIOException invalidTokenType(DsonContextType contextType, DsonToken token) {
+    public static DsonIOException InvalidTokenType(DsonContextType contextType, DsonToken token) {
         return new DsonIOException($"invalid token, contextType {contextType}, token {token}.");
     }
 
-    public static DsonIOException invalidTokenType(DsonContextType contextType, DsonToken token, IList<DsonTokenType> expected) {
+    public static DsonIOException InvalidTokenType(DsonContextType contextType, DsonToken token, IList<DsonTokenType> expected) {
         return new DsonIOException($"invalid token, contextType {contextType}, expected {expected}, but found {token}.");
     }
 
+    public static DsonIOException InvalidTopDsonType(DsonType dsonType) {
+        return new DsonIOException($"invalid topDsonValue, dsonType: {dsonType}");
+    }
     // endregion
 }

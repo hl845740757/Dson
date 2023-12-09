@@ -33,6 +33,7 @@ public class DsonObjectReader<TName> : AbstractDsonReader<TName> where TName : I
         : base(settings) {
         Context context = new Context();
         context.Init(null, DsonContextType.TopLevel, DsonTypes.Invalid);
+        context._header = dsonArray.Header.Count > 0 ? dsonArray.Header : null;
         context._arrayIterator = new MarkableIterator<DsonValue>(dsonArray.GetEnumerator());
         SetContext(context);
     }
@@ -47,7 +48,7 @@ public class DsonObjectReader<TName> : AbstractDsonReader<TName> where TName : I
         if (defValue == null) throw new ArgumentNullException(nameof(defValue));
         Context context = GetContext();
         if (context._dsonObject == null) {
-            throw DsonIOException.contextError(DsonInternals.NewList(DsonContextType.Object, DsonContextType.Header), context._contextType);
+            throw DsonIOException.ContextError(DsonInternals.NewList(DsonContextType.Object, DsonContextType.Header), context._contextType);
         }
         context.SetKeyItr(keyItr, defValue);
     }
@@ -60,7 +61,7 @@ public class DsonObjectReader<TName> : AbstractDsonReader<TName> where TName : I
     public ICollection<TName> Keys() {
         Context context = GetContext();
         if (context._dsonObject == null) {
-            throw DsonIOException.contextError(DsonInternals.NewList(DsonContextType.Object, DsonContextType.Header), context._contextType);
+            throw DsonIOException.ContextError(DsonInternals.NewList(DsonContextType.Object, DsonContextType.Header), context._contextType);
         }
         return context._dsonObject.Keys;
     }

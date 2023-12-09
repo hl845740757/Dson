@@ -115,7 +115,7 @@ public abstract class AbstractDsonReader<TName> : IDsonReader<TName> where TName
         // 不直接使用方法返回值比较，避免装箱
         ReadName();
         if (!expected.Equals(_currentName)) {
-            throw DsonIOException.unexpectedName(expected, _currentName);
+            throw DsonIOException.UnexpectedName(expected, _currentName);
         }
     }
 
@@ -152,7 +152,7 @@ public abstract class AbstractDsonReader<TName> : IDsonReader<TName> where TName
         else {
             // topLevel只可是容器对象
             if (context._contextType == DsonContextType.TopLevel && !dsonType.IsContainerOrHeader()) {
-                throw DsonIOException.invalidDsonType(context._contextType, dsonType);
+                throw DsonIOException.InvalidDsonType(context._contextType, dsonType);
             }
             if (context._contextType == DsonContextType.Object) {
                 // 如果是header则直接进入VALUE状态 - header是匿名属性
@@ -187,7 +187,7 @@ public abstract class AbstractDsonReader<TName> : IDsonReader<TName> where TName
             }
         }
         if (requiredType != DsonTypes.Invalid && _currentDsonType != requiredType) {
-            throw DsonIOException.dsonTypeMismatch(requiredType, _currentDsonType);
+            throw DsonIOException.DsonTypeMismatch(requiredType, _currentDsonType);
         }
     }
 
@@ -196,7 +196,7 @@ public abstract class AbstractDsonReader<TName> : IDsonReader<TName> where TName
             throw InvalidState(DsonInternals.NewList(DsonReaderState.Value));
         }
         if (_currentDsonType != requiredType) {
-            throw DsonIOException.dsonTypeMismatch(requiredType, _currentDsonType);
+            throw DsonIOException.DsonTypeMismatch(requiredType, _currentDsonType);
         }
     }
 
@@ -205,7 +205,7 @@ public abstract class AbstractDsonReader<TName> : IDsonReader<TName> where TName
     }
 
     protected DsonIOException InvalidState(List<DsonReaderState> expected) {
-        return DsonIOException.invalidState(_context._contextType, expected, _context._state);
+        return DsonIOException.InvalidState(_context._contextType, expected, _context._state);
     }
 
     #endregion
@@ -368,7 +368,7 @@ public abstract class AbstractDsonReader<TName> : IDsonReader<TName> where TName
     public void BackToWaitStart() {
         Context context = this._context;
         if (context._contextType == DsonContextType.TopLevel) {
-            throw DsonIOException.contextErrorTopLevel();
+            throw DsonIOException.ContextErrorTopLevel();
         }
         if (context._state != DsonReaderState.Type) {
             throw InvalidState(DsonInternals.NewList(DsonReaderState.Type));
@@ -383,7 +383,7 @@ public abstract class AbstractDsonReader<TName> : IDsonReader<TName> where TName
             return;
         }
         if (_recursionDepth >= Settings.RecursionLimit) {
-            throw DsonIOException.recursionLimitExceeded();
+            throw DsonIOException.RecursionLimitExceeded();
         }
         AutoStartTopLevel(context);
         EnsureValueState(context, dsonType);
@@ -407,7 +407,7 @@ public abstract class AbstractDsonReader<TName> : IDsonReader<TName> where TName
 
     private void CheckEndContext(Context context, DsonContextType contextType) {
         if (context._contextType != contextType) {
-            throw DsonIOException.contextError(contextType, context._contextType);
+            throw DsonIOException.ContextError(contextType, context._contextType);
         }
         if (context._state != DsonReaderState.WaitEndObject) {
             throw InvalidState(DsonInternals.NewList(DsonReaderState.WaitEndObject));
@@ -456,7 +456,7 @@ public abstract class AbstractDsonReader<TName> : IDsonReader<TName> where TName
     public void SkipToEndOfObject() {
         Context context = GetContext();
         if (context._contextType == DsonContextType.TopLevel) {
-            throw DsonIOException.contextErrorTopLevel();
+            throw DsonIOException.ContextErrorTopLevel();
         }
         if (context._state == DsonReaderState.WaitStartObject) {
             throw InvalidState(DsonInternals.NewList(DsonReaderState.Type, DsonReaderState.Name, DsonReaderState.Value));

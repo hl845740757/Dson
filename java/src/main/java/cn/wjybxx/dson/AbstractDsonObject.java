@@ -77,17 +77,15 @@ public abstract class AbstractDsonObject<K> extends DsonValue implements Map<K, 
                 "valueMap=" + valueMap +
                 '}';
     }
+
     // endregion
 
     // region 安全检查
 
     static <K> void checkKeyValue(K key, DsonValue value) {
-        if (key == null) {
-            throw new IllegalArgumentException("key cant be null");
-        }
-        if (value == null) {
-            throw new IllegalArgumentException("value cant be null");
-        }
+        if (key == null) throw new IllegalArgumentException("key cant be null");
+        if (value == null) throw new IllegalArgumentException("value cant be null");
+        if (value.getDsonType() == DsonType.HEADER) throw new IllegalArgumentException("add Header");
     }
 
     @Override
