@@ -39,6 +39,17 @@ public class DsonTextWriterSettings : DsonWriterSettings
         this.MaxLengthOfUnquoteString = builder.MaxLengthOfUnquoteString;
     }
 
+    public static readonly DsonTextWriterSettings Default;
+    public static readonly DsonTextWriterSettings RelaxedDefault;
+
+    static DsonTextWriterSettings() {
+        Default = NewBuilder().Build();
+
+        Builder relaxedBuilder = NewBuilder();
+        relaxedBuilder.DsonMode = DsonMode.Relaxed;
+        RelaxedDefault = relaxedBuilder.Build();
+    }
+
     public new static Builder NewBuilder() {
         return new Builder();
     }

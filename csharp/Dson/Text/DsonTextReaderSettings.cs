@@ -18,6 +18,8 @@ namespace Dson.Text;
 
 public class DsonTextReaderSettings : DsonReaderSettings
 {
+    public static readonly DsonTextReaderSettings Default = NewBuilder().Build();
+
     public DsonTextReaderSettings(Builder builder) : base(builder) {
     }
 

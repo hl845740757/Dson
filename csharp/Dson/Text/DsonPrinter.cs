@@ -6,7 +6,7 @@ namespace Dson.Text;
 public class DsonPrinter : IDisposable
 {
 #nullable disable
-    private readonly StreamWriter _writer;
+    private readonly TextWriter _writer;
     private readonly string _lineSeparator;
     private readonly bool _autoClose;
 
@@ -19,7 +19,7 @@ public class DsonPrinter : IDisposable
     private int _column;
 #nullable enable
 
-    public DsonPrinter(StreamWriter writer, string lineSeparator, bool autoClose) {
+    public DsonPrinter(TextWriter writer, string lineSeparator, bool autoClose) {
         this._writer = writer;
         this._lineSeparator = lineSeparator;
         this._autoClose = autoClose;
@@ -37,7 +37,7 @@ public class DsonPrinter : IDisposable
     /** 当前行内容的长度 */
     public int ContentLength => _headLabel == null ? _column : _column - _headLabel.Length - 1;
 
-    public StreamWriter Writer => _writer;
+    public TextWriter Writer => _writer;
 
     #region 普通打印
 

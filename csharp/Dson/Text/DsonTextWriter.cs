@@ -8,12 +8,12 @@ namespace Dson.Text;
 public class DsonTextWriter : AbstractDsonWriter<string>
 {
 #nullable disable
-    private readonly StreamWriter _writer;
+    private readonly TextWriter _writer;
     private readonly DsonTextWriterSettings _settings;
     private DsonPrinter _printer;
 #nullable enable
 
-    public DsonTextWriter(DsonTextWriterSettings settings, StreamWriter writer)
+    public DsonTextWriter(DsonTextWriterSettings settings, TextWriter writer)
         : base(settings) {
         this._settings = settings;
         this._writer = writer;
@@ -21,7 +21,7 @@ public class DsonTextWriter : AbstractDsonWriter<string>
         SetContext(new Context().Init(null, DsonContextType.TopLevel, DsonTypes.Invalid));
     }
 
-    public StreamWriter StreamWriter => _writer ?? throw new ObjectDisposedException("writer");
+    public TextWriter StreamWriter => _writer ?? throw new ObjectDisposedException("writer");
 
     protected override Context GetContext() {
         return (Context)_context;

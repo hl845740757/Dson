@@ -30,19 +30,23 @@ public class DsonScanner implements AutoCloseable {
 
     private static final List<DsonTokenType> STRING_TOKEN_TYPES = List.of(DsonTokenType.STRING, DsonTokenType.UNQUOTE_STRING);
 
-    private DsonCharStream buffer;
+    private DsonCharStream charStream;
     private StringBuilder pooledStringBuilder = new StringBuilder(64);
     private final char[] hexBuffer = new char[4];
 
-    public DsonScanner(DsonCharStream buffer) {
-        this.buffer = Objects.requireNonNull(buffer);
+    public DsonScanner(String dson, DsonMode dsonMode) {
+        this.charStream = new StringCharStream(dson, dsonMode);
+    }
+
+    public DsonScanner(DsonCharStream charStream) {
+        this.charStream = Objects.requireNonNull(charStream);
     }
 
     @Override
     public void close() {
-        if (buffer != null) {
-            buffer.close();
-            buffer = null;
+        if (charStream != null) {
+            charStream.close();
+            charStream = null;
         }
         if (pooledStringBuilder != null) {
             pooledStringBuilder = null;
@@ -50,7 +54,7 @@ public class DsonScanner implements AutoCloseable {
     }
 
     public DsonToken nextToken() {
-        if (buffer == null) {
+        if (charStream == null) {
             throw new DsonParseException("Scanner closed");
         }
         int c = skipWhitespace();
@@ -60,8 +64,8 @@ public class DsonScanner implements AutoCloseable {
         return switch (c) {
             case '{' -> {
                 // peek下一个字符，判断是否有修饰自身的header
-                int nextChar = buffer.read();
-                buffer.unread();
+                int nextChar = charStream.read();
+                charStream.unread();
                 if (nextChar == '@') {
                     yield new DsonToken(DsonTokenType.BEGIN_OBJECT, "{@", getPosition());
                 } else {
@@ -69,8 +73,8 @@ public class DsonScanner implements AutoCloseable {
                 }
             }
             case '[' -> {
-                int nextChar = buffer.read();
-                buffer.unread();
+                int nextChar = charStream.read();
+                charStream.unread();
                 if (nextChar == '@') {
                     yield new DsonToken(DsonTokenType.BEGIN_ARRAY, "[@", getPosition());
                 } else {
@@ -124,7 +128,7 @@ public class DsonScanner implements AutoCloseable {
     }
 
     private int getPosition() {
-        return buffer.getPosition();
+        return charStream.getPosition();
     }
 
     // endregion
@@ -144,7 +148,7 @@ public class DsonScanner implements AutoCloseable {
     }
 
     private String scanClassName() {
-        int firstChar = buffer.read();
+        int firstChar = charStream.read();
         if (firstChar < 0) {
             throw invalidClassName("@", getPosition());
         }
@@ -162,7 +166,7 @@ public class DsonScanner implements AutoCloseable {
                 throw invalidClassName(Character.toString((char) firstChar), getPosition());
             }
             // 非双引号模式下，不支持换行继续输入，且clsName后必须是空格或换行符
-            DsonCharStream buffer = this.buffer;
+            DsonCharStream buffer = this.charStream;
             StringBuilder sb = allocStringBuilder();
             sb.append((char) firstChar);
             int c;
@@ -237,7 +241,7 @@ public class DsonScanner implements AutoCloseable {
 
     /** @return 如果跳到文件尾则返回 -1 */
     private int skipWhitespace() {
-        DsonCharStream buffer = this.buffer;
+        DsonCharStream buffer = this.charStream;
         int c;
         while ((c = buffer.read()) != -1) {
             if (c == -2) {
@@ -260,7 +264,7 @@ public class DsonScanner implements AutoCloseable {
      * @param firstChar 第一个非空白字符
      */
     private String scanUnquotedString(final char firstChar) {
-        DsonCharStream buffer = this.buffer;
+        DsonCharStream buffer = this.charStream;
         StringBuilder sb = allocStringBuilder();
         sb.append((char) firstChar);
         int c;
@@ -286,7 +290,7 @@ public class DsonScanner implements AutoCloseable {
      * @param quoteChar 引号字符
      */
     private String scanString(char quoteChar) {
-        DsonCharStream buffer = this.buffer;
+        DsonCharStream buffer = this.charStream;
         StringBuilder sb = allocStringBuilder();
         int c;
         while ((c = buffer.read()) != -1) {
@@ -311,7 +315,7 @@ public class DsonScanner implements AutoCloseable {
 
     /** 扫描文本段 */
     private String scanText() {
-        DsonCharStream buffer = this.buffer;
+        DsonCharStream buffer = this.charStream;
         StringBuilder sb = allocStringBuilder();
         int c;
         while ((c = buffer.read()) != -1) {

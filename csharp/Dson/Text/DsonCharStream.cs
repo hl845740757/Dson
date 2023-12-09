@@ -16,7 +16,7 @@
 
 namespace Dson.Text;
 
-public interface DsonCharStream : IDisposable
+public interface IDsonCharStream : IDisposable
 {
     /// <summary>
     /// 1.如果产生换行，则返回 -2
@@ -100,11 +100,11 @@ public interface DsonCharStream : IDisposable
 
     #region 工厂方法
 
-    public static DsonCharStream NewJsonStream(string jsonString) {
+    public static IDsonCharStream NewJsonStream(string jsonString) {
         return new StringCharStream(jsonString, DsonMode.Relaxed);
     }
 
-    public static DsonCharStream NewCharStream(string dsonString, DsonMode dsonMode = DsonMode.Standard) {
+    public static IDsonCharStream NewCharStream(string dsonString, DsonMode dsonMode = DsonMode.Standard) {
         return new StringCharStream(dsonString, dsonMode);
     }
 
@@ -116,8 +116,8 @@ public interface DsonCharStream : IDisposable
     /// <param name="bufferSize">缓冲区大小</param>
     /// <param name="autoClose">是否自动关闭Stream</param>
     /// <returns></returns>
-    public static DsonCharStream NewBufferedCharStream(StreamReader reader, DsonMode dsonMode = DsonMode.Standard,
-                                                       int bufferSize = 512, bool autoClose = true) {
+    public static IDsonCharStream NewBufferedCharStream(TextReader reader, DsonMode dsonMode = DsonMode.Standard,
+                                                        int bufferSize = 512, bool autoClose = true) {
         return new BufferedCharStream(reader, dsonMode, bufferSize, autoClose);
     }
 

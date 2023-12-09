@@ -9,7 +9,7 @@ class BufferedCharStream : AbstractCharStream
     private const int MaxBufferSize = 1024;
 
 #nullable disable
-    private StreamReader _reader;
+    private TextReader _reader;
     private readonly bool _autoClose;
 #nullable enable
 
@@ -22,7 +22,7 @@ class BufferedCharStream : AbstractCharStream
     /** reader是否已到达文件尾部 -- 部分reader在到达文件尾部的时候不可继续读 */
     private bool _readerEof;
 
-    public BufferedCharStream(StreamReader reader, DsonMode dsonMode,
+    public BufferedCharStream(TextReader reader, DsonMode dsonMode,
                               int bufferSize = 64, bool autoClose = true) : base(dsonMode) {
         this._reader = reader ?? throw new ArgumentNullException(nameof(reader));
         this._buffer = new CharBuffer(Math.Max(MinBufferSize, bufferSize));

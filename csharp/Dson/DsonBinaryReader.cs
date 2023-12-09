@@ -28,6 +28,7 @@ public class DsonBinaryReader<TName> : AbstractDsonReader<TName> where TName : I
 
     public DsonBinaryReader(DsonReaderSettings settings, IDsonInput input) : base(settings) {
         this._input = input;
+        SetContext(new Context().Init(null, DsonContextType.TopLevel, DsonTypes.Invalid));
         if (DsonInternals.IsStringKey<TName>()) {
             this._textReader = this as AbstractDsonReader<string>;
             this._binReader = null;

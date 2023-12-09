@@ -18,7 +18,7 @@ using System.Diagnostics;
 
 namespace Dson.Text;
 
-public abstract class AbstractCharStream : DsonCharStream
+public abstract class AbstractCharStream : IDsonCharStream
 {
     protected readonly DsonMode DsonMode;
     private readonly List<LineInfo> _lines = new List<LineInfo>();

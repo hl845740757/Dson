@@ -52,7 +52,7 @@ public class DsonTextReader : AbstractDsonReader<string>
         : this(settings, new DsonScanner(dson, dsonMode)) {
     }
 
-    public DsonTextReader(DsonTextReaderSettings settings, DsonCharStream charStream)
+    public DsonTextReader(DsonTextReaderSettings settings, IDsonCharStream charStream)
         : this(settings, new DsonScanner(charStream)) {
     }
 
@@ -712,7 +712,7 @@ public class DsonTextReader : AbstractDsonReader<string>
         // 将header中的特殊属性记录下来
         Context context = GetContext();
         if (context._contextType == DsonContextType.Header) {
-            if (DsonHeaders.NamesCompClassName != _currentName) {
+            if (DsonHeaders.NamesCompClassName == _currentName) {
                 context._compClsNameToken = new DsonToken(DsonTokenType.ClassName, _nextValue, -1);
             }
             // else 其它属性

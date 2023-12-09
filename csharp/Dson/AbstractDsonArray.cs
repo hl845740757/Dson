@@ -69,6 +69,13 @@ public abstract class AbstractDsonArray : DsonValue, IList<DsonValue>, IEquatabl
         return this;
     }
 
+    public void AddAll(List<DsonValue> dsonValues) {
+        foreach (var item in dsonValues) {
+            CheckElement(item);
+            _values.Add(item);
+        }
+    }
+
     #endregion
 
     #region 简单代理

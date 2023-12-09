@@ -23,29 +23,29 @@ public class DsonScanner : IDisposable
     private static readonly List<DsonTokenType> STRING_TOKEN_TYPES = DsonInternals.NewList(DsonTokenType.String, DsonTokenType.UnquoteString);
 
 #nullable disable
-    private DsonCharStream _buffer;
+    private IDsonCharStream _charStream;
     private StringBuilder _pooledStringBuilder = new StringBuilder(64);
     private readonly char[] _hexBuffer = new char[4];
 #nullable enable
 
     public DsonScanner(string dson, DsonMode dsonMode = DsonMode.Standard) {
-        _buffer = new StringCharStream(dson, dsonMode);
+        _charStream = new StringCharStream(dson, dsonMode);
     }
 
-    public DsonScanner(DsonCharStream buffer) {
-        _buffer = buffer ?? throw new ArgumentNullException(nameof(buffer));
+    public DsonScanner(IDsonCharStream charStream) {
+        _charStream = charStream ?? throw new ArgumentNullException(nameof(charStream));
     }
 
     public void Dispose() {
-        if (_buffer != null) {
-            _buffer.Dispose();
-            _buffer = null;
+        if (_charStream != null) {
+            _charStream.Dispose();
+            _charStream = null;
         }
         _pooledStringBuilder = null;
     }
 
     public DsonToken NextToken() {
-        if (_buffer == null) {
+        if (_charStream == null) {
             throw new DsonParseException("Scanner closed");
         }
         int c = SkipWhitespace();
@@ -55,8 +55,8 @@ public class DsonScanner : IDisposable
         switch (c) {
             case '{': {
                 // peek下一个字符，判断是否有修饰自身的header
-                int nextChar = _buffer.Read();
-                _buffer.Unread();
+                int nextChar = _charStream.Read();
+                _charStream.Unread();
                 if (nextChar == '@') {
                     return new DsonToken(DsonTokenType.BeginObject, "{@", Position);
                 }
@@ -65,8 +65,8 @@ public class DsonScanner : IDisposable
                 }
             }
             case '[': {
-                int nextChar = _buffer.Read();
-                _buffer.Unread();
+                int nextChar = _charStream.Read();
+                _charStream.Unread();
                 if (nextChar == '@') {
                     return new DsonToken(DsonTokenType.BeginArray, "[@", Position);
                 }
@@ -119,7 +119,7 @@ public class DsonScanner : IDisposable
         return _pooledStringBuilder;
     }
 
-    private int Position => _buffer.Position;
+    private int Position => _charStream.Position;
 
     #endregion
 
@@ -139,7 +139,7 @@ public class DsonScanner : IDisposable
     }
 
     private string ScanClassName() {
-        int firstChar = _buffer.Read();
+        int firstChar = _charStream.Read();
         if (firstChar < 0) {
             throw InvalidClassName("@", Position);
         }
@@ -158,7 +158,7 @@ public class DsonScanner : IDisposable
                 throw InvalidClassName(char.ToString((char)firstChar), Position);
             }
             // 非双引号模式下，不支持换行继续输入，且clsName后必须是空格或换行符
-            DsonCharStream buffer = this._buffer;
+            IDsonCharStream buffer = this._charStream;
             StringBuilder sb = AllocStringBuilder();
             sb.Append((char)firstChar);
             int c;
@@ -237,7 +237,7 @@ public class DsonScanner : IDisposable
     /// </summary>
     /// <returns>如果跳到文件尾则返回 -1</returns>
     private int SkipWhitespace() {
-        DsonCharStream buffer = this._buffer;
+        IDsonCharStream buffer = this._charStream;
         int c;
         while ((c = buffer.Read()) != -1) {
             if (c == -2) {
@@ -260,7 +260,7 @@ public class DsonScanner : IDisposable
     /// <param name="firstChar">第一个非空白字符</param>
     /// <returns></returns>
     private string ScanUnquotedString(in char firstChar) {
-        DsonCharStream buffer = this._buffer;
+        IDsonCharStream buffer = this._charStream;
         StringBuilder sb = AllocStringBuilder();
         sb.Append((char)firstChar);
         int c;
@@ -286,7 +286,7 @@ public class DsonScanner : IDisposable
     /// <param name="quoteChar">引号字符</param>
     /// <returns></returns>
     private string ScanString(char quoteChar) {
-        DsonCharStream buffer = this._buffer;
+        IDsonCharStream buffer = this._charStream;
         StringBuilder sb = AllocStringBuilder();
         int c;
         while ((c = buffer.Read()) != -1) {
@@ -319,7 +319,7 @@ public class DsonScanner : IDisposable
     /// </summary>
     /// <returns></returns>
     private string ScanText() {
-        DsonCharStream buffer = this._buffer;
+        IDsonCharStream buffer = this._charStream;
         StringBuilder sb = AllocStringBuilder();
         int c;
         while ((c = buffer.Read()) != -1) {
@@ -344,7 +344,7 @@ public class DsonScanner : IDisposable
         throw new DsonParseException("End of file in Dson string.");
     }
 
-    private static void Switch2TextMode(DsonCharStream buffer, StringBuilder sb) {
+    private static void Switch2TextMode(IDsonCharStream buffer, StringBuilder sb) {
         int c;
         while ((c = buffer.Read()) != -1) {
             if (c == -2) {
@@ -359,7 +359,7 @@ public class DsonScanner : IDisposable
         }
     }
 
-    private void Switch2EscapeMode(DsonCharStream buffer, StringBuilder sb) {
+    private void Switch2EscapeMode(IDsonCharStream buffer, StringBuilder sb) {
         int c;
         while ((c = buffer.Read()) != -1) {
             if (c == -2) {
@@ -377,7 +377,7 @@ public class DsonScanner : IDisposable
         }
     }
 
-    private void DoEscape(DsonCharStream buffer, StringBuilder sb, LineHead lockHead) {
+    private void DoEscape(IDsonCharStream buffer, StringBuilder sb, LineHead lockHead) {
         int c = ReadEscapeChar(buffer, lockHead);
         switch (c) {
             case '"':
@@ -417,7 +417,7 @@ public class DsonScanner : IDisposable
     }
 
     /** 读取下一个要转义的字符 -- 只能换行到合并行 */
-    private int ReadEscapeChar(DsonCharStream buffer, LineHead lockHead) {
+    private int ReadEscapeChar(IDsonCharStream buffer, LineHead lockHead) {
         int c;
         while (true) {
             c = buffer.Read();

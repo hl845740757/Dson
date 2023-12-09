@@ -16,6 +16,7 @@
 
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Text;
 using Dson.Text;
 
 namespace Dson;
@@ -433,19 +434,71 @@ public static class Dsons
 
     #endregion
 
+    #region 快捷方法
+
+    public static String ToDson(DsonValue dsonValue, ObjectStyle style, DsonMode dsonMode = DsonMode.Standard) {
+        return ToDson(dsonValue, style, dsonMode == DsonMode.Relaxed
+            ? DsonTextWriterSettings.RelaxedDefault
+            : DsonTextWriterSettings.Default);
+    }
+
+    public static String ToDson(DsonValue dsonValue, ObjectStyle style, DsonTextWriterSettings settings) {
+        if (!dsonValue.DsonType.IsContainerOrHeader()) {
+            throw new InvalidOperationException("invalid dsonType " + dsonValue.DsonType);
+        }
+        StringWriter stringWriter = new StringWriter(new StringBuilder(1024));
+        using (DsonTextWriter writer = new DsonTextWriter(settings, stringWriter)) {
+            WriteTopDsonValue(writer, dsonValue, style);
+        }
+        return stringWriter.ToString();
+    }
+
+    public static DsonValue FromDson(string dsonString) {
+        using (DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.Default, dsonString)) {
+            return ReadTopDsonValue(reader)!;
+        }
+    }
+
+    /** @param jsonString json字符串或无行首的dson字符串 */
+    public static DsonValue FromJson(string jsonString) {
+        using (DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.Default, NewJsonScanner(jsonString))) {
+            return ReadTopDsonValue(reader)!;
+        }
+    }
+
+    /** 获取dsonValue的localId -- dson的约定之一 */
+    public static string? GetLocalId(DsonValue dsonValue) {
+        DsonHeader<string> header;
+        if (dsonValue is DsonObject<String> dsonObject) {
+            header = dsonObject.Header;
+        }
+        else if (dsonValue is DsonArray<string> dsonArray) {
+            header = dsonArray.Header;
+        }
+        else {
+            return null;
+        }
+        if (header.TryGetValue(DsonHeaders.NamesLocalId, out DsonValue wrapped)) {
+            return wrapped is DsonString dsonString ? dsonString.Value : null;
+        }
+        return null;
+    }
+
+    #endregion
+
     #region 工厂方法
 
     public static DsonScanner NewJsonScanner(string jsonString) {
-        return new DsonScanner(DsonCharStream.NewCharStream(jsonString, DsonMode.Relaxed));
+        return new DsonScanner(IDsonCharStream.NewCharStream(jsonString, DsonMode.Relaxed));
     }
 
     public static DsonScanner NewStringScanner(string dsonString, DsonMode dsonMode = DsonMode.Standard) {
-        return new DsonScanner(DsonCharStream.NewCharStream(dsonString, dsonMode));
+        return new DsonScanner(IDsonCharStream.NewCharStream(dsonString, dsonMode));
     }
 
-    public static DsonScanner NewStreamScanner(StreamReader reader, DsonMode dsonMode = DsonMode.Standard,
+    public static DsonScanner NewStreamScanner(TextReader reader, DsonMode dsonMode = DsonMode.Standard,
                                                int bufferSize = 512, bool autoClose = true) {
-        return new DsonScanner(DsonCharStream.NewBufferedCharStream(reader, dsonMode, bufferSize, autoClose));
+        return new DsonScanner(IDsonCharStream.NewBufferedCharStream(reader, dsonMode, bufferSize, autoClose));
     }
 
     #endregion
