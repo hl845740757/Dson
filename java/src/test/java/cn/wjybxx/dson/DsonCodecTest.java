@@ -50,7 +50,7 @@ public class DsonCodecTest {
 
 
         DsonRepository repository = DsonRepository.fromDson(DsonTextReaderTest.dsonString);
-        repository.remove(0); // 文件头
+        repository.removeAt(0); // 文件头
         obj1.append("wrapped1", repository.toDsonArray());
         obj1.append("wrapped2", Dsons.fromDson(DsonTextReaderTest2.dsonString));
         obj1.append("wrapped3", Dsons.fromDson(DsonNumberTest.numberString));

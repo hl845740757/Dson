@@ -140,7 +140,7 @@ public class DsonInternals {
         if (index < 0) {
             return false;
         }
-        removeAt(list, index, true);
+        list.remove(index);
         return true;
     }
 

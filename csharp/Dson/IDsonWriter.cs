@@ -74,12 +74,6 @@ public interface IDsonWriter<in TName> : IDisposable where TName : IEquatable<TN
 
     void WriteBinary(TName name, DsonBinary dsonBinary);
 
-    /// <summary>
-    /// Binary的变种接口；只写入Chunk的有效内容部分
-    /// </summary>
-    /// <param name="name">字段名</param>
-    /// <param name="type">Binary的子类型</param>
-    /// <param name="chunk">二进制块</param>
     void WriteBinary(TName name, int type, DsonChunk chunk);
 
     void WriteExtInt32(TName name, DsonExtInt32 value, WireType wireType, INumberStyle? style = null);

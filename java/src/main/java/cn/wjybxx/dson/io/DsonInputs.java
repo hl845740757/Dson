@@ -157,7 +157,7 @@ public class DsonInputs {
         @Override
         public boolean readBool() {
             try {
-                return codedInputStream.readBool();
+                return codedInputStream.readRawByte() > 0;
             } catch (IOException e) {
                 throw DsonIOException.wrap(e);
             }
@@ -238,8 +238,8 @@ public class DsonInputs {
     static class ArrayInput extends CodedInput {
 
         final byte[] buffer;
-        final int offset;
-        final int limit;
+        final int rawOffset;
+        final int rawLimit;
 
         ArrayInput(byte[] buffer) {
             this(buffer, 0, buffer.length);
@@ -247,8 +247,8 @@ public class DsonInputs {
 
         ArrayInput(byte[] buffer, int offset, int length) {
             this.buffer = buffer;
-            this.offset = offset;
-            this.limit = offset + length;
+            this.rawOffset = offset;
+            this.rawLimit = offset + length;
 
             this.codedInputStream = CodedInputStream.newInstance(buffer, offset, length);
             this.codedInputStreamOffset = offset;
@@ -256,32 +256,37 @@ public class DsonInputs {
 
         @Override
         public int getPosition() {
-            return (codedInputStreamOffset - offset) + codedInputStream.getTotalBytesRead();
+            return (codedInputStreamOffset - rawOffset) + codedInputStream.getTotalBytesRead();
         }
 
         @Override
         public void setPosition(int readerIndex) {
-            Objects.checkIndex(readerIndex, limit - offset);
-            if (readerIndex == getPosition()) {
+            Objects.checkIndex(readerIndex, rawLimit - rawOffset);
+            int seek = readerIndex - getPosition();
+            if (seek == 0) {
                 return;
             }
-            int newOffset = offset + readerIndex;
-            codedInputStream = CodedInputStream.newInstance(buffer, newOffset, limit - readerIndex);
-            codedInputStreamOffset = newOffset;
+            if (seek > 0) { // 实际上多为负
+                skipRawBytes(seek);
+                return;
+            }
+            int bufferPos = rawOffset + readerIndex;
+            codedInputStream = CodedInputStream.newInstance(buffer, bufferPos, rawLimit - readerIndex);
+            codedInputStreamOffset = bufferPos;
         }
 
         @Override
         public byte getByte(int readerIndex) {
-            int newOffset = offset + readerIndex;
-            BinaryUtils.checkBuffer(buffer, newOffset, 1);
-            return buffer[newOffset];
+            int bufferPos = rawOffset + readerIndex;
+            BinaryUtils.checkBuffer(buffer, bufferPos, 1);
+            return buffer[bufferPos];
         }
 
         @Override
         public int getFixed32(int readerIndex) {
-            int newOffset = offset + readerIndex;
-            BinaryUtils.checkBuffer(buffer, newOffset, 4);
-            return BinaryUtils.getIntLE(buffer, newOffset);
+            int bufferPos = rawOffset + readerIndex;
+            BinaryUtils.checkBuffer(buffer, bufferPos, 4);
+            return BinaryUtils.getIntLE(buffer, bufferPos);
         }
     }
 
@@ -306,26 +311,31 @@ public class DsonInputs {
         @Override
         public void setPosition(int readerIndex) {
             Objects.checkIndex(readerIndex, byteBuffer.limit() - offset);
-            if (getPosition() == readerIndex) {
+            int seek = readerIndex - getPosition();
+            if (seek == 0) {
+                return;
+            }
+            if (seek > 0) { // 实际上多为负
+                skipRawBytes(seek);
                 return;
             }
 
-            int newOffset = offset + readerIndex;
-            BinaryUtils.position(byteBuffer, newOffset);
+            int bufferPos = offset + readerIndex;
+            BinaryUtils.position(byteBuffer, bufferPos);
             codedInputStream = CodedInputStream.newInstance(byteBuffer);
-            codedInputStreamOffset = newOffset;
+            codedInputStreamOffset = bufferPos;
         }
 
         @Override
         public byte getByte(int readerIndex) {
-            int newOffset = offset + readerIndex;
-            return byteBuffer.get(newOffset);
+            int bufferPos = offset + readerIndex;
+            return byteBuffer.get(bufferPos);
         }
 
         @Override
         public int getFixed32(int readerIndex) {
-            int newOffset = offset + readerIndex;
-            return byteBuffer.getInt(newOffset);
+            int bufferPos = offset + readerIndex;
+            return byteBuffer.getInt(bufferPos);
         }
 
     }

@@ -143,6 +143,15 @@ internal static class DsonInternals
         return -1;
     }
 
+    public static bool RemoveRef<TE>(List<TE> list, Object element) where TE : class {
+        int index = IndexOfRef(list, element);
+        if (index < 0) {
+            return false;
+        }
+        list.RemoveAt(index);
+        return true;
+    }
+
     #endregion
 
     #region 数组

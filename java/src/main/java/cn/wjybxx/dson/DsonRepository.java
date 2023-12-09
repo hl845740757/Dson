@@ -8,7 +8,7 @@ import cn.wjybxx.dson.types.ObjectRef;
 import java.util.*;
 
 /**
- * 用于简单的解析引用
+ * 简单的Dson对象仓库实现 -- 提供简单的引用解析功能。
  *
  * @author wjybxx
  * date - 2023/6/21
@@ -21,18 +21,18 @@ public class DsonRepository {
     public DsonRepository() {
     }
 
+    public DsonArray<String> toDsonArray() {
+        DsonArray<String> dsonArray = new DsonArray<>(valueList.size());
+        dsonArray.addAll(valueList);
+        return dsonArray;
+    }
+
     public Map<String, DsonValue> getIndexMap() {
         return Collections.unmodifiableMap(indexMap);
     }
 
     public List<DsonValue> getValues() {
         return Collections.unmodifiableList(valueList);
-    }
-
-    public DsonArray<String> toDsonArray() {
-        DsonArray<String> dsonArray = new DsonArray<>(valueList.size());
-        dsonArray.addAll(valueList);
-        return dsonArray;
     }
 
     public int size() {
@@ -59,7 +59,7 @@ public class DsonRepository {
         return this;
     }
 
-    public DsonValue remove(int idx) {
+    public DsonValue removeAt(int idx) {
         DsonValue dsonValue = valueList.remove(idx);
         String localId = Dsons.getLocalId(dsonValue);
         if (localId != null) {
@@ -71,14 +71,14 @@ public class DsonRepository {
     public boolean remove(DsonValue dsonValue) {
         int idx = DsonInternals.indexOfRef(valueList, dsonValue);
         if (idx >= 0) {
-            remove(idx);
+            removeAt(idx);
             return true;
         } else {
             return false;
         }
     }
 
-    public DsonValue remove(String localId) {
+    public DsonValue removeById(String localId) {
         Objects.requireNonNull(localId);
         DsonValue exist = indexMap.remove(localId);
         if (exist != null) {
@@ -148,26 +148,11 @@ public class DsonRepository {
         return repository;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        DsonRepository that = (DsonRepository) o;
-
-        return valueList.equals(that.valueList);
-    }
-
-    @Override
-    public int hashCode() {
-        return valueList.hashCode();
-    }
-
+    // 解析引用后可能导致循环，因此equals等不实现
     @Override
     public String toString() {
-        return "DsonRepository{" +
-                "valueList=" + valueList +
-                '}';
+        // 解析引用后可能导致死循环，因此不输出
+        return "DsonRepository:" + super.toString();
     }
 
 }

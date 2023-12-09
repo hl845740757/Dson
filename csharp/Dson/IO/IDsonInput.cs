@@ -43,19 +43,27 @@ public interface IDsonInput : IDisposable
     long ReadFixed64();
 
     /// <summary>
-    /// 该接口默认读取4字节
+    /// 该接口固定读取4字节
     /// </summary>
     /// <returns></returns>
     float ReadFloat();
 
     /// <summary>
-    /// 该接口默认读取8字节
+    /// 该接口固定读取8字节
     /// </summary>
     /// <returns></returns>
     double ReadDouble();
 
+    /// <summary>
+    /// 该接口固定读取一个字节
+    /// </summary>
+    /// <returns></returns>
     bool ReadBool();
 
+    /// <summary>
+    /// 该接口先读取一个uint32编码的长度，再读取相应字节数
+    /// </summary>
+    /// <returns></returns>
     string ReadString();
 
     /// <summary>
@@ -73,6 +81,13 @@ public interface IDsonInput : IDisposable
 
     /// <summary>
     /// 从输入中读取一个protobuf消息
+    /// 1.只读取message的内容部分，不包含长度信息
+    /// 2.该方法用于避免创建临时的字节数组
+    ///
+    /// <code>
+    ///    byte[] data = input.readRawBytes(len);
+    ///    return parser.parseFrom(data);
+    /// </code>
     /// </summary>
     /// <param name="parser">消息的解析器</param>
     /// <typeparam name="T"></typeparam>
@@ -114,7 +129,7 @@ public interface IDsonInput : IDisposable
     /// <summary>
     /// 恢复限制
     /// </summary>
-    /// <param name="oldLimit"></param>
+    /// <param name="oldLimit">PushLimit返回的值</param>
     void PopLimit(int oldLimit);
 
     /// <summary>

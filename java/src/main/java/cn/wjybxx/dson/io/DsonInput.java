@@ -50,14 +50,16 @@ public interface DsonInput extends AutoCloseable {
 
     //
 
-    /** 该接口默认读取4字节 */
+    /** 该接口固定读取4字节 */
     float readFloat();
 
-    /** 该接口默认读取8字节 */
+    /** 该接口固定读取8字节 */
     double readDouble();
 
+    /** 该接口固定只读取一个字节 */
     boolean readBool();
 
+    /** 该接口先读取一个uint32编码的长度，再读取相应字节数 */
     String readString();
 
     /** @param size 要读取的字节数 */
@@ -67,7 +69,14 @@ public interface DsonInput extends AutoCloseable {
     void skipRawBytes(int n);
 
     /**
-     * 读取一个protoBuf消息，内容部分没有size
+     * 读取一个protoBuf消息
+     * 1.只读取message的内容部分，不包含长度信息
+     * 2.该方法用于避免创建临时的字节数组
+     *
+     * <pre>{@code
+     *      byte[] data = input.readRawBytes(len);
+     *      return parser.parseFrom(data);
+     * }</pre>
      */
     <T> T readMessage(@Nonnull Parser<T> parser);
 

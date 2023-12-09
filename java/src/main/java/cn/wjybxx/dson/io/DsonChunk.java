@@ -69,6 +69,7 @@ public final class DsonChunk {
         this.used = used;
     }
 
+    /** chunk的有效载荷 */
     public byte[] payload() {
         byte[] r = new byte[length];
         System.arraycopy(buffer, offset, r, 0, length);

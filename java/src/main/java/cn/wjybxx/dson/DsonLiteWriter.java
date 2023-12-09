@@ -71,16 +71,15 @@ public interface DsonLiteWriter extends AutoCloseable {
 
     void writeBinary(int name, DsonBinary dsonBinary);
 
-    /** @param chunk 写入chunk的length区域 */
     void writeBinary(int name, int type, DsonChunk chunk);
 
-    void writeExtInt32(int name, DsonExtInt32 value, WireType wireType);
+    void writeExtInt32(int name, DsonExtInt32 extInt32, WireType wireType);
 
-    void writeExtInt64(int name, DsonExtInt64 value, WireType wireType);
+    void writeExtInt64(int name, DsonExtInt64 extInt64, WireType wireType);
 
-    void writeExtDouble(int name, DsonExtDouble value);
+    void writeExtDouble(int name, DsonExtDouble extDouble);
 
-    void writeExtString(int name, DsonExtString value);
+    void writeExtString(int name, DsonExtString extString);
 
     void writeRef(int name, ObjectRef objectRef);
 

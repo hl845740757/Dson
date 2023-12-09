@@ -48,14 +48,26 @@ public interface IDsonOutput : IDisposable
 
     void WriteFixed64(long value);
 
+    /// <summary>
+    /// 该接口固定写入4个字节
+    /// </summary>
+    /// <param name="value"></param>
     void WriteFloat(float value);
 
+    /// <summary>
+    /// 该接口固定写入8个字节
+    /// </summary>
+    /// <param name="value"></param>
     void WriteDouble(double value);
 
+    /// <summary>
+    /// 该接口固定写入一个字节
+    /// </summary>
+    /// <param name="value"></param>
     void WriteBool(bool value);
 
     /// <summary>
-    /// Output会自动写入String的长度，且长度以 Uint32 编码。
+    /// 该接口先以Uint32格式写入String的长度，再写入String以UTF8编码后的内容
     /// </summary>
     /// <param name="value">要写入的字符串</param>
     void WriteString(string value);
@@ -68,11 +80,20 @@ public interface IDsonOutput : IDisposable
         WriteRawBytes(value, 0, value.Length);
     }
 
+    /// <summary>
+    /// 仅写入内容，不会写入数组的长度
+    /// </summary>
     void WriteRawBytes(byte[] value, int offset, int length);
 
     /// <summary>
     /// 写入一个Protobuf消息
-    /// 只写入message的内容部分，不包含长度信息
+    /// 1.只写入message的内容部分，不包含长度信息
+    /// 2.该方法用于避免创建临时的字节数组
+    ///
+    /// <code>
+    ///    byte[] data = message.toByteArray();
+    ///    output.writeRawBytes(data);
+    /// </code>
     /// </summary>
     /// <param name="value"></param>
     void WriteMessage(IMessage value);

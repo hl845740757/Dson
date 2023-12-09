@@ -197,34 +197,34 @@ public abstract class AbstractDsonWriter implements DsonWriter {
     }
 
     @Override
-    public void writeExtInt32(String name, DsonExtInt32 value, WireType wireType, INumberStyle style) {
-        Objects.requireNonNull(value);
+    public void writeExtInt32(String name, DsonExtInt32 extInt32, WireType wireType, INumberStyle style) {
+        Objects.requireNonNull(extInt32);
         advanceToValueState(name);
-        doWriteExtInt32(value, wireType, style);
+        doWriteExtInt32(extInt32, wireType, style);
         setNextState();
     }
 
     @Override
-    public void writeExtInt64(String name, DsonExtInt64 value, WireType wireType, INumberStyle style) {
-        Objects.requireNonNull(value);
+    public void writeExtInt64(String name, DsonExtInt64 extInt64, WireType wireType, INumberStyle style) {
+        Objects.requireNonNull(extInt64);
         advanceToValueState(name);
-        doWriteExtInt64(value, wireType, style);
+        doWriteExtInt64(extInt64, wireType, style);
         setNextState();
     }
 
     @Override
-    public void writeExtDouble(String name, DsonExtDouble value, INumberStyle style) {
-        Objects.requireNonNull(value);
+    public void writeExtDouble(String name, DsonExtDouble extDouble, INumberStyle style) {
+        Objects.requireNonNull(extDouble);
         advanceToValueState(name);
-        doWriteExtDouble(value, style);
+        doWriteExtDouble(extDouble, style);
         setNextState();
     }
 
     @Override
-    public void writeExtString(String name, DsonExtString value, StringStyle style) {
-        Objects.requireNonNull(value);
+    public void writeExtString(String name, DsonExtString extString, StringStyle style) {
+        Objects.requireNonNull(extString);
         advanceToValueState(name);
-        doWriteExtString(value, style);
+        doWriteExtString(extString, style);
         setNextState();
     }
 
