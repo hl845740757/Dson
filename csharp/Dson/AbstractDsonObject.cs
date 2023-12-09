@@ -18,7 +18,7 @@
 
 using System.Collections;
 
-namespace Dson;
+namespace Wjybxx.Dson;
 
 /// <summary>
 /// Dson KV类结构的抽象实现

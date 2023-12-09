@@ -16,10 +16,10 @@
 
 #endregion
 
-using Dson.Text;
-using Dson.Types;
+using Wjybxx.Dson.Text;
+using Wjybxx.Dson.Types;
 
-namespace Dson;
+namespace Wjybxx.Dson;
 
 /// <summary>
 /// 简单的Dson对象仓库实现 -- 提供简单的引用解析功能。

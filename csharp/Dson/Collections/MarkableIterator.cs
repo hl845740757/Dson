@@ -18,7 +18,7 @@
 
 using System.Collections;
 
-namespace Dson.Collections;
+namespace Wjybxx.Dson.Collections;
 
 /// <summary>
 /// C#和Java的迭代器差异较大

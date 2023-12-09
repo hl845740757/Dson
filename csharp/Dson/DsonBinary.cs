@@ -16,9 +16,9 @@
 
 #endregion
 
-using Dson.IO;
+using Wjybxx.Dson.IO;
 
-namespace Dson;
+namespace Wjybxx.Dson;
 
 public class DsonBinary : DsonValue, IEquatable<DsonBinary>
 {

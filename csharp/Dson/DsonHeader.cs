@@ -16,7 +16,7 @@
 
 #endregion
 
-namespace Dson;
+namespace Wjybxx.Dson;
 
 /// <summary>
 /// Dson对象头

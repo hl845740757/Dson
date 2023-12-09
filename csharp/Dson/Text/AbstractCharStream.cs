@@ -18,7 +18,7 @@
 
 using System.Diagnostics;
 
-namespace Dson.Text;
+namespace Wjybxx.Dson.Text;
 
 public abstract class AbstractCharStream : IDsonCharStream
 {

@@ -16,7 +16,7 @@
 
 #endregion
 
-namespace Dson;
+namespace Wjybxx.Dson;
 
 public struct ExtString : IEquatable<ExtString>, IComparable<ExtString>, IComparable
 {

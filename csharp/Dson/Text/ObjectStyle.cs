@@ -16,7 +16,7 @@
 
 #endregion
 
-namespace Dson.Text;
+namespace Wjybxx.Dson.Text;
 
 /// <summary>
 /// 对象和数组的缩进模式

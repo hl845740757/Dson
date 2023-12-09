@@ -18,7 +18,7 @@
 
 using Google.Protobuf;
 
-namespace Dson.IO;
+namespace Wjybxx.Dson.IO;
 
 /// <summary>
 /// </summary>

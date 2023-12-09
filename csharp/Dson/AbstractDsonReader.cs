@@ -17,11 +17,11 @@
 #endregion
 
 using System.Diagnostics;
-using Dson.IO;
-using Dson.Types;
+using Wjybxx.Dson.IO;
+using Wjybxx.Dson.Types;
 using Google.Protobuf;
 
-namespace Dson;
+namespace Wjybxx.Dson;
 
 public abstract class AbstractDsonReader<TName> : IDsonReader<TName> where TName : IEquatable<TName>
 {

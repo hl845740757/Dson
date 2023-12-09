@@ -16,7 +16,7 @@
 
 #endregion
 
-namespace Dson.Text;
+namespace Wjybxx.Dson.Text;
 
 /// <summary>
 /// Dson文本模式

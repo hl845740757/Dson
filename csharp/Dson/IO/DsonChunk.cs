@@ -16,7 +16,7 @@
 
 #endregion
 
-namespace Dson.IO;
+namespace Wjybxx.Dson.IO;
 
 public class DsonChunk
 {

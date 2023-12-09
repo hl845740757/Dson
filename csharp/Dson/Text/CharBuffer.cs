@@ -16,9 +16,9 @@
 
 #endregion
 
-using Dson.IO;
+using Wjybxx.Dson.IO;
 
-namespace Dson.Text;
+namespace Wjybxx.Dson.Text;
 
 internal class CharBuffer
 {

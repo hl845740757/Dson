@@ -16,7 +16,7 @@
 
 #endregion
 
-namespace Dson;
+namespace Wjybxx.Dson;
 
 public class DsonNull : DsonValue, IEquatable<DsonNull>
 {

@@ -16,7 +16,7 @@
 
 #endregion
 
-namespace Dson;
+namespace Wjybxx.Dson;
 
 /// <summary>
 /// Object、Header上下文循环： [NAME-VALUE],[NAME-VALUE]...

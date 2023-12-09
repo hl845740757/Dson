@@ -18,7 +18,7 @@
 
 using System.Runtime.CompilerServices;
 
-namespace Dson;
+namespace Wjybxx.Dson;
 
 internal static class DsonInternals
 {

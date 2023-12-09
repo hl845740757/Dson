@@ -16,7 +16,7 @@
 
 #endregion
 
-namespace Dson;
+namespace Wjybxx.Dson;
 
 public class DsonExtInt32 : DsonValue, IEquatable<DsonExtInt32>, IComparable<DsonExtInt32>, IComparable
 {

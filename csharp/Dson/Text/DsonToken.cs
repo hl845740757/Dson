@@ -16,7 +16,7 @@
 
 #endregion
 
-namespace Dson.Text;
+namespace Wjybxx.Dson.Text;
 
 public class DsonToken : IEquatable<DsonToken>
 {

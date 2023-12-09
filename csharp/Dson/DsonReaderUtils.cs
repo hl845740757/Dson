@@ -17,11 +17,11 @@
 #endregion
 
 using System.Collections.Immutable;
-using Dson.IO;
-using Dson.Types;
+using Wjybxx.Dson.IO;
+using Wjybxx.Dson.Types;
 using Google.Protobuf;
 
-namespace Dson;
+namespace Wjybxx.Dson;
 
 public class DsonReaderUtils
 {

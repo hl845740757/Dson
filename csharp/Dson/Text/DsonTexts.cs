@@ -20,7 +20,7 @@ using System.Collections;
 using System.Collections.Immutable;
 using System.Text;
 
-namespace Dson.Text;
+namespace Wjybxx.Dson.Text;
 
 public static class DsonTexts
 {

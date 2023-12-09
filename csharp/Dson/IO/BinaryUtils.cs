@@ -19,7 +19,7 @@
 using System.Runtime.CompilerServices;
 using Google.Protobuf;
 
-namespace Dson.IO;
+namespace Wjybxx.Dson.IO;
 
 /// <summary>
 /// C#10不支持逻辑右移，但这里使用算术右移是等价的

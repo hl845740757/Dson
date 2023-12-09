@@ -19,9 +19,9 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
-using Dson.Text;
+using Wjybxx.Dson.Text;
 
-namespace Dson;
+namespace Wjybxx.Dson;
 
 /// <summary>
 /// C#是真泛型，因此可以减少类型

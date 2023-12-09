@@ -18,7 +18,7 @@
 
 using System.Text;
 
-namespace Dson.Text;
+namespace Wjybxx.Dson.Text;
 
 public class DsonScanner : IDisposable
 {

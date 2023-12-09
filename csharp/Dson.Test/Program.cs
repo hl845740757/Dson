@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics;
-using Dson.IO;
-using Dson.Text;
+using Wjybxx.Dson.IO;
+using Wjybxx.Dson.Text;
 
-namespace Dson.Test;
+namespace Wjybxx.Dson.Test;
 
 public class Program
 {

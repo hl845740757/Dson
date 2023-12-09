@@ -18,7 +18,7 @@
 
 using System.Globalization;
 
-namespace Dson.Text;
+namespace Wjybxx.Dson.Text;
 
 /// <summary>
 /// 这里提供默认数字格式化方式

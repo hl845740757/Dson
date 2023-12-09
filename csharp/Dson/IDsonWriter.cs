@@ -16,12 +16,12 @@
 
 #endregion
 
-using Dson.IO;
-using Dson.Text;
-using Dson.Types;
+using Wjybxx.Dson.IO;
+using Wjybxx.Dson.Text;
+using Wjybxx.Dson.Types;
 using Google.Protobuf;
 
-namespace Dson;
+namespace Wjybxx.Dson;
 
 /// <summary>
 /// 1. 写数组普通元素的时候，name传null或零值，写嵌套对象时使用无name参数的start方法（实在不想定义太多的方法）

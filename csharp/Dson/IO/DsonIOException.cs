@@ -17,9 +17,9 @@
 #endregion
 
 using System.Runtime.Serialization;
-using Dson.Text;
+using Wjybxx.Dson.Text;
 
-namespace Dson.IO;
+namespace Wjybxx.Dson.IO;
 
 public class DsonIOException : Exception
 {

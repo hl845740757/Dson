@@ -16,12 +16,12 @@
 
 #endregion
 
-using Dson.IO;
-using Dson.Text;
-using Dson.Types;
+using Wjybxx.Dson.IO;
+using Wjybxx.Dson.Text;
+using Wjybxx.Dson.Types;
 using Google.Protobuf;
 
-namespace Dson;
+namespace Wjybxx.Dson;
 
 public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName> where TName : IEquatable<TName>
 {

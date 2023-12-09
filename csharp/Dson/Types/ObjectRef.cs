@@ -16,7 +16,7 @@
 
 #endregion
 
-namespace Dson.Types;
+namespace Wjybxx.Dson.Types;
 
 /// <summary>
 /// 对象引用

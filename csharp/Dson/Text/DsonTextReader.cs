@@ -19,11 +19,11 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
-using Dson.IO;
-using Dson.Types;
+using Wjybxx.Dson.IO;
+using Wjybxx.Dson.Types;
 using Google.Protobuf;
 
-namespace Dson.Text;
+namespace Wjybxx.Dson.Text;
 
 [SuppressMessage("ReSharper", "HeapView.BoxingAllocation")]
 public class DsonTextReader : AbstractDsonReader<string>

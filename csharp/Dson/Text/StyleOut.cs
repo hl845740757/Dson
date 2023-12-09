@@ -16,7 +16,7 @@
 
 #endregion
 
-namespace Dson.Text;
+namespace Wjybxx.Dson.Text;
 
 /// <summary>
 /// C#这里用值类型是非常方便的

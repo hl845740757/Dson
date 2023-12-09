@@ -16,10 +16,10 @@
 
 #endregion
 
-using Dson.Types;
+using Wjybxx.Dson.Types;
 using Google.Protobuf;
 
-namespace Dson;
+namespace Wjybxx.Dson;
 
 /// <summary>
 /// 1. 读取数组内普通成员时，name传null或零值，读取嵌套对象时使用无name参数的方法

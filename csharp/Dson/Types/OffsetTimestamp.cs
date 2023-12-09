@@ -18,9 +18,9 @@
 
 using System.Globalization;
 using System.Text;
-using Dson.Text;
+using Wjybxx.Dson.Text;
 
-namespace Dson;
+namespace Wjybxx.Dson;
 
 /// <summary>
 /// 带时区偏移的时间戳

@@ -21,7 +21,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using Google.Protobuf;
 
-namespace Dson.IO;
+namespace Wjybxx.Dson.IO;
 
 public class DsonOutputs
 {

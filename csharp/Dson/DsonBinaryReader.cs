@@ -16,11 +16,11 @@
 
 #endregion
 
-using Dson.IO;
-using Dson.Types;
+using Wjybxx.Dson.IO;
+using Wjybxx.Dson.Types;
 using Google.Protobuf;
 
-namespace Dson;
+namespace Wjybxx.Dson;
 
 public class DsonBinaryReader<TName> : AbstractDsonReader<TName> where TName : IEquatable<TName>
 {

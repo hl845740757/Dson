@@ -16,9 +16,9 @@
 
 #endregion
 
-using Dson.Types;
+using Wjybxx.Dson.Types;
 
-namespace Dson;
+namespace Wjybxx.Dson;
 
 public abstract class DsonValue
 {
