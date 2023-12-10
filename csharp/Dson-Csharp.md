@@ -1,19 +1,21 @@
-# Dson Java库指南
+# Dson Csharp
 
-## Dsons和DsonLites工具类
+## Dsons工具类
 
-在Dson库中提供了Dsons和DsonLites两个工具类，提供了读写Dson的快捷API。  
+为方便用户使用，我提供了**Dsons**工具类，提供了大量的读写Dson的快捷API。
+
+在Dson库中提供了Dsons和DsonLites两个工具类，提供了  
 注意：fromDson默认只读取第一个对象。
 
 ```
-    DsonObject<String> dsonObject = Dsons.fromDson(dsonString).asObject();
-    String dsonString1 = Dsons.toDson(value, ObjectStyle.INDENT);
-    System.out.println(dsonString1)
+     DsonObject<String> dsonObject = Dsons.FromDson(dsonString).AsObject();
+     String dsonString1 = Dsons.ToDson(dsonObject, ObjectStyle.Indent);
+     Console.WriteLine(dsonString1);
 ```
 
 ## 解析引用(DsonRepository)
 
-Dsons和DsonLites中的方法默认不解析引用，库提供了简单解析引用的工具类*DsonRepository*。
+Dsons中的方法默认不解析引用，库提供了简单解析引用的工具类*DsonRepository*。
 
 方式1：fromDson的时候解析引用。
 
@@ -28,10 +30,10 @@ Dsons和DsonLites中的方法默认不解析引用，库提供了简单解析引
     repository.resolveReference();
 ```
 
-## Java库特性
+## C#库特性
 
 解析规则不分语言，因此reader的实现应该保持一致，也就不存在特别的特性。
-但书写格式各个库的实现可能并不相同，这里谈一谈我为Java Dson库的设计的一些特性 —— 未来c#会具备相同的特性。
+但书写格式各个库的实现可能并不相同，因此writer可能有所差异；不过Csharp的代码也由我编写，因此具备与Java相同的特性。
 
 ### 全局设置
 
@@ -49,11 +51,11 @@ Number提供了7种默认格式输出：
 
 1. SIMPLE 简单模式 —— 普通整数和小数格式，科学计数法
 2. TYPED 简单类型模式 —— 在简单模式的基础上打印类型
-3. SIGNED_HEX 有符号16进制，负数会输出负号
-4. UNSIGNED_HEX 无符号16进制，负数将打印所有位
-5. SIGNED_BINARY 有符号2进制，负数会输出负号 -- 不支持浮点数
-6. UNSIGNED_BINARY 无符号2进制，负数将打印所有位 -- 不支持浮点数
-7. FIXED_BINARY 固定位数2进制，int32打印为32位，int64打印为64位
+3. SignedHex 有符号16进制，负数会输出负号 -- 不支持浮点数
+4. UnsignedHex 无符号16进制，负数将打印所有位 -- 不支持浮点数
+5. SignedBinary 有符号2进制，负数会输出负号 -- 不支持浮点数
+6. UnsignedBinary 无符号2进制，负数将打印所有位 -- 不支持浮点数
+7. FixedBinary 固定位数2进制，int32打印为32位，int64打印为64位
 
 注意：
 

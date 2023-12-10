@@ -2,12 +2,12 @@
 using Wjybxx.Dson.IO;
 using Wjybxx.Dson.Text;
 
-namespace Wjybxx.Dson.Test;
+namespace Wjybxx.Dson.Tests;
 
 public class Program
 {
     // c#10还不支持 """，因此转为@格式
-    private static string dsonString = @"           
+    private const string DsonString = @"           
             - @{clsName: FileHeader, intro: 预留设计，允许定义文件头}
             -
             - {@MyStruct
@@ -51,9 +51,12 @@ public class Program
     /// 但程序反复读写，以及不同方式之间的读写结果应当相同。
     /// </summary>
     /// <param name="args"></param>
-    public static void Main(string[] args) {
+    public static void Main22(string[] args) {
+        Console.WriteLine(NumberStyles.FixedBinary.ToString(255).Value);
+        Console.WriteLine("--------------------------------------------");
+        
         DsonArray<string> topContainer1;
-        using (IDsonReader<string> reader = new DsonTextReader(DsonTextReaderSettings.Default, dsonString)) {
+        using (IDsonReader<string> reader = new DsonTextReader(DsonTextReaderSettings.Default, DsonString)) {
             topContainer1 = Dsons.ReadTopContainer(reader);
         }
         string dsonString1 = Dsons.ToFlatDson(topContainer1);
@@ -89,4 +92,6 @@ public class Program
             }
         }
     }
+    
+    
 }

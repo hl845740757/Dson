@@ -289,32 +289,30 @@ public enum NumberStyle implements INumberStyle {
     FIXED_BINARY(9) {
         @Override
         public void toString(int value, StyleOut styleOut) {
-            styleOut.setTyped(true);
             String binaryString = Integer.toBinaryString(value);
+            StringBuilder sb = new StringBuilder(34);
+            sb.append("0b");
             if (binaryString.length() < 32) {
-                StringBuilder sb = new StringBuilder(34);
-                sb.append("0b");
                 pending(sb, 32 - binaryString.length());
-                sb.append(binaryString);
-                styleOut.setValue(sb.toString());
-            } else {
-                styleOut.setValue("0b" + binaryString);
             }
+            sb.append(binaryString);
+
+            styleOut.setTyped(true);
+            styleOut.setValue(sb.toString());
         }
 
         @Override
         public void toString(long value, StyleOut styleOut) {
-            styleOut.setTyped(true);
             String binaryString = Long.toBinaryString(value);
+            StringBuilder sb = new StringBuilder(66);
+            sb.append("0b");
             if (binaryString.length() < 64) {
-                StringBuilder sb = new StringBuilder(66);
-                sb.append("0b");
                 pending(sb, 64 - binaryString.length());
-                sb.append(binaryString);
-                styleOut.setValue(sb.toString());
-            } else {
-                styleOut.setValue("0b" + binaryString);
             }
+            sb.append(binaryString);
+
+            styleOut.setTyped(true);
+            styleOut.setValue(sb.toString());
         }
 
         private void pending(StringBuilder sb, int count) {
