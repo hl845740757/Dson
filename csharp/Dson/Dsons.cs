@@ -501,16 +501,85 @@ public static class Dsons
 
     #endregion
 
+    #region Copy
+
+    /** 深度拷贝为可变对象 */
+    public static DsonValue MutableDeepCopy<TName>(DsonValue dsonValue) {
+        return MutableDeepCopy<TName>(dsonValue, 0);
+    }
+
+    /**
+     * 深度拷贝为可变对象
+     *
+     * @param stack 当前栈深度
+     */
+    private static DsonValue MutableDeepCopy<TName>(DsonValue dsonValue, int stack) {
+        if (stack > 100) throw new InvalidOperationException("Check for circular references");
+        switch (dsonValue.DsonType) {
+            case DsonType.Object: {
+                DsonObject<TName> src = dsonValue.AsObject<TName>();
+                DsonObject<TName> result = new DsonObject<TName>(src.Count);
+                CopyKvPair(src.Header, result.Header, stack);
+                CopyKvPair(src, result, stack);
+                return result;
+            }
+            case DsonType.Array: {
+                DsonArray<TName> src = dsonValue.AsArray<TName>();
+                DsonArray<TName> result = new DsonArray<TName>(src.Count);
+                CopyKvPair(src.Header, result.Header, stack);
+                CopyElements<TName>(src, result, stack);
+                return result;
+            }
+            case DsonType.Header:{
+                DsonHeader<TName> src = dsonValue.AsHeader<TName>();
+                DsonHeader<TName> result = new DsonHeader<TName>();
+                CopyKvPair(src, result, stack);
+                return result;
+            }
+            case DsonType.Binary: {
+                return new DsonBinary(dsonValue.AsBinary());
+            }
+            default: {
+                return dsonValue;
+            }
+        }
+    }
+
+    private static void CopyKvPair<TName>(AbstractDsonObject<TName> src, AbstractDsonObject<TName> dest, int stack) {
+        if (src.Count > 0) {
+            foreach (KeyValuePair<TName, DsonValue> pair in src) {
+                dest[pair.Key] = MutableDeepCopy<TName>(pair.Value, stack + 1);
+            }
+        }
+    }
+
+    private static void CopyElements<TName>(AbstractDsonArray src, AbstractDsonArray dest, int stack) {
+        if (src.Count > 0) {
+            foreach (DsonValue dsonValue in src) {
+                dest.Add(MutableDeepCopy<TName>(dsonValue, stack + 1));
+            }
+        }
+    }
+
+    #endregion
+
     #region 快捷方法
 
     /** 该接口用于写顶层数组容器，所有元素将被展开 */
     public static string ToFlatDson(DsonArray<string> topContainer, DsonTextWriterSettings? settings = null) {
-        settings = settings ?? DsonTextWriterSettings.Default;
+        if (settings == null) settings = DsonTextWriterSettings.Default;
         StringWriter stringWriter = new StringWriter(new StringBuilder(1024));
         using (DsonTextWriter writer = new DsonTextWriter(settings, stringWriter)) {
             WriteTopContainer(writer, topContainer);
         }
         return stringWriter.ToString();
+    }
+
+    /** 该接口用于读取多顶层对象dson文本 */
+    public static DsonArray<string> FromFlatDson(String dsonString) {
+        using (DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.Default, dsonString)) {
+            return ReadTopContainer(reader);
+        }
     }
 
     public static string ToDson(DsonValue dsonValue, ObjectStyle style, DsonMode dsonMode = DsonMode.Standard) {

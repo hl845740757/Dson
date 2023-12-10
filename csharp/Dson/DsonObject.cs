@@ -29,6 +29,10 @@ public class DsonObject<TK> : AbstractDsonObject<TK>
     public DsonObject()
         : this(DsonInternals.NewLinkedDictionary<TK>(), new DsonHeader<TK>()) {
     }
+    
+    public DsonObject(int capacity)
+        : this(DsonInternals.NewLinkedDictionary<TK>(capacity), new DsonHeader<TK>()) {
+    }
 
     public DsonObject(DsonObject<TK> src) // 需要拷贝
         : this(DsonInternals.NewLinkedDictionary(src), new DsonHeader<TK>(src._header)) {

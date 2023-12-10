@@ -3,7 +3,6 @@ package cn.wjybxx.dson;
 import cn.wjybxx.dson.io.DsonIOException;
 
 import javax.annotation.Nullable;
-import java.util.Objects;
 
 /**
  * Dson二进制流工具类
@@ -303,17 +302,38 @@ public class DsonLites {
 
     // region 拷贝
 
+    /** 深度拷贝为可变对象 */
     public static DsonValue mutableDeepCopy(DsonValue dsonValue) {
-        Objects.requireNonNull(dsonValue);
+        return mutableDeepCopy(dsonValue, 0);
+    }
+
+    /**
+     * 深度拷贝为可变对象
+     *
+     * @param stack 当前栈深度
+     */
+    private static DsonValue mutableDeepCopy(DsonValue dsonValue, int stack) {
+        if (stack > 100) throw new IllegalStateException("Check for circular references");
         switch (dsonValue.getDsonType()) {
             case OBJECT -> {
-                return mutableDeepCopy(dsonValue.asObjectLite());
-            }
-            case HEADER -> {
-                return copyHeader(dsonValue.asHeaderLite());
+                DsonObject<FieldNumber> src = dsonValue.asObjectLite();
+                DsonObject<FieldNumber> result = new DsonObject<>(src.size());
+                copyKVPair(src.getHeader(), result.getHeader(), stack);
+                copyKVPair(src, result, stack);
+                return result;
             }
             case ARRAY -> {
-                return mutableDeepCopy(dsonValue.asArrayLite());
+                DsonArray<FieldNumber> src = dsonValue.asArrayLite();
+                DsonArray<FieldNumber> result = new DsonArray<>(src.size());
+                copyKVPair(src.getHeader(), result.getHeader(), stack);
+                copyElements(src, result, stack);
+                return result;
+            }
+            case HEADER -> {
+                DsonHeader<FieldNumber> src = dsonValue.asHeaderLite();
+                DsonHeader<FieldNumber> result = new DsonHeader<>();
+                copyKVPair(src, result, stack);
+                return result;
             }
             case BINARY -> {
                 return new DsonBinary(dsonValue.asBinary());
@@ -324,31 +344,15 @@ public class DsonLites {
         }
     }
 
-    public static DsonObject<FieldNumber> mutableDeepCopy(DsonObject<FieldNumber> src) {
-        DsonObject<FieldNumber> result = new DsonObject<>(src.size());
-        copyObject(src.getHeader(), result.getHeader());
-        copyObject(src, result);
-        return result;
-    }
-
-    public static DsonArray<FieldNumber> mutableDeepCopy(DsonArray<FieldNumber> src) {
-        DsonArray<FieldNumber> result = new DsonArray<>(src.size());
-        copyObject(src.getHeader(), result.getHeader());
+    private static void copyKVPair(AbstractDsonObject<FieldNumber> src, AbstractDsonObject<FieldNumber> dest, int stack) {
         if (src.size() > 0) {
-            src.forEach(e -> result.add(mutableDeepCopy(e)));
+            src.forEach((s, dsonValue) -> dest.put(s, mutableDeepCopy(dsonValue, stack + 1)));
         }
-        return result;
     }
 
-    private static DsonHeader<FieldNumber> copyHeader(DsonHeader<FieldNumber> src) {
-        DsonHeader<FieldNumber> result = new DsonHeader<>();
-        copyObject(src, result);
-        return result;
-    }
-
-    private static void copyObject(AbstractDsonObject<FieldNumber> src, AbstractDsonObject<FieldNumber> dest) {
+    private static void copyElements(AbstractDsonArray src, AbstractDsonArray dest, int stack) {
         if (src.size() > 0) {
-            src.forEach((s, dsonValue) -> dest.put(s, mutableDeepCopy(dsonValue)));
+            src.forEach(e -> dest.add(mutableDeepCopy(e, stack + 1)));
         }
     }
 

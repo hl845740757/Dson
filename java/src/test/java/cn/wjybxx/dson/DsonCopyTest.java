@@ -28,7 +28,7 @@ public class DsonCopyTest {
     @Test
     void test() {
         DsonObject<String> dsonObject = DsonCodecTest.genRandObject();
-        DsonObject<String> result = Dsons.mutableDeepCopy(dsonObject);
+        DsonObject<String> result = Dsons.mutableDeepCopy(dsonObject).asObject();
         Assertions.assertEquals(dsonObject, result);
     }
 }

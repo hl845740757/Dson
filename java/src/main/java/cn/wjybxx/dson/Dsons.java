@@ -22,7 +22,6 @@ import cn.wjybxx.dson.text.*;
 import javax.annotation.Nullable;
 import java.io.Reader;
 import java.io.StringWriter;
-import java.util.Objects;
 
 /**
  * dson的辅助工具类，二进制流工具类{@link DsonLites}
@@ -358,17 +357,38 @@ public final class Dsons {
 
     // region 拷贝
 
+    /** 深度拷贝为可变对象 */
     public static DsonValue mutableDeepCopy(DsonValue dsonValue) {
-        Objects.requireNonNull(dsonValue);
+        return mutableDeepCopy(dsonValue, 0);
+    }
+
+    /**
+     * 深度拷贝为可变对象
+     *
+     * @param stack 当前栈深度
+     */
+    private static DsonValue mutableDeepCopy(DsonValue dsonValue, int stack) {
+        if (stack > 100) throw new IllegalStateException("Check for circular references");
         switch (dsonValue.getDsonType()) {
             case OBJECT -> {
-                return mutableDeepCopy(dsonValue.asObject());
-            }
-            case HEADER -> {
-                return copyHeader(dsonValue.asHeader());
+                DsonObject<String> src = dsonValue.asObject();
+                DsonObject<String> result = new DsonObject<>(src.size());
+                copyKVPair(src.getHeader(), result.getHeader(), stack);
+                copyKVPair(src, result, stack);
+                return result;
             }
             case ARRAY -> {
-                return mutableDeepCopy(dsonValue.asArray());
+                DsonArray<String> src = dsonValue.asArray();
+                DsonArray<String> result = new DsonArray<>(src.size());
+                copyKVPair(src.getHeader(), result.getHeader(), stack);
+                copyElements(src, result, stack);
+                return result;
+            }
+            case HEADER -> {
+                DsonHeader<String> src = dsonValue.asHeader();
+                DsonHeader<String> result = new DsonHeader<>();
+                copyKVPair(src, result, stack);
+                return result;
             }
             case BINARY -> {
                 return new DsonBinary(dsonValue.asBinary());
@@ -379,31 +399,15 @@ public final class Dsons {
         }
     }
 
-    public static DsonObject<String> mutableDeepCopy(DsonObject<String> src) {
-        DsonObject<String> result = new DsonObject<>(src.size());
-        copyObject(src.getHeader(), result.getHeader());
-        copyObject(src, result);
-        return result;
-    }
-
-    public static DsonArray<String> mutableDeepCopy(DsonArray<String> src) {
-        DsonArray<String> result = new DsonArray<>(src.size());
-        copyObject(src.getHeader(), result.getHeader());
+    private static void copyKVPair(AbstractDsonObject<String> src, AbstractDsonObject<String> dest, int stack) {
         if (src.size() > 0) {
-            src.forEach(e -> result.add(mutableDeepCopy(e)));
+            src.forEach((s, dsonValue) -> dest.put(s, mutableDeepCopy(dsonValue, stack + 1)));
         }
-        return result;
     }
 
-    private static DsonHeader<String> copyHeader(DsonHeader<String> src) {
-        DsonHeader<String> result = new DsonHeader<>();
-        copyObject(src, result);
-        return result;
-    }
-
-    private static void copyObject(AbstractDsonObject<String> src, AbstractDsonObject<String> dest) {
+    private static void copyElements(AbstractDsonArray src, AbstractDsonArray dest, int stack) {
         if (src.size() > 0) {
-            src.forEach((s, dsonValue) -> dest.put(s, mutableDeepCopy(dsonValue)));
+            src.forEach(e -> dest.add(mutableDeepCopy(e, stack + 1)));
         }
     }
 
@@ -417,14 +421,19 @@ public final class Dsons {
 
     /** 该接口用于写顶层数组容器，所有元素将被展开 */
     public static String toFlatDson(DsonArray<String> topContainer, DsonTextWriterSettings settings) {
-        if (settings == null) {
-            settings = DsonTextWriterSettings.DEFAULT;
-        }
+        if (settings == null) settings = DsonTextWriterSettings.DEFAULT;
         StringWriter stringWriter = new StringWriter(1024);
         try (DsonTextWriter writer = new DsonTextWriter(settings, stringWriter)) {
             writeTopContainer(writer, topContainer);
         }
         return stringWriter.toString();
+    }
+
+    /** 该接口用于读取多顶层对象dson文本 */
+    public static DsonArray<String> fromFlatDson(String dsonString) {
+        try (DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.DEFAULT, dsonString)) {
+            return readTopContainer(reader);
+        }
     }
 
     public static String toDson(DsonValue dsonValue, ObjectStyle style) {

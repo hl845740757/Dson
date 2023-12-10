@@ -78,12 +78,9 @@ public class DsonTextReaderTest {
      */
     @Test
     void test() {
-        DsonArray<String> topContainer1;
-        try (DsonTextReader textReader = new DsonTextReader(DsonTextReaderSettings.DEFAULT, DsonTextReaderTest.dsonString)) {
-            topContainer1 = Dsons.readTopContainer(textReader);
-        }
+        DsonArray<String> topContainer1 = Dsons.fromFlatDson(dsonString);
         String dsonString1 = Dsons.toFlatDson(topContainer1);
-        System.out.println(dsonString1);
+//        System.out.println(dsonString1);
 
         // Binary
         {

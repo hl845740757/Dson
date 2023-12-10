@@ -141,6 +141,10 @@ public class DsonRepository {
         return fromDson(reader, false);
     }
 
+    /**
+     * @param reader     默认自动关闭reader
+     * @param resolveRef 是否解析引用
+     */
     public static DsonRepository fromDson(DsonReader reader, boolean resolveRef) {
         try (reader) {
             DsonRepository repository = new DsonRepository(Dsons.readTopContainer(reader));
