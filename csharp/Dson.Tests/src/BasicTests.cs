@@ -1,11 +1,15 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Wjybxx.Dson.IO;
 using Wjybxx.Dson.Text;
 
 namespace Wjybxx.Dson.Tests;
 
-public class Program
+/// <summary>
+/// 测试三种Reader/Writer实现之间的等效性
+/// </summary>
+public class BasicTests
 {
+    
     // c#10还不支持 """，因此转为@格式
     private const string DsonString = @"           
             - @{clsName: FileHeader, intro: 预留设计，允许定义文件头}
@@ -45,13 +49,20 @@ public class Program
             -  [ 3, 10010],
             -  [ 4, 10001],
             - ]";
+    
+    [SetUp]
+    public void Setup()
+    {
+        
+    }
 
     /// <summary>
     /// 程序生成的无法保证和手写的文本相同
     /// 但程序反复读写，以及不同方式之间的读写结果应当相同。
     /// </summary>
     /// <param name="args"></param>
-    public static void Main22(string[] args) {
+    [Test]
+    public static void test_equivalenceOfAllReaders() {
         Console.WriteLine(NumberStyles.FixedBinary.ToString(255).Value);
         Console.WriteLine("--------------------------------------------");
         
@@ -92,6 +103,4 @@ public class Program
             }
         }
     }
-    
-    
 }

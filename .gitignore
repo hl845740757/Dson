@@ -21,24 +21,55 @@ target/
 .springBeans
 .sts4-cache
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
+### JetBrains Rider ###
+*.sln.iml
 
-### VS Code ###
-.vscode/
+### Maven ###
+.flattened*
+
+### Visual Studio ###
+# Files built by Visual Studio
+*_i.c
+*_p.c
+*_h.h
+*.ilk
+*.meta
+*.obj
+*.iobj
+*.pch
+*.pdb
+*.ipdb
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.tmp_proj
+*_wpftmp.csproj
+*.log
+*.tlog
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.svclog
+*.scc
+
+# JetBrains Rider
+*.sln.iml
 
 ### Mac OS ###
 .DS_Store
 
-### flatten 用于解决maven多模块版本管理
-.flattened*
-testres/
-/csharp/obj
-csharp/bin/
+### 自定义 ###
+# Java
+java/testres/
+
+# C#
+csharp/Dson/obj
+csharp/Dson/bin
+csharp/Dson.Tests/obj
+csharp/Dson.Tests/bin
