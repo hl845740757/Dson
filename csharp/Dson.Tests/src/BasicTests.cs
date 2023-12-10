@@ -9,7 +9,6 @@ namespace Wjybxx.Dson.Tests;
 /// </summary>
 public class BasicTests
 {
-    
     // c#10还不支持 """，因此转为@格式
     private const string DsonString = @"           
             - @{clsName: FileHeader, intro: 预留设计，允许定义文件头}
@@ -21,7 +20,7 @@ public class BasicTests
             -   intro: ""hello world"",
             -   ref1 : {@ref localId: 10001, ns: 16148b3b4e7b8923d398},
             -   ref2 : @ref 17630eb4f916148b,
-            -   bin : [@bin 0, 35df2e75e6a4be9e6f4571c64cb6d08b],
+            -   bin : [@bin 0, 35df2e75e6a4be9e6f4571c64cb6d08b0d6bc46c1754f6e9eb4a6e57e2fd53],
             - }
             -
             - {@MyStruct
@@ -49,23 +48,17 @@ public class BasicTests
             -  [ 3, 10010],
             -  [ 4, 10001],
             - ]";
-    
+
     [SetUp]
-    public void Setup()
-    {
-        
+    public void Setup() {
     }
 
     /// <summary>
     /// 程序生成的无法保证和手写的文本相同
     /// 但程序反复读写，以及不同方式之间的读写结果应当相同。
     /// </summary>
-    /// <param name="args"></param>
     [Test]
     public static void test_equivalenceOfAllReaders() {
-        Console.WriteLine(NumberStyles.FixedBinary.ToString(255).Value);
-        Console.WriteLine("--------------------------------------------");
-        
         DsonArray<string> topContainer1;
         using (IDsonReader<string> reader = new DsonTextReader(DsonTextReaderSettings.Default, DsonString)) {
             topContainer1 = Dsons.ReadTopContainer(reader);

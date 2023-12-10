@@ -209,16 +209,21 @@ public class DsonTextWriter : AbstractDsonWriter<string>
     private void PrintBinary(byte[] buffer, int offset, int length) {
         DsonPrinter printer = this._printer;
         int softLineLength = this._settings.SoftLineLength;
-        int segment = 8; // 分段打印控制行长度；c#的接口不能传buffer
+
+        // 使用小buffer多次编码代替大的buffer，一方面节省内存，一方面控制行长度
+        int segment = 8;
+        Span<char> cBuffer = stackalloc char[segment * 2];
         int loop = length / segment;
         for (int i = 0; i < loop; i++) {
             CheckLineLength(printer, softLineLength, LineHead.AppendLine);
-            printer.PrintFastPath(Convert.ToHexString(buffer, offset + i * segment, segment));
+            DsonTexts.EncodeHex(buffer, offset + i * segment, segment, cBuffer);
+            printer.PrintFastPath(cBuffer);
         }
         int remain = length - loop * segment;
         if (remain > 0) {
             CheckLineLength(printer, softLineLength, LineHead.AppendLine);
-            printer.PrintFastPath(Convert.ToHexString(buffer, offset + loop * segment, remain));
+            DsonTexts.EncodeHex(buffer, offset + loop * segment, remain, cBuffer);
+            printer.PrintFastPath(cBuffer.Slice(0, remain * 2));
         }
     }
 

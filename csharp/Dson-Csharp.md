@@ -4,7 +4,6 @@
 
 为方便用户使用，我提供了**Dsons**工具类，提供了大量的读写Dson的快捷API。
 
-在Dson库中提供了Dsons和DsonLites两个工具类，提供了  
 注意：fromDson默认只读取第一个对象。
 
 ```
@@ -20,13 +19,13 @@ Dsons中的方法默认不解析引用，库提供了简单解析引用的工具
 方式1：fromDson的时候解析引用。
 
 ```
-    DsonRepository repository = DsonRepository.fromDson(dsonString, true);
+    DsonRepository repository = DsonRepository.fromDson(reader, true);
 ```
 
 方式2：需要的时候解析引用。该方式支持手动构建repository。
 
 ```
-    DsonRepository repository = DsonRepository.fromDson(dsonString);
+    DsonRepository repository = DsonRepository.fromDson(reader);
     repository.resolveReference();
 ```
 

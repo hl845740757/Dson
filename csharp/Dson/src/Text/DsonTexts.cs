@@ -19,6 +19,7 @@
 using System.Collections;
 using System.Collections.Immutable;
 using System.Text;
+using Wjybxx.Dson.IO;
 
 namespace Wjybxx.Dson.Text;
 
@@ -62,6 +63,12 @@ public static class DsonTexts
         "null", "undefine",
         "NaN", "Infinity", "-Infinity"
     }.ToImmutableHashSet();
+
+    /** 字节数组转16进制 */
+    private static readonly char[] DigitsUpper = {
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+        'A', 'B', 'C', 'D', 'E', 'F'
+    };
 
     /**
      * 规定哪些不安全较为容易，规定哪些安全反而不容易
@@ -277,6 +284,65 @@ public static class DsonTexts
             }
         }
         return sb.ToString();
+    }
+
+    #endregion
+
+    #region 字节数组
+
+    /** 编码长度固定位 dataLen * 2 */
+    public static void EncodeHex(byte[] data, int dataOffset, int dataLen,
+                                 Span<char> outBuffer) {
+        char[] toDigits = DigitsUpper;
+        for (int i = dataOffset, j = 0; i < dataOffset + dataLen; i++) {
+            outBuffer[j++] = toDigits[(0xF0 & data[i]) >> 4]; // 高4位
+            outBuffer[j++] = toDigits[0x0F & data[i]]; // 低4位
+        }
+    }
+
+    public static byte[] DecodeHex(char[] data) {
+        int dateLen = data.Length;
+        if ((dateLen & 0x01) != 0) {
+            throw new DsonIOException("Odd number of characters.");
+        }
+        byte[] result = new byte[dateLen >> 1];
+        // two characters form the hex value.
+        for (int i = 0, j = 0; j < dateLen; i++) {
+            int f = ToDigit(data[j], j) << 4;
+            j++;
+            f |= ToDigit(data[j], j);
+            j++;
+            result[i] = (byte)(f & 0xFF);
+        }
+        return result;
+    }
+
+    private static int ToDigit(char c, int index) {
+        return c switch {
+            '0' => 0,
+            '1' => 1,
+            '2' => 2,
+            '3' => 3,
+            '4' => 4,
+            '5' => 5,
+            '6' => 6,
+            '7' => 7,
+            '8' => 8,
+            '9' => 9,
+            'a' => 10,
+            'A' => 10,
+            'b' => 11,
+            'B' => 11,
+            'c' => 12,
+            'C' => 12,
+            'd' => 13,
+            'D' => 13,
+            'e' => 14,
+            'E' => 14,
+            'f' => 15,
+            'F' => 15,
+            _ => throw new DsonIOException($"Illegal hexadecimal character {c} at index {index}")
+        };
     }
 
     #endregion

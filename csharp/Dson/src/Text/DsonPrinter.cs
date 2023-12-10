@@ -111,6 +111,12 @@ public class DsonPrinter : IDisposable
     }
 
     /** @param cBuffer 内容中无tab字符 */
+    public void PrintFastPath(ReadOnlySpan<char> cBuffer) {
+        _builder.Append(cBuffer);
+        _column += cBuffer.Length;
+    }
+
+    /** @param cBuffer 内容中无tab字符 */
     public void PrintFastPath(char[] cBuffer) {
         _builder.Append(cBuffer);
         _column += cBuffer.Length;

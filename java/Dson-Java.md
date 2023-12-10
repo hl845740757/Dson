@@ -18,13 +18,13 @@ Dsons和DsonLites中的方法默认不解析引用，库提供了简单解析引
 方式1：fromDson的时候解析引用。
 
 ```
-    DsonRepository repository = DsonRepository.fromDson(dsonString, true);
+    DsonRepository repository = DsonRepository.fromDson(reader, true);
 ```
 
 方式2：需要的时候解析引用。该方式支持手动构建repository。
 
 ```
-    DsonRepository repository = DsonRepository.fromDson(dsonString);
+    DsonRepository repository = DsonRepository.fromDson(reader);
     repository.resolveReference();
 ```
 
