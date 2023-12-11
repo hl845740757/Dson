@@ -1,6 +1,6 @@
 ﻿#region LICENSE
 
-//  Copyright 2023 wjybxx
+//  Copyright 2023 wjybxx(845740757@qq.com)
 // 
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ namespace Wjybxx.Dson.Types;
 /// <summary>
 /// 对象引用
 /// </summary>
-public struct ObjectRef : IEquatable<ObjectRef>
+public readonly struct ObjectRef : IEquatable<ObjectRef>
 {
     public const int MaskNamespace = 1;
     public const int MaskType = 1 << 1;

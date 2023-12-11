@@ -1,6 +1,6 @@
 ﻿#region LICENSE
 
-//  Copyright 2023 wjybxx
+//  Copyright 2023 wjybxx(845740757@qq.com)
 // 
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -530,7 +530,7 @@ public static class Dsons
                 CopyElements<TName>(src, result, stack);
                 return result;
             }
-            case DsonType.Header:{
+            case DsonType.Header: {
                 DsonHeader<TName> src = dsonValue.AsHeader<TName>();
                 DsonHeader<TName> result = new DsonHeader<TName>();
                 CopyKvPair(src, result, stack);

@@ -69,7 +69,5 @@ target/
 java/testres/
 
 # C#
-csharp/Dson/obj
-csharp/Dson/bin
-csharp/Dson.Tests/obj
-csharp/Dson.Tests/bin
+csharp/**/obj/
+csharp/**/bin/

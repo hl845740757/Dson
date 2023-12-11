@@ -1,6 +1,6 @@
 ﻿#region LICENSE
 
-//  Copyright 2023 wjybxx
+//  Copyright 2023 wjybxx(845740757@qq.com)
 // 
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -20,12 +20,12 @@ using System.Globalization;
 using System.Text;
 using Wjybxx.Dson.Text;
 
-namespace Wjybxx.Dson;
+namespace Wjybxx.Dson.Types;
 
 /// <summary>
 /// 带时区偏移的时间戳
 /// </summary>
-public struct OffsetTimestamp : IEquatable<OffsetTimestamp>
+public readonly struct OffsetTimestamp : IEquatable<OffsetTimestamp>
 {
     public const int MaskDate = 1;
     public const int MaskTime = 1 << 1;

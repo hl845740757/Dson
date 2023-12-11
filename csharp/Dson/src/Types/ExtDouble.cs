@@ -1,6 +1,6 @@
 ﻿#region LICENSE
 
-//  Copyright 2023 wjybxx
+//  Copyright 2023 wjybxx(845740757@qq.com)
 // 
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 #endregion
 
-namespace Wjybxx.Dson;
+namespace Wjybxx.Dson.Types;
 
-public struct ExtDouble : IEquatable<ExtDouble>, IComparable<ExtDouble>, IComparable
+public readonly struct ExtDouble : IEquatable<ExtDouble>, IComparable<ExtDouble>, IComparable
 {
     private readonly int _type;
     private readonly bool _hasVal; // 比较时放前面

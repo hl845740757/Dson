@@ -1,6 +1,6 @@
 ﻿#region LICENSE
 
-//  Copyright 2023 wjybxx
+//  Copyright 2023 wjybxx(845740757@qq.com)
 // 
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
 //  limitations under the License.
 
 #endregion
+
+using Wjybxx.Dson.Types;
 
 namespace Wjybxx.Dson;
 

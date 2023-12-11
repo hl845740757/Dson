@@ -1,6 +1,6 @@
 ﻿#region LICENSE
 
-//  Copyright 2023 wjybxx
+//  Copyright 2023 wjybxx(845740757@qq.com)
 // 
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ using Google.Protobuf;
 
 namespace Wjybxx.Dson;
 
-public class DsonReaderUtils
+public static class DsonReaderUtils
 {
     /** 支持读取为bytes和直接写入bytes的数据类型 -- 这些类型不可以存储额外数据在WireType上 */
     public static readonly IList<DsonType> ValueBytesTypes = new[] {

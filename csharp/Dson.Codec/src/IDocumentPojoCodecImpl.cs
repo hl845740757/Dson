@@ -16,15 +16,10 @@
 
 #endregion
 
-namespace Wjybxx.Dson;
+namespace Wjybxx.Dson.Codec;
 
-public abstract class DsonNumber : DsonValue
+public interface IDocumentPojoCodecImpl<T>
 {
-    public abstract int IntValue { get; }
-
-    public abstract long LongValue { get; }
-
-    public abstract float FloatValue { get; }
-
-    public abstract double DoubleValue { get; }
+    /** 即泛型T的类型 */
+    Type EncoderClass { get; }
 }
