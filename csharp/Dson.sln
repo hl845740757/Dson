@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dson-Core", "Dson\Dson.csproj", "{3BD989D7-E9BB-4F2A-86C2-1E7953582518}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dson.Core", "Dson\Dson.csproj", "{3BD989D7-E9BB-4F2A-86C2-1E7953582518}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dson.Tests", "Dson.Tests\Dson.Tests.csproj", "{F23582ED-054E-4EDB-89F4-5E6F1C04B3B2}"
 EndProject

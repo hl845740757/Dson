@@ -26,11 +26,19 @@ namespace Wjybxx.Dson.IO;
 public class DsonOutputs
 {
     public static IDsonOutput NewInstance(byte[] buffer) {
-        return new ArrayDsonOutput(buffer, 0, buffer.Length);
+        return new ArrayDsonOutput(buffer, 0, buffer.Length, 8192);
     }
 
-    public static IDsonOutput NewInstance(byte[] buffer, int offset, int length) {
-        return new ArrayDsonOutput(buffer, offset, length);
+    /// <summary>
+    /// 在字符串较长时，预计算字符串的长度有很大的开销，这种情况下适合先写入buffer，再向前拷贝，连续内存的拷贝通常是很快的。
+    /// </summary>
+    /// <param name="buffer"></param>
+    /// <param name="offset">起始偏移</param>
+    /// <param name="length">有效长度</param>
+    /// <param name="slowPathThreshold">字符串长度大于该值时不预计算长度</param>
+    /// <returns></returns>
+    public static IDsonOutput NewInstance(byte[] buffer, int offset, int length, int slowPathThreshold = 8192) {
+        return new ArrayDsonOutput(buffer, offset, length, slowPathThreshold);
     }
 
     private class ArrayDsonOutput : IDsonOutput
@@ -41,12 +49,14 @@ public class DsonOutputs
 
         private int _bufferPos;
         private int _bufferPosLimit;
+        private int _slowPathThreshold;
 
-        internal ArrayDsonOutput(byte[] buffer, int offset, int length) {
+        internal ArrayDsonOutput(byte[] buffer, int offset, int length, int slowPathThreshold) {
             BinaryUtils.CheckBuffer(buffer, offset, length);
             this._buffer = buffer;
             this._rawOffset = offset;
             this._rawLimit = offset + length;
+            this._slowPathThreshold = slowPathThreshold;
 
             this._bufferPos = offset;
             this._bufferPosLimit = offset + length;
@@ -185,17 +195,34 @@ public class DsonOutputs
 
         public void WriteString(string value) {
             try {
-                // 注意，这里写的编码后的字节长度；而不是字符串长度 -- 提前计算UTF8的长度是很有用的方法
-                int byteCount = Encoding.UTF8.GetByteCount(value);
-                int newPos = BinaryUtils.WriteUint32(_buffer, _bufferPos, byteCount);
-                if (value.Length > 0) {
-                    int lengthUtilLimit = _rawLimit - newPos;
-                    Span<byte> span = new Span<byte>(_buffer, newPos, lengthUtilLimit);
-                    int realByteCount = Encoding.UTF8.GetBytes(value, span);
-                    Debug.Assert(byteCount == realByteCount);
-                    newPos += byteCount;
+                ulong maxByteCount = (ulong)(value.Length * 3);
+                int maxByteCountVarIntSize = BinaryUtils.ComputeUint64Size(maxByteCount);
+                int minByteCountVarIntSize = BinaryUtils.ComputeUInt32Size((uint)value.Length);
+                if (maxByteCountVarIntSize == minByteCountVarIntSize) {
+                    // len占用的字节数是可提前确定的，因此先写入内容的情况下无需向前拷贝
+                    int byteCount = Encoding.UTF8.GetBytes(value, 0, value.Length, _buffer, _bufferPos + minByteCountVarIntSize);
+                    int newPos = BinaryUtils.WriteUint32(_buffer, _bufferPos, byteCount);
+                    _bufferPos = CheckNewBufferPos(newPos + byteCount);
                 }
-                _bufferPos = CheckNewBufferPos(newPos);
+                else if (value.Length > _slowPathThreshold) {
+                    // len占用的字节数不确定，安全起见向后偏移5个字节(varint最多5字节)，写在当前buffer的后面再拷贝回来，避免创建额外的buffer
+                    int byteCount = Encoding.UTF8.GetBytes(value, 0, value.Length, _buffer, _bufferPos + 5);
+                    int newPos = BinaryUtils.WriteUint32(_buffer, _bufferPos, byteCount);
+                    Array.Copy(_buffer, _bufferPos + 5, _buffer, newPos, byteCount);
+                    _bufferPos = CheckNewBufferPos(newPos + byteCount);
+                }
+                else {
+                    // 注意，这里写的编码后的字节长度；而不是字符串长度 -- 提前计算UTF8的长度是很有用的方法
+                    int byteCount = Encoding.UTF8.GetByteCount(value);
+                    int newPos = BinaryUtils.WriteUint32(_buffer, _bufferPos, byteCount);
+                    if (value.Length > 0) {
+                        CheckNewBufferPos(newPos + byteCount);
+                        //  如果需要限制buffer访问区域，可使用Span；但这里预计算过，因此是安全的
+                        int realByteCount = Encoding.UTF8.GetBytes(value, 0, value.Length, _buffer, newPos);
+                        Debug.Assert(byteCount == realByteCount);
+                    }
+                    _bufferPos = (newPos + byteCount);
+                }
             }
             catch (Exception e) {
                 throw DsonIOException.Wrap(e);

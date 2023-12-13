@@ -21,7 +21,8 @@ using System.Collections;
 namespace Wjybxx.Dson.Collections;
 
 /// <summary>
-/// C#和Java的迭代器差异较大
+/// C#和Java的迭代器差异较大；虽然写Java的时候更多，但不能说C#的迭代器有问题。
+/// 对于单线程数据结构，先测试是否有数据，再Move体验更好；而对于并发数据结构，先Move再获取数据则更安全。
 /// </summary>
 /// <typeparam name="TE"></typeparam>
 public class MarkableIterator<TE> : IEnumerator<TE>
@@ -83,7 +84,7 @@ public class MarkableIterator<TE> : IEnumerator<TE>
         }
         bool hasNext = MoveNext();
         if (hasNext) {
-            _bufferIndex--;
+            _bufferIndex--; // 索引虽然减了，但数据保存在了Buffer中
         }
         // 还原
         _current = prev;

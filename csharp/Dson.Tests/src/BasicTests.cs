@@ -114,4 +114,20 @@ public class BasicTests
             }
         }
     }
+
+    [Test]
+    public static void test_longStringCodec() {
+        byte[] data = new byte[5200]; // 超过8192
+        Random.Shared.NextBytes(data);
+        string hexString = Convert.ToHexString(data);
+
+        byte[] buffer = new byte[16 * 1024];
+        IDsonOutput output = DsonOutputs.NewInstance(buffer);
+        output.WriteString(hexString);
+        
+        
+        IDsonInput input = DsonInputs.NewInstance(buffer, 0, output.Position);
+        string string2 = input.ReadString();
+        Debug.Assert(hexString == string2);
+    }
 }
