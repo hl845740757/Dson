@@ -19,7 +19,6 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
-using Google.Protobuf;
 
 namespace Wjybxx.Dson.IO;
 
@@ -196,8 +195,8 @@ public class DsonOutputs
         public void WriteString(string value) {
             try {
                 ulong maxByteCount = (ulong)(value.Length * 3);
-                int maxByteCountVarIntSize = BinaryUtils.ComputeUint64Size(maxByteCount);
-                int minByteCountVarIntSize = BinaryUtils.ComputeUInt32Size((uint)value.Length);
+                int maxByteCountVarIntSize = BinaryUtils.ComputeRawVarInt64Size(maxByteCount);
+                int minByteCountVarIntSize = BinaryUtils.ComputeRawVarInt32Size((uint)value.Length);
                 if (maxByteCountVarIntSize == minByteCountVarIntSize) {
                     // len占用的字节数是可提前确定的，因此先写入内容的情况下无需向前拷贝
                     int byteCount = Encoding.UTF8.GetBytes(value, 0, value.Length, _buffer, _bufferPos + minByteCountVarIntSize);
@@ -235,14 +234,6 @@ public class DsonOutputs
 
             Array.Copy(data, offset, _buffer, _bufferPos, length);
             _bufferPos += length;
-        }
-
-        public void WriteMessage(IMessage message) {
-            using (CodedOutputStream stream = new CodedOutputStream(new MemoryStream(_buffer, _bufferPos, SpaceLeft))) {
-                stream.WriteRawMessage(message);
-                stream.Flush();
-                _bufferPos += (int)stream.Position;
-            }
         }
 
         public int Position {

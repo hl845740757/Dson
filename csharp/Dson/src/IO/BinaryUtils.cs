@@ -17,7 +17,6 @@
 #endregion
 
 using System.Runtime.CompilerServices;
-using Google.Protobuf;
 
 namespace Wjybxx.Dson.IO;
 
@@ -165,29 +164,73 @@ public static class BinaryUtils
 
     #endregion
 
+    // 以下参考自protobuf，以避免引入PB
+
+    #region protobuf util
+
+    private const uint IntCodedMask1 = (~0U) << 7; // 低7位0
+    private const uint IntCodedMask2 = (~0U) << 14; // 低14位0
+    private const uint IntCodedMask3 = (~0U) << 21;
+    private const uint IntCodedMask4 = (~0U) << 28;
+
+    private const ulong LongCodedMask1 = (~0UL) << 7;
+    private const ulong LongCodedMask2 = (~0UL) << 14;
+    private const ulong LongCodedMask3 = (~0UL) << 21;
+    private const ulong LongCodedMask4 = (~0UL) << 28;
+    private const ulong LongCodedMask5 = (~0UL) << 35;
+    private const ulong LongCodedMask6 = (~0UL) << 42;
+    private const ulong LongCodedMask7 = (~0UL) << 49;
+    private const ulong LongCodedMask8 = (~0UL) << 56;
+    private const ulong LongCodedMask9 = (~0UL) << 63;
+
+    /// <summary>
+    /// 计算原始的32位变长整形的编码长度
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns>编码长度</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int ComputeRawVarInt32Size(uint value) {
+        if ((value & IntCodedMask1) == 0) return 1; // 所有高位为0
+        if ((value & IntCodedMask2) == 0) return 2;
+        if ((value & IntCodedMask3) == 0) return 3;
+        if ((value & IntCodedMask4) == 0) return 4;
+        return 5;
+    }
+
+    /// <summary>
+    /// 计算原始的64位变长整形的编码长度
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns>编码长度</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int ComputeRawVarInt64Size(ulong value) {
+        if ((value & LongCodedMask1) == 0) return 1; // 所有高位为0
+        if ((value & LongCodedMask2) == 0) return 2;
+        if ((value & LongCodedMask3) == 0) return 3;
+        if ((value & LongCodedMask4) == 0) return 4;
+        if ((value & LongCodedMask5) == 0) return 5;
+        if ((value & LongCodedMask6) == 0) return 6;
+        if ((value & LongCodedMask7) == 0) return 7;
+        if ((value & LongCodedMask8) == 0) return 8;
+        if ((value & LongCodedMask9) == 0) return 9;
+        return 10;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static uint EncodeZigZag32(int n) => (uint)(n << 1 ^ n >> 31);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int DecodeZigZag32(uint n) => (int)(n >> 1) ^ -((int)n & 1);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static ulong EncodeZigZag64(long n) => (ulong)(n << 1 ^ n >> 63);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static long DecodeZigZag64(ulong n) => (long)(n >> 1) ^ -((long)n & 1L);
+
+    #endregion
+
     #region protobuf decode
-
-    // 由于Protobuf在C#端的接口开放较少，我决定不直接使用CodedInputStream和CodedOutputStream，而是自己实现
-
-    /// <summary>
-    /// 计算无符号32位整数(非负数)编码后的长度
-    /// </summary>
-    /// <param name="value"></param>
-    /// <returns>编码长度</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static int ComputeUInt32Size(uint value) {
-        return CodedOutputStream.ComputeRawVarint32Size(value);
-    }
-
-    /// <summary>
-    /// 计算无符号64位整数(非负数)编码后的长度
-    /// </summary>
-    /// <param name="value"></param>
-    /// <returns>编码长度</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static int ComputeUint64Size(ulong value) {
-        return CodedOutputStream.ComputeRawVarint64Size(value);
-    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static int ReadInt32(byte[] buffer, int pos, out int newPos) {
@@ -246,12 +289,6 @@ public static class BinaryUtils
         ulong rawBits = ReadRawFixed64(buffer, pos, out newPos);
         return BitConverter.UInt64BitsToDouble(rawBits);
     }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static int DecodeZigZag32(uint n) => (int)(n >> 1) ^ -((int)n & 1);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static long DecodeZigZag64(ulong n) => (long)(n >> 1) ^ -((long)n & 1L);
 
     /** varint编码不区分int和long，而是固定读取到高位字节为0，因此无需两个方法 */
     private static ulong ReadRawVarint64(byte[] buffer, int pos, out int newPos) {
@@ -414,12 +451,6 @@ public static class BinaryUtils
         buffer[pos + 7] = (byte)(value >> 56);
         return pos + 8;
     }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static uint EncodeZigZag32(int n) => (uint)(n << 1 ^ n >> 31);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static ulong EncodeZigZag64(long n) => (ulong)(n << 1 ^ n >> 63);
 
     #endregion
 }

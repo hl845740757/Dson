@@ -18,7 +18,6 @@
 
 using Wjybxx.Dson.IO;
 using Wjybxx.Dson.Types;
-using Google.Protobuf;
 
 namespace Wjybxx.Dson;
 
@@ -207,10 +206,6 @@ public class DsonBinaryReader<TName> : AbstractDsonReader<TName> where TName : I
 
     protected override void DoSkipToEndOfObject() {
         DsonReaderUtils.SkipToEndOfObject(_input);
-    }
-
-    protected override T DoReadMessage<T>(int binaryType, MessageParser<T> parser) {
-        return DsonReaderUtils.ReadMessage(_input, binaryType, parser);
     }
 
     protected override byte[] DoReadValueAsBytes() {

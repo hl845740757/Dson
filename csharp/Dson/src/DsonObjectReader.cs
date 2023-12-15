@@ -20,7 +20,6 @@ using System.Collections;
 using Wjybxx.Dson.Collections;
 using Wjybxx.Dson.IO;
 using Wjybxx.Dson.Types;
-using Google.Protobuf;
 
 namespace Wjybxx.Dson;
 
@@ -290,13 +289,6 @@ public class DsonObjectReader<TName> : AbstractDsonReader<TName> where TName : I
             context._objectIterator!.ForEachRemaining(_ => { });
         }
     }
-
-    protected override T DoReadMessage<T>(int binaryType, MessageParser<T> parser) {
-        DsonBinary dsonBinary = (DsonBinary)PopNextValue();
-        if (dsonBinary == null) throw new InvalidOperationException();
-        return parser.ParseFrom(dsonBinary.Data);
-    }
-
 
     protected override byte[] DoReadValueAsBytes() {
         throw new InvalidOperationException("Unsupported operation");

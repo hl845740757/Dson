@@ -17,7 +17,6 @@
 #endregion
 
 using Wjybxx.Dson.Types;
-using Google.Protobuf;
 
 namespace Wjybxx.Dson;
 
@@ -194,17 +193,6 @@ public interface IDsonReader<TName> : IDisposable where TName : IEquatable<TName
     /// 也就是说，调用该方法后应立即调用 ReadEnd 相关方法
     /// </summary>
     void SkipToEndOfObject();
-
-    /// <summary>
-    /// 读取一个protobuf消息
-    /// 只有当前数据是Binary的时候才合法
-    /// </summary>
-    /// <param name="name">字段名</param>
-    /// <param name="binaryType">期望的二进制子类型，校验</param>
-    /// <param name="parser">消息解析器</param>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
-    T ReadMessage<T>(TName name, int binaryType, MessageParser<T> parser) where T : IMessage<T>;
 
     /// <summary>
     /// 将value的值读取为字节数组

@@ -19,7 +19,6 @@
 using Wjybxx.Dson.IO;
 using Wjybxx.Dson.Text;
 using Wjybxx.Dson.Types;
-using Google.Protobuf;
 
 namespace Wjybxx.Dson;
 
@@ -204,12 +203,6 @@ public class DsonBinaryWriter<TName> : AbstractDsonWriter<TName> where TName : I
     #endregion
 
     #region 特殊
-
-    protected override void DoWriteMessage(int binaryType, IMessage messageLite) {
-        IDsonOutput output = this._output;
-        WriteFullTypeAndCurrentName(output, DsonType.Binary, 0);
-        DsonReaderUtils.WriteMessage(output, binaryType, messageLite);
-    }
 
     protected override void DoWriteValueBytes(DsonType type, byte[] data) {
         IDsonOutput output = this._output;

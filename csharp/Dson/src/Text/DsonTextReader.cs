@@ -21,7 +21,6 @@ using System.Globalization;
 using System.Text;
 using Wjybxx.Dson.IO;
 using Wjybxx.Dson.Types;
-using Google.Protobuf;
 
 namespace Wjybxx.Dson.Text;
 
@@ -898,14 +897,6 @@ public class DsonTextReader : AbstractDsonReader<string>
             }
         }
         throw new InvalidOperationException("Assert Exception");
-    }
-
-    protected override T DoReadMessage<T>(int binaryType, MessageParser<T> parser) {
-        DsonBinary dsonBinary = (DsonBinary)PopNextValue() ?? throw new InvalidOperationException();
-        if (dsonBinary.Type != binaryType) {
-            throw DsonIOException.UnexpectedSubType(binaryType, dsonBinary.Type);
-        }
-        return parser.ParseFrom(dsonBinary.Data);
     }
 
     protected override byte[] DoReadValueAsBytes() {

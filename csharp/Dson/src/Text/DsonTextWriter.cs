@@ -19,7 +19,6 @@
 using System.Diagnostics;
 using Wjybxx.Dson.IO;
 using Wjybxx.Dson.Types;
-using Google.Protobuf;
 
 namespace Wjybxx.Dson.Text;
 
@@ -545,10 +544,6 @@ public class DsonTextWriter : AbstractDsonWriter<string>
             printer.Print(' ');
         }
         SetNextState();
-    }
-
-    protected override void DoWriteMessage(int binaryType, IMessage message) {
-        DoWriteBinary(new DsonBinary(binaryType, message.ToByteArray()));
     }
 
     protected override void DoWriteValueBytes(DsonType type, byte[] data) {

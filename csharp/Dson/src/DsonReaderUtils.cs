@@ -19,7 +19,6 @@
 using System.Collections.Immutable;
 using Wjybxx.Dson.IO;
 using Wjybxx.Dson.Types;
-using Google.Protobuf;
 
 namespace Wjybxx.Dson;
 
@@ -219,14 +218,14 @@ public static class DsonReaderUtils
     #region binary
 
     public static void WriteBinary(IDsonOutput output, DsonBinary binary) {
-        int sizeOfBinaryType = BinaryUtils.ComputeUInt32Size((uint)binary.Type);
+        int sizeOfBinaryType = BinaryUtils.ComputeRawVarInt32Size((uint)binary.Type);
         output.WriteFixed32(sizeOfBinaryType + binary.Data.Length);
         output.WriteUint32(binary.Type);
         output.WriteRawBytes(binary.Data);
     }
 
     public static void WriteBinary(IDsonOutput output, int type, DsonChunk chunk) {
-        int sizeOfBinaryType = BinaryUtils.ComputeUInt32Size((uint)type);
+        int sizeOfBinaryType = BinaryUtils.ComputeRawVarInt32Size((uint)type);
         output.WriteFixed32(sizeOfBinaryType + chunk.Length);
         output.WriteUint32(type);
         output.WriteRawBytes(chunk.Buffer, chunk.Offset, chunk.Length);
@@ -243,26 +242,6 @@ public static class DsonReaderUtils
         }
         input.PopLimit(oldLimit);
         return binary;
-    }
-
-    public static void WriteMessage(IDsonOutput output, int binaryType, IMessage messageLite) {
-        int sizeOfBinaryType = CodedOutputStream.ComputeUInt32Size((uint)binaryType);
-        output.WriteFixed32(sizeOfBinaryType + messageLite.CalculateSize()); // CalculateSize，因此这里调用不会增加开销
-        output.WriteUint32(binaryType);
-        output.WriteMessage(messageLite);
-    }
-
-    public static T ReadMessage<T>(IDsonInput input, int binaryType, MessageParser<T> parser) where T : IMessage<T> {
-        int size = input.ReadFixed32();
-        int oldLimit = input.PushLimit(size);
-        T value;
-        {
-            int type = input.ReadUint32();
-            if (type != binaryType) throw DsonIOException.UnexpectedSubType(binaryType, type);
-            value = input.ReadMessage(parser, size - BinaryUtils.ComputeUInt32Size((uint)type));
-        }
-        input.PopLimit(oldLimit);
-        return value;
     }
 
     #endregion

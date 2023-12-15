@@ -19,7 +19,6 @@
 using Wjybxx.Dson.IO;
 using Wjybxx.Dson.Text;
 using Wjybxx.Dson.Types;
-using Google.Protobuf;
 
 namespace Wjybxx.Dson;
 
@@ -167,10 +166,6 @@ public class DsonObjectWriter<TName> : AbstractDsonWriter<TName> where TName : I
     #endregion
 
     #region 特殊
-
-    protected override void DoWriteMessage(int binaryType, IMessage message) {
-        DoWriteBinary(new DsonBinary(binaryType, message.ToByteArray()));
-    }
 
     protected override void DoWriteValueBytes(DsonType type, byte[] data) {
         throw new InvalidOperationException("Unsupported operation");

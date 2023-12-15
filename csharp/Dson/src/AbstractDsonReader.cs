@@ -19,7 +19,6 @@
 using System.Diagnostics;
 using Wjybxx.Dson.IO;
 using Wjybxx.Dson.Types;
-using Google.Protobuf;
 
 namespace Wjybxx.Dson;
 
@@ -471,14 +470,6 @@ public abstract class AbstractDsonReader<TName> : IDsonReader<TName> where TName
         Debug.Assert(_currentDsonType == DsonType.EndOfObject);
     }
 
-    public T ReadMessage<T>(TName name, int binaryType, MessageParser<T> parser) where T : IMessage<T> {
-        if (parser == null) throw new ArgumentNullException(nameof(parser));
-        AdvanceToValueState(name, DsonType.Binary);
-        T value = DoReadMessage(binaryType, parser);
-        SetNextState();
-        return value;
-    }
-
     public byte[] ReadValueAsBytes(TName name) {
         AdvanceToValueState(name, DsonTypes.Invalid);
         DsonReaderUtils.CheckReadValueAsBytes(_currentDsonType);
@@ -504,8 +495,6 @@ public abstract class AbstractDsonReader<TName> : IDsonReader<TName> where TName
     protected abstract void DoSkipValue();
 
     protected abstract void DoSkipToEndOfObject();
-
-    protected abstract T DoReadMessage<T>(int binaryType, MessageParser<T> parser) where T : IMessage<T>;
 
     protected abstract byte[] DoReadValueAsBytes();
 

@@ -19,7 +19,6 @@
 using Wjybxx.Dson.IO;
 using Wjybxx.Dson.Text;
 using Wjybxx.Dson.Types;
-using Google.Protobuf;
 
 namespace Wjybxx.Dson;
 
@@ -161,15 +160,6 @@ public interface IDsonWriter<in TName> : IDisposable where TName : IEquatable<TN
         textWrite.WriteString(DsonHeaders.NamesClassName, clsName, StringStyle.AutoQuote);
         textWrite.WriteEndHeader();
     }
-
-    /// <summary>
-    /// 向Writer中写入一个Protobuf的Message
-    /// (Message最终会写为Binary)
-    /// </summary>
-    /// <param name="name">字段名字</param>
-    /// <param name="binaryType">对应的二进制子类型</param>
-    /// <param name="message">pb消息</param>
-    void WriteMessage(TName name, int binaryType, IMessage message);
 
     /// <summary>
     /// 直接写入一个已编码的字节数组

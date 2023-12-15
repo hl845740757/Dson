@@ -16,7 +16,6 @@
 
 #endregion
 
-using Google.Protobuf;
 
 namespace Wjybxx.Dson.IO;
 
@@ -80,22 +79,6 @@ public interface IDsonInput : IDisposable
     /// </summary>
     /// <param name="n">要跳过的字节数；0安全</param>
     void SkipRawBytes(int n);
-
-    /// <summary>
-    /// 从输入中读取一个protobuf消息
-    /// 1.只读取message的内容部分，不包含长度信息
-    /// 2.该方法用于避免创建临时的字节数组
-    /// 
-    /// <code>
-    ///    byte[] data = input.readRawBytes(len);
-    ///    return parser.parseFrom(data);
-    /// </code>
-    /// </summary>
-    /// <param name="parser">消息的解析器</param>
-    /// <param name="len">消息的长度</param>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
-    T ReadMessage<T>(MessageParser<T> parser, int len) where T : IMessage<T>;
 
     #endregion
 

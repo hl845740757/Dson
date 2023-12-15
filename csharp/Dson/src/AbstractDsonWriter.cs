@@ -19,7 +19,6 @@
 using Wjybxx.Dson.IO;
 using Wjybxx.Dson.Text;
 using Wjybxx.Dson.Types;
-using Google.Protobuf;
 
 namespace Wjybxx.Dson;
 
@@ -337,13 +336,6 @@ public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName> where TName
         textWrite.WriteEndHeader();
     }
 
-    public void WriteMessage(TName name, int binaryType, IMessage message) {
-        Dsons.CheckSubType(binaryType);
-        AdvanceToValueState(name);
-        DoWriteMessage(binaryType, message);
-        SetNextState();
-    }
-
     public void WriteValueBytes(TName name, DsonType type, byte[] data) {
         DsonReaderUtils.CheckWriteValueAsBytes(type);
         AdvanceToValueState(name);
@@ -358,8 +350,6 @@ public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName> where TName
     public object Attachment() {
         return _context._userData;
     }
-
-    protected abstract void DoWriteMessage(int binaryType, IMessage message);
 
     protected abstract void DoWriteValueBytes(DsonType type, byte[] data);
 

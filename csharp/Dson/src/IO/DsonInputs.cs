@@ -18,7 +18,6 @@
 
 using System.Runtime.CompilerServices;
 using System.Text;
-using Google.Protobuf;
 
 namespace Wjybxx.Dson.IO;
 
@@ -214,13 +213,6 @@ public class DsonInputs
             if (n < 0) throw new ArgumentException(nameof(n));
             if (n == 0) return;
             Position += n;
-        }
-
-        public T ReadMessage<T>(MessageParser<T> parser, int len) where T : IMessage<T> {
-            CheckNewBufferPos(_bufferPos + len);
-            T message = parser.ParseFrom(_buffer, _bufferPos, len);
-            _bufferPos += len;
-            return message;
         }
 
         //

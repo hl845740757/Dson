@@ -16,8 +16,6 @@
 
 #endregion
 
-using Google.Protobuf;
-
 namespace Wjybxx.Dson.IO;
 
 /// <summary>
@@ -86,19 +84,6 @@ public interface IDsonOutput : IDisposable
     /// 仅写入内容，不会写入数组的长度
     /// </summary>
     void WriteRawBytes(byte[] data, int offset, int length);
-
-    /// <summary>
-    /// 写入一个Protobuf消息
-    /// 1.只写入message的内容部分，不包含长度信息
-    /// 2.该方法用于避免创建临时的字节数组
-    ///
-    /// <code>
-    ///    byte[] data = message.toByteArray();
-    ///    output.writeRawBytes(data);
-    /// </code>
-    /// </summary>
-    /// <param name="message"></param>
-    void WriteMessage(IMessage message);
 
     #endregion
 
