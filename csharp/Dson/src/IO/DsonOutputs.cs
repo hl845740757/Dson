@@ -25,19 +25,11 @@ namespace Wjybxx.Dson.IO;
 public class DsonOutputs
 {
     public static IDsonOutput NewInstance(byte[] buffer) {
-        return new ArrayDsonOutput(buffer, 0, buffer.Length, 8192);
+        return new ArrayDsonOutput(buffer, 0, buffer.Length);
     }
 
-    /// <summary>
-    /// 在字符串较长时，预计算字符串的长度有很大的开销，这种情况下适合先写入buffer，再向前拷贝，连续内存的拷贝通常是很快的。
-    /// </summary>
-    /// <param name="buffer"></param>
-    /// <param name="offset">起始偏移</param>
-    /// <param name="length">有效长度</param>
-    /// <param name="slowPathThreshold">字符串长度大于该值时不预计算长度</param>
-    /// <returns></returns>
-    public static IDsonOutput NewInstance(byte[] buffer, int offset, int length, int slowPathThreshold = 8192) {
-        return new ArrayDsonOutput(buffer, offset, length, slowPathThreshold);
+    public static IDsonOutput NewInstance(byte[] buffer, int offset, int length) {
+        return new ArrayDsonOutput(buffer, offset, length);
     }
 
     private class ArrayDsonOutput : IDsonOutput
@@ -48,14 +40,12 @@ public class DsonOutputs
 
         private int _bufferPos;
         private int _bufferPosLimit;
-        private int _slowPathThreshold;
 
-        internal ArrayDsonOutput(byte[] buffer, int offset, int length, int slowPathThreshold) {
+        internal ArrayDsonOutput(byte[] buffer, int offset, int length) {
             BinaryUtils.CheckBuffer(buffer, offset, length);
             this._buffer = buffer;
             this._rawOffset = offset;
             this._rawLimit = offset + length;
-            this._slowPathThreshold = slowPathThreshold;
 
             this._bufferPos = offset;
             this._bufferPosLimit = offset + length;
@@ -73,9 +63,9 @@ public class DsonOutputs
             return newBufferPos;
         }
 
-        private int SpaceLeft => _bufferPosLimit - _bufferPos;
-
         #endregion
+
+        #region basic
 
         public void WriteRawByte(byte value) {
             CheckNewBufferPos(_bufferPos + 1);
@@ -194,20 +184,13 @@ public class DsonOutputs
 
         public void WriteString(string value) {
             try {
-                ulong maxByteCount = (ulong)(value.Length * 3);
+                ulong maxByteCount = (ulong)(value.Length * 3L);
                 int maxByteCountVarIntSize = BinaryUtils.ComputeRawVarInt64Size(maxByteCount);
                 int minByteCountVarIntSize = BinaryUtils.ComputeRawVarInt32Size((uint)value.Length);
                 if (maxByteCountVarIntSize == minByteCountVarIntSize) {
-                    // len占用的字节数是可提前确定的，因此先写入内容的情况下无需向前拷贝
+                    // len占用的字节数是可提前确定的，因此无需额外的字节数计算，可直接编码
                     int byteCount = Encoding.UTF8.GetBytes(value, 0, value.Length, _buffer, _bufferPos + minByteCountVarIntSize);
                     int newPos = BinaryUtils.WriteUint32(_buffer, _bufferPos, byteCount);
-                    _bufferPos = CheckNewBufferPos(newPos + byteCount);
-                }
-                else if (value.Length > _slowPathThreshold) {
-                    // len占用的字节数不确定，安全起见向后偏移5个字节(varint最多5字节)，写在当前buffer的后面再拷贝回来，避免创建额外的buffer
-                    int byteCount = Encoding.UTF8.GetBytes(value, 0, value.Length, _buffer, _bufferPos + 5);
-                    int newPos = BinaryUtils.WriteUint32(_buffer, _bufferPos, byteCount);
-                    Array.Copy(_buffer, _bufferPos + 5, _buffer, newPos, byteCount);
                     _bufferPos = CheckNewBufferPos(newPos + byteCount);
                 }
                 else {
@@ -236,6 +219,12 @@ public class DsonOutputs
             _bufferPos += length;
         }
 
+        #endregion
+
+        #region sp
+
+        public int SpaceLeft => _bufferPosLimit - _bufferPos;
+
         public int Position {
             get => _bufferPos - _rawOffset;
             set {
@@ -253,8 +242,10 @@ public class DsonOutputs
         public void SetFixedInt32(int pos, int value) {
             BinaryUtils.CheckBuffer(_rawLimit - _rawOffset, pos, 4);
             int bufferPos = _rawOffset + pos;
-            BinaryUtils.SetIntLe(_buffer, bufferPos, value);
+            BinaryUtils.SetIntLE(_buffer, bufferPos, value);
         }
+
+        #endregion
 
         public void Flush() {
         }

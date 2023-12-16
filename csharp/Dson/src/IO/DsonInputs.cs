@@ -67,6 +67,8 @@ public class DsonInputs
 
         #endregion
 
+        #region basic
+        
         public byte ReadRawByte() {
             CheckNewBufferPos(_bufferPos + 1);
             return _buffer[_bufferPos++];
@@ -209,13 +211,15 @@ public class DsonInputs
             return bytes;
         }
 
-        public virtual void SkipRawBytes(int n) {
+        public void SkipRawBytes(int n) {
             if (n < 0) throw new ArgumentException(nameof(n));
             if (n == 0) return;
-            Position += n;
+            _bufferPos = CheckNewBufferPos(_bufferPos + n);
         }
+        #endregion
 
-        //
+        #region sp
+
         public int Position {
             get => _bufferPos - _rawOffset;
             set {
@@ -233,7 +237,7 @@ public class DsonInputs
         public int GetFixed32(int pos) {
             BinaryUtils.CheckBuffer(_rawLimit - _rawOffset, pos, 4);
             int bufferPos = _rawOffset + pos;
-            return BinaryUtils.GetIntLe(_buffer, bufferPos);
+            return BinaryUtils.GetIntLE(_buffer, bufferPos);
         }
 
         public int PushLimit(int byteLimit) {
@@ -257,6 +261,8 @@ public class DsonInputs
 
         public bool IsAtEnd() => _bufferPos >= _bufferPosLimit;
 
+        #endregion
+        
         public void Dispose() {
         }
     }

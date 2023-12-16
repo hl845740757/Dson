@@ -116,31 +116,31 @@ public static class BinaryUtils
 
     #region 小端编码
 
-    public static void SetShortLe(byte[] buffer, int index, int value) {
+    public static void SetShortLE(byte[] buffer, int index, int value) {
         buffer[index] = (byte)value;
         buffer[index + 1] = (byte)(value >> 8);
     }
 
-    public static short GetShortLe(byte[] buffer, int index) {
+    public static short GetShortLE(byte[] buffer, int index) {
         return (short)((buffer[index] & 0xff)
                        | (buffer[index + 1] << 8));
     }
 
-    public static void SetIntLe(byte[] buffer, int index, int value) {
+    public static void SetIntLE(byte[] buffer, int index, int value) {
         buffer[index] = (byte)value;
         buffer[index + 1] = (byte)(value >> 8);
         buffer[index + 2] = (byte)(value >> 16);
         buffer[index + 3] = (byte)(value >> 24);
     }
 
-    public static int GetIntLe(byte[] buffer, int index) {
+    public static int GetIntLE(byte[] buffer, int index) {
         return (((buffer[index] & 0xff))
                 | ((buffer[index + 1] & 0xff) << 8)
                 | ((buffer[index + 2] & 0xff) << 16)
                 | ((buffer[index + 3] & 0xff) << 24));
     }
 
-    public static void SetLongLe(byte[] buffer, int index, long value) {
+    public static void SetLongLE(byte[] buffer, int index, long value) {
         buffer[index] = (byte)value;
         buffer[index + 1] = (byte)(value >> 8);
         buffer[index + 2] = (byte)(value >> 16);
@@ -151,7 +151,7 @@ public static class BinaryUtils
         buffer[index + 7] = (byte)(value >> 56);
     }
 
-    public static long GetLongLe(byte[] buffer, int index) {
+    public static long GetLongLE(byte[] buffer, int index) {
         return (((buffer[index] & 0xffL))
                 | ((buffer[index + 1] & 0xffL) << 8)
                 | ((buffer[index + 2] & 0xffL) << 16)
@@ -241,7 +241,7 @@ public static class BinaryUtils
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static long ReadInt64(byte[] buffer, int pos, out int newPos) {
         ulong rawBits = ReadRawVarint64(buffer, pos, out newPos);
-        return (int)rawBits;
+        return (long)rawBits;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -292,10 +292,16 @@ public static class BinaryUtils
 
     /** varint编码不区分int和long，而是固定读取到高位字节为0，因此无需两个方法 */
     private static ulong ReadRawVarint64(byte[] buffer, int pos, out int newPos) {
-        int shift = 0;
-        ulong r = 0;
+        // 单字节优化
+        byte b = buffer[pos++];
+        ulong r = b & 127UL;
+        if (b < 128U) {
+            newPos = pos;
+            return r;
+        }
+        int shift = 7;
         do {
-            byte b = buffer[pos++];
+            b = buffer[pos++];
             r |= (b & 127UL) << shift; // 取后7位左移
             if (b < 128U) { // 高位0
                 newPos = pos;
@@ -395,7 +401,7 @@ public static class BinaryUtils
     /// <param name="pos">开始写入的位置</param>
     /// <param name="value">要写入的值</param>
     /// <returns>写入后的新坐标</returns>
-    public static int WriteRawVarint64(byte[] buffer, int pos, ulong value) {
+    private static int WriteRawVarint64(byte[] buffer, int pos, ulong value) {
         if (value < 128UL) { // 小数值较多的情况下有意义
             buffer[pos] = (byte)value;
             return pos + 1;
@@ -413,8 +419,12 @@ public static class BinaryUtils
     }
 
     /// <summary>
-    /// 注意：该方法只可以在value为非负数的情况下可调用，外部在转换数据类型的时候要注意
+    /// 写入一个变长的32位整数
     /// </summary>
+    /// <param name="buffer"></param>
+    /// <param name="pos">开始写入的位置</param>
+    /// <param name="value">要写入的值</param>
+    /// <returns>写入后的新坐标</returns>
     private static int WriteRawVarint32(byte[] buffer, int pos, uint value) {
         if (value < 128U) { // 小数值较多的情况下有意义
             buffer[pos] = (byte)value;
