@@ -25,6 +25,7 @@ import java.nio.Buffer;
  * @author wjybxx
  * date 2023/3/31
  */
+@SuppressWarnings("unused")
 public class BinaryUtils {
 
     private BinaryUtils() {
