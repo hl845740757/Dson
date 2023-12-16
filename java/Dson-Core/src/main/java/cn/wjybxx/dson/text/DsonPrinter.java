@@ -35,6 +35,7 @@ public final class DsonPrinter implements AutoCloseable {
 
     private final Writer writer;
     private final String lineSeparator;
+    private final int extraIndent;
     private final boolean autoClose;
 
     /** 行缓冲，减少同步写操作 */
@@ -45,9 +46,16 @@ public final class DsonPrinter implements AutoCloseable {
     private String headLabel;
     private int column;
 
-    public DsonPrinter(Writer writer, String lineSeparator, boolean autoClose) {
+    /**
+     * @param writer        底层输出流
+     * @param lineSeparator 换行符
+     * @param extraIndent   外部控制的额外缩进
+     * @param autoClose     是否自动关闭持有的writer
+     */
+    public DsonPrinter(Writer writer, String lineSeparator, int extraIndent, boolean autoClose) {
         this.writer = Objects.requireNonNull(writer);
         this.lineSeparator = Objects.requireNonNull(lineSeparator);
+        this.extraIndent = extraIndent;
         this.autoClose = autoClose;
     }
 
@@ -68,18 +76,14 @@ public final class DsonPrinter implements AutoCloseable {
 
     /** 当前行内容的长度 */
     public int getContentLength() {
-        return headLabel == null ? column : column - headLabel.length() - 1;
+        if (headLabel == null) {
+            return (column - extraIndent);
+        }
+        return (column - extraIndent - headLabel.length() - 1); // 1 是label后的缩进
     }
 
     public Writer getWriter() {
         return writer;
-    }
-
-    /** 勿在输出过程中调整 */
-    public void setIndent(int indent) {
-        if (indent < 0) throw new IllegalArgumentException();
-        this.indent = indent;
-        updateIndent();
     }
 
     // region 普通打印
@@ -254,20 +258,24 @@ public final class DsonPrinter implements AutoCloseable {
         column += indent;
     }
 
-    /** 打印缩进，可指定一个偏移量 */
-    public void printIndent(int offset) {
-        int len = indent - offset;
-        if (len <= 0) {
-            throw new IllegalArgumentException("invalid offset, indent: %d, offset: %d".formatted(indent, offset));
-        }
-        builder.append(indentionArray, offset, len);
-        column += len;
-    }
-
     /** 打印一个空格 */
     public void printSpace() {
         builder.append(' ');
         column += 1;
+    }
+
+    /** 打印指定数量的空格 */
+    public void printSpace(int count) {
+        if (count < 0) throw new IllegalArgumentException();
+        if (count == 0) return;
+        if (count <= indentionArray.length) {
+            builder.append(indentionArray, 0, count);
+        } else {
+            char[] chars = new char[count];
+            Arrays.fill(chars, ' ');
+            builder.append(chars);
+        }
+        column += count;
     }
 
     /** 当前的缩进长度 */

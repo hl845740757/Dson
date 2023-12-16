@@ -28,7 +28,7 @@ public class DsonTextWriterSettings : DsonWriterSettings
     public readonly float LengthFactorOfText;
     public readonly bool UnicodeChar;
     public readonly int MaxLengthOfUnquoteString;
-    public readonly int InitIndent;
+    public readonly int ExtraIndent;
 
     public DsonTextWriterSettings(Builder builder) : base(builder) {
         this.LineSeparator = builder.LineSeparator;
@@ -40,7 +40,7 @@ public class DsonTextWriterSettings : DsonWriterSettings
         this.LengthFactorOfText = builder.LengthFactorOfText;
         this.UnicodeChar = builder.UnicodeChar;
         this.MaxLengthOfUnquoteString = builder.MaxLengthOfUnquoteString;
-        this.InitIndent = Math.Max(0, builder.InitIndent);
+        this.ExtraIndent = Math.Max(0, builder.ExtraIndent);
     }
 
     public static readonly DsonTextWriterSettings Default;
@@ -92,8 +92,8 @@ public class DsonTextWriterSettings : DsonWriterSettings
          * 自动模式下无引号字符串的最大长度
          */
         public int MaxLengthOfUnquoteString = 66;
-        /** 初始缩进空格数 */
-        public int InitIndent;
+        /** 外层额外缩进 */
+        public int ExtraIndent;
 
         public Builder() {
         }

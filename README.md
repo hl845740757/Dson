@@ -36,46 +36,29 @@ PS：Dson的文本格式从设计到最终实现大概2个月时间，尝试了�
 
 ## 文本示例(标准)
 
-以下代码来自 DsonTextReaderTest2.java
+下面文本非手写，由程序读取手写文本格式化后输出。  
+(可运行测试用例 `DsonTextReaderTest2.java`)
 
 ```
-   # 输入文本
-   - {@{clsName:MyClassInfo, guid :10001, flags: 0}
-   -   name : wjybxx,
-   -   age: 28,
-   -   pos :{@Vector3 x: 0, y: 0, z: 0},
-   -   address: [
-   -     beijing,
-   -     chengdu
-   -   ],
-   -   intro: @ss
-   |   我是wjybxx，是一个游戏开发者，Dson是我设计的文档型数据表达法，
-   | 你可以通过github联系到我。
-   -   thanks
-   ~   , url: @ss https://www.github.com/hl845740757
-   ~   , time: {@dt date: 2023-06-17, time: 18:37:00, millis: 100, offset: +08:00}
-   - }
-    
-   # 程序读取后输出
-   - {@{clsName: MyClassInfo, guid: 10001, flags: 0}
-   -   name: wjybxx,
-   -   age: 28,
-   -   pos: {@Vector3
-   -     x: 0,
-   -     y: 0,
-   -     z: 0
-   -   },
-   -   address: [
-   -     beijing,
-   -     chengdu
-   -   ],
-   -   intro: @ss   我是wjybxx，是一个游戏开发者，Dson是我设计的文档型数据表达
-   | 法，你可以通过github联系到我。
-   -   thanks
-   ~ , url: "https://www.github.com/hl845740757",
-   -   time: {@dt date: 2023-06-17, time: 18:37:00, millis: 100, 
-   - offset: +08:00}
-   - }
+  - {@{clsName: MyClassInfo, guid: 10001, flags: 0}
+  -   name: wjybxx,
+  -   age: 28,
+  -   pos: {@Vector3
+  -     x: 0,
+  -     y: 0,
+  -     z: 0
+  -   },
+  -   address: [
+  -     beijing,
+  -     chengdu
+  -   ],
+  -   intro: @ss   我是wjybxx，是一个游戏开发者，Dson是我设计的文档型数据表达法，你可以通
+  | 过github联系到我。
+  -   thanks
+  ~ , url: "https://www.github.com/hl845740757",
+  -   time: {@dt date: 2023-06-17, time: 18:37:00, millis: 100, 
+  - offset: +08:00}
+  - }
 ```
 
 ## 文本示例(宽松)

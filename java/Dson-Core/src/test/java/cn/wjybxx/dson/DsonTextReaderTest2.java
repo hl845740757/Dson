@@ -34,10 +34,19 @@ public class DsonTextReaderTest2 {
     void test() {
         DsonObject<String> dsonObject = Dsons.fromDson(dsonString).asObject();
         String dsonString2 = Dsons.toDson(dsonObject, ObjectStyle.INDENT, DsonTextWriterSettings.newBuilder()
-                .setSoftLineLength(50)
+                .setExtraIndent(2)
+                .setSoftLineLength(58)
                 .setLengthFactorOfText(1)
                 .build());
+        System.out.println("Mode:" + DsonMode.STANDARD);
         System.out.println(dsonString2);
+
+        System.out.println();
+        System.out.println("Mode:" + DsonMode.RELAXED);
+        System.out.println(Dsons.toDson(dsonObject, ObjectStyle.INDENT, DsonTextWriterSettings.newBuilder()
+                .setDsonMode(DsonMode.RELAXED)
+                .setExtraIndent(2)
+                .build()));
 
         DsonScanner scanner = Dsons.newStreamScanner(new StringReader(dsonString2));
         try (DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.DEFAULT, scanner)) {
@@ -46,12 +55,6 @@ public class DsonTextReaderTest2 {
             Assertions.assertEquals(dsonObject, dsonObject2);
             Assertions.assertEquals(dsonObject, dsonObject3);
         }
-
-//        System.out.println();
-//        System.out.println(Dsons.toDson(dsonObject, ObjectStyle.INDENT, DsonTextWriterSettings.newBuilder()
-//                .setDsonMode(DsonMode.RELAXED)
-//                .setInitIndent(2)
-//                .build()));
     }
 
 }

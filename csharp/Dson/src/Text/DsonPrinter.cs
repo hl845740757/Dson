@@ -26,21 +26,30 @@ public class DsonPrinter : IDisposable
 #nullable disable
     private readonly TextWriter _writer;
     private readonly string _lineSeparator;
+    private readonly int _extraIndent;
     private readonly bool _autoClose;
 
     /** 行缓冲，减少同步写操作 */
     private readonly StringBuilder _builder = new StringBuilder(150);
-    private char[] _indentionArray = new char[0];
+    private char[] _indentionArray = Array.Empty<char>();
     private int _indent = 0;
 
     private string _headLabel;
     private int _column;
 #nullable enable
 
-    public DsonPrinter(TextWriter writer, string lineSeparator, bool autoClose) {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="writer"></param>
+    /// <param name="lineSeparator">换行符</param>
+    /// <param name="extraIndent">外层额外缩进</param>
+    /// <param name="autoClose">是否自动关闭底层writer</param>
+    public DsonPrinter(TextWriter writer, string lineSeparator, int extraIndent, bool autoClose) {
         this._writer = writer;
         this._lineSeparator = lineSeparator;
         this._autoClose = autoClose;
+        this._extraIndent = extraIndent;
     }
 
     /** 当前列数 */
@@ -53,16 +62,16 @@ public class DsonPrinter : IDisposable
     public bool HasContent => ContentLength > 0;
 
     /** 当前行内容的长度 */
-    public int ContentLength => _headLabel == null ? _column : _column - _headLabel.Length - 1;
+    public int ContentLength {
+        get {
+            if (_headLabel == null) {
+                return _column - _extraIndent;
+            }
+            return _column - _extraIndent - _headLabel.Length - 1; // 1 是label后的缩进
+        }
+    }
 
     public TextWriter Writer => _writer;
-    
-    /** 勿在输出过程中调整 */
-    public void SetIndent(int indent) {
-        if (indent < 0) throw new ArgumentException();
-        this._indent = indent;
-        UpdateIndent();
-    }
 
     #region 普通打印
 
@@ -259,20 +268,25 @@ public class DsonPrinter : IDisposable
         _column += _indent;
     }
 
-    /** 打印缩进，可指定一个偏移量 */
-    public void PrintIndent(int offset) {
-        int len = _indent - offset;
-        if (len <= 0) {
-            throw new ArgumentException($"invalid offset, indent: {_indent}, offset: {offset}");
-        }
-        _builder.Append(_indentionArray, offset, len);
-        _column += len;
-    }
-
     /** 打印一个空格 */
     public void PrintSpace() {
         _builder.Append(' ');
         _column += 1;
+    }
+
+    /** 打印多个空格 */
+    public void PrintSpace(int count) {
+        if (count < 0) throw new ArgumentException(nameof(count));
+        if (count == 0) return;
+        if (count <= _indentionArray.Length) {
+            _builder.Append(_indentionArray, 0, count);
+        }
+        else {
+            char[] chars = new char[count];
+            Array.Fill(chars, ' ');
+            _builder.Append(chars);
+        }
+        _column += count;
     }
 
     /** 当前的缩进长度 */

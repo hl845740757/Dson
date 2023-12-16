@@ -34,8 +34,7 @@ public class DsonTextWriter : AbstractDsonWriter<string>
         : base(settings) {
         this._settings = settings;
         this._writer = writer;
-        this._printer = new DsonPrinter(writer, settings.LineSeparator, settings.AutoClose);
-        this._printer.SetIndent(settings.InitIndent);
+        this._printer = new DsonPrinter(writer, settings.LineSeparator, settings.ExtraIndent, settings.AutoClose);
         SetContext(new Context().Init(null, DsonContextType.TopLevel, DsonTypes.Invalid));
     }
 
@@ -65,9 +64,16 @@ public class DsonTextWriter : AbstractDsonWriter<string>
 
     private void WriteCurrentName(DsonPrinter printer, DsonType dsonType) {
         Context context = GetContext();
-        // 打印元素前先检查是否打印了行首
-        if (printer.HeadLabel == null) {
-            PrintLineHead(LineHead.AppendLine);
+        // 打印元素前先检查是否打印了行首和外部缩进
+        if (_settings.DsonMode == DsonMode.Standard) {
+            if (printer.HeadLabel == null) {
+                PrintLineHead(LineHead.AppendLine);
+            }
+        }
+        else {
+            if (printer.Column < _settings.ExtraIndent) {
+                printer.PrintSpace(_settings.ExtraIndent - printer.Column);
+            }
         }
         // header与外层对象无缩进，且是匿名属性 -- 如果打印多个header，将保持连续
         if (dsonType == DsonType.Header) {
@@ -85,9 +91,10 @@ public class DsonTextWriter : AbstractDsonWriter<string>
             PrintLineHead(LineHead.AppendLine);
         }
         if (context._style == ObjectStyle.Indent) {
-            if (context._count > 0 && printer.ContentLength < printer.IndentLength()) {
-                // 当前字符数小于缩进也不换行，但首个字段需要换行
-                printer.PrintIndent(printer.ContentLength);
+            bool hasElement = context._count > 0 || context._headerCount > 0;
+            if (hasElement && printer.ContentLength < printer.IndentLength()) {
+                // 当前行是纯文本结束行，文本结束位置尚未到达缩进，不换行
+                printer.PrintSpace(printer.IndentLength() - printer.ContentLength);
             }
             else if (printer.HasContent) {
                 // 当前行有内容了才换行缩进
@@ -235,6 +242,9 @@ public class DsonTextWriter : AbstractDsonWriter<string>
     }
 
     private void PrintLineHead(LineHead lineHead) {
+        if (_settings.ExtraIndent > 0) {
+            _printer.PrintSpace(_settings.ExtraIndent);
+        }
         if (_settings.DsonMode == DsonMode.Standard) {
             _printer.PrintHead(lineHead);
         }
@@ -490,10 +500,6 @@ public class DsonTextWriter : AbstractDsonWriter<string>
         Context newContext = NewContext(GetContext(), contextType, dsonType);
         newContext._style = style;
 
-        // 顶层元素需要自行缩进
-        if (GetContext()._contextType == DsonContextType.TopLevel) {
-            printer.PrintIndent();
-        }
         printer.PrintFastPath(contextType.GetStartSymbol()!);
         if (style == ObjectStyle.Indent) {
             printer.Indent(); // 调整缩进

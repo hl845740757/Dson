@@ -45,8 +45,7 @@ public class DsonTextWriter extends AbstractDsonWriter {
         super(settings);
         this.settings = settings;
         this.writer = writer;
-        this.printer = new DsonPrinter(writer, settings.lineSeparator, settings.autoClose);
-        this.printer.setIndent(settings.initIndent);
+        this.printer = new DsonPrinter(writer, settings.lineSeparator, settings.extraIndent, settings.autoClose);
         setContext(new Context().init(null, DsonContextType.TOP_LEVEL, null));
     }
 
@@ -85,10 +84,17 @@ public class DsonTextWriter extends AbstractDsonWriter {
 
     private void writeCurrentName(DsonPrinter printer, DsonType dsonType) {
         Context context = getContext();
-        // 打印元素前先检查是否打印了行首
-        if (printer.getHeadLabel() == null) {
-            printLineHead(LineHead.APPEND_LINE);
+        // 打印元素前先检查是否打印了行首和外部缩进
+        if (settings.dsonMode == DsonMode.STANDARD) {
+            if (printer.getHeadLabel() == null) {
+                printLineHead(LineHead.APPEND_LINE);
+            }
+        } else {
+            if (printer.getColumn() < settings.extraIndent) {
+                printer.printSpace(settings.extraIndent - printer.getColumn());
+            }
         }
+
         // header与外层对象无缩进，且是匿名属性 -- 如果打印多个header，将保持连续
         if (dsonType == DsonType.HEADER) {
             assert context.count == 0;
@@ -105,9 +111,10 @@ public class DsonTextWriter extends AbstractDsonWriter {
             printLineHead(LineHead.APPEND_LINE);
         }
         if (context.style == ObjectStyle.INDENT) {
-            if (context.count > 0 && printer.getContentLength() < printer.indentLength()) {
-                // 当前字符数小于缩进也不换行，但首个字段需要换行
-                printer.printIndent(printer.getContentLength());
+            boolean hasElement = context.count > 0 || context.headerCount > 0;
+            if (hasElement && printer.getContentLength() < printer.indentLength()) {
+                // 当前行是纯文本结束行，文本结束位置尚未到达缩进，不换行
+                printer.printSpace(printer.indentLength() - printer.getContentLength());
             } else if (printer.hasContent()) {
                 // 当前行有内容了才换行缩进
                 printer.println();
@@ -243,6 +250,9 @@ public class DsonTextWriter extends AbstractDsonWriter {
     }
 
     private void printLineHead(LineHead lineHead) {
+        if (settings.extraIndent > 0) {
+            printer.printSpace(settings.extraIndent);
+        }
         if (settings.dsonMode == DsonMode.STANDARD) {
             printer.printHead(lineHead);
         }
@@ -509,10 +519,6 @@ public class DsonTextWriter extends AbstractDsonWriter {
         Context newContext = newContext(getContext(), contextType, dsonType);
         newContext.style = style;
 
-        // 顶层元素需要自行缩进
-        if (getContext().contextType == DsonContextType.TOP_LEVEL) {
-            printer.printIndent();
-        }
         printer.printFastPath(contextType.startSymbol);
         if (style == ObjectStyle.INDENT) {
             printer.indent(); // 调整缩进
