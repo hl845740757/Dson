@@ -5,12 +5,18 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>cn.wjybxx.dson</groupId>
-    <artifactId>dson-core</artifactId>
-    <version>1.1.0</version>
+    <artifactId>dson-parent</artifactId>
+    <version>${revision}</version>
+    <packaging>pom</packaging>_
 
-    <name>Dson-Core</name>
+    <name>Dson-Parent</name>
     <description>有点奇怪的配置文件格式和序列化方案</description>
     <url>https://github.com/hl845740757/Dson</url>
+
+    <modules>
+        <module>Dson-Core</module>
+        <module>Dson-ProtoBuf</module>
+    </modules>
 
     <!-- 证书 -->
     <licenses>
@@ -42,6 +48,7 @@
     </developers>
 
     <properties>
+        <revision>1.2.0</revision>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -81,6 +88,8 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.google.code.findbugs/jsr305 -->
+
         <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
         <dependency>
             <groupId>commons-io</groupId>
@@ -90,23 +99,16 @@
         </dependency>
 
         <!-- 运行时依赖 -->
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>jsr305</artifactId>
+            <version>${jsr305.version}</version>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>${commons-lang3.version}</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->
-        <dependency>
-            <groupId>com.google.protobuf</groupId>
-            <artifactId>protobuf-java</artifactId>
-            <version>${pb.version}</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/com.google.code.findbugs/jsr305 -->
-        <dependency>
-            <groupId>com.google.code.findbugs</groupId>
-            <artifactId>jsr305</artifactId>
-            <version>${jsr305.version}</version>
         </dependency>
     </dependencies>
 

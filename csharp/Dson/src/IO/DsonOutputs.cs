@@ -197,7 +197,7 @@ public class DsonOutputs
                     // 注意，这里写的编码后的字节长度；而不是字符串长度 -- 提前计算UTF8的长度是很有用的方法
                     int byteCount = Encoding.UTF8.GetByteCount(value);
                     int newPos = BinaryUtils.WriteUint32(_buffer, _bufferPos, byteCount);
-                    if (value.Length > 0) {
+                    if (byteCount > 0) {
                         CheckNewBufferPos(newPos + byteCount);
                         //  如果需要限制buffer访问区域，可使用Span；但这里预计算过，因此是安全的
                         int realByteCount = Encoding.UTF8.GetBytes(value, 0, value.Length, _buffer, newPos);
