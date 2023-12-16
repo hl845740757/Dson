@@ -7,7 +7,7 @@
     <groupId>cn.wjybxx.dson</groupId>
     <artifactId>dson-parent</artifactId>
     <version>${revision}</version>
-    <packaging>pom</packaging>_
+    <packaging>pom</packaging>
 
     <name>Dson-Parent</name>
     <description>有点奇怪的配置文件格式和序列化方案</description>
@@ -48,7 +48,7 @@
     </developers>
 
     <properties>
-        <revision>1.2.0</revision>
+        <revision>1.2.rc2</revision>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -115,6 +115,32 @@
 
     <build>
         <plugins>
+            <!-- 模块版本同步 -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <version>1.5.0</version>
+                <configuration>
+                    <updatePomFile>true</updatePomFile>
+                    <flattenMode>resolveCiFriendliesOnly</flattenMode>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>flatten</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>flatten</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>flatten.clean</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <!-- 指定参数-parameters，否则test目录下文件编译异常 -->
             <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-compiler-plugin -->
             <plugin>
@@ -189,7 +215,7 @@
                         <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-gpg-plugin -->
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>3.0.1</version>
+                        <version>3.1.0</version>
                         <executions>
                             <execution>
                                 <!-- id与mvn setting.xml的 gpg 配置中的 id 对应-->
@@ -201,7 +227,6 @@
                             </execution>
                         </executions>
                     </plugin>
-
                     <!-- maven部署相关插件 -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
