@@ -187,7 +187,8 @@ public class DsonTextWriter extends AbstractDsonWriter {
             printer.printEscaped(text.charAt(i), unicodeChar);
             if (printer.getColumn() >= softLineLength && (i + 1 < length)) {
                 printer.println();
-                printLineHead(LineHead.APPEND);
+                // 字符串不能在非标准模式下打印额外缩进
+                printLineHead(LineHead.APPEND, settings.dsonMode == DsonMode.STANDARD);
             }
         }
         printer.print('"');
@@ -197,7 +198,9 @@ public class DsonTextWriter extends AbstractDsonWriter {
     private void printText(String text) {
         int softLineLength = settings.softLineLength;
         DsonPrinter printer = this.printer;
-        printer.printFastPath("@ss "); // 开始符
+        printer.printFastPath("@ss"); // 开始符
+        printer.println(); // 换一行开始更直观
+        printLineHead(LineHead.APPEND);
         for (int i = 0, length = text.length(); i < length; i++) {
             char c = text.charAt(i);
             // 要执行文本中的换行符
@@ -251,6 +254,15 @@ public class DsonTextWriter extends AbstractDsonWriter {
 
     private void printLineHead(LineHead lineHead) {
         if (settings.extraIndent > 0) {
+            printer.printSpace(settings.extraIndent);
+        }
+        if (settings.dsonMode == DsonMode.STANDARD) {
+            printer.printHead(lineHead);
+        }
+    }
+
+    private void printLineHead(LineHead lineHead, boolean printExtraIndent) {
+        if (printExtraIndent && settings.extraIndent > 0) {
             printer.printSpace(settings.extraIndent);
         }
         if (settings.dsonMode == DsonMode.STANDARD) {

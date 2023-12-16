@@ -178,7 +178,8 @@ public class DsonTextWriter : AbstractDsonWriter<string>
             printer.PrintEscaped(text[i], unicodeChar);
             if (printer.Column >= softLineLength && (i + 1 < length)) {
                 printer.Println();
-                PrintLineHead(LineHead.Append);
+                // 字符串不能在非标准模式下打印额外缩进
+                PrintLineHead(LineHead.Append, _settings.DsonMode == DsonMode.Standard);
             }
         }
         printer.Print('"');
@@ -188,7 +189,9 @@ public class DsonTextWriter : AbstractDsonWriter<string>
     private void PrintText(string text) {
         int softLineLength = _settings.SoftLineLength;
         DsonPrinter printer = this._printer;
-        printer.PrintFastPath("@ss "); // 开始符
+        printer.PrintFastPath("@ss"); // 开始符
+        printer.Println(); // 换一行开始更直观
+        PrintLineHead(LineHead.Append);
         for (int i = 0, length = text.Length; i < length; i++) {
             char c = text[i];
             // 要执行文本中的换行符
@@ -241,8 +244,8 @@ public class DsonTextWriter : AbstractDsonWriter<string>
         }
     }
 
-    private void PrintLineHead(LineHead lineHead) {
-        if (_settings.ExtraIndent > 0) {
+    private void PrintLineHead(LineHead lineHead, bool printExtraIndent = true) {
+        if (printExtraIndent && _settings.ExtraIndent > 0) {
             _printer.PrintSpace(_settings.ExtraIndent);
         }
         if (_settings.DsonMode == DsonMode.Standard) {
