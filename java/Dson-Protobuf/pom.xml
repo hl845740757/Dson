@@ -8,6 +8,7 @@
         <artifactId>dson-parent</artifactId>
         <version>${revision}</version>
     </parent>
+    <!-- 发现弄成大写了，已发布出去了，不改了... -->
     <artifactId>Dson-ProtoBuf</artifactId>
 
     <name>Dson-ProtoBuf</name>
