@@ -35,6 +35,7 @@ public class DsonTextWriter : AbstractDsonWriter<string>
         this._settings = settings;
         this._writer = writer;
         this._printer = new DsonPrinter(writer, settings.LineSeparator, settings.AutoClose);
+        this._printer.SetIndent(settings.InitIndent);
         SetContext(new Context().Init(null, DsonContextType.TopLevel, DsonTypes.Invalid));
     }
 
@@ -489,6 +490,10 @@ public class DsonTextWriter : AbstractDsonWriter<string>
         Context newContext = NewContext(GetContext(), contextType, dsonType);
         newContext._style = style;
 
+        // 顶层元素需要自行缩进
+        if (GetContext()._contextType == DsonContextType.TopLevel) {
+            printer.PrintIndent();
+        }
         printer.PrintFastPath(contextType.GetStartSymbol()!);
         if (style == ObjectStyle.Indent) {
             printer.Indent(); // 调整缩进

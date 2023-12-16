@@ -75,6 +75,13 @@ public final class DsonPrinter implements AutoCloseable {
         return writer;
     }
 
+    /** 勿在输出过程中调整 */
+    public void setIndent(int indent) {
+        if (indent < 0) throw new IllegalArgumentException();
+        this.indent = indent;
+        updateIndent();
+    }
+
     // region 普通打印
 
     /**

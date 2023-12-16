@@ -56,6 +56,13 @@ public class DsonPrinter : IDisposable
     public int ContentLength => _headLabel == null ? _column : _column - _headLabel.Length - 1;
 
     public TextWriter Writer => _writer;
+    
+    /** 勿在输出过程中调整 */
+    public void SetIndent(int indent) {
+        if (indent < 0) throw new ArgumentException();
+        this._indent = indent;
+        UpdateIndent();
+    }
 
     #region 普通打印
 

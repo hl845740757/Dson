@@ -39,6 +39,7 @@ public class DsonTextWriterSettings extends DsonWriterSettings {
     public final float lengthFactorOfText;
     public final boolean unicodeChar;
     public final int maxLengthOfUnquoteString;
+    public final int initIndent;
 
     private DsonTextWriterSettings(Builder builder) {
         super(builder);
@@ -51,6 +52,7 @@ public class DsonTextWriterSettings extends DsonWriterSettings {
         this.lengthFactorOfText = builder.lengthFactorOfText;
         this.unicodeChar = builder.unicodeChar;
         this.maxLengthOfUnquoteString = builder.maxLengthOfUnquoteString;
+        this.initIndent = Math.max(0, builder.initIndent);
     }
 
     public static Builder newBuilder() {
@@ -91,6 +93,8 @@ public class DsonTextWriterSettings extends DsonWriterSettings {
          * 自动模式下无引号字符串的最大长度
          */
         private int maxLengthOfUnquoteString = 66;
+        /** 初始缩进字符数 */
+        private int initIndent;
 
         private Builder() {
         }
@@ -163,6 +167,14 @@ public class DsonTextWriterSettings extends DsonWriterSettings {
             return this;
         }
 
+        public int getInitIndent() {
+            return initIndent;
+        }
+
+        public Builder setInitIndent(int initIndent) {
+            this.initIndent = initIndent;
+            return this;
+        }
     }
 
 }

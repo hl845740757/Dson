@@ -46,6 +46,12 @@ public class DsonTextReaderTest2 {
             Assertions.assertEquals(dsonObject, dsonObject2);
             Assertions.assertEquals(dsonObject, dsonObject3);
         }
+
+//        System.out.println();
+//        System.out.println(Dsons.toDson(dsonObject, ObjectStyle.INDENT, DsonTextWriterSettings.newBuilder()
+//                .setDsonMode(DsonMode.RELAXED)
+//                .setInitIndent(2)
+//                .build()));
     }
 
 }

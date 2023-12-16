@@ -46,6 +46,7 @@ public class DsonTextWriter extends AbstractDsonWriter {
         this.settings = settings;
         this.writer = writer;
         this.printer = new DsonPrinter(writer, settings.lineSeparator, settings.autoClose);
+        this.printer.setIndent(settings.initIndent);
         setContext(new Context().init(null, DsonContextType.TOP_LEVEL, null));
     }
 
@@ -508,6 +509,10 @@ public class DsonTextWriter extends AbstractDsonWriter {
         Context newContext = newContext(getContext(), contextType, dsonType);
         newContext.style = style;
 
+        // 顶层元素需要自行缩进
+        if (getContext().contextType == DsonContextType.TOP_LEVEL) {
+            printer.printIndent();
+        }
         printer.printFastPath(contextType.startSymbol);
         if (style == ObjectStyle.INDENT) {
             printer.indent(); // 调整缩进

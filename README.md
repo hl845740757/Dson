@@ -83,22 +83,22 @@ PS：Dson的文本格式从设计到最终实现大概2个月时间，尝试了�
 下面文本非手写，由上面的文本格式化输出得到 -- dson的java和csharp库都支持无行首输出。
 
 ```
-	{@{clsName: MyClassInfo, guid: 10001, flags: 0}
-	  name: wjybxx,
-	  age: 28,
-	  pos: {@Vector3
-		x: 0,
-		y: 0,
-		z: 0
-	  },
-	  address: [
-		beijing,
-		chengdu
-	  ],
-	  intro: "  我是wjybxx，是一个游戏开发者，Dson是我设计的文档型数据表达法，你可以通过github联系到我。\n  thanks",
-	  url: "https://www.github.com/hl845740757",
-	  time: {@dt date: 2023-06-17, time: 18:37:00, millis: 100, offset: +08:00}
-	}
+  {@{clsName: MyClassInfo, guid: 10001, flags: 0}
+    name: wjybxx,
+    age: 28,
+    pos: {@Vector3
+      x: 0,
+      y: 0,
+      z: 0
+    },
+    address: [
+      beijing,
+      chengdu
+    ],
+    intro: "  我是wjybxx，是一个游戏开发者，Dson是我设计的文档型数据表达法，你可以通过github联系到我。\n  thanks",
+    url: "https://www.github.com/hl845740757",
+    time: {@dt date: 2023-06-17, time: 18:37:00, millis: 100, offset: +08:00}
+  }
 ```
 
 ## 行首
