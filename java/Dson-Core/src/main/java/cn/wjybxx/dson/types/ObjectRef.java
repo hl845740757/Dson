@@ -18,7 +18,6 @@ package cn.wjybxx.dson.types;
 
 import cn.wjybxx.dson.DsonLites;
 import cn.wjybxx.dson.internal.DsonInternals;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.concurrent.Immutable;
 import java.util.Objects;
@@ -61,15 +60,15 @@ public final class ObjectRef {
     }
 
     public boolean isEmpty() {
-        return StringUtils.isBlank(namespace) && StringUtils.isBlank(localId);
+        return DsonInternals.isBlank(namespace) && DsonInternals.isBlank(localId);
     }
 
     public boolean hasLocalId() {
-        return !StringUtils.isBlank(localId);
+        return !DsonInternals.isBlank(localId);
     }
 
     public boolean hasNamespace() {
-        return !StringUtils.isBlank(namespace);
+        return !DsonInternals.isBlank(namespace);
     }
 
     public String getLocalId() {

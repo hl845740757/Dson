@@ -17,7 +17,6 @@
 package cn.wjybxx.dson.text;
 
 import cn.wjybxx.dson.internal.DsonInternals;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Objects;
@@ -183,7 +182,7 @@ public class DsonScanner implements AutoCloseable {
             }
             className = sb.toString();
         }
-        if (StringUtils.isBlank(className)) {
+        if (DsonInternals.isBlank(className)) {
             throw invalidClassName(className, getPosition());
         }
         return className;

@@ -17,6 +17,7 @@
 package cn.wjybxx.dson.text;
 
 import cn.wjybxx.dson.*;
+import cn.wjybxx.dson.internal.CommonsLang3;
 import cn.wjybxx.dson.internal.DsonInternals;
 import cn.wjybxx.dson.io.DsonIOException;
 import cn.wjybxx.dson.types.ObjectRef;
@@ -438,7 +439,7 @@ public class DsonTextReader extends AbstractDsonReader {
         return switch (headerToken.castAsString()) {
             case DsonTexts.LABEL_BINARY -> {
                 Tuple2 tuple2 = scanTuple2(context);
-                byte[] data = DsonTexts.decodeHex(tuple2.value.toCharArray());
+                byte[] data = CommonsLang3.decodeHex(tuple2.value.toCharArray());
                 pushNextValue(new DsonBinary(tuple2.type, data));
                 yield DsonType.BINARY;
             }

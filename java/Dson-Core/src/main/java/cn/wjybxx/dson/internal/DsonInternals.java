@@ -16,9 +16,6 @@
 
 package cn.wjybxx.dson.internal;
 
-import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.math.NumberUtils;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
@@ -45,27 +42,27 @@ public class DsonInternals {
         }
     }
 
-    // region properties
-
-    public static int getInt(Properties properties, String key, int def) {
-        String v = properties.getProperty(key);
-        return NumberUtils.toInt(v, def);
+    // region string
+    public static int length(CharSequence cs) {
+        return cs == null ? 0 : cs.length();
     }
 
-    public static long getLong(Properties properties, String key, long def) {
-        String v = properties.getProperty(key);
-        return NumberUtils.toLong(v, def);
+    public static boolean isEmpty(CharSequence cs) {
+        return cs == null || cs.isEmpty();
     }
 
-    public static boolean getBool(Properties properties, String key, boolean def) {
-        String v = properties.getProperty(key);
-        return v != null ? BooleanUtils.toBoolean(v) : def;
+    public static boolean isBlank(CharSequence cs) {
+        final int strLen = length(cs);
+        if (strLen == 0) {
+            return true;
+        }
+        for (int i = 0; i < strLen; i++) {
+            if (!Character.isWhitespace(cs.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
     }
-
-    public static String getString(Properties properties, String key, String def) {
-        return properties.getProperty(key, def);
-    }
-
     // endregion
 
     // region bits
@@ -81,28 +78,6 @@ public class DsonInternals {
     // endregion
 
     // region collection
-
-    /**
-     * 删除指定位置的元素，可以选择是否保持列表中元素的顺序，当不需要保持顺序时可以对删除性能进行优化
-     * 注意：应当小心使用该特性，能够使用该特性的场景不多，应当慎之又慎。
-     *
-     * @param ordered 是否保持之前的顺序。
-     * @return 删除的元素
-     */
-    public static <E> E removeAt(List<E> list, int index, boolean ordered) {
-        if (ordered) {
-            return list.remove(index);
-        } else {
-            // 将最后一个元素赋值到要删除的位置，然后删除最后一个
-            final E deleted = list.get(index);
-            final int tailIndex = list.size() - 1;
-            if (index < tailIndex) {
-                list.set(index, list.get(tailIndex));
-            }
-            list.remove(tailIndex);
-            return deleted;
-        }
-    }
 
     /** 使用“==”判断元素是否存在 */
     public static boolean containsRef(List<?> list, Object element) {
@@ -144,16 +119,6 @@ public class DsonInternals {
         return true;
     }
 
-    /** 使用“==”删除对象 */
-    public static boolean removeRef(List<?> list, Object element, boolean ordered) {
-        final int index = indexOfRef(list, element);
-        if (index < 0) {
-            return false;
-        }
-        removeAt(list, index, ordered);
-        return true;
-    }
-
     @Nonnull
     public static <E> List<E> toImmutableList(@Nullable Collection<E> src) {
         return (src == null || src.isEmpty()) ? List.of() : List.copyOf(src);
@@ -188,7 +153,7 @@ public class DsonInternals {
 
     /** @throws NoSuchElementException 如果map为空 */
     public static <K> K firstKey(Map<K, ?> map) {
-        // JDK21支持查询FirstKey
+        // JDK21支持查询FirstKey，但jdk21太新了，我使用jdk17可能都有项目无法引入
         if (map instanceof SortedMap<K, ?> sortedMap) {
             return sortedMap.firstKey();
         } else {

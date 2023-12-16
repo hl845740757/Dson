@@ -23,7 +23,6 @@ import com.google.protobuf.ExtensionRegistryLite;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Parser;
 
-import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Objects;
@@ -37,7 +36,7 @@ public class DsonProtobufInputs {
     /** 缓存有助于性能 */
     private static final ExtensionRegistryLite EMPTY_REGISTRY = ExtensionRegistryLite.getEmptyRegistry();
 
-    public static DsonProtobufInput newInstance(@Nonnull byte[] buffer) {
+    public static DsonProtobufInput newInstance(byte[] buffer) {
         return new ArrayInput(buffer);
     }
 
@@ -191,7 +190,7 @@ public class DsonProtobufInputs {
         }
 
         @Override
-        public <T> T readMessage(@Nonnull Parser<T> parser) {
+        public <T> T readMessage(Parser<T> parser) {
             try {
                 return parser.parseFrom(codedInputStream, EMPTY_REGISTRY);
             } catch (InvalidProtocolBufferException e) {

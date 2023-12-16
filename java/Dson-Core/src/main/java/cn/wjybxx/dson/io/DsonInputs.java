@@ -16,9 +16,9 @@
 
 package cn.wjybxx.dson.io;
 
-import org.apache.commons.lang3.mutable.MutableInt;
 
-import javax.annotation.Nonnull;
+import cn.wjybxx.dson.types.MutableInt;
+
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -29,7 +29,7 @@ import java.nio.charset.StandardCharsets;
  */
 public class DsonInputs {
 
-    public static DsonInput newInstance(@Nonnull byte[] buffer) {
+    public static DsonInput newInstance(byte[] buffer) {
         return new ArrayDsonInput(buffer, 0, buffer.length);
     }
 
@@ -81,7 +81,7 @@ public class DsonInputs {
         public int readInt32() {
             try {
                 int r = BinaryUtils.readInt32(buffer, bufferPos, newPos);
-                bufferPos = checkNewBufferPos(newPos.intValue());
+                bufferPos = checkNewBufferPos(newPos.getValue());
                 return r;
             } catch (Exception e) {
                 throw DsonIOException.wrap(e, "buffer overflow");
@@ -92,7 +92,7 @@ public class DsonInputs {
         public int readUint32() {
             try {
                 int r = BinaryUtils.readUint32(buffer, bufferPos, newPos);
-                bufferPos = checkNewBufferPos(newPos.intValue());
+                bufferPos = checkNewBufferPos(newPos.getValue());
                 return r;
             } catch (Exception e) {
                 throw DsonIOException.wrap(e, "buffer overflow");
@@ -103,7 +103,7 @@ public class DsonInputs {
         public int readSint32() {
             try {
                 int r = BinaryUtils.readSint32(buffer, bufferPos, newPos);
-                bufferPos = checkNewBufferPos(newPos.intValue());
+                bufferPos = checkNewBufferPos(newPos.getValue());
                 return r;
             } catch (Exception e) {
                 throw DsonIOException.wrap(e, "buffer overflow");
@@ -114,7 +114,7 @@ public class DsonInputs {
         public int readFixed32() {
             try {
                 int r = BinaryUtils.readFixed32(buffer, bufferPos, newPos);
-                bufferPos = checkNewBufferPos(newPos.intValue());
+                bufferPos = checkNewBufferPos(newPos.getValue());
                 return r;
             } catch (Exception e) {
                 throw DsonIOException.wrap(e, "buffer overflow");
@@ -125,7 +125,7 @@ public class DsonInputs {
         public long readInt64() {
             try {
                 long r = BinaryUtils.readInt64(buffer, bufferPos, newPos);
-                bufferPos = checkNewBufferPos(newPos.intValue());
+                bufferPos = checkNewBufferPos(newPos.getValue());
                 return r;
             } catch (Exception e) {
                 throw DsonIOException.wrap(e, "buffer overflow");
@@ -136,7 +136,7 @@ public class DsonInputs {
         public long readUint64() {
             try {
                 long r = BinaryUtils.readUint64(buffer, bufferPos, newPos);
-                bufferPos = checkNewBufferPos(newPos.intValue());
+                bufferPos = checkNewBufferPos(newPos.getValue());
                 return r;
             } catch (Exception e) {
                 throw DsonIOException.wrap(e, "buffer overflow");
@@ -147,7 +147,7 @@ public class DsonInputs {
         public long readSint64() {
             try {
                 long r = BinaryUtils.readSint64(buffer, bufferPos, newPos);
-                bufferPos = checkNewBufferPos(newPos.intValue());
+                bufferPos = checkNewBufferPos(newPos.getValue());
                 return r;
             } catch (Exception e) {
                 throw DsonIOException.wrap(e, "buffer overflow");
@@ -158,7 +158,7 @@ public class DsonInputs {
         public long readFixed64() {
             try {
                 long r = BinaryUtils.readFixed64(buffer, bufferPos, newPos);
-                bufferPos = checkNewBufferPos(newPos.intValue());
+                bufferPos = checkNewBufferPos(newPos.getValue());
                 return r;
             } catch (Exception e) {
                 throw DsonIOException.wrap(e, "buffer overflow");
@@ -169,7 +169,7 @@ public class DsonInputs {
         public float readFloat() {
             try {
                 float r = BinaryUtils.readFloat(buffer, bufferPos, newPos);
-                bufferPos = checkNewBufferPos(newPos.intValue());
+                bufferPos = checkNewBufferPos(newPos.getValue());
                 return r;
             } catch (Exception e) {
                 throw DsonIOException.wrap(e, "buffer overflow");
@@ -180,7 +180,7 @@ public class DsonInputs {
         public double readDouble() {
             try {
                 double r = BinaryUtils.readDouble(buffer, bufferPos, newPos);
-                bufferPos = checkNewBufferPos(newPos.intValue());
+                bufferPos = checkNewBufferPos(newPos.getValue());
                 return r;
             } catch (Exception e) {
                 throw DsonIOException.wrap(e, "buffer overflow");
@@ -197,10 +197,10 @@ public class DsonInputs {
         public String readString() {
             try {
                 int len = BinaryUtils.readUint32(buffer, bufferPos, newPos); // 字符串长度
-                checkNewBufferPos(newPos.intValue() + len); // 先检查，避免构建无效字符串
+                checkNewBufferPos(newPos.getValue() + len); // 先检查，避免构建无效字符串
 
-                String r = new String(buffer, newPos.intValue(), len, StandardCharsets.UTF_8);
-                bufferPos = newPos.intValue() + len;
+                String r = new String(buffer, newPos.getValue(), len, StandardCharsets.UTF_8);
+                bufferPos = newPos.getValue() + len;
                 return r;
             } catch (Exception e) {
                 throw DsonIOException.wrap(e, "buffer overflow");

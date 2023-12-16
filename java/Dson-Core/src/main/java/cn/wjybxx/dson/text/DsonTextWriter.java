@@ -17,10 +17,11 @@
 package cn.wjybxx.dson.text;
 
 import cn.wjybxx.dson.*;
+import cn.wjybxx.dson.internal.CommonsLang3;
+import cn.wjybxx.dson.internal.DsonInternals;
 import cn.wjybxx.dson.io.DsonChunk;
 import cn.wjybxx.dson.types.ObjectRef;
 import cn.wjybxx.dson.types.OffsetTimestamp;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.Writer;
 
@@ -222,13 +223,13 @@ public class DsonTextWriter extends AbstractDsonWriter {
         int loop = length / segment;
         for (int i = 0; i < loop; i++) {
             checkLineLength(printer, softLineLength, LineHead.APPEND_LINE);
-            DsonTexts.encodeHex(buffer, offset + i * segment, segment, cBuffer, 0);
+            CommonsLang3.encodeHex(buffer, offset + i * segment, segment, cBuffer, 0);
             printer.printFastPath(cBuffer, 0, cBuffer.length);
         }
         int remain = length - loop * segment;
         if (remain > 0) {
             checkLineLength(printer, softLineLength, LineHead.APPEND_LINE);
-            DsonTexts.encodeHex(buffer, offset + loop * segment, remain, cBuffer, 0);
+            CommonsLang3.encodeHex(buffer, offset + loop * segment, remain, cBuffer, 0);
             printer.printFastPath(cBuffer, 0, remain * 2);
         }
     }
@@ -409,7 +410,7 @@ public class DsonTextWriter extends AbstractDsonWriter {
         DsonPrinter printer = this.printer;
         int softLineLength = this.settings.softLineLength;
         writeCurrentName(printer, DsonType.REFERENCE);
-        if (StringUtils.isBlank(objectRef.getNamespace())
+        if (DsonInternals.isBlank(objectRef.getNamespace())
                 && objectRef.getType() == 0 && objectRef.getPolicy() == 0) {
             printer.printFastPath("@ref "); // 只有localId时简写
             printString(printer, objectRef.getLocalId(), StringStyle.AUTO_QUOTE);

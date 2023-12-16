@@ -23,6 +23,7 @@ namespace Wjybxx.Dson;
 internal static class DsonInternals
 {
     //c#居然没有一开始就支持逻辑右移...C#11提供了逻辑右移，但目前.NET6是主流
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int LogicalShiftRight(int val, int offset) {
         if (offset < 0) throw new ArgumentException("invalid offset " + offset);
         if (offset == 0) return val;
@@ -30,6 +31,7 @@ internal static class DsonInternals
         return (int)(uval >> offset);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static long LogicalShiftRight(long val, int offset) {
         if (offset < 0) throw new ArgumentException("invalid offset " + offset);
         if (offset == 0) return val;
@@ -42,10 +44,12 @@ internal static class DsonInternals
         return (value & mask) == mask;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsDisabled(int value, int mask) {
         return (value & mask) != mask;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsStringKey<TName>() {
         if (typeof(TName) == typeof(string)) {
             return true;
@@ -84,6 +88,7 @@ internal static class DsonInternals
 
     #region 集合Util
 
+    // 将创建我的集合库中的LinkedDictionary
     public static IDictionary<TK, DsonValue> NewLinkedDictionary<TK>(int capacity = 0) {
         return new Dictionary<TK, DsonValue>(capacity);
     }

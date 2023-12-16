@@ -17,12 +17,10 @@
 package cn.wjybxx.dson.text;
 
 import cn.wjybxx.dson.DsonType;
-import cn.wjybxx.dson.io.DsonIOException;
-import org.apache.commons.lang3.math.NumberUtils;
+import cn.wjybxx.dson.internal.CommonsLang3;
 
 import java.util.BitSet;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 /**
  * Dson的文本表示法
@@ -71,12 +69,8 @@ public class DsonTexts {
             "NaN", "Infinity", "-Infinity");
 
     // 正则的性能不好
-    private static final Pattern number_rule = Pattern.compile("^([+-]?\\d+\\.\\d+)|([+-]?\\d+)|([+-]?\\.\\d+)$");
-    private static final Pattern scientific_rule = Pattern.compile("^[+-]?((\\d+\\.?\\d*)|(\\.\\d+))[Ee][+-]?\\d+$");
-
-    private static final char[] DIGITS_UPPER = {
-            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-            'A', 'B', 'C', 'D', 'E', 'F'};
+//    private static final Pattern number_rule = Pattern.compile("^([+-]?\\d+\\.\\d+)|([+-]?\\d+)|([+-]?\\.\\d+)$");
+//    private static final Pattern scientific_rule = Pattern.compile("^[+-]?((\\d+\\.?\\d*)|(\\.\\d+))[Ee][+-]?\\d+$");
 
     /**
      * 规定哪些不安全较为容易，规定哪些安全反而不容易
@@ -171,7 +165,7 @@ public class DsonTexts {
         if (length == 0 || length > 67 + 16) { // 最长也不应该比二进制格式长，16是下划线预留
             return false;
         }
-        return NumberUtils.isParsable(str);
+        return CommonsLang3.isParsable(str);
     }
 
     public static int parseInt(String rawStr) {
@@ -269,58 +263,6 @@ public class DsonTexts {
         return sb.toString();
     }
 
-    // endregion
-
-    // region 字节数组
-    // 修改自commons-codec，避免引入依赖
-
-    public static void encodeHex(final byte[] data, final int dataOffset, final int dataLen,
-                                 final char[] outBuffer, final int outOffset) {
-        char[] toDigits = DIGITS_UPPER;
-        for (int i = dataOffset, j = outOffset; i < dataOffset + dataLen; i++) {
-            outBuffer[j++] = toDigits[(0xF0 & data[i]) >>> 4]; // 高4位
-            outBuffer[j++] = toDigits[0x0F & data[i]]; // 低4位
-        }
-    }
-
-    public static byte[] decodeHex(char[] data) {
-        final int dateLen = data.length;
-        if ((dateLen & 0x01) != 0) {
-            throw new DsonIOException("Odd number of characters.");
-        }
-        byte[] result = new byte[dateLen >> 1];
-        // two characters form the hex value.
-        for (int i = 0, j = 0; j < dateLen; i++) {
-            int f = toDigit(data[j], j) << 4;
-            j++;
-            f = f | toDigit(data[j], j);
-            j++;
-            result[i] = (byte) (f & 0xFF);
-        }
-        return result;
-    }
-
-    private static int toDigit(final char c, final int index) {
-        return switch (c) {
-            case '0' -> 0;
-            case '1' -> 1;
-            case '2' -> 2;
-            case '3' -> 3;
-            case '4' -> 4;
-            case '5' -> 5;
-            case '6' -> 6;
-            case '7' -> 7;
-            case '8' -> 8;
-            case '9' -> 9;
-            case 'a', 'A' -> 10;
-            case 'b', 'B' -> 11;
-            case 'c', 'C' -> 12;
-            case 'd', 'D' -> 13;
-            case 'e', 'E' -> 14;
-            case 'f', 'F' -> 15;
-            default -> throw new DsonIOException("Illegal hexadecimal character " + c + " at index " + index);
-        };
-    }
     // endregion
 
     public static DsonToken clsNameTokenOfType(DsonType dsonType) {

@@ -16,7 +16,8 @@
 
 package cn.wjybxx.dson.io;
 
-import org.apache.commons.lang3.mutable.MutableInt;
+
+import cn.wjybxx.dson.types.MutableInt;
 
 import java.nio.Buffer;
 

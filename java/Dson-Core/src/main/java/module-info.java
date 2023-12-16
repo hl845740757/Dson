@@ -3,7 +3,6 @@
  * date - 2023/6/29
  */
 module dson.core {
-    requires org.apache.commons.lang3;
     requires jsr305;
 
     exports cn.wjybxx.dson;
