@@ -48,7 +48,7 @@ public class FormatTest
                 ExtraIndent = 2,
                 SoftLineLength = 50,
                 TextStringLength = 50,
-                StringAlignLeft = true
+                TextAlignLeft = true
             };
             string dsonString2 = Dsons.ToDson(dsonObject, ObjectStyle.Indent, builder.Build());
             Console.WriteLine("Mode:" + DsonMode.Standard);
