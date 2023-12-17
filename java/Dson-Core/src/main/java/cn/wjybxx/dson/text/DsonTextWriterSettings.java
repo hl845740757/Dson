@@ -30,13 +30,17 @@ public class DsonTextWriterSettings extends DsonWriterSettings {
 
     public static final DsonTextWriterSettings DEFAULT = DsonTextWriterSettings.newBuilder().build();
     public static final DsonTextWriterSettings RELAXED_DEFAULT = DsonTextWriterSettings.newBuilder().setDsonMode(DsonMode.RELAXED).build();
+    private static final int MIN_LINE_LENGTH = 10;
 
     public final String lineSeparator;
-    public final int softLineLength;
     public final DsonMode dsonMode;
+    public final int softLineLength;
 
     public final boolean enableText;
-    public final float lengthFactorOfText;
+    public final float textStringLength;
+    public final boolean textAlignLeft;
+    public final boolean stringAlignLeft;
+
     public final boolean unicodeChar;
     public final int maxLengthOfUnquoteString;
     public final int extraIndent;
@@ -44,12 +48,15 @@ public class DsonTextWriterSettings extends DsonWriterSettings {
     private DsonTextWriterSettings(Builder builder) {
         super(builder);
         this.lineSeparator = Objects.requireNonNull(builder.lineSeparator);
-        this.softLineLength = Math.max(8, builder.softLineLength);
         this.dsonMode = builder.dsonMode;
+        this.softLineLength = Math.max(MIN_LINE_LENGTH, builder.softLineLength);
 
         // 标准模式下才可启用纯文本
         this.enableText = dsonMode == DsonMode.STANDARD && builder.enableText;
-        this.lengthFactorOfText = builder.lengthFactorOfText;
+        this.textStringLength = Math.max(MIN_LINE_LENGTH, builder.textStringLength);
+        this.textAlignLeft = builder.textAlignLeft;
+        this.stringAlignLeft = builder.stringAlignLeft;
+
         this.unicodeChar = builder.unicodeChar;
         this.maxLengthOfUnquoteString = builder.maxLengthOfUnquoteString;
         this.extraIndent = Math.max(0, builder.extraIndent);
@@ -63,6 +70,8 @@ public class DsonTextWriterSettings extends DsonWriterSettings {
 
         /** 行分隔符 */
         private String lineSeparator = System.lineSeparator();
+        /** 文本模式 */
+        private DsonMode dsonMode = DsonMode.STANDARD;
         /**
          * 行长度，该值是一个换行参考值
          * 精确控制行长度较为复杂，那样我们需要考虑每一种值toString后长度超出的问题；
@@ -70,30 +79,28 @@ public class DsonTextWriterSettings extends DsonWriterSettings {
          * 另外，这个行长度是是码元计数，不是字符计数。
          */
         private int softLineLength = 120;
+
         /**
-         * 文本模式
-         */
-        private DsonMode dsonMode = DsonMode.STANDARD;
-        /**
-         * 是否支持纯文本模式
+         * 是否启用纯文本模式
          * 如果{@link #unicodeChar}为true，该值通常需要关闭，text模式不会执行转义，也就不会处理unicode字符
          */
         private boolean enableText = true;
-        /**
-         * 当字符串的长度达到 lineLength  * factor 触发text模式
-         */
-        private float lengthFactorOfText = 2;
+        /** 触发text模式的字符串长度 */
+        private float textStringLength = 120;
+        /** 纯文本换行是否启用左对齐 -- 仅标准模式下生效 */
+        private boolean textAlignLeft = false;
+        /** 普通字符串换行是否启用左对齐 -- 仅标准模式下生效；不适用无引号字符串 */
+        private boolean stringAlignLeft = false;
+
         /**
          * 不可打印的ascii码字符是否转为unicode字符
          * (ascii码32~126以外的字符)
          * 通常用于非UTF8文本的移植
          */
         private boolean unicodeChar = false;
-        /**
-         * 自动模式下无引号字符串的最大长度
-         */
+        /** 自动模式下无引号字符串的最大长度 -- 66为2进制long长度 */
         private int maxLengthOfUnquoteString = 66;
-        /** 外层额外缩进 */
+        /** 外层额外缩进 -- 行首前缩进 */
         private int extraIndent;
 
         private Builder() {
@@ -149,12 +156,21 @@ public class DsonTextWriterSettings extends DsonWriterSettings {
             return this;
         }
 
-        public float getLengthFactorOfText() {
-            return lengthFactorOfText;
+        public boolean isStringAlignLeft() {
+            return stringAlignLeft;
         }
 
-        public Builder setLengthFactorOfText(float lengthFactorOfText) {
-            this.lengthFactorOfText = lengthFactorOfText;
+        public Builder setStringAlignLeft(boolean stringAlignLeft) {
+            this.stringAlignLeft = stringAlignLeft;
+            return this;
+        }
+
+        public float getTextStringLength() {
+            return textStringLength;
+        }
+
+        public Builder setTextStringLength(float textStringLength) {
+            this.textStringLength = textStringLength;
             return this;
         }
 
@@ -173,6 +189,15 @@ public class DsonTextWriterSettings extends DsonWriterSettings {
 
         public Builder setExtraIndent(int extraIndent) {
             this.extraIndent = extraIndent;
+            return this;
+        }
+
+        public boolean isTextAlignLeft() {
+            return textAlignLeft;
+        }
+
+        public Builder setTextAlignLeft(boolean textAlignLeft) {
+            this.textAlignLeft = textAlignLeft;
             return this;
         }
     }

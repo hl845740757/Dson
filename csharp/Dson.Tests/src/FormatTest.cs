@@ -22,7 +22,7 @@ namespace Wjybxx.Dson.Tests;
 
 public class FormatTest
 {
-    private static string dsonString = @"
+    private static readonly string dsonString = @"
             - {@{clsName:MyClassInfo, guid :10001, flags: 0}
             -   name : wjybxx,
             -   age: 28,
@@ -46,25 +46,30 @@ public class FormatTest
         {
             DsonTextWriterSettings.Builder builder = new DsonTextWriterSettings.Builder() {
                 ExtraIndent = 2,
-                SoftLineLength = 60,
-                LengthFactorOfText = 1
+                SoftLineLength = 50,
+                TextStringLength = 50,
+                StringAlignLeft = true
             };
             string dsonString2 = Dsons.ToDson(dsonObject, ObjectStyle.Indent, builder.Build());
             Console.WriteLine("Mode:" + DsonMode.Standard);
             Console.WriteLine(dsonString2);
+
+            DsonValue dsonObject2 = Dsons.FromDson(dsonString2);
+            Assert.That(dsonObject2, Is.EqualTo(dsonObject));
         }
 
         Console.WriteLine();
-        Console.WriteLine("Mode:" + DsonMode.Relaxed);
         {
             DsonTextWriterSettings.Builder builder = new DsonTextWriterSettings.Builder() {
                 DsonMode = DsonMode.Relaxed,
                 ExtraIndent = 2,
-                SoftLineLength = 60,
-                LengthFactorOfText = 1
+                SoftLineLength = 60
             };
             string dsonString3 = Dsons.ToDson(dsonObject, ObjectStyle.Indent, builder.Build());
+            Console.WriteLine("Mode:" + DsonMode.Relaxed);
             Console.WriteLine(dsonString3);
+            DsonValue dsonObject3 = Dsons.FromJson(dsonString3);
+            Assert.That(dsonObject3, Is.EqualTo(dsonObject));
         }
     }
 }

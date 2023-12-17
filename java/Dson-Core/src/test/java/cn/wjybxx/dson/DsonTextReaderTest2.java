@@ -1,10 +1,10 @@
 package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.text.*;
+import cn.wjybxx.dson.text.DsonMode;
+import cn.wjybxx.dson.text.DsonTextWriterSettings;
+import cn.wjybxx.dson.text.ObjectStyle;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import java.io.StringReader;
 
 /**
  * @author wjybxx
@@ -33,28 +33,28 @@ public class DsonTextReaderTest2 {
     @Test
     void test() {
         DsonObject<String> dsonObject = Dsons.fromDson(dsonString).asObject();
-        String dsonString2 = Dsons.toDson(dsonObject, ObjectStyle.INDENT, DsonTextWriterSettings.newBuilder()
-                .setExtraIndent(2)
-                .setSoftLineLength(60)
-                .setLengthFactorOfText(1)
-                .build());
-        System.out.println("Mode:" + DsonMode.STANDARD);
-        System.out.println(dsonString2);
-
-        System.out.println();
-        System.out.println("Mode:" + DsonMode.RELAXED);
-        System.out.println(Dsons.toDson(dsonObject, ObjectStyle.INDENT, DsonTextWriterSettings.newBuilder()
-                .setDsonMode(DsonMode.RELAXED)
-                .setExtraIndent(2)
-                .setSoftLineLength(60)
-                .setLengthFactorOfText(1)
-                .build()));
-
-        DsonScanner scanner = Dsons.newStreamScanner(new StringReader(dsonString2));
-        try (DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.DEFAULT, scanner)) {
+        {
+            String dsonString2 = Dsons.toDson(dsonObject, ObjectStyle.INDENT, DsonTextWriterSettings.newBuilder()
+                    .setExtraIndent(2)
+                    .setSoftLineLength(50)
+                    .setTextAlignLeft(true)
+                    .setTextStringLength(50)
+                    .build());
+            System.out.println("Mode:" + DsonMode.STANDARD);
+            System.out.println(dsonString2);
             DsonValue dsonObject2 = Dsons.fromDson(dsonString2);
-            DsonValue dsonObject3 = Dsons.readTopDsonValue(reader);
             Assertions.assertEquals(dsonObject, dsonObject2);
+        }
+        System.out.println();
+        {
+            String dsonString3 = Dsons.toDson(dsonObject, ObjectStyle.INDENT, DsonTextWriterSettings.newBuilder()
+                    .setDsonMode(DsonMode.RELAXED)
+                    .setExtraIndent(2)
+                    .setSoftLineLength(60)
+                    .build());
+            System.out.println("Mode:" + DsonMode.RELAXED);
+            System.out.println(dsonString3);
+            DsonValue dsonObject3 = Dsons.fromJson(dsonString3);
             Assertions.assertEquals(dsonObject, dsonObject3);
         }
     }

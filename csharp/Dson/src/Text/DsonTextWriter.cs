@@ -34,7 +34,7 @@ public class DsonTextWriter : AbstractDsonWriter<string>
         : base(settings) {
         this._settings = settings;
         this._writer = writer;
-        this._printer = new DsonPrinter(writer, settings.LineSeparator, settings.ExtraIndent, settings.AutoClose);
+        this._printer = new DsonPrinter(settings, writer);
         SetContext(new Context().Init(null, DsonContextType.TopLevel, DsonTypes.Invalid));
     }
 
@@ -65,15 +65,8 @@ public class DsonTextWriter : AbstractDsonWriter<string>
     private void WriteCurrentName(DsonPrinter printer, DsonType dsonType) {
         Context context = GetContext();
         // 打印元素前先检查是否打印了行首和外部缩进
-        if (_settings.DsonMode == DsonMode.Standard) {
-            if (printer.HeadLabel == null) {
-                PrintLineHead(LineHead.AppendLine);
-            }
-        }
-        else {
-            if (printer.Column < _settings.ExtraIndent) {
-                printer.PrintSpace(_settings.ExtraIndent - printer.Column);
-            }
+        if (printer.Column == 0) {
+            PrintLineHead(LineHead.AppendLine);
         }
         // header与外层对象无缩进，且是匿名属性 -- 如果打印多个header，将保持连续
         if (dsonType == DsonType.Header) {
@@ -91,16 +84,15 @@ public class DsonTextWriter : AbstractDsonWriter<string>
             PrintLineHead(LineHead.AppendLine);
         }
         if (context._style == ObjectStyle.Indent) {
-            bool hasElement = context._count > 0 || context._headerCount > 0;
-            if (hasElement && printer.ContentLength < printer.IndentLength()) {
-                // 当前行是纯文本结束行，文本结束位置尚未到达缩进，不换行
-                printer.PrintSpace(printer.IndentLength() - printer.ContentLength);
+            if (context.HasElement() && printer.Column < printer.PrettyBodyColum) {
+                // 当前行是字符串结束行，字符串结束位置尚未到达缩进，不换行
+                printer.PrintSpace(printer.PrettyBodyColum - printer.Column);
             }
-            else if (printer.HasContent) {
+            else if (printer.Column > printer.PrettyBodyColum) {
                 // 当前行有内容了才换行缩进
                 printer.Println();
                 PrintLineHead(LineHead.AppendLine);
-                printer.PrintIndent();
+                printer.PrintBodyIndent();
             }
         }
         else if (context._count > 0) {
@@ -165,7 +157,7 @@ public class DsonTextWriter : AbstractDsonWriter<string>
     }
 
     private static bool CanPrintAsText(string str, DsonTextWriterSettings settings) {
-        return settings.EnableText && (str.Length > settings.SoftLineLength * settings.LengthFactorOfText);
+        return settings.EnableText && (str.Length > settings.TextStringLength);
     }
 
     /** 打印双引号String */
@@ -173,13 +165,21 @@ public class DsonTextWriter : AbstractDsonWriter<string>
         bool unicodeChar = _settings.UnicodeChar;
         int softLineLength = _settings.SoftLineLength;
         DsonPrinter printer = this._printer;
+        int headIndent;
+        if (_settings.DsonMode == DsonMode.Standard) {
+            headIndent = _settings.StringAlignLeft ? printer.PrettyBodyColum : _settings.ExtraIndent;
+        }
+        else {
+            headIndent = 0; // 字符串不能在非标准模式下缩进
+        }
         printer.Print('"');
         for (int i = 0, length = text.Length; i < length; i++) {
             printer.PrintEscaped(text[i], unicodeChar);
             if (printer.Column >= softLineLength && (i + 1 < length)) {
                 printer.Println();
-                // 字符串不能在非标准模式下打印额外缩进
-                PrintLineHead(LineHead.Append, _settings.DsonMode == DsonMode.Standard);
+                printer.HeadIndent = headIndent;
+                printer.BodyIndent = 0;
+                PrintLineHead(LineHead.Append);
             }
         }
         printer.Print('"');
@@ -189,19 +189,33 @@ public class DsonTextWriter : AbstractDsonWriter<string>
     private void PrintText(string text) {
         int softLineLength = _settings.SoftLineLength;
         DsonPrinter printer = this._printer;
-        printer.PrintFastPath("@ss"); // 开始符
-        printer.Println(); // 换一行开始更直观
-        PrintLineHead(LineHead.Append);
+        int headIndent;
+        if (_settings.TextAlignLeft) {
+            headIndent = printer.PrettyBodyColum;
+            printer.PrintFastPath("@ss"); // 开始符
+            printer.Println();
+            printer.HeadIndent = headIndent;
+            printer.BodyIndent = 0;
+            PrintLineHead(LineHead.Append);
+        }
+        else {
+            headIndent = _settings.ExtraIndent;
+            printer.PrintFastPath("@ss "); // 开始符
+        }
         for (int i = 0, length = text.Length; i < length; i++) {
             char c = text[i];
             // 要执行文本中的换行符
             if (c == '\n') {
                 printer.Println();
+                printer.HeadIndent = headIndent;
+                printer.BodyIndent = 0;
                 PrintLineHead(LineHead.AppendLine);
                 continue;
             }
             if (c == '\r' && (i + 1 < length && text[i + 1] == '\n')) {
                 printer.Println();
+                printer.HeadIndent = headIndent;
+                printer.BodyIndent = 0;
                 PrintLineHead(LineHead.AppendLine);
                 i++;
                 continue;
@@ -209,10 +223,13 @@ public class DsonTextWriter : AbstractDsonWriter<string>
             printer.Print(c);
             if (printer.Column > softLineLength && (i + 1 < length)) {
                 printer.Println();
+                printer.HeadIndent = headIndent;
+                printer.BodyIndent = 0;
                 PrintLineHead(LineHead.Append);
             }
         }
         printer.Println();
+        printer.HeadIndent = headIndent;
         PrintLineHead(LineHead.EndOfText); // 结束符
     }
 
@@ -244,10 +261,8 @@ public class DsonTextWriter : AbstractDsonWriter<string>
         }
     }
 
-    private void PrintLineHead(LineHead lineHead, bool printExtraIndent = true) {
-        if (printExtraIndent && _settings.ExtraIndent > 0) {
-            _printer.PrintSpace(_settings.ExtraIndent);
-        }
+    private void PrintLineHead(LineHead lineHead) {
+        _printer.PrintHeadIndent();
         if (_settings.DsonMode == DsonMode.Standard) {
             _printer.PrintHead(lineHead);
         }
@@ -519,10 +534,10 @@ public class DsonTextWriter : AbstractDsonWriter<string>
         if (context._style == ObjectStyle.Indent) {
             printer.Retract(); // 恢复缩进
             // 打印了内容的情况下才换行结束
-            if (printer.HasContent && (context._headerCount > 0 || context._count > 0)) {
+            if (context.HasElement() && (printer.Column > printer.PrettyBodyColum)) {
                 printer.Println();
                 PrintLineHead(LineHead.AppendLine);
-                printer.PrintIndent();
+                printer.PrintBodyIndent();
             }
         }
         printer.PrintFastPath(context._contextType.GetEndSymbol()!);
@@ -592,6 +607,10 @@ public class DsonTextWriter : AbstractDsonWriter<string>
         internal int _count = 0;
 
         public Context() {
+        }
+
+        internal bool HasElement() {
+            return _headerCount > 0 || _count > 0;
         }
 
         public override void Reset() {

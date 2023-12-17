@@ -68,7 +68,7 @@ public class DsonInputs
         #endregion
 
         #region basic
-        
+
         public byte ReadRawByte() {
             CheckNewBufferPos(_bufferPos + 1);
             return _buffer[_bufferPos++];
@@ -216,6 +216,7 @@ public class DsonInputs
             if (n == 0) return;
             _bufferPos = CheckNewBufferPos(_bufferPos + n);
         }
+
         #endregion
 
         #region sp
@@ -262,7 +263,7 @@ public class DsonInputs
         public bool IsAtEnd() => _bufferPos >= _bufferPosLimit;
 
         #endregion
-        
+
         public void Dispose() {
         }
     }

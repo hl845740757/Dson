@@ -52,8 +52,8 @@ PS：Dson的文本格式从设计到最终实现大概2个月时间，尝试了�
   -     beijing,
   -     chengdu
   -   ],
-  -   intro: @ss
-  |   我是wjybxx，是一个游戏开发者，Dson是我设计的文档型数据表达法，你可以通过github联系到我。
+  -   intro: @ss   我是wjybxx，是一个游戏开发者，Dson是我设计的文档型数据表达法，你可以通过g
+  | ithub联系到我。
   -   thanks
   ~ , url: "https://www.github.com/hl845740757",
   -   time: {@dt date: 2023-06-17, time: 18:37:00, millis: 100, 

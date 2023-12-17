@@ -88,3 +88,33 @@ Number提供了7种默认格式输出：
 可以很好的减少行数。
 
 PS：其实Writer的目标就是尽可能和我们的书写格式一致。
+
+
+### 文本左对齐
+
+在新的版本中，我增加行首缩进和纯文本左对齐功能，通过修改测试用例的WriterSetting，我们得到以下文本。  
+（仅标准模式下可用）
+
+```
+  - {@{clsName: MyClassInfo, guid: 10001, flags: 0}
+  -   name: wjybxx,
+  -   age: 28,
+  -   pos: {@Vector3
+  -     x: 0,
+  -     y: 0,
+  -     z: 0
+  -   },
+  -   address: [
+  -     beijing,
+  -     chengdu
+  -   ],
+  -   intro: @ss
+      |   我是wjybxx，是一个游戏开发者，Dson是我设计的文档型数据表达法，你可以通过
+      | github联系到我。
+      -   thanks
+      ~ ,
+  -   url: "https://www.github.com/hl845740757",
+  -   time: {@dt date: 2023-06-17, time: 18:37:00, 
+  - millis: 100, offset: +08:00}
+  - }
+```

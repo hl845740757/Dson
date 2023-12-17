@@ -119,7 +119,7 @@ public abstract class AbstractDsonArray : DsonValue, IList<DsonValue>, IEquatabl
     public bool Equals(AbstractDsonArray? other) {
         if (ReferenceEquals(null, other)) return false;
         if (ReferenceEquals(this, other)) return true;
-        return _values.Equals(other._values);
+        return _values.SequenceEqual(other._values);
     }
 
     public override bool Equals(object? obj) {

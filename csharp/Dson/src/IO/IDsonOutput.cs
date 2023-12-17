@@ -93,7 +93,7 @@ public interface IDsonOutput : IDisposable
     /// 剩余可写空间
     /// </summary>
     int SpaceLeft { get; }
-    
+
     /// <summary>
     /// 当前写索引(也等于写入的字节数)
     /// </summary>

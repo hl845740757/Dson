@@ -20,24 +20,32 @@ namespace Wjybxx.Dson.Text;
 
 public class DsonTextWriterSettings : DsonWriterSettings
 {
+    private const int MinLineLength = 10;
+
     public readonly string LineSeparator;
-    public readonly int SoftLineLength;
     public readonly DsonMode DsonMode;
+    public readonly int SoftLineLength;
 
     public readonly bool EnableText;
-    public readonly float LengthFactorOfText;
+    public readonly float TextStringLength;
+    public readonly bool TextAlignLeft;
+    public readonly bool StringAlignLeft;
+
     public readonly bool UnicodeChar;
     public readonly int MaxLengthOfUnquoteString;
     public readonly int ExtraIndent;
 
     public DsonTextWriterSettings(Builder builder) : base(builder) {
         this.LineSeparator = builder.LineSeparator;
-        this.SoftLineLength = Math.Max(8, builder.SoftLineLength);
+        this.SoftLineLength = Math.Max(MinLineLength, builder.SoftLineLength);
         this.DsonMode = builder.DsonMode;
 
         // 标准模式下才可启用纯文本
         this.EnableText = DsonMode == DsonMode.Standard && builder.EnableText;
-        this.LengthFactorOfText = builder.LengthFactorOfText;
+        this.TextStringLength = Math.Max(MinLineLength, builder.TextStringLength);
+        this.TextAlignLeft = builder.TextAlignLeft;
+        this.StringAlignLeft = builder.StringAlignLeft;
+
         this.UnicodeChar = builder.UnicodeChar;
         this.MaxLengthOfUnquoteString = builder.MaxLengthOfUnquoteString;
         this.ExtraIndent = Math.Max(0, builder.ExtraIndent);
@@ -62,6 +70,8 @@ public class DsonTextWriterSettings : DsonWriterSettings
     {
         /** 行分隔符 */
         public string LineSeparator = Environment.NewLine;
+        /** 文本模式 */
+        public DsonMode DsonMode = DsonMode.Standard;
         /**
          * 行长度，该值是一个换行参考值
          * 精确控制行长度较为复杂，那样我们需要考虑每一种值toString后长度超出的问题；
@@ -69,28 +79,26 @@ public class DsonTextWriterSettings : DsonWriterSettings
          * 另外，这个行长度是是码元计数，不是字符计数。
          */
         public int SoftLineLength = 120;
+
         /**
-         * 文本模式
-         */
-        public DsonMode DsonMode = DsonMode.Standard;
-        /**
-         * 是否支持纯文本模式
+         * 是否启用纯文本模式
          * 如果{@link #unicodeChar}为true，该值通常需要关闭，text模式不会执行转义，也就不会处理unicode字符
          */
         public bool EnableText = true;
-        /**
-         * 当字符串的长度达到 lineLength  * factor 触发text模式
-         */
-        public float LengthFactorOfText = 2;
+        /** 触发text模式的字符串长度 */
+        public float TextStringLength = 120;
+        /** 纯文本换行是否启用左对齐 -- 仅标准模式下生效 */
+        public bool TextAlignLeft = false;
+        /** 字符串换行是否启用左对齐 -- 仅标准模式下生效；不适用无引号字符串 */
+        public bool StringAlignLeft = false;
+
         /**
          * 不可打印的ascii码字符是否转为unicode字符
          * (ascii码32~126以外的字符)
          * 通常用于非UTF8文本的移植
          */
         public bool UnicodeChar = false;
-        /**
-         * 自动模式下无引号字符串的最大长度
-         */
+        /** 自动模式下无引号字符串的最大长度 -- 66为2进制long长度 */
         public int MaxLengthOfUnquoteString = 66;
         /** 外层额外缩进 */
         public int ExtraIndent;

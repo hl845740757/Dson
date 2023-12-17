@@ -119,7 +119,7 @@ public abstract class AbstractDsonObject<TK> : DsonValue, IDictionary<TK, DsonVa
     public bool Equals(AbstractDsonObject<TK>? other) {
         if (ReferenceEquals(null, other)) return false;
         if (ReferenceEquals(this, other)) return true;
-        return _valueMap.Equals(other._valueMap);
+        return _valueMap.SequenceEqual(other._valueMap); // C#的集合默认都是未实现Equals的
     }
 
     public override bool Equals(object? obj) {
