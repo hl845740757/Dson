@@ -21,8 +21,12 @@ using System.Collections.Immutable;
 using System.Text;
 using Wjybxx.Dson.IO;
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson.Text;
 
+/// <summary>
+/// Dson文本解析工具类
+/// </summary>
 public static class DsonTexts
 {
     // 类型标签
@@ -280,11 +284,7 @@ public static class DsonTexts
 
     #endregion
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="label">行首标签</param>
-    /// <returns>行首值</returns>
+    /** 通过行首label字符查找行首枚举 */
     public static LineHead? LineHeadOfLabel(string label) {
         return label switch {
             DsonTexts.HeadComment => LineHead.Comment,
@@ -296,6 +296,7 @@ public static class DsonTexts
         };
     }
 
+    /** 获取行首枚举关联的字符  */
     public static string GetLabel(LineHead lineHead) {
         return lineHead switch {
             LineHead.Comment => DsonTexts.HeadComment,
@@ -307,6 +308,7 @@ public static class DsonTexts
         };
     }
 
+    /** 获取dsonType关联的无位置Token */
     public static DsonToken ClsNameTokenOfType(DsonType dsonType) {
         return dsonType switch {
             DsonType.Int32 => new DsonToken(DsonTokenType.ClassName, LabelInt32, -1),

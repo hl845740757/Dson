@@ -16,23 +16,41 @@
 
 #endregion
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson.Text;
 
+/// <summary>
+/// DsonTextWriter的设置
+/// </summary>
 public class DsonTextWriterSettings : DsonWriterSettings
 {
     private const int MinLineLength = 10;
+    /** 标准模式默认设置 */
+    public static readonly DsonTextWriterSettings Default;
+    /** 宽松模式默认设置 */
+    public static readonly DsonTextWriterSettings RelaxedDefault;
 
+    /** 行分隔符 */
     public readonly string LineSeparator;
+    /** Dson文本模式 */
     public readonly DsonMode DsonMode;
+    /** 行长度-软限制 */
     public readonly int SoftLineLength;
 
+    /** 是否启用文本模式输出 */
     public readonly bool EnableText;
+    /** 触发文本输出的字符串长度 */
     public readonly float TextStringLength;
+    /** 文本字符串换行是否启用左对齐 */
     public readonly bool TextAlignLeft;
+    /** 双引号字符串换行是否启用左对齐 */
     public readonly bool StringAlignLeft;
 
+    /** 不可打印的ascii码字符是否转为unicode字符 */
     public readonly bool UnicodeChar;
+    /** 无引号字符串的最大长度 */
     public readonly int MaxLengthOfUnquoteString;
+    /** 行首前的额外缩进 */
     public readonly int ExtraIndent;
 
     public DsonTextWriterSettings(Builder builder) : base(builder) {
@@ -50,9 +68,6 @@ public class DsonTextWriterSettings : DsonWriterSettings
         this.MaxLengthOfUnquoteString = builder.MaxLengthOfUnquoteString;
         this.ExtraIndent = Math.Max(0, builder.ExtraIndent);
     }
-
-    public static readonly DsonTextWriterSettings Default;
-    public static readonly DsonTextWriterSettings RelaxedDefault;
 
     static DsonTextWriterSettings() {
         Default = NewBuilder().Build();

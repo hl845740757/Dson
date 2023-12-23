@@ -20,6 +20,7 @@ using Wjybxx.Dson.IO;
 using Wjybxx.Dson.Text;
 using Wjybxx.Dson.Types;
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson;
 
 public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName> where TName : IEquatable<TName>

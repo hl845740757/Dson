@@ -16,8 +16,12 @@
 
 #endregion
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson;
 
+/// <summary>
+/// DsonInt32
+/// </summary>
 public class DsonInt32 : DsonNumber, IEquatable<DsonInt32>, IComparable<DsonInt32>, IComparable
 {
     private readonly int _value;

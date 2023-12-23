@@ -22,8 +22,12 @@ using System.Text;
 using Wjybxx.Dson.IO;
 using Wjybxx.Dson.Types;
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson.Text;
 
+/// <summary>
+/// 从文本读取Dson对象的Reader
+/// </summary>
 [SuppressMessage("ReSharper", "HeapView.BoxingAllocation")]
 public class DsonTextReader : AbstractDsonReader<string>
 {

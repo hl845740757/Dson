@@ -20,6 +20,7 @@ using System.Diagnostics;
 using Wjybxx.Dson.IO;
 using Wjybxx.Dson.Types;
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson;
 
 public abstract class AbstractDsonReader<TName> : IDsonReader<TName> where TName : IEquatable<TName>

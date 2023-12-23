@@ -16,8 +16,12 @@
 
 #endregion
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson.Types;
 
+/// <summary>
+/// 具有类型标签的双精度浮点数
+/// </summary>
 public readonly struct ExtDouble : IEquatable<ExtDouble>, IComparable<ExtDouble>, IComparable
 {
     private readonly int _type;

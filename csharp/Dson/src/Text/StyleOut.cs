@@ -16,14 +16,17 @@
 
 #endregion
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson.Text;
 
 /// <summary>
-/// C#这里用值类型是非常方便的
+/// Dson数值转文本的结果类
 /// </summary>
 public readonly struct StyleOut : IEquatable<StyleOut>
 {
+    /** 字符串值 */
     public readonly string Value;
+    /** 是否需要打印类型标签 */
     public readonly bool IsTyped;
 
     /// <summary>
@@ -32,7 +35,7 @@ public readonly struct StyleOut : IEquatable<StyleOut>
     /// <param name="value">文本</param>
     /// <param name="isTyped">输出是否需要加类型</param>
     public StyleOut(string value, bool isTyped) {
-        Value = value;
+        Value = value ?? throw new ArgumentNullException(nameof(value));
         IsTyped = isTyped;
     }
 

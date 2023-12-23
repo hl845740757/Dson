@@ -18,33 +18,37 @@
 
 using System.Collections;
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson.Collections;
 
 /// <summary>
 /// C#和Java的迭代器差异较大；虽然写Java的时候更多，但不能说C#的迭代器有问题。
 /// 对于单线程数据结构，先测试是否有数据，再Move体验更好；而对于并发数据结构，先Move再获取数据则更安全。
 /// </summary>
-/// <typeparam name="TE"></typeparam>
-public class MarkableIterator<TE> : IEnumerator<TE>
+/// <typeparam name="T">元素的类型</typeparam>
+public class MarkableIterator<T> : IEnumerator<T>
 {
-    private readonly IEnumerator<TE> _baseIterator;
+    private readonly IEnumerator<T> _baseIterator;
     private bool _marking;
 
-    private readonly List<TE> _buffer = new(4);
+    private readonly List<T> _buffer = new(4);
     private int _bufferIndex;
     /** 用于避免List频繁删除队首 */
     private int _bufferOffsetIdx;
 
-    private TE? _current;
-    private TE? _markedValue;
+    private T? _current;
+    private T? _markedValue;
 
-    public MarkableIterator(IEnumerator<TE> baseIterator) {
+    public MarkableIterator(IEnumerator<T> baseIterator) {
         this._baseIterator = baseIterator ?? throw new ArgumentNullException(nameof(baseIterator));
         this._bufferIndex = -1;
         this._bufferOffsetIdx = -1;
         this._marking = false;
     }
 
+    /// <summary>
+    /// 当前是否处于标记中
+    /// </summary>
     public bool IsMarking => _marking;
 
     /// <summary>
@@ -97,14 +101,18 @@ public class MarkableIterator<TE> : IEnumerator<TE>
     /// </summary>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
-    public TE Next() {
+    public T Next() {
         if (MoveNext()) {
             return _current;
         }
         throw new InvalidOperationException();
     }
 
-    public void ForEachRemaining(Action<TE> action) {
+    /// <summary>
+    /// 对剩下的元素执行给定的操作
+    /// </summary>
+    /// <param name="action"></param>
+    public void ForEachRemaining(Action<T> action) {
         while (MoveNext()) {
             action.Invoke(_current);
         }
@@ -112,10 +120,11 @@ public class MarkableIterator<TE> : IEnumerator<TE>
 
     object IEnumerator.Current => Current;
 
-    public TE Current => _current;
+    public T Current => _current;
 
+    /// <inheritdoc />
     public bool MoveNext() {
-        List<TE> buffer = this._buffer;
+        List<T> buffer = this._buffer;
         if (_bufferIndex + 1 < buffer.Count) {
             _current = buffer[++_bufferIndex];
             if (!_marking) {
@@ -142,6 +151,7 @@ public class MarkableIterator<TE> : IEnumerator<TE>
         }
     }
 
+    /// <inheritdoc />
     public void Dispose() {
         _marking = false;
         _buffer.Clear();

@@ -16,8 +16,12 @@
 
 #endregion
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson;
 
+/// <summary>
+/// Dson单精度浮点数
+/// </summary>
 public class DsonFloat : DsonNumber, IEquatable<DsonFloat>, IComparable<DsonFloat>, IComparable
 {
     private readonly float _value;

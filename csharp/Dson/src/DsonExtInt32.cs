@@ -16,8 +16,12 @@
 
 #endregion
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson;
 
+/// <summary>
+/// Dson具备类型标签的Int32类型
+/// </summary>
 public class DsonExtInt32 : DsonValue, IEquatable<DsonExtInt32>, IComparable<DsonExtInt32>, IComparable
 {
     private readonly int _type;

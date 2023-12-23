@@ -18,13 +18,20 @@
 
 namespace Wjybxx.Dson;
 
+/// <summary>
+/// Dson数字类型抽象
+/// </summary>
 public abstract class DsonNumber : DsonValue
 {
+    /** 将value转为int */
     public abstract int IntValue { get; }
 
+    /** 将value转long */
     public abstract long LongValue { get; }
 
+    /** 将value转float */
     public abstract float FloatValue { get; }
 
+    /** 将value转double */
     public abstract double DoubleValue { get; }
 }

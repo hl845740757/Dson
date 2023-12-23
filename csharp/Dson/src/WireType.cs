@@ -50,8 +50,12 @@ public enum WireType
     Fixed = 3,
 }
 
+/// <summary>
+/// WireType的工具类
+/// </summary>
 public static class WireTypes
 {
+    /** 通过number查找关联枚举 */
     public static WireType ForNumber(int number) {
         return number switch {
             0 => WireType.VarInt,

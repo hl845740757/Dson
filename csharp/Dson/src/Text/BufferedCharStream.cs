@@ -145,7 +145,7 @@ class BufferedCharStream : AbstractCharStream
                 }
             }
         }
-        catch (ThreadInterruptedException _) {
+        catch (ThreadInterruptedException) {
             Thread.CurrentThread.Interrupt(); // 恢复中断
         }
     }

@@ -19,7 +19,7 @@
 namespace Wjybxx.Dson;
 
 /// <summary>
-/// 
+/// DsonReader的状态枚举
 /// </summary>
 public enum DsonReaderState
 {

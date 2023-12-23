@@ -19,8 +19,12 @@
 using System.Text;
 using Wjybxx.Dson.IO;
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson.Text;
 
+/// <summary>
+/// Dson字符打印类
+/// </summary>
 public class DsonPrinter : IDisposable
 {
     /** 默认共享的缩进缓存 -- 4空格 */

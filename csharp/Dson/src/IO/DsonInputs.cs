@@ -22,19 +22,31 @@ using System.Text;
 namespace Wjybxx.Dson.IO;
 
 /// <summary>
-/// 
+/// DsonInput工具类
 /// </summary>
 public class DsonInputs
 {
+    /// <summary>
+    /// 创建一个基于数组的DsonInput实例，默认buffer的整个区域为可读区间
+    /// </summary>
+    /// <param name="buffer"></param>
+    /// <returns></returns>
     public static IDsonInput NewInstance(byte[] buffer) {
         return new ArrayDsonInput(buffer, 0, buffer.Length);
     }
 
+    /// <summary>
+    /// 创建一个基于数组的DsonInput实例
+    /// </summary>
+    /// <param name="buffer"></param>
+    /// <param name="offset">buffer起始偏移</param>
+    /// <param name="length">buffer有效长度</param>
+    /// <returns></returns>
     public static IDsonInput NewInstance(byte[] buffer, int offset, int length) {
         return new ArrayDsonInput(buffer, offset, length);
     }
 
-    internal class ArrayDsonInput : IDsonInput
+    private class ArrayDsonInput : IDsonInput
     {
         private readonly byte[] _buffer;
         private readonly int _rawOffset;

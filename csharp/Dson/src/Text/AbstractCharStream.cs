@@ -18,8 +18,12 @@
 
 using System.Diagnostics;
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson.Text;
 
+/// <summary>
+/// CharStram抽象类实现
+/// </summary>
 public abstract class AbstractCharStream : IDsonCharStream
 {
     protected readonly DsonMode DsonMode;

@@ -20,8 +20,13 @@ using Wjybxx.Dson.IO;
 using Wjybxx.Dson.Text;
 using Wjybxx.Dson.Types;
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson;
 
+/// <summary>
+/// 将对象写入<see cref="DsonArray{TName}"/>
+/// </summary>
+/// <typeparam name="TName"></typeparam>
 public class DsonObjectWriter<TName> : AbstractDsonWriter<TName> where TName : IEquatable<TName>
 {
     /// <summary>

@@ -20,14 +20,25 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson.IO;
 
+/// <summary>
+/// DsonOutput工具类
+/// </summary>
 public class DsonOutputs
 {
     public static IDsonOutput NewInstance(byte[] buffer) {
         return new ArrayDsonOutput(buffer, 0, buffer.Length);
     }
 
+    /// <summary>
+    /// 创建一个基于数组的DsonOutput实例
+    /// </summary>
+    /// <param name="buffer"></param>
+    /// <param name="offset">buffer起始偏移</param>
+    /// <param name="length">buffer有效长度</param>
+    /// <returns></returns>
     public static IDsonOutput NewInstance(byte[] buffer, int offset, int length) {
         return new ArrayDsonOutput(buffer, offset, length);
     }

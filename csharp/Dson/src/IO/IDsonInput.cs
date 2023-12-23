@@ -16,7 +16,7 @@
 
 #endregion
 
-
+#pragma warning disable CS1591
 namespace Wjybxx.Dson.IO;
 
 /// <summary>

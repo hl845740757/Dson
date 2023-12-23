@@ -18,8 +18,12 @@
 
 using Wjybxx.Dson.Types;
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson;
 
+/// <summary>
+/// Dson所有值类型的抽象
+/// </summary>
 public abstract class DsonValue
 {
     public abstract DsonType DsonType { get; }
@@ -100,21 +104,9 @@ public abstract class DsonValue
 
     #endregion
 
-    #region tools
+    #region util
 
-    public bool IsNumber {
-        get {
-            switch (DsonType) {
-                case DsonType.Int32:
-                case DsonType.Int64:
-                case DsonType.Float:
-                case DsonType.Double:
-                    return true;
-                default:
-                    return false;
-            }
-        }
-    }
+    public bool IsNumber => DsonType.IsNumber();
 
     #endregion
 }

@@ -18,6 +18,9 @@
 
 namespace Wjybxx.Dson.Text;
 
+/// <summary>
+/// Dson字符流
+/// </summary>
 public interface IDsonCharStream : IDisposable
 {
     /// <summary>
@@ -102,16 +105,18 @@ public interface IDsonCharStream : IDisposable
 
     #region 工厂方法
 
+    /** 创建一个基于json字符串的字符流 */
     public static IDsonCharStream NewJsonStream(string jsonString) {
         return new StringCharStream(jsonString, DsonMode.Relaxed);
     }
 
+    /** 创建一个基于string的字符流 */
     public static IDsonCharStream NewCharStream(string dsonString, DsonMode dsonMode = DsonMode.Standard) {
         return new StringCharStream(dsonString, dsonMode);
     }
 
     /// <summary>
-    /// 
+    /// 创建一个基于TextReader的带缓存的Dson字符串流
     /// </summary>
     /// <param name="reader">Stream流</param>
     /// <param name="dsonMode">文本模式</param>

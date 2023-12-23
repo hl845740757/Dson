@@ -20,6 +20,7 @@ using Wjybxx.Dson.IO;
 using Wjybxx.Dson.Text;
 using Wjybxx.Dson.Types;
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson;
 
 /// <summary>
@@ -31,6 +32,7 @@ namespace Wjybxx.Dson;
 /// <typeparam name="TName">name的类型，string或<see cref="FieldNumber"/></typeparam>
 public interface IDsonWriter<in TName> : IDisposable where TName : IEquatable<TName>
 {
+    /** 刷新写缓冲区 */
     void Flush();
 
     /// <summary>

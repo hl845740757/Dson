@@ -16,8 +16,12 @@
 
 #endregion
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson.Types;
 
+/// <summary>
+/// 具有类型标签的Int32
+/// </summary>
 public readonly struct ExtInt32 : IEquatable<ExtInt32>, IComparable<ExtInt32>, IComparable
 {
     private readonly int _type;

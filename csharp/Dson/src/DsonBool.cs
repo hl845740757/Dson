@@ -16,11 +16,17 @@
 
 #endregion
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson;
 
+/// <summary>
+/// DsonBool
+/// </summary>
 public class DsonBool : DsonValue, IComparable<DsonBool>, IEquatable<DsonBool>, IComparable
 {
+    /** 静态True实例 */
     public static readonly DsonBool True = new DsonBool(true);
+    /** 静态False实例 */
     public static readonly DsonBool False = new DsonBool(false);
 
     private readonly bool _value;
@@ -29,6 +35,7 @@ public class DsonBool : DsonValue, IComparable<DsonBool>, IEquatable<DsonBool>, 
         _value = value;
     }
 
+    /** ValueOf使用缓存代替构建新对象 */
     public static DsonBool ValueOf(bool value) {
         return value ? True : False;
     }

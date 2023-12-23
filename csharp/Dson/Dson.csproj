@@ -6,9 +6,34 @@
         <Nullable>annotations</Nullable>
         <LangVersion>10</LangVersion>
         <RootNamespace>Wjybxx.Dson</RootNamespace>
+
+        <AssemblyName>Wjybxx.Dson</AssemblyName>
+        <PackageId>Wjybxx.Dson</PackageId>
+        <PackageVersion>1.0.0-rc1</PackageVersion>
+
+        <Title>Wjybxx.Dson</Title>
+        <Description>Dson-有点奇怪的配置文件格式和序列化方案</Description>
+        <PackageTags>wjybxx;dson;</PackageTags>
+
+        <Authors>wjybxx(845740757@qq.com)</Authors>
+        <Copyright>Copyright 2023 wjybxx(845740757@qq.com)</Copyright>
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/hl845740757/dson</PackageProjectUrl>
+        <PackageReleaseNotes>https://github.com/hl845740757/dson/releases</PackageReleaseNotes>
+
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <NeutralLanguage>zh-Hans</NeutralLanguage>
+
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 
     <ItemGroup>
+        <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Wjybxx.Commons.Core" Version="1.0.0" />
     </ItemGroup>
 
 </Project>

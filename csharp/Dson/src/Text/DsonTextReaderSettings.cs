@@ -16,8 +16,12 @@
 
 #endregion
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson.Text;
 
+/// <summary>
+/// 文本解析器的设置
+/// </summary>
 public class DsonTextReaderSettings : DsonReaderSettings
 {
     public static readonly DsonTextReaderSettings Default = NewBuilder().Build();

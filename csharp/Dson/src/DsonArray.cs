@@ -16,10 +16,11 @@
 
 #endregion
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson;
 
 /// <summary>
-/// 
+/// Dson数组
 /// </summary>
 /// <typeparam name="TK">header的key类型</typeparam>
 public class DsonArray<TK> : AbstractDsonArray

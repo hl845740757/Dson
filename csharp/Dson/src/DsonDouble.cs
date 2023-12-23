@@ -16,8 +16,12 @@
 
 #endregion
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson;
 
+/// <summary>
+/// Dson双精度浮点数
+/// </summary>
 public class DsonDouble : DsonNumber, IComparable<DsonDouble>, IEquatable<DsonDouble>, IComparable
 {
     private readonly double _value;

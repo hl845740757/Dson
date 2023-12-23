@@ -20,6 +20,7 @@ using System.Globalization;
 using System.Text;
 using Wjybxx.Dson.Text;
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson.Types;
 
 /// <summary>
@@ -64,10 +65,12 @@ public readonly struct OffsetTimestamp : IEquatable<OffsetTimestamp>
 
     public bool HasOffset => DsonInternals.IsEnabled(Enables, MaskOffset);
 
+    /** 纳秒部分是否可转为毫秒 -- 纳秒恰为整毫秒时返回true */
     public bool CanConvertNanosToMillis() {
         return (Nanos % 1000_000) == 0;
     }
 
+    /** 将纳秒部分换行为毫秒 */
     public int ConvertNanosToMillis() {
         return Nanos / 1000_000;
     }

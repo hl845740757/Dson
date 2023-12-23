@@ -18,8 +18,12 @@
 
 using Wjybxx.Dson.Types;
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson;
 
+/// <summary>
+/// Dson对象引用
+/// </summary>
 public class DsonReference : DsonValue, IEquatable<DsonReference>
 {
     private readonly ObjectRef _value;

@@ -33,6 +33,9 @@ public enum DsonContextType
     Header,
 }
 
+/// <summary>
+/// <see cref="DsonContextType"/>的工具类
+/// </summary>
 public static class DsonContextTypes
 {
     /// <summary>
@@ -61,14 +64,29 @@ public static class DsonContextTypes
         };
     }
 
+    /// <summary>
+    /// 上下文是否表示一个容器类型 - header属于普通容器类
+    /// </summary>
+    /// <param name="contextType">上下文类型</param>
+    /// <returns></returns>
     public static bool IsContainer(this DsonContextType contextType) {
         return contextType == DsonContextType.Object || contextType == DsonContextType.Array;
     }
 
+    /// <summary>
+    /// 上下文是否表示一个数组或类似数组的类型
+    /// </summary>
+    /// <param name="contextType">上下文类型</param>
+    /// <returns></returns>
     public static bool IsLikeArray(this DsonContextType contextType) {
         return contextType == DsonContextType.Array || contextType == DsonContextType.TopLevel;
     }
 
+    /// <summary>
+    /// 上下文是否表示一个Object或类似Object的类型(KV结构)
+    /// </summary>
+    /// <param name="contextType">上下文类型</param>
+    /// <returns></returns>
     public static bool IsLikeObject(this DsonContextType contextType) {
         return contextType == DsonContextType.Object || contextType == DsonContextType.Header;
     }

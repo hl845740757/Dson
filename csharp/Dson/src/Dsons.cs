@@ -22,10 +22,12 @@ using System.Text;
 using Wjybxx.Dson.IO;
 using Wjybxx.Dson.Text;
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson;
 
 /// <summary>
-/// C#是真泛型，因此可以减少类型
+/// Dson工具类
+/// (C#是真泛型，因此只需一个工具类)
 /// </summary>
 public static class Dsons
 {
@@ -82,30 +84,35 @@ public static class Dsons
         return fieldName.Length <= 32 ? string.Intern(fieldName) : fieldName;
     }
 
+    /** 检查具备类型标签的数据的子类型是否合法 */
     public static void CheckSubType(int type) {
         if (type < 0) {
             throw new ArgumentException("type cant be negative");
         }
     }
 
+    /** 检查二进制数据的长度是否合法 */
     public static void CheckBinaryLength(int length) {
-        if (length > MaxBinaryLength) {
+        if (length < 0 || length > MaxBinaryLength) {
             throw new ArgumentException($"the length of data must between[0, {MaxBinaryLength}], but found: {length}");
         }
     }
 
+    /** 检查hasValue标记和值是否匹配 */
     public static void CheckHasValue(int value, bool hasVal) {
         if (!hasVal && value != 0) {
             throw new ArgumentException();
         }
     }
 
+    /** 检查hasValue标记和值是否匹配 */
     public static void CheckHasValue(long value, bool hasVal) {
         if (!hasVal && value != 0) {
             throw new ArgumentException();
         }
     }
 
+    /** 检查hasValue标记和值是否匹配 */
     public static void CheckHasValue(double value, bool hasVal) {
         if (!hasVal && value != 0) {
             throw new ArgumentException();
@@ -138,6 +145,11 @@ public static class Dsons
         return (dsonType << WireTypeBits) | wireType;
     }
 
+    /// <summary>
+    /// 通过FullType计算
+    /// </summary>
+    /// <param name="fullType"></param>
+    /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int DsonTypeOfFullType(int fullType) {
         return DsonInternals.LogicalShiftRight(fullType, WireTypeBits);

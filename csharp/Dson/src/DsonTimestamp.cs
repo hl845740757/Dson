@@ -18,8 +18,12 @@
 
 using Wjybxx.Dson.Types;
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson;
 
+/// <summary>
+/// Dson时间戳类型
+/// </summary>
 public class DsonTimestamp : DsonValue, IEquatable<DsonTimestamp>
 {
     private readonly OffsetTimestamp _value;

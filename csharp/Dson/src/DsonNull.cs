@@ -16,10 +16,15 @@
 
 #endregion
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson;
 
+/// <summary>
+/// DsonNull
+/// </summary>
 public class DsonNull : DsonValue, IEquatable<DsonNull>
 {
+    /** 静态DsonNull实例 */
     public static readonly DsonNull Null = new DsonNull();
     /** 可用于特殊情况下的测试 -- 一般不建议使用 */
     public static readonly DsonNull Undefine = new DsonNull();

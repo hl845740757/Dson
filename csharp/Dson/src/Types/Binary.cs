@@ -16,8 +16,12 @@
 
 #endregion
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson.Types;
 
+/// <summary>
+/// 具有类型标签的二进制数据(字节数组)
+/// </summary>
 public readonly struct Binary : IEquatable<Binary>
 {
     private readonly int _type;

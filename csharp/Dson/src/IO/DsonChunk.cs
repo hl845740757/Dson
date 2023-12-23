@@ -16,8 +16,12 @@
 
 #endregion
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson.IO;
 
+/// <summary>
+/// Dson数据块
+/// </summary>
 public class DsonChunk
 {
     private readonly byte[] _buffer;
@@ -77,10 +81,18 @@ public class DsonChunk
         return r;
     }
 
+    /// <summary>
+    /// 转为Span
+    /// </summary>
+    /// <returns></returns>
     public Span<byte> AsSpan() {
         return new Span<byte>(_buffer, _offset, _length);
     }
 
+    /// <summary>
+    /// 转为ArraySegment
+    /// </summary>
+    /// <returns></returns>
     public ArraySegment<byte> AsSegment() {
         return new ArraySegment<byte>(_buffer, _offset, _length);
     }

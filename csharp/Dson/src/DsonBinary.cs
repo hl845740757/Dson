@@ -18,8 +18,12 @@
 
 using Wjybxx.Dson.IO;
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson;
 
+/// <summary>
+/// Dson字节数组抽象
+/// </summary>
 public class DsonBinary : DsonValue, IEquatable<DsonBinary>
 {
     private readonly int _type;
@@ -47,9 +51,14 @@ public class DsonBinary : DsonValue, IEquatable<DsonBinary>
     }
 
     public override DsonType DsonType => DsonType.Binary;
+
+    /// <summary>
+    /// 子类型
+    /// </summary>
     public int Type => _type;
 
     /// <summary>
+    /// 数据部分
     /// 不宜修改返回的数据
     /// </summary>
     public byte[] Data => _data;

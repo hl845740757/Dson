@@ -16,6 +16,7 @@
 
 #endregion
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson;
 
 public class DsonString : DsonValue, IEquatable<DsonString>, IComparable<DsonString>, IComparable

@@ -19,8 +19,12 @@
 using System.Runtime.Serialization;
 using Wjybxx.Dson.Text;
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson.IO;
 
+/// <summary>
+/// DsonIO操作异常
+/// </summary>
 public class DsonIOException : Exception
 {
     public DsonIOException() {

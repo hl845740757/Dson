@@ -20,8 +20,12 @@ using System.Diagnostics;
 using Wjybxx.Dson.IO;
 using Wjybxx.Dson.Types;
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson.Text;
 
+/// <summary>
+/// 将输出写为文本的Writer
+/// </summary>
 public class DsonTextWriter : AbstractDsonWriter<string>
 {
 #nullable disable

@@ -20,8 +20,13 @@ using Wjybxx.Dson.IO;
 using Wjybxx.Dson.Text;
 using Wjybxx.Dson.Types;
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson;
 
+/// <summary>
+/// Dson二进制Writer
+/// </summary>
+/// <typeparam name="TName"></typeparam>
 public class DsonBinaryWriter<TName> : AbstractDsonWriter<TName> where TName : IEquatable<TName>
 {
     private IDsonOutput _output;

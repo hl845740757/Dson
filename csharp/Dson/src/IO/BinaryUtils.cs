@@ -18,6 +18,7 @@
 
 using System.Runtime.CompilerServices;
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson.IO;
 
 /// <summary>
@@ -31,7 +32,7 @@ public static class BinaryUtils
     }
 
     /// <summary>
-    /// 检查buffer的参数
+    /// 检查buffer参数
     /// </summary>
     /// <param name="bufferLength">buffer数组的长度</param>
     /// <param name="offset">数据的起始索引</param>
@@ -44,6 +45,12 @@ public static class BinaryUtils
         }
     }
 
+    /// <summary>
+    /// 检查buffer参数
+    /// </summary>
+    /// <param name="offset">数据的起始索引</param>
+    /// <param name="bufferLength">数据的长度</param>
+    /// <exception cref="ArgumentException"></exception>
     public static void CheckBuffer(int bufferLength, int offset) {
         if (offset < 0 || offset > bufferLength) {
             throw new ArgumentException($"Array range is invalid. Buffer.length={bufferLength}, offset={offset}");
@@ -164,6 +171,7 @@ public static class BinaryUtils
 
     #endregion
 
+#pragma warning restore CS1591
     // 以下参考自protobuf，以避免引入PB
 
     #region protobuf util
@@ -216,6 +224,8 @@ public static class BinaryUtils
         return 10;
     }
 
+#pragma warning disable CS1591
+    /** https://protobuf.dev/programming-guides/encoding  */
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static uint EncodeZigZag32(int n) => (uint)(n << 1 ^ n >> 31);
 
@@ -227,6 +237,8 @@ public static class BinaryUtils
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static long DecodeZigZag64(ulong n) => (long)(n >> 1) ^ -((long)n & 1L);
+
+#pragma warning restore CS1591
 
     #endregion
 

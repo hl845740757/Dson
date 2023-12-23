@@ -21,8 +21,13 @@ using Wjybxx.Dson.Collections;
 using Wjybxx.Dson.IO;
 using Wjybxx.Dson.Types;
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson;
 
+/// <summary>
+/// 从<see cref="DsonArray{TK}"/>中读取输入
+/// </summary>
+/// <typeparam name="TName"></typeparam>
 public class DsonObjectReader<TName> : AbstractDsonReader<TName> where TName : IEquatable<TName>
 {
     private TName? _nextName;

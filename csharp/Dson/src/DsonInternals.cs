@@ -17,9 +17,13 @@
 #endregion
 
 using System.Runtime.CompilerServices;
+using Wjybxx.Commons.Collections;
 
 namespace Wjybxx.Dson;
 
+/// <summary>
+/// Dson内部工具类
+/// </summary>
 internal static class DsonInternals
 {
     //c#居然没有一开始就支持逻辑右移...C#11提供了逻辑右移，但目前.NET6是主流
@@ -88,121 +92,27 @@ internal static class DsonInternals
 
     #region 集合Util
 
-    // 将创建我的集合库中的LinkedDictionary
+    public static List<T> NewList<T>(T first) {
+        return new List<T>(1) { first };
+    }
+
+    public static List<T> NewList<T>(T first, T second) {
+        return new List<T>(2) { first, second };
+    }
+
+    public static List<T> NewList<T>(T first, T second, T third) {
+        return new List<T>(3) { first, second, third };
+    }
+
     public static IDictionary<TK, DsonValue> NewLinkedDictionary<TK>(int capacity = 0) {
         return new Dictionary<TK, DsonValue>(capacity);
     }
 
     public static IDictionary<TK, DsonValue> NewLinkedDictionary<TK>(IDictionary<TK, DsonValue> src) {
         if (src == null) throw new ArgumentNullException(nameof(src));
-        return new Dictionary<TK, DsonValue>(src);
-    }
-
-    public static List<T> NewList<T>(T first) {
-        var list = new List<T>(1);
-        list.Add(first);
-        return list;
-    }
-
-    public static List<T> NewList<T>(T first, T second) {
-        var list = new List<T>(2);
-        list.Add(first);
-        list.Add(second);
-        return list;
-    }
-
-    public static List<T> NewList<T>(T first, T second, T third) {
-        var list = new List<T>(3);
-        list.Add(first);
-        list.Add(second);
-        list.Add(third);
-        return list;
-    }
-
-    public static List<T> NewList<T>(params T[] elements) {
-        return new List<T>(elements);
-    }
-
-    public static bool ContainsRef<TE>(IList<TE> list, TE element) where TE : class {
-        for (int i = 0, size = list.Count; i < size; i++) {
-            if (ReferenceEquals(list[i], element)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static int IndexOfRef<TE>(IList<TE> list, Object element) where TE : class {
-        for (int idx = 0, size = list.Count; idx < size; idx++) {
-            if (ReferenceEquals(list[idx], element)) {
-                return idx;
-            }
-        }
-        return -1;
-    }
-
-    public static int LastIndexOfRef<TE>(IList<TE> list, Object element) where TE : class {
-        for (int idx = list.Count - 1; idx >= 0; idx--) {
-            if (ReferenceEquals(list[idx], element)) {
-                return idx;
-            }
-        }
-        return -1;
-    }
-
-    public static bool RemoveRef<TE>(IList<TE> list, Object element) where TE : class {
-        int index = IndexOfRef(list, element);
-        if (index < 0) {
-            return false;
-        }
-        list.RemoveAt(index);
-        return true;
-    }
-
-    #endregion
-
-    #region 数组
-
-    /// <summary>
-    /// 拷贝数组
-    /// </summary>
-    /// <param name="src">原始四组</param>
-    /// <param name="newLen">可大于或小于原始数组长度</param>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
-    public static T[] CopyOf<T>(T[] src, int newLen) {
-        if (src == null) throw new ArgumentNullException(nameof(src));
-        if (newLen < 0) throw new ArgumentException("newLen cant be negative");
-        T[] result = new T[newLen];
-        Array.Copy(src, 0, result, 0, Math.Min(src.Length, newLen));
-        return result;
-    }
-
-    public static bool ContainsRef<TE>(TE[] list, TE element) where TE : class {
-        for (int i = 0, size = list.Length; i < size; i++) {
-            if (ReferenceEquals(list[i], element)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static int IndexOfRef<TE>(TE[] list, Object element) where TE : class {
-        for (int idx = 0, size = list.Length; idx < size; idx++) {
-            if (ReferenceEquals(list[idx], element)) {
-                return idx;
-            }
-        }
-        return -1;
-    }
-
-    public static int LastIndexOfRef<TE>(TE[] list, Object element) where TE : class {
-        for (int idx = list.Length - 1; idx >= 0; idx--) {
-            if (ReferenceEquals(list[idx], element)) {
-                return idx;
-            }
-        }
-        return -1;
+        var dictionary = new LinkedDictionary<TK, DsonValue>();
+        dictionary.PutAll(src);
+        return dictionary;
     }
 
     #endregion

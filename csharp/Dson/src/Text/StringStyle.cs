@@ -18,6 +18,9 @@
 
 namespace Wjybxx.Dson.Text;
 
+/// <summary>
+/// 字符串输出样式
+/// </summary>
 public enum StringStyle
 {
     /**

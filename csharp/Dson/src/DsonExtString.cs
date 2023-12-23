@@ -16,8 +16,12 @@
 
 #endregion
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson;
 
+/// <summary>
+/// Dson具备类型标签的String，支持value为null
+/// </summary>
 public class DsonExtString : DsonValue, IEquatable<DsonExtString>, IComparable<DsonExtString>, IComparable
 {
     public const int MaskType = 1;

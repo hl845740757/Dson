@@ -8,4 +8,8 @@
         <RootNamespace>Wjybxx.Dson.Codec</RootNamespace>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Wjybxx.Commons.Core" Version="1.0.0" />
+    </ItemGroup>
+
 </Project>

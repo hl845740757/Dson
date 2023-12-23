@@ -19,8 +19,13 @@
 using Wjybxx.Dson.IO;
 using Wjybxx.Dson.Types;
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson;
 
+/// <summary>
+/// Dson二进制Reader
+/// </summary>
+/// <typeparam name="TName"></typeparam>
 public class DsonBinaryReader<TName> : AbstractDsonReader<TName> where TName : IEquatable<TName>
 {
     private IDsonInput _input;

@@ -16,8 +16,12 @@
 
 #endregion
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson;
 
+/// <summary>
+/// Dson数据类型枚举
+/// </summary>
 public enum DsonType
 {
     /** 对象的结束标识 */
@@ -43,8 +47,17 @@ public enum DsonType
     /// 通过扩展类型，可避免破坏业务代码，可避免用户自行封装
     /// </summary>
     ExtInt32 = 9,
+    /// <summary>
+    /// Int64的扩展类型
+    /// </summary>
     ExtInt64 = 10,
+    /// <summary>
+    /// Double的扩展类型
+    /// </summary>
     ExtDouble = 11,
+    /// <summary>
+    /// String的扩展类型
+    /// </summary>
     ExtString = 12,
 
     /// <summary>
@@ -71,9 +84,14 @@ public enum DsonType
     Object = 31,
 }
 
+/// <summary>
+/// DsonType的工具类
+/// </summary>
 public static class DsonTypes
 {
     private static readonly DsonType[] LookUp;
+
+    /** 用于表示无效DsonType的共享值 */
     public static readonly DsonType Invalid = (DsonType)(-1);
 
     static DsonTypes() {
@@ -83,6 +101,7 @@ public static class DsonTypes
         }
     }
 
+    /** DsonType是否表示Dson的Number */
     public static bool IsNumber(this DsonType dsonType) {
         return dsonType switch {
             DsonType.Int32 => true,
@@ -93,6 +112,7 @@ public static class DsonTypes
         };
     }
 
+    /** DsonType关联的值在二进制编码时是否包含WireType */
     public static bool HasWireType(this DsonType dsonType) {
         return dsonType switch {
             DsonType.Int32 => true,
@@ -103,15 +123,17 @@ public static class DsonTypes
         };
     }
 
-    /** header不属于普通意义上的容器 */
+    /** DsonType是否表示容器类型；header不属于普通意义上的容器 */
     public static bool IsContainer(this DsonType dsonType) {
         return dsonType == DsonType.Object || dsonType == DsonType.Array;
     }
 
+    /** DsonType是否是容器类型或Header */
     public static bool IsContainerOrHeader(this DsonType dsonType) {
         return dsonType == DsonType.Object || dsonType == DsonType.Array || dsonType == DsonType.Header;
     }
 
+    /** 通过Number获取对应的枚举 */
     public static DsonType ForNumber(int number) {
         return LookUp[number];
     }

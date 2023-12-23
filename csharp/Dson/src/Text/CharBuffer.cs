@@ -16,6 +16,7 @@
 
 #endregion
 
+using Wjybxx.Commons.Collections;
 using Wjybxx.Dson.IO;
 
 namespace Wjybxx.Dson.Text;
@@ -170,7 +171,7 @@ internal class CharBuffer
         if (capacity <= buffer.Length) {
             return;
         }
-        this.Buffer = DsonInternals.CopyOf(this.Buffer, capacity);
+        this.Buffer = CollectionUtil.CopyOf(this.Buffer, 0, capacity);
     }
 
     #endregion

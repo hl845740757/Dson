@@ -10,7 +10,7 @@
     <packaging>pom</packaging>
 
     <name>Dson-Parent</name>
-    <description>有点奇怪的配置文件格式和序列化方案</description>
+    <description>Dson-有点奇怪的配置文件格式和序列化方案</description>
     <url>https://github.com/hl845740757/Dson</url>
 
     <modules>
@@ -48,7 +48,7 @@
     </developers>
 
     <properties>
-        <revision>1.2.rc2</revision>
+        <revision>1.2.0</revision>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

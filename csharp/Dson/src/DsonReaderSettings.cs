@@ -16,12 +16,19 @@
 
 #endregion
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson;
 
+/// <summary>
+/// DsonReader的设置数据
+/// </summary>
 public class DsonReaderSettings
 {
+    /** 递归深度限制 */
     public readonly int RecursionLimit;
+    /** 关闭Reader时是否自动关闭底层的输入流 */
     public readonly bool AutoClose;
+    /** 是否启用字段名池化 */
     public readonly bool EnableFieldIntern;
 
     public DsonReaderSettings(Builder builder) {

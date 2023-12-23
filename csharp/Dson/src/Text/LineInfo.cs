@@ -18,13 +18,21 @@
 
 using System.Text;
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson.Text;
 
+/// <summary>
+/// Dson文本行扫描信息
+/// </summary>
 public class LineInfo
 {
+    /** 扫描中 */
     public const int StateScan = 0;
+    /** 扫描到'\n'换行符 */
     public const int StateLf = 1;
+    /** 扫描到'\r\n'换行符 */
     public const int StateCrlf = 2;
+    /** 扫描到文件尾 */
     public const int StateEof = 3;
 
     /** 行号 */

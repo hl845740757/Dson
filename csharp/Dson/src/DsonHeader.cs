@@ -16,6 +16,7 @@
 
 #endregion
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson;
 
 /// <summary>
@@ -40,7 +41,7 @@ public class DsonHeader<TK> : AbstractDsonObject<TK>
 }
 
 /// <summary>
-/// 定义常量
+/// 定义DsonHeader常量
 /// </summary>
 public static class DsonHeaders
 {

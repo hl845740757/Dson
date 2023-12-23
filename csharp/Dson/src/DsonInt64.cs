@@ -16,8 +16,12 @@
 
 #endregion
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson;
 
+/// <summary>
+/// DsonInt64
+/// </summary>
 public class DsonInt64 : DsonNumber, IEquatable<DsonInt64>, IComparable<DsonInt64>, IComparable
 {
     private readonly long _value;

@@ -16,8 +16,12 @@
 
 #endregion
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson;
 
+/// <summary>
+/// Dson具备类型标签的Int64类型
+/// </summary>
 public class DsonExtInt64 : DsonValue, IEquatable<DsonExtInt64>, IComparable<DsonExtInt64>, IComparable
 {
     private readonly int _type;

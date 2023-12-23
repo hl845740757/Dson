@@ -20,8 +20,12 @@ using System.Collections.Immutable;
 using Wjybxx.Dson.IO;
 using Wjybxx.Dson.Types;
 
+#pragma warning disable CS1591
 namespace Wjybxx.Dson;
 
+/// <summary>
+/// Dson二进制编解码工具类
+/// </summary>
 public static class DsonReaderUtils
 {
     /** 支持读取为bytes和直接写入bytes的数据类型 -- 这些类型不可以存储额外数据在WireType上 */
