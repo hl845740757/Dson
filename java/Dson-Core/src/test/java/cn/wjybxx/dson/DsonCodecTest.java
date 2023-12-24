@@ -36,6 +36,7 @@ import java.util.List;
  * @author wjybxx
  * date - 2023/6/3
  */
+@SuppressWarnings("deprecation")
 public class DsonCodecTest {
 
     private static final int loop = 3;

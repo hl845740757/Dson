@@ -3,7 +3,7 @@
  * date - 2023/12/16
  */
 module Dson.ProtoBuf {
-    requires dson.core;
+    requires wjybxx.dson.core;
     requires protobuf.java;
 
     exports cn.wjybxx.dson.pb;

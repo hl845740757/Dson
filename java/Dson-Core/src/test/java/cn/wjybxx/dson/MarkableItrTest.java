@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Test;
  * @author wjybxx
  * date - 2023/8/9
  */
+@SuppressWarnings("deprecation")
 public class MarkableItrTest {
 
     @Test

@@ -31,6 +31,7 @@ import java.util.List;
  * @author wjybxx
  * date - 2023/6/3
  */
+@SuppressWarnings("deprecation")
 public class DsonCharStreamTest {
 
     private static final String tokenString = """

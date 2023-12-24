@@ -464,7 +464,7 @@ public final class Dsons {
             return readTopDsonValue(reader);
         }
     }
-    
+
     /** @param jsonString json字符串或无行首的dson字符串 */
     public static DsonValue fromJson(CharSequence jsonString) {
         try (DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.DEFAULT, newJsonScanner(jsonString))) {

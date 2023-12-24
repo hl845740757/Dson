@@ -34,6 +34,7 @@ import java.util.List;
  * @author wjybxx
  * date - 2023/8/9
  */
+@SuppressWarnings("deprecation")
 public class PeekTypeTest {
 
     private static List<DsonReader> createReaders(DsonObject<String> dsonObject) {

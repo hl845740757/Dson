@@ -2,7 +2,7 @@
  * @author wjybxx
  * date - 2023/6/29
  */
-module dson.core {
+module wjybxx.dson.core {
     requires jsr305;
 
     exports cn.wjybxx.dson;
@@ -14,4 +14,6 @@ module dson.core {
     opens cn.wjybxx.dson.text;
     opens cn.wjybxx.dson.io;
     opens cn.wjybxx.dson.types;
+
+    exports cn.wjybxx.dson.internal to wjybxx.dson.codec;
 }

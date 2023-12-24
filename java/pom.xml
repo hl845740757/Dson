@@ -15,7 +15,9 @@
 
     <modules>
         <module>Dson-Core</module>
+        <module>Dson-Codec</module>
         <module>Dson-Protobuf</module>
+        <module>Dson-Apt</module>
     </modules>
 
     <!-- 证书 -->
@@ -48,20 +50,22 @@
     </developers>
 
     <properties>
-        <revision>1.2.0</revision>
+        <revision>1.2.rc4</revision>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!--测试依赖 -->
         <slf4j.version>2.0.9</slf4j.version>
-        <logback.version>1.4.13</logback.version>
+        <logback.version>1.4.14</logback.version>
         <junit.version>5.9.2</junit.version>
-        <commons-lang3.version>3.14.0</commons-lang3.version>
         <commons-io.version>2.13.0</commons-io.version>
 
         <!-- 运行时依赖 -->
+        <base.version>1.0.rc1</base.version>
         <jsr305.version>3.0.2</jsr305.version>
+        <commons-lang3.version>3.14.0</commons-lang3.version>
+        <fastutil.version>8.5.12</fastutil.version>
         <pb.version>3.25.1</pb.version>
     </properties>
 
