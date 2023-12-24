@@ -163,45 +163,4 @@ public class DsonInternals {
 
     // endregion
 
-    // region properties
-
-    public static int getInt(Properties properties, String key) {
-        String v = properties.getProperty(key);
-        return Integer.parseInt(v);
-    }
-
-    public static int getInt(Properties properties, String key, int def) {
-        String v = properties.getProperty(key);
-        try {
-            return Integer.parseInt(v);
-        } catch (NumberFormatException e) {
-            return def;
-        }
-    }
-
-    public static boolean getBool(Properties properties, String key, boolean def) {
-        String v = properties.getProperty(key);
-        return toBoolean(v, def);
-    }
-
-    public static boolean toBoolean(String value) {
-        return toBoolean(value, false);
-    }
-
-    public static boolean toBoolean(String value, boolean def) {
-        if (value == null || value.isEmpty()) {
-            return def;
-        }
-        value = value.trim().toLowerCase();
-        if (value.isEmpty()) {
-            return def;
-        }
-        return switch (value) {
-            case "true", "yes", "y", "1" -> true;
-            case "false", "no", "n", "0" -> false;
-            default -> def;
-        };
-    }
-
-    // endregion
 }

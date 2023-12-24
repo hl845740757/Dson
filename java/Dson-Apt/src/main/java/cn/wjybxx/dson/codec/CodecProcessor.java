@@ -143,7 +143,8 @@ public class CodecProcessor extends MyAbstractProcessor {
 
     @Override
     public Set<String> getSupportedAnnotationTypes() {
-        return Set.of(CNAME_BIN_SERIALIZABLE, CNAME_DOC_SERIALIZABLE);
+        return Set.of(CNAME_BIN_SERIALIZABLE, CNAME_DOC_SERIALIZABLE,
+                CNAME_CODEC_LINKER_GROUP);
     }
 
     @Override

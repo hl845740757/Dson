@@ -15,6 +15,10 @@
     <description>Dson基于Protobuf的输入输出流</description>
     <url>https://github.com/hl845740757/Dson</url>
 
+    <properties>
+        <maven.deploy.skip>false</maven.deploy.skip>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>cn.wjybxx.dson</groupId>

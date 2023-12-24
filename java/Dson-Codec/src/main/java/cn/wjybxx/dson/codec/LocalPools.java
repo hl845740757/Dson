@@ -16,7 +16,7 @@
 
 package cn.wjybxx.dson.codec;
 
-import cn.wjybxx.dson.internal.DsonInternals;
+import cn.wjybxx.base.PropertiesUtils;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayDeque;
@@ -42,8 +42,8 @@ public class LocalPools {
 
     static {
         Properties properties = System.getProperties();
-        BUFFER_SIZE = DsonInternals.getInt(properties, "cn.wjybxx.dson.codec.buffsize", 64 * 1024);
-        POOL_SIZE = DsonInternals.getInt(properties, "cn.wjybxx.dson.codec.poolsize", 4);
+        BUFFER_SIZE = PropertiesUtils.getInt(properties, "cn.wjybxx.dson.codec.buffsize", 64 * 1024);
+        POOL_SIZE = PropertiesUtils.getInt(properties, "cn.wjybxx.dson.codec.poolsize", 4);
 
         LOCAL_BUFFER_QUEUE = ThreadLocal.withInitial(() -> new ArrayDeque<>(POOL_SIZE));
         LOCAL_STRING_QUEUE = ThreadLocal.withInitial(() -> new ArrayDeque<>(POOL_SIZE));
