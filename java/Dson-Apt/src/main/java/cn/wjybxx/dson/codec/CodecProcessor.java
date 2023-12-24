@@ -19,6 +19,7 @@ package cn.wjybxx.dson.codec;
 import cn.wjybxx.apt.AptUtils;
 import cn.wjybxx.apt.BeanUtils;
 import cn.wjybxx.apt.MyAbstractProcessor;
+import cn.wjybxx.base.ObjectUtils;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.*;
 
@@ -63,6 +64,7 @@ public class CodecProcessor extends MyAbstractProcessor {
     private static final String CNAME_CODEC_LINKER_GROUP = "cn.wjybxx.dson.codec.CodecLinkerGroup";
     private static final String CNAME_CODEC_LINKER = "cn.wjybxx.dson.codec.CodecLinker";
     private static final String MNAME_OUTPUT = "outputPackage";
+    private static final String MNAME_SUBPACKAGE = "subPackage";
     private static final String MNAME_CLASSIMPL = "classImpl";
 
     // PojoCodecImpl
@@ -276,12 +278,15 @@ public class CodecProcessor extends MyAbstractProcessor {
             Objects.requireNonNull(classImplAnnoValue, "classImp props is absent");
             AptClassImpl aptClassImpl = AptClassImpl.parse((AnnotationMirror) classImplAnnoValue.getValue());
 
+            final String subPackage = AptUtils.getAnnotationValueValue(groupContext.linkerGroupAnnoMirror, MNAME_SUBPACKAGE, "");
+
             // 创建模拟数据
             TypeElement typeElement = (TypeElement) declaredType.asElement();
             Context context = new Context(typeElement);
             context.linkerAddAnnotations = getAdditionalAnnotations(linkerAnnoMirror);
             context.binSerialAnnoMirror = context.docSerialAnnoMirror = linkerAnnoMirror;
             context.binAddAnnotations = context.docAddAnnotations = context.linkerAddAnnotations;
+            context.outPackage = ObjectUtils.isBlank(subPackage) ? outPackage : outPackage + "." + subPackage;
 
             context.aptClassImpl = aptClassImpl;
             context.allFieldsAndMethodWithInherit = BeanUtils.getAllFieldsAndMethodsWithInherit(typeElement);

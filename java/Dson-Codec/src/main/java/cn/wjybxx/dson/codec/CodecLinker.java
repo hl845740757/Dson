@@ -42,6 +42,13 @@ public @interface CodecLinker {
      */
     ClassImpl classImpl();
 
+    /**
+     * 子目录
+     * 1.与{@link CodecLinkerGroup#outputPackage()}构成最终包路径。
+     * 2.另一种方案是，每个子包使用一个静态内部来引用
+     */
+    String subPackage() default "";
+
     /** 为生成的文件添加的注解 */
     Class<? extends Annotation>[] annotations() default {};
 
