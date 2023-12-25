@@ -20,6 +20,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Wjybxx.Commons.Collections;
 
 #pragma warning disable CS1591
 namespace Wjybxx.Dson;
@@ -28,11 +29,11 @@ namespace Wjybxx.Dson;
 /// Dson KV类结构的抽象实现
 /// </summary>
 /// <typeparam name="TK">String或<see cref="FieldNumber"/></typeparam>
-public abstract class AbstractDsonObject<TK> : DsonValue, IDictionary<TK, DsonValue>, IEquatable<AbstractDsonObject<TK>>
+public abstract class AbstractDsonObject<TK> : DsonValue, IGenericDictionary<TK, DsonValue>, IEquatable<AbstractDsonObject<TK>>
 {
-    protected readonly IDictionary<TK, DsonValue> _valueMap;
+    protected readonly IGenericDictionary<TK, DsonValue> _valueMap;
 
-    public AbstractDsonObject(IDictionary<TK, DsonValue> valueMap) {
+    public AbstractDsonObject(IGenericDictionary<TK, DsonValue> valueMap) {
         _valueMap = valueMap;
     }
 
@@ -70,6 +71,16 @@ public abstract class AbstractDsonObject<TK> : DsonValue, IDictionary<TK, DsonVa
         _valueMap.Add(key, value);
     }
 
+    public bool TryAdd(TK key, DsonValue value) {
+        CheckElement(key, value);
+        return _valueMap.TryAdd(key, value);
+    }
+
+    public PutResult<DsonValue> Put(TK key, DsonValue value) {
+        CheckElement(key, value);
+        return _valueMap.Put(key, value);
+    }
+
     public virtual AbstractDsonObject<TK> Append(TK key, DsonValue value) {
         CheckElement(key, value);
         _valueMap[key!] = value;
@@ -80,39 +91,33 @@ public abstract class AbstractDsonObject<TK> : DsonValue, IDictionary<TK, DsonVa
 
     #region 简单代理
 
-    public void Clear() {
-        _valueMap.Clear();
-    }
-
-    public bool Contains(KeyValuePair<TK, DsonValue> item) {
-        return _valueMap.Contains(item);
-    }
-
-    public void CopyTo(KeyValuePair<TK, DsonValue>[] array, int arrayIndex) {
-        _valueMap.CopyTo(array, arrayIndex);
-    }
-
-    public bool Remove(KeyValuePair<TK, DsonValue> item) {
-        return _valueMap.Remove(item);
-    }
-
     public int Count => _valueMap.Count;
     public bool IsReadOnly => _valueMap.IsReadOnly;
 
-    public bool ContainsKey(TK key) {
-        return _valueMap.ContainsKey(key);
-    }
+    public bool Contains(KeyValuePair<TK, DsonValue> item) => _valueMap.Contains(item);
 
-    public bool Remove(TK key) {
-        return _valueMap.Remove(key);
-    }
+    public bool ContainsKey(TK key) => _valueMap.ContainsKey(key);
 
-    public bool TryGetValue(TK key, out DsonValue value) {
-        return _valueMap.TryGetValue(key, out value);
-    }
+    public bool ContainsValue(DsonValue value) => _valueMap.ContainsValue(value);
 
-    public ICollection<TK> Keys => _valueMap.Keys;
-    public ICollection<DsonValue> Values => _valueMap.Values;
+    public bool TryGetValue(TK key, out DsonValue value) => _valueMap.TryGetValue(key, out value);
+
+    public bool Remove(KeyValuePair<TK, DsonValue> item) => _valueMap.Remove(item);
+
+    public bool Remove(TK key) => _valueMap.Remove(key);
+
+    public bool Remove(TK key, out DsonValue value) => _valueMap.Remove(key, out value);
+
+    public void Clear() => _valueMap.Clear();
+
+    public void CopyTo(KeyValuePair<TK, DsonValue>[] array, int arrayIndex) => _valueMap.CopyTo(array, arrayIndex);
+
+    public IGenericCollection<TK> Keys => _valueMap.Keys;
+    public IGenericCollection<DsonValue> Values => _valueMap.Values;
+
+    public IGenericCollection<TK> UnsafeKeys() => _valueMap.UnsafeKeys();
+
+    public void AdjustCapacity(int expectedCount) => _valueMap.AdjustCapacity(expectedCount);
 
     #endregion
 

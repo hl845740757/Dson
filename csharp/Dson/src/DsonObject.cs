@@ -17,6 +17,7 @@
 #endregion
 
 using System.Collections.Generic;
+using Wjybxx.Commons.Collections;
 
 #pragma warning disable CS1591
 namespace Wjybxx.Dson;
@@ -41,7 +42,7 @@ public class DsonObject<TK> : AbstractDsonObject<TK>
         : this(DsonInternals.NewLinkedDictionary(src), new DsonHeader<TK>(src._header)) {
     }
 
-    private DsonObject(IDictionary<TK, DsonValue> valueMap, DsonHeader<TK> header)
+    private DsonObject(IGenericDictionary<TK, DsonValue> valueMap, DsonHeader<TK> header)
         : base(valueMap) {
         _header = header;
     }

@@ -106,11 +106,11 @@ internal static class DsonInternals
         return new List<T>(3) { first, second, third };
     }
 
-    public static IDictionary<TK, DsonValue> NewLinkedDictionary<TK>(int capacity = 0) {
-        return new Dictionary<TK, DsonValue>(capacity);
+    public static IGenericDictionary<TK, DsonValue> NewLinkedDictionary<TK>(int capacity = 0) {
+        return new LinkedDictionary<TK, DsonValue>(capacity);
     }
 
-    public static IDictionary<TK, DsonValue> NewLinkedDictionary<TK>(IDictionary<TK, DsonValue> src) {
+    public static IGenericDictionary<TK, DsonValue> NewLinkedDictionary<TK>(IDictionary<TK, DsonValue> src) {
         if (src == null) throw new ArgumentNullException(nameof(src));
         var dictionary = new LinkedDictionary<TK, DsonValue>();
         dictionary.PutAll(src);

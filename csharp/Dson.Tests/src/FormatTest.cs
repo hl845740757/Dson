@@ -16,13 +16,14 @@
 
 #endregion
 
+using NUnit.Framework;
 using Wjybxx.Dson.Text;
 
 namespace Wjybxx.Dson.Tests;
 
 public class FormatTest
 {
-    private static readonly string dsonString = @"
+    internal static readonly string DsonString = @"
             - {@{clsName:MyClassInfo, guid :10001, flags: 0}
             -   name : wjybxx,
             -   age: 28,
@@ -42,7 +43,7 @@ public class FormatTest
 
     [Test]
     public void FormatTest0() {
-        DsonObject<string> dsonObject = Dsons.FromDson(dsonString).AsObject();
+        DsonObject<string> dsonObject = Dsons.FromDson(DsonString).AsObject();
         {
             DsonTextWriterSettings.Builder builder = new DsonTextWriterSettings.Builder() {
                 ExtraIndent = 2,

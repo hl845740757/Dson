@@ -17,6 +17,7 @@
 #endregion
 
 using System.Diagnostics;
+using NUnit.Framework;
 using Wjybxx.Dson.IO;
 using Wjybxx.Dson.Text;
 
@@ -28,7 +29,7 @@ namespace Wjybxx.Dson.Tests;
 public class BasicTests
 {
     // c#10还不支持 """，因此转为@格式
-    private const string DsonString = @"           
+    internal const string DsonString = @"           
             - @{clsName: FileHeader, intro: 预留设计，允许定义文件头}
             -
             - {@MyStruct
@@ -124,8 +125,8 @@ public class BasicTests
         byte[] buffer = new byte[16 * 1024];
         IDsonOutput output = DsonOutputs.NewInstance(buffer);
         output.WriteString(hexString);
-        
-        
+
+
         IDsonInput input = DsonInputs.NewInstance(buffer, 0, output.Position);
         string string2 = input.ReadString();
         Debug.Assert(hexString == string2);

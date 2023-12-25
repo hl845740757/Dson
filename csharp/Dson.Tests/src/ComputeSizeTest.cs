@@ -17,6 +17,7 @@
 #endregion
 
 using Google.Protobuf;
+using NUnit.Framework;
 using Wjybxx.Dson.IO;
 
 namespace Wjybxx.Dson.Tests;
@@ -43,6 +44,20 @@ public class ComputeSizeTest
         }
     }
 
+    [Test]
     public void ComputeVarInt64() {
+        ulong value = 0;
+        {
+            int pbSize = CodedOutputStream.ComputeRawVarint64Size(value);
+            int mySize = BinaryUtils.ComputeRawVarInt64Size(value);
+            Assert.That(mySize, Is.EqualTo(pbSize));
+        }
+        value = 1;
+        for (int i = 0; i < 64; i++) {
+            int pbSize = CodedOutputStream.ComputeRawVarint64Size(value);
+            int mySize = BinaryUtils.ComputeRawVarInt64Size(value);
+            Assert.That(mySize, Is.EqualTo(pbSize));
+            value *= 71;
+        }
     }
 }
