@@ -36,7 +36,7 @@ public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName> where TName
 #nullable enable
 
     protected AbstractDsonWriter(DsonWriterSettings settings) {
-        this.Settings = settings;
+        this.Settings = settings ?? throw new ArgumentNullException(nameof(settings));
     }
 
     public DsonWriterSettings WriterSettings => Settings;

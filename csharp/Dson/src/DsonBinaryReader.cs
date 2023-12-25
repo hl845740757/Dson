@@ -29,12 +29,14 @@ namespace Wjybxx.Dson;
 /// <typeparam name="TName"></typeparam>
 public class DsonBinaryReader<TName> : AbstractDsonReader<TName> where TName : IEquatable<TName>
 {
+#nullable disable
     private IDsonInput _input;
+#nullable enable
     private readonly AbstractDsonReader<string>? _textReader;
     private readonly AbstractDsonReader<FieldNumber>? _binReader;
 
     public DsonBinaryReader(DsonReaderSettings settings, IDsonInput input) : base(settings) {
-        this._input = input;
+        this._input = input ?? throw new ArgumentNullException(nameof(input));
         SetContext(new Context().Init(null, DsonContextType.TopLevel, DsonTypes.Invalid));
         if (DsonInternals.IsStringKey<TName>()) {
             this._textReader = this as AbstractDsonReader<string>;
@@ -75,7 +77,7 @@ public class DsonBinaryReader<TName> : AbstractDsonReader<TName> where TName : I
         this._currentDsonType = dsonType;
         this._currentWireType = wireType;
         this._currentWireTypeBits = wreTypeBits;
-        this._currentName = default;
+        this._currentName = default!;
 
         OnReadDsonType(context, dsonType);
         return dsonType;
@@ -223,7 +225,7 @@ public class DsonBinaryReader<TName> : AbstractDsonReader<TName> where TName : I
     #region context
 
     private Context NewContext(Context parent, DsonContextType contextType, DsonType dsonType) {
-        Context context = GetPooledContext();
+        Context? context = GetPooledContext();
         if (context != null) {
             SetPooledContext(null);
         }

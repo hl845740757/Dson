@@ -39,7 +39,7 @@ public class DsonTextWriter : AbstractDsonWriter<string>
     public DsonTextWriter(DsonTextWriterSettings settings, TextWriter writer)
         : base(settings) {
         this._settings = settings;
-        this._writer = writer;
+        this._writer = writer ?? throw new ArgumentNullException(nameof(writer));
         this._printer = new DsonPrinter(settings, writer);
         SetContext(new Context().Init(null, DsonContextType.TopLevel, DsonTypes.Invalid));
     }

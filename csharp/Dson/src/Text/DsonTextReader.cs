@@ -936,7 +936,7 @@ public class DsonTextReader : AbstractDsonReader<string>
         /** 对象的开始token */
         internal DsonToken _beginToken;
         /** header只可触发一次流程 */
-        internal int _headerCount = 0;
+        internal int _headerCount;
         /** 元素计数，判断冒号 */
         internal int _count;
         /** 数组/Object成员的类型 - token类型可直接复用；header的该属性是用于注释外层对象的 */

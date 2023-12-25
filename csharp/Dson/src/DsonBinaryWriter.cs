@@ -30,12 +30,14 @@ namespace Wjybxx.Dson;
 /// <typeparam name="TName"></typeparam>
 public class DsonBinaryWriter<TName> : AbstractDsonWriter<TName> where TName : IEquatable<TName>
 {
+#nullable disable
     private IDsonOutput _output;
+#nullable enable
     private readonly AbstractDsonWriter<string>? _textWriter;
     private readonly AbstractDsonWriter<FieldNumber>? _binWriter;
 
     public DsonBinaryWriter(DsonWriterSettings settings, IDsonOutput output) : base(settings) {
-        this._output = output;
+        this._output = output ?? throw new ArgumentNullException(nameof(output));
         SetContext(new Context().Init(null, DsonContextType.TopLevel, DsonTypes.Invalid));
         if (DsonInternals.IsStringKey<TName>()) {
             _textWriter = this as AbstractDsonWriter<string>;
@@ -221,7 +223,7 @@ public class DsonBinaryWriter<TName> : AbstractDsonWriter<TName> where TName : I
     #region context
 
     private Context NewContext(Context parent, DsonContextType contextType, DsonType dsonType) {
-        Context context = GetPooledContext();
+        Context? context = GetPooledContext();
         if (context != null) {
             SetPooledContext(null);
         }
@@ -239,7 +241,7 @@ public class DsonBinaryWriter<TName> : AbstractDsonWriter<TName> where TName : I
 
     protected new class Context : AbstractDsonWriter<TName>.Context
     {
-        protected internal int _preWritten = 0;
+        protected internal int _preWritten;
 
         public Context() {
         }

@@ -41,7 +41,7 @@ public abstract class AbstractDsonReader<TName> : IDsonReader<TName> where TName
 #nullable enable
 
     protected AbstractDsonReader(DsonReaderSettings settings) {
-        Settings = settings;
+        Settings = settings ?? throw new ArgumentNullException(nameof(settings));
     }
 
     public DsonReaderSettings ReaderSettings => Settings;

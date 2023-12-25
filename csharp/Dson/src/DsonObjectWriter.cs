@@ -37,11 +37,10 @@ public class DsonObjectWriter<TName> : AbstractDsonWriter<TName> where TName : I
     /// <param name="outList">接收编码结果</param>
     public DsonObjectWriter(DsonWriterSettings settings, DsonArray<TName> outList)
         : base(settings) {
-        if (outList == null) throw new ArgumentNullException(nameof(outList));
         // 顶层输出是一个数组
         Context context = new Context();
         context.Init(null, DsonContextType.TopLevel, DsonTypes.Invalid);
-        context._container = outList;
+        context._container = outList ?? throw new ArgumentNullException(nameof(outList));
         SetContext(context);
     }
 
@@ -166,7 +165,7 @@ public class DsonObjectWriter<TName> : AbstractDsonWriter<TName> where TName : I
 
         this._recursionDepth--;
         SetContext(context.Parent!);
-        poolContext(context);
+        PoolContext(context);
     }
 
     #endregion
@@ -182,7 +181,7 @@ public class DsonObjectWriter<TName> : AbstractDsonWriter<TName> where TName : I
     #region context
 
     private Context NewContext(Context parent, DsonContextType contextType, DsonType dsonType) {
-        Context context = GetPooledContext();
+        Context? context = GetPooledContext();
         if (context != null) {
             SetPooledContext(null);
         }
@@ -193,7 +192,7 @@ public class DsonObjectWriter<TName> : AbstractDsonWriter<TName> where TName : I
         return context;
     }
 
-    private void poolContext(Context context) {
+    private void PoolContext(Context context) {
         context.Reset();
         SetPooledContext(context);
     }
@@ -228,7 +227,7 @@ public class DsonObjectWriter<TName> : AbstractDsonWriter<TName> where TName : I
             }
         }
 
-        public new Context? Parent => (Context)_parent;
+        public new Context Parent => (Context)_parent;
     }
 
     #endregion

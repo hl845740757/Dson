@@ -24,6 +24,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using Wjybxx.Dson.IO;
 using Wjybxx.Dson.Text;
+// ReSharper disable UnusedMember.Local
 
 #pragma warning disable CS1591
 namespace Wjybxx.Dson;
@@ -195,7 +196,7 @@ public static class Dsons
 
     // classId
     public static long MakeClassGuid(int ns, int classId) {
-        return ((long)ns << 32) | ((long)classId & 0xFFFF_FFFFL);
+        return ((long)ns << 32) | (classId & 0xFFFF_FFFFL);
     }
 
     public static int NamespaceOfClassGuid(long guid) {

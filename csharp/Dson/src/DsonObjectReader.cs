@@ -306,7 +306,7 @@ public class DsonObjectReader<TName> : AbstractDsonReader<TName> where TName : I
     #region context
 
     private Context NewContext(Context parent, DsonContextType contextType, DsonType dsonType) {
-        Context context = GetPooledContext();
+        Context? context = GetPooledContext();
         if (context != null) {
             SetPooledContext(null);
         }
