@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+<!--        <TargetFramework>net6.0</TargetFramework>-->
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>annotations</Nullable>
         <LangVersion>10</LangVersion>
@@ -13,9 +13,10 @@
 
         <Title>Wjybxx.Dson</Title>
         <Description>Dson-有点奇怪的配置文件格式和序列化方案</Description>
-        <PackageTags>wjybxx;dson;</PackageTags>
+        <PackageTags>wjybxx;dson;json</PackageTags>
 
         <Authors>wjybxx(845740757@qq.com)</Authors>
+        <Owners>wjybxx(845740757@qq.com)</Owners>
         <Copyright>Copyright 2023 wjybxx(845740757@qq.com)</Copyright>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
         <PackageProjectUrl>https://github.com/hl845740757/dson</PackageProjectUrl>
@@ -25,7 +26,9 @@
         <NeutralLanguage>zh-Hans</NeutralLanguage>
 
         <PackageReadmeFile>README.md</PackageReadmeFile>
+        <EmbedAllSources>true</EmbedAllSources>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <TargetFrameworks>net6.0;net7.0;</TargetFrameworks>
     </PropertyGroup>
 
     <ItemGroup>

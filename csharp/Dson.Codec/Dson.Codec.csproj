@@ -1,15 +1,46 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <!--        <TargetFramework>net6.0</TargetFramework>-->
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>annotations</Nullable>
         <LangVersion>10</LangVersion>
         <RootNamespace>Wjybxx.Dson.Codec</RootNamespace>
+
+        <AssemblyName>Wjybxx.Dson.Codec</AssemblyName>
+        <PackageId>Wjybxx.Dson.Codec</PackageId>
+        <PackageVersion>1.0.0-rc1</PackageVersion>
+
+        <Title>Wjybxx.Dson.Codec</Title>
+        <Description>Dson-有点奇怪的配置文件格式和序列化方案</Description>
+        <PackageTags>wjybxx;dson;json;codec</PackageTags>
+
+        <Authors>wjybxx(845740757@qq.com)</Authors>
+        <Owners>wjybxx(845740757@qq.com)</Owners>
+        <Copyright>Copyright 2023 wjybxx(845740757@qq.com)</Copyright>
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/hl845740757/dson</PackageProjectUrl>
+        <PackageReleaseNotes>https://github.com/hl845740757/dson/releases</PackageReleaseNotes>
+
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <NeutralLanguage>zh-Hans</NeutralLanguage>
+
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <EmbedAllSources>true</EmbedAllSources>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <TargetFrameworks>net6.0;net7.0;</TargetFrameworks>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Wjybxx.Commons.Core" Version="1.0.0" />
+        <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <ProjectReference Include="..\Dson\Dson.csproj" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Folder Include="src" />
     </ItemGroup>
 
 </Project>
