@@ -16,6 +16,7 @@
 
 #endregion
 
+using System;
 using System.Runtime.Serialization;
 using Wjybxx.Dson.IO;
 

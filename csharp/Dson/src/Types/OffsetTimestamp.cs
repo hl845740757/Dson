@@ -16,6 +16,7 @@
 
 #endregion
 
+using System;
 using System.Globalization;
 using System.Text;
 using Wjybxx.Dson.Text;

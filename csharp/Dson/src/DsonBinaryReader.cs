@@ -16,6 +16,7 @@
 
 #endregion
 
+using System;
 using Wjybxx.Dson.IO;
 using Wjybxx.Dson.Types;
 

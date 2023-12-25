@@ -16,6 +16,8 @@
 
 #endregion
 
+using System;
+
 namespace Wjybxx.Dson;
 
 /// <summary>

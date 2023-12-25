@@ -16,6 +16,8 @@
 
 #endregion
 
+using System;
+using System.IO;
 using Wjybxx.Commons.Collections;
 using Wjybxx.Dson.IO;
 

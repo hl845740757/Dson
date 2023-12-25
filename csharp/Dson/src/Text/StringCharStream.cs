@@ -16,6 +16,8 @@
 
 #endregion
 
+using System;
+
 namespace Wjybxx.Dson.Text;
 
 class StringCharStream : AbstractCharStream

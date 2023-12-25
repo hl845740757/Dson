@@ -16,6 +16,9 @@
 
 #endregion
 
+using System;
+using System.IO;
+
 namespace Wjybxx.Dson.Text;
 
 /// <summary>

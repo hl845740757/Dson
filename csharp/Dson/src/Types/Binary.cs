@@ -16,6 +16,9 @@
 
 #endregion
 
+using System;
+using System.Linq;
+
 #pragma warning disable CS1591
 namespace Wjybxx.Dson.Types;
 

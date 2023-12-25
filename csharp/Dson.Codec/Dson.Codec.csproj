@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <!--        <TargetFramework>net6.0</TargetFramework>-->
-        <ImplicitUsings>enable</ImplicitUsings>
+        <ImplicitUsings>false</ImplicitUsings>
         <Nullable>annotations</Nullable>
         <LangVersion>10</LangVersion>
         <RootNamespace>Wjybxx.Dson.Codec</RootNamespace>

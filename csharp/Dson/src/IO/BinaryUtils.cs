@@ -16,6 +16,7 @@
 
 #endregion
 
+using System;
 using System.Runtime.CompilerServices;
 
 #pragma warning disable CS1591

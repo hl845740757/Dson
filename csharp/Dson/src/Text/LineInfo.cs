@@ -102,7 +102,7 @@ public class LineInfo
 
     #region equals
 
-    public override bool Equals(Object o) {
+    public override bool Equals(object o) {
         return this == o;
     }
 

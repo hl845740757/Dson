@@ -16,6 +16,8 @@
 
 #endregion
 
+using System;
+using System.Linq;
 using Wjybxx.Dson.IO;
 
 #pragma warning disable CS1591
