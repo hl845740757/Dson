@@ -458,17 +458,26 @@ public final class Dsons {
         return stringWriter.toString();
     }
 
-    /** 默认只读取第一个值 */
-    public static DsonValue fromDson(CharSequence dsonString) {
-        try (DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.DEFAULT, dsonString)) {
-            return readTopDsonValue(reader);
-        }
-    }
-
     /** @param jsonString json字符串或无行首的dson字符串 */
     public static DsonValue fromJson(CharSequence jsonString) {
-        try (DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.DEFAULT, newJsonScanner(jsonString))) {
-            return readTopDsonValue(reader);
+        return fromDson(jsonString, DsonMode.RELAXED);
+    }
+
+    /** 默认只读取第一个值 */
+    public static DsonValue fromDson(CharSequence dsonString) {
+        return fromDson(dsonString, DsonMode.STANDARD);
+    }
+
+    /** 默认只读取第一个值 */
+    public static DsonValue fromDson(CharSequence dsonString, DsonMode dsonMode) {
+        if (dsonMode == DsonMode.STANDARD) {
+            try (DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.DEFAULT, dsonString)) {
+                return readTopDsonValue(reader);
+            }
+        } else {
+            try (DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.DEFAULT, newJsonScanner(dsonString))) {
+                return readTopDsonValue(reader);
+            }
         }
     }
 

@@ -611,18 +611,24 @@ public static class Dsons
         return stringWriter.ToString();
     }
 
-    public static DsonValue FromDson(string dsonString) {
-        using (DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.Default, dsonString)) {
-            return ReadTopDsonValue(reader)!;
+    /** @param jsonString json字符串或无行首的dson字符串 */
+    public static DsonValue FromJson(string jsonString) {
+        return FromDson(jsonString, DsonMode.Relaxed);
+    }
+
+    public static DsonValue FromDson(string dsonString, DsonMode dsonMode = DsonMode.Standard) {
+        if (dsonMode == DsonMode.Standard) {
+            using (DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.Default, dsonString)) {
+                return ReadTopDsonValue(reader)!;
+            }
+        }
+        else {
+            using (DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.Default, NewJsonScanner(dsonString))) {
+                return ReadTopDsonValue(reader)!;
+            }
         }
     }
 
-    /** @param jsonString json字符串或无行首的dson字符串 */
-    public static DsonValue FromJson(string jsonString) {
-        using (DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.Default, NewJsonScanner(jsonString))) {
-            return ReadTopDsonValue(reader)!;
-        }
-    }
 
     /** 获取dsonValue的localId -- dson的约定之一 */
     public static string? GetLocalId(DsonValue dsonValue) {

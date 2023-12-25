@@ -72,7 +72,7 @@ public class DsonTextReader : AbstractDsonReader<string>
      * 1.这对于精确解析数组元素和Object的字段十分有用 -- 比如解析一个{@code Vector3}的时候就可以指定字段的默认类型为float。
      * 2.辅助方法见：{@link DsonTexts#clsNameTokenOfType(DsonType)}
      */
-    public void SetCompClsNameToken(DsonToken dsonToken) {
+    public void SetCompClsNameToken(DsonToken? dsonToken) {
         GetContext()._compClsNameToken = dsonToken;
     }
 
@@ -129,7 +129,7 @@ public class DsonTextReader : AbstractDsonReader<string>
     }
 
     private void PushToken(DsonToken token) {
-        if (token == null) throw new ArgumentNullException(nameof(token));
+        // if (token == null) throw new ArgumentNullException(nameof(token));
         _pushedTokenQueue.Push(token);
     }
 
@@ -304,8 +304,8 @@ public class DsonTextReader : AbstractDsonReader<string>
     /** 字符串默认解析规则 */
     private DsonType ParseUnquoteStringToken(Context context, DsonToken valueToken) {
         string unquotedString = valueToken.CastAsString();
-        if (context._contextType != DsonContextType.Header && context._compClsNameToken != null) {
-            switch (context._compClsNameToken.CastAsString()) {
+        if (context._contextType != DsonContextType.Header && context._compClsNameToken.HasValue) {
+            switch (context._compClsNameToken.Value.CastAsString()) {
                 case DsonTexts.LabelInt32: {
                     PushNextValue(DsonTexts.ParseInt(unquotedString));
                     return DsonType.Int32;
@@ -389,7 +389,7 @@ public class DsonTextReader : AbstractDsonReader<string>
         DsonToken? headerToken;
         if (valueToken.LastChar() == '@') { // {@
             headerToken = PopToken();
-            EnsureHeadersToken(context, headerToken);
+            EnsureHeadersToken(context, headerToken.Value);
         }
         else if (context._contextType != DsonContextType.Header) {
             headerToken = context._compClsNameToken;
@@ -397,13 +397,13 @@ public class DsonTextReader : AbstractDsonReader<string>
         else {
             headerToken = null;
         }
-        if (headerToken == null) {
+        if (!headerToken.HasValue) {
             PushNextValue(valueToken);
             return DsonType.Object;
         }
 
         // 内置结构体
-        string clsName = headerToken.CastAsString();
+        string clsName = headerToken.Value.CastAsString();
         switch (clsName) {
             case DsonTexts.LabelReference: {
                 PushNextValue(ScanRef(context));
@@ -414,7 +414,7 @@ public class DsonTextReader : AbstractDsonReader<string>
                 return DsonType.Timestamp;
             }
             default: {
-                EscapeHeaderAndPush(headerToken);
+                EscapeHeaderAndPush(headerToken.Value);
                 PushNextValue(valueToken); // push以供context保存
                 return DsonType.Object;
             }
@@ -426,7 +426,7 @@ public class DsonTextReader : AbstractDsonReader<string>
         DsonToken? headerToken;
         if (valueToken.LastChar() == '@') { // [@
             headerToken = PopToken();
-            EnsureHeadersToken(context, headerToken);
+            EnsureHeadersToken(context, headerToken.Value);
         }
         else if (context._contextType != DsonContextType.Header) {
             headerToken = context._compClsNameToken;
@@ -434,12 +434,12 @@ public class DsonTextReader : AbstractDsonReader<string>
         else {
             headerToken = null;
         }
-        if (headerToken == null) {
+        if (!headerToken.HasValue) {
             PushNextValue(valueToken);
             return DsonType.Array;
         }
         // 内置元组
-        switch (headerToken.CastAsString()) {
+        switch (headerToken.Value.CastAsString()) {
             case DsonTexts.LabelBinary: {
                 Tuple2 tuple2 = ScanTuple2(context);
                 byte[] data = Convert.FromHexString(tuple2.Value);
@@ -474,7 +474,7 @@ public class DsonTextReader : AbstractDsonReader<string>
                 return DsonType.ExtString;
             }
             default: {
-                EscapeHeaderAndPush(headerToken);
+                EscapeHeaderAndPush(headerToken.Value);
                 PushNextValue(valueToken); // push以供context保存
                 return DsonType.Array;
             }
@@ -931,10 +931,8 @@ public class DsonTextReader : AbstractDsonReader<string>
 
     protected new class Context : AbstractDsonReader<string>.Context
     {
-#nullable disable
+        /** 对象的开始token */
         internal DsonToken _beginToken;
-#nullable enable
-
         /** header只可触发一次流程 */
         internal int _headerCount = 0;
         /** 元素计数，判断冒号 */
@@ -947,7 +945,7 @@ public class DsonTextReader : AbstractDsonReader<string>
 
         public override void Reset() {
             base.Reset();
-            _beginToken = null;
+            _beginToken = default;
             _headerCount = 0;
             _count = 0;
             _compClsNameToken = null;

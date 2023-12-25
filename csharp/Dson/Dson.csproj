@@ -9,7 +9,7 @@
 
         <AssemblyName>Wjybxx.Dson</AssemblyName>
         <PackageId>Wjybxx.Dson</PackageId>
-        <PackageVersion>1.0.0-rc1</PackageVersion>
+        <PackageVersion>1.0.0-rc2</PackageVersion>
 
         <Title>Wjybxx.Dson</Title>
         <Description>Dson-有点奇怪的配置文件格式和序列化方案</Description>

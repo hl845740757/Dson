@@ -21,8 +21,9 @@ namespace Wjybxx.Dson.Text;
 
 /// <summary>
 /// Dson文本token
+/// (值类型小心使用)
 /// </summary>
-public class DsonToken : IEquatable<DsonToken>
+public readonly struct DsonToken : IEquatable<DsonToken>
 {
 #nullable disable
     /** token的类型 */
@@ -60,29 +61,24 @@ public class DsonToken : IEquatable<DsonToken>
 
     // Equals默认不比较位置
 
-    public bool Equals(DsonToken? other) {
-        if (ReferenceEquals(null, other)) return false;
-        if (ReferenceEquals(this, other)) return true;
+    public bool Equals(DsonToken other) {
         return Type == other.Type && Equals(Value, other.Value);
     }
 
     public override bool Equals(object? obj) {
-        if (ReferenceEquals(null, obj)) return false;
-        if (ReferenceEquals(this, obj)) return true;
-        if (obj.GetType() != this.GetType()) return false;
-        return Equals((DsonToken)obj);
+        return obj is DsonToken other && Equals(other);
     }
 
     public override int GetHashCode() {
         return HashCode.Combine((int)Type, Value);
     }
 
-    public static bool operator ==(DsonToken? left, DsonToken? right) {
-        return Equals(left, right);
+    public static bool operator ==(DsonToken left, DsonToken right) {
+        return left.Equals(right);
     }
 
-    public static bool operator !=(DsonToken? left, DsonToken? right) {
-        return !Equals(left, right);
+    public static bool operator !=(DsonToken left, DsonToken right) {
+        return !left.Equals(right);
     }
 
     #endregion
