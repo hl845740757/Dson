@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-<!--        <TargetFramework>net6.0</TargetFramework>-->
         <ImplicitUsings>false</ImplicitUsings>
         <Nullable>annotations</Nullable>
         <LangVersion>10</LangVersion>
@@ -9,7 +8,7 @@
 
         <AssemblyName>Wjybxx.Dson</AssemblyName>
         <PackageId>Wjybxx.Dson</PackageId>
-        <PackageVersion>1.0.0-rc2</PackageVersion>
+        <PackageVersion>1.0.0</PackageVersion>
 
         <Title>Wjybxx.Dson</Title>
         <Description>Dson-有点奇怪的配置文件格式和序列化方案</Description>
@@ -36,7 +35,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Wjybxx.Commons.Core" Version="1.0.1" />
+      <PackageReference Include="Wjybxx.Commons.Core" Version="1.0.2" />
     </ItemGroup>
 
 </Project>

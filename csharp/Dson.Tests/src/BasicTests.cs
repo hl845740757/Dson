@@ -82,7 +82,7 @@ public class BasicTests
         using (IDsonReader<string> reader = new DsonTextReader(DsonTextReaderSettings.Default, DsonString)) {
             topContainer1 = Dsons.ReadTopContainer(reader);
         }
-        string dsonString1 = Dsons.ToFlatDson(topContainer1);
+        string dsonString1 = topContainer1.ToFlatDson();
         Console.WriteLine(dsonString1);
 
         // BinaryWriter
@@ -96,7 +96,7 @@ public class BasicTests
             using (IDsonReader<string> reader = new DsonBinaryReader<string>(DsonTextReaderSettings.Default, input)) {
                 DsonArray<string> topContainer2 = Dsons.ReadTopContainer(reader);
 
-                string dsonString2 = Dsons.ToFlatDson(topContainer2);
+                string dsonString2 = topContainer2.ToFlatDson();
                 Debug.Assert(dsonString1 == dsonString2, "BinaryReader/BinaryWriter");
             }
         }
@@ -110,7 +110,7 @@ public class BasicTests
             using (IDsonReader<string> reader = new DsonObjectReader<string>(DsonTextReaderSettings.Default, outList)) {
                 DsonArray<string> topContainer3 = Dsons.ReadTopContainer(reader);
 
-                string dsonString3 = Dsons.ToFlatDson(topContainer3);
+                string dsonString3 = topContainer3.ToFlatDson();
                 Debug.Assert(dsonString1 == dsonString3, "ObjectReader/ObjectWriter");
             }
         }

@@ -16,7 +16,6 @@
 
 #endregion
 
-using System.Collections.Generic;
 using Wjybxx.Commons.Collections;
 
 #pragma warning disable CS1591

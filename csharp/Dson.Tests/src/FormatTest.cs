@@ -51,7 +51,7 @@ public class FormatTest
                 TextStringLength = 50,
                 TextAlignLeft = true
             };
-            string dsonString2 = Dsons.ToDson(dsonObject, ObjectStyle.Indent, builder.Build());
+            string dsonString2 = dsonObject.ToDson(ObjectStyle.Indent, builder.Build());
             Console.WriteLine("Mode:" + DsonMode.Standard);
             Console.WriteLine(dsonString2);
 
@@ -66,7 +66,7 @@ public class FormatTest
                 ExtraIndent = 2,
                 SoftLineLength = 60
             };
-            string dsonString3 = Dsons.ToDson(dsonObject, ObjectStyle.Indent, builder.Build());
+            string dsonString3 = dsonObject.ToDson(ObjectStyle.Indent, builder.Build());
             Console.WriteLine("Mode:" + DsonMode.Relaxed);
             Console.WriteLine(dsonString3);
             DsonValue dsonObject3 = Dsons.FromJson(dsonString3);

@@ -24,6 +24,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using Wjybxx.Dson.IO;
 using Wjybxx.Dson.Text;
+
 // ReSharper disable UnusedMember.Local
 
 #pragma warning disable CS1591
@@ -582,7 +583,7 @@ public static class Dsons
     #region 快捷方法
 
     /** 该接口用于写顶层数组容器，所有元素将被展开 */
-    public static string ToFlatDson(DsonArray<string> topContainer, DsonTextWriterSettings? settings = null) {
+    public static string ToFlatDson(this DsonArray<string> topContainer, DsonTextWriterSettings? settings = null) {
         if (settings == null) settings = DsonTextWriterSettings.Default;
         StringWriter stringWriter = new StringWriter(new StringBuilder(1024));
         using (DsonTextWriter writer = new DsonTextWriter(settings, stringWriter)) {
@@ -592,19 +593,19 @@ public static class Dsons
     }
 
     /** 该接口用于读取多顶层对象dson文本 */
-    public static DsonArray<string> FromFlatDson(String dsonString) {
+    public static DsonArray<string> FromFlatDson(string dsonString) {
         using (DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.Default, dsonString)) {
             return ReadTopContainer(reader);
         }
     }
 
-    public static string ToDson(DsonValue dsonValue, ObjectStyle style, DsonMode dsonMode = DsonMode.Standard) {
+    public static string ToDson(this DsonValue dsonValue, ObjectStyle style, DsonMode dsonMode = DsonMode.Standard) {
         return ToDson(dsonValue, style, dsonMode == DsonMode.Relaxed
             ? DsonTextWriterSettings.RelaxedDefault
             : DsonTextWriterSettings.Default);
     }
 
-    public static string ToDson(DsonValue dsonValue, ObjectStyle style, DsonTextWriterSettings settings) {
+    public static string ToDson(this DsonValue dsonValue, ObjectStyle style, DsonTextWriterSettings settings) {
         if (!dsonValue.DsonType.IsContainerOrHeader()) {
             throw new InvalidOperationException("invalid dsonType " + dsonValue.DsonType);
         }
@@ -622,17 +623,14 @@ public static class Dsons
 
     public static DsonValue FromDson(string dsonString, DsonMode dsonMode = DsonMode.Standard) {
         if (dsonMode == DsonMode.Standard) {
-            using (DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.Default, dsonString)) {
-                return ReadTopDsonValue(reader)!;
-            }
+            using DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.Default, dsonString);
+            return ReadTopDsonValue(reader)!;
         }
         else {
-            using (DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.Default, NewJsonScanner(dsonString))) {
-                return ReadTopDsonValue(reader)!;
-            }
+            using DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.Default, NewJsonScanner(dsonString));
+            return ReadTopDsonValue(reader)!;
         }
     }
-
 
     /** 获取dsonValue的localId -- dson的约定之一 */
     public static string? GetLocalId(DsonValue dsonValue) {
