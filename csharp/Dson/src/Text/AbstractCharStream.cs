@@ -215,7 +215,7 @@ public abstract class AbstractCharStream : IDsonCharStream
     }
 
     /** 获取首行行号，基于Reader时可能不是第一行开始 */
-    protected int FirstLn => 1;
+    protected virtual int FirstLn => 1;
 
     /** 丢弃部分已读的行，减少内存占用 */
     protected void DiscardReadLines(List<LineInfo> lines, LineInfo? curLine) {

@@ -58,8 +58,6 @@
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>utf-8</project.reporting.outputEncoding>
-        <!-- 父模块不发布，子模块需要变更为false -->
-        <maven.deploy.skip>true</maven.deploy.skip>
 
         <!--测试依赖 -->
         <slf4j.version>2.0.9</slf4j.version>
@@ -241,6 +239,9 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-deploy-plugin</artifactId>
                         <version>3.1.0</version>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
                     </plugin>
                     <plugin>
                         <groupId>org.sonatype.plugins</groupId>

@@ -84,9 +84,9 @@ public class ConvertOptions {
     /** 文本解码设置 */
     public final DsonTextReaderSettings textReaderSettings;
     /** 文本编码设置 */
-    public final DsonTextWriterSettings textWriterSettings;
-    /** 类json文本编码 */
-    public final DsonTextWriterSettings jsonWriterSettings;
+    public final DsonTextWriterSettings standardWriterSettings;
+    /** 宽松文本writer设置 */
+    public final DsonTextWriterSettings relaxedWriterSettings;
 
     public ConvertOptions(Builder builder) {
         this.classIdPolicy = builder.classIdPolicy;
@@ -102,14 +102,14 @@ public class ConvertOptions {
         this.binReaderSettings = Objects.requireNonNull(builder.binReaderSettings);
         this.binWriterSettings = Objects.requireNonNull(builder.binWriterSettings);
         this.textReaderSettings = Objects.requireNonNull(builder.textReaderSettings);
-        this.textWriterSettings = Objects.requireNonNull(builder.textWriterSettings);
-        this.jsonWriterSettings = Objects.requireNonNull(builder.jsonWriterSettings);
+        this.standardWriterSettings = Objects.requireNonNull(builder.standardWriterSettings);
+        this.relaxedWriterSettings = Objects.requireNonNull(builder.relaxedWriterSettings);
 
-        if (textWriterSettings.dsonMode != DsonMode.STANDARD) {
-            throw new IllegalArgumentException("textWriterSettings.dsonMode must be STANDARD");
+        if (standardWriterSettings.dsonMode != DsonMode.STANDARD) {
+            throw new IllegalArgumentException("standardWriterSettings.dsonMode must be STANDARD");
         }
-        if (jsonWriterSettings.dsonMode != DsonMode.RELAXED) {
-            throw new IllegalArgumentException("jsonWriterSetting.dsonMode must be RELAXED");
+        if (relaxedWriterSettings.dsonMode != DsonMode.RELAXED) {
+            throw new IllegalArgumentException("relaxedWriterSettings.dsonMode must be RELAXED");
         }
     }
 
@@ -134,8 +134,8 @@ public class ConvertOptions {
         private DsonReaderSettings binReaderSettings = DsonReaderSettings.DEFAULT;
         private DsonWriterSettings binWriterSettings = DsonWriterSettings.DEFAULT;
         private DsonTextReaderSettings textReaderSettings = DsonTextReaderSettings.DEFAULT;
-        private DsonTextWriterSettings textWriterSettings = DsonTextWriterSettings.DEFAULT;
-        private DsonTextWriterSettings jsonWriterSettings = DsonTextWriterSettings.RELAXED_DEFAULT;
+        private DsonTextWriterSettings standardWriterSettings = DsonTextWriterSettings.DEFAULT;
+        private DsonTextWriterSettings relaxedWriterSettings = DsonTextWriterSettings.RELAXED_DEFAULT;
 
         public ClassIdPolicy getClassIdPolicy() {
             return classIdPolicy;
@@ -245,21 +245,21 @@ public class ConvertOptions {
             return this;
         }
 
-        public DsonTextWriterSettings getTextWriterSettings() {
-            return textWriterSettings;
+        public DsonTextWriterSettings getStandardWriterSettings() {
+            return standardWriterSettings;
         }
 
-        public Builder setTextWriterSettings(DsonTextWriterSettings textWriterSettings) {
-            this.textWriterSettings = textWriterSettings;
+        public Builder setStandardWriterSettings(DsonTextWriterSettings standardWriterSettings) {
+            this.standardWriterSettings = standardWriterSettings;
             return this;
         }
 
-        public DsonTextWriterSettings getJsonWriterSettings() {
-            return jsonWriterSettings;
+        public DsonTextWriterSettings getRelaxedWriterSettings() {
+            return relaxedWriterSettings;
         }
 
-        public Builder setJsonWriterSettings(DsonTextWriterSettings jsonWriterSettings) {
-            this.jsonWriterSettings = jsonWriterSettings;
+        public Builder setRelaxedWriterSettings(DsonTextWriterSettings relaxedWriterSettings) {
+            this.relaxedWriterSettings = relaxedWriterSettings;
             return this;
         }
 

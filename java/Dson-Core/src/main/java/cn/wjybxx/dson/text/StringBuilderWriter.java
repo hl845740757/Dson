@@ -36,8 +36,11 @@ public class StringBuilderWriter extends Writer {
     }
 
     public StringBuilderWriter(StringBuilder builder) {
-        this.builder = builder == null ? new StringBuilder() : builder;
-        this.lock = this.builder;
+        if (builder == null) {
+            builder = new StringBuilder();
+        }
+        this.builder = builder;
+        this.lock = builder;
     }
 
     // region

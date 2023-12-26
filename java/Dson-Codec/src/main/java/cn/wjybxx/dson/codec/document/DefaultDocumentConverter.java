@@ -159,7 +159,7 @@ public class DefaultDocumentConverter implements DocumentConverter {
     @Override
     public void writeAsDson(Object value, DsonMode dsonMode, @Nonnull TypeArgInfo<?> typeArgInfo, Writer writer) {
         Objects.requireNonNull(writer, "writer");
-        DsonTextWriterSettings writerSettings = dsonMode == DsonMode.RELAXED ? options.jsonWriterSettings : options.textWriterSettings;
+        DsonTextWriterSettings writerSettings = dsonMode == DsonMode.RELAXED ? options.relaxedWriterSettings : options.standardWriterSettings;
         try (DocumentObjectWriter wrapper = new DefaultDocumentObjectWriter(this,
                 new DsonTextWriter(writerSettings, writer))) {
             wrapper.writeObject(value, typeArgInfo, null);

@@ -6,7 +6,8 @@ Dson同时设计了二进制和文本格式，二进制用于网络传输，文�
 Dson核心包不提供Dson到对象的编解码实现，只包含Dson的二进制流和文本解析实现；Dson支持复杂的数据结构，同时还设计了对象头，因此实现自己的Codec是很容易的。
 
 Dson最初是为序列化而创建的，但我们在这里只讨论文本格式，二进制格式详见
-[Dson二进制流](https://github.com/hl845740757/Dson/blob/dev/DsonBinary.md)，[Commons](https://github.com/hl845740757/Dson/blob/dev/DsonCodec.md)。  
+[Dson二进制流](https://github.com/hl845740757/Dson/blob/dev/DsonBinary.md)，
+[Dson-Codec](https://github.com/hl845740757/Dson/blob/dev/DsonCodec.md)。  
 另外，Dson的一些设计可能与你期望的不同，为避免频繁提问，我将一些设计理由进行了整理，见
 [Dson设计过程中的一些反思](https://github.com/hl845740757/Dson/blob/dev/DsonIssues.md)。  
 另外，我将一些特殊的测试用例或者说模板整理了一下，见
