@@ -133,8 +133,7 @@ public abstract class AbstractDsonReader<TName> : IDsonReader<TName> where TName
             if (context._state != DsonReaderState.Initial && context._state != DsonReaderState.Type) {
                 throw InvalidState(DsonInternals.NewList(DsonReaderState.Initial, DsonReaderState.Type));
             }
-        }
-        else if (context._state != DsonReaderState.Type) {
+        } else if (context._state != DsonReaderState.Type) {
             throw InvalidState(DsonInternals.NewList(DsonReaderState.Type));
         }
     }
@@ -146,12 +145,10 @@ public abstract class AbstractDsonReader<TName> : IDsonReader<TName> where TName
             // 顶层读取到 END_OF_OBJECT 表示到达文件尾
             if (context._contextType == DsonContextType.TopLevel) {
                 context.SetState(DsonReaderState.EndOfFile);
-            }
-            else {
+            } else {
                 context.SetState(DsonReaderState.WaitEndObject);
             }
-        }
-        else {
+        } else {
             // topLevel只可是容器对象
             if (context._contextType == DsonContextType.TopLevel && !dsonType.IsContainerOrHeader()) {
                 throw DsonIOException.InvalidDsonType(context._contextType, dsonType);
@@ -160,15 +157,12 @@ public abstract class AbstractDsonReader<TName> : IDsonReader<TName> where TName
                 // 如果是header则直接进入VALUE状态 - header是匿名属性
                 if (dsonType == DsonType.Header) {
                     context.SetState(DsonReaderState.Value);
-                }
-                else {
+                } else {
                     context.SetState(DsonReaderState.Name);
                 }
-            }
-            else if (context._contextType == DsonContextType.Header) {
+            } else if (context._contextType == DsonContextType.Header) {
                 context.SetState(DsonReaderState.Name);
-            }
-            else {
+            } else {
                 context.SetState(DsonReaderState.Value);
             }
         }

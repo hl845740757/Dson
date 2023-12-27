@@ -69,7 +69,7 @@ public class FormatTest
             string dsonString3 = dsonObject.ToDson(ObjectStyle.Indent, builder.Build());
             Console.WriteLine("Mode:" + DsonMode.Relaxed);
             Console.WriteLine(dsonString3);
-            DsonValue dsonObject3 = Dsons.FromJson(dsonString3);
+            DsonValue dsonObject3 = Dsons.FromRelaxedDson(dsonString3);
             Assert.That(dsonObject3, Is.EqualTo(dsonObject));
         }
     }

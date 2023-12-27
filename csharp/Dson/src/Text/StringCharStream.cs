@@ -62,8 +62,7 @@ class StringCharStream : AbstractCharStream
         if (curLine == null) {
             ln = FirstLn;
             startPos = 0;
-        }
-        else {
+        } else {
             ln = curLine.Ln + 1;
             startPos = curLine.EndPos + 1;
         }
@@ -110,8 +109,7 @@ class StringCharStream : AbstractCharStream
                 lineHead = LineHead.Append;
                 contentStartPos = startPos;
             }
-        }
-        else {
+        } else {
             if (headPos >= startPos && headPos <= lastReadablePos) {
                 string label = buffer[headPos].ToString();
                 lineHead = DsonTexts.LineHeadOfLabel(label);

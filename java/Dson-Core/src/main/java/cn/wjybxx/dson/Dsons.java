@@ -458,9 +458,9 @@ public final class Dsons {
         return stringWriter.toString();
     }
 
-    /** @param jsonString json字符串或无行首的dson字符串 */
-    public static DsonValue fromJson(CharSequence jsonString) {
-        return fromDson(jsonString, DsonMode.RELAXED);
+    /** @param dsonString 宽松样式的dson字符串 */
+    public static DsonValue fromRelaxedDson(CharSequence dsonString) {
+        return fromDson(dsonString, DsonMode.RELAXED);
     }
 
     /** 默认只读取第一个值 */
@@ -470,14 +470,8 @@ public final class Dsons {
 
     /** 默认只读取第一个值 */
     public static DsonValue fromDson(CharSequence dsonString, DsonMode dsonMode) {
-        if (dsonMode == DsonMode.STANDARD) {
-            try (DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.DEFAULT, dsonString)) {
-                return readTopDsonValue(reader);
-            }
-        } else {
-            try (DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.DEFAULT, newJsonScanner(dsonString))) {
-                return readTopDsonValue(reader);
-            }
+        try (DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.DEFAULT, dsonString, dsonMode)) {
+            return readTopDsonValue(reader);
         }
     }
 
@@ -498,10 +492,6 @@ public final class Dsons {
     // endregion
 
     // region 工厂方法
-
-    public static DsonScanner newJsonScanner(CharSequence jsonString) {
-        return new DsonScanner(DsonCharStream.newCharStream(jsonString, DsonMode.RELAXED));
-    }
 
     public static DsonScanner newStringScanner(CharSequence dsonString) {
         return new DsonScanner(DsonCharStream.newCharStream(dsonString, DsonMode.STANDARD));

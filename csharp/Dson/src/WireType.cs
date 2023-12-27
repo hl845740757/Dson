@@ -59,7 +59,8 @@ public static class WireTypes
 {
     /** 通过number查找关联枚举 */
     public static WireType ForNumber(int number) {
-        return number switch {
+        return number switch
+        {
             0 => WireType.VarInt,
             1 => WireType.Uint,
             2 => WireType.Sint,

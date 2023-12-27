@@ -195,12 +195,10 @@ public static class DsonTexts
         if (firstChar == '+') {
             sign = 1;
             lookOffset = 1;
-        }
-        else if (firstChar == '-') {
+        } else if (firstChar == '-') {
             sign = -1;
             lookOffset = 1;
-        }
-        else {
+        } else {
             sign = 1;
             lookOffset = 0;
         }
@@ -231,12 +229,10 @@ public static class DsonTexts
         if (firstChar == '+') {
             sign = 1;
             lookOffset = 1;
-        }
-        else if (firstChar == '-') {
+        } else if (firstChar == '-') {
             sign = -1;
             lookOffset = 1;
-        }
-        else {
+        } else {
             sign = 1;
             lookOffset = 0;
         }
@@ -283,8 +279,7 @@ public static class DsonTexts
                     throw new ArgumentException(str); // 不能多个连续下划线
                 }
                 hasUnderline = true;
-            }
-            else {
+            } else {
                 sb.Append(c);
                 hasUnderline = false;
             }
@@ -296,7 +291,8 @@ public static class DsonTexts
 
     /** 通过行首label字符查找行首枚举 */
     public static LineHead? LineHeadOfLabel(string label) {
-        return label switch {
+        return label switch
+        {
             DsonTexts.HeadComment => LineHead.Comment,
             DsonTexts.HeadAppendLine => LineHead.AppendLine,
             DsonTexts.HeadAppend => LineHead.Append,
@@ -308,7 +304,8 @@ public static class DsonTexts
 
     /** 获取行首枚举关联的字符  */
     public static string GetLabel(LineHead lineHead) {
-        return lineHead switch {
+        return lineHead switch
+        {
             LineHead.Comment => DsonTexts.HeadComment,
             LineHead.AppendLine => DsonTexts.HeadAppendLine,
             LineHead.Append => DsonTexts.HeadAppend,
@@ -321,22 +318,24 @@ public static class DsonTexts
     /** 获取类型名对应的Token类型 */
     public static DsonTokenType TokenTypeOfClsName(string label) {
         if (label == null) throw new ArgumentNullException(nameof(label));
-        return label switch  {
-            LabelInt32 =>  DsonTokenType.Int32, 
-            LabelInt64=> DsonTokenType.Int64,
+        return label switch
+        {
+            LabelInt32 => DsonTokenType.Int32,
+            LabelInt64 => DsonTokenType.Int64,
             LabelFloat => DsonTokenType.Float,
-            LabelDouble => DsonTokenType.Double, 
-            LabelBool => DsonTokenType.Bool, 
+            LabelDouble => DsonTokenType.Double,
+            LabelBool => DsonTokenType.Bool,
             LabelString => DsonTokenType.String,
-            LabelExtString =>DsonTokenType.String,
-            LabelNull => DsonTokenType.Null, 
-            _ => BuiltinStructLabels.Contains(label) ? DsonTokenType.BuiltinStruct: DsonTokenType.SimpleHeader
+            LabelExtString => DsonTokenType.String,
+            LabelNull => DsonTokenType.Null,
+            _ => BuiltinStructLabels.Contains(label) ? DsonTokenType.BuiltinStruct : DsonTokenType.SimpleHeader
         };
     }
-    
+
     /** 获取dsonType关联的无位置Token */
     public static DsonToken ClsNameTokenOfType(DsonType dsonType) {
-        return dsonType switch {
+        return dsonType switch
+        {
             DsonType.Int32 => new DsonToken(DsonTokenType.Int32, LabelInt32, -1),
             DsonType.Int64 => new DsonToken(DsonTokenType.Int64, LabelInt64, -1),
             DsonType.Float => new DsonToken(DsonTokenType.Float, LabelFloat, -1),

@@ -105,7 +105,8 @@ public static class DsonTypes
 
     /** DsonType是否表示Dson的Number */
     public static bool IsNumber(this DsonType dsonType) {
-        return dsonType switch {
+        return dsonType switch
+        {
             DsonType.Int32 => true,
             DsonType.Int64 => true,
             DsonType.Float => true,
@@ -116,7 +117,8 @@ public static class DsonTypes
 
     /** DsonType关联的值在二进制编码时是否包含WireType */
     public static bool HasWireType(this DsonType dsonType) {
-        return dsonType switch {
+        return dsonType switch
+        {
             DsonType.Int32 => true,
             DsonType.Int64 => true,
             DsonType.ExtInt32 => true,

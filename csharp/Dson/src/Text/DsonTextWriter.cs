@@ -93,15 +93,13 @@ public class DsonTextWriter : AbstractDsonWriter<string>
             if (context.HasElement() && printer.Column < printer.PrettyBodyColum) {
                 // 当前行是字符串结束行，字符串结束位置尚未到达缩进，不换行
                 printer.PrintSpace(printer.PrettyBodyColum - printer.Column);
-            }
-            else if (printer.Column > printer.PrettyBodyColum) {
+            } else if (printer.Column > printer.PrettyBodyColum) {
                 // 当前行有内容了才换行缩进
                 printer.Println();
                 PrintLineHead(LineHead.AppendLine);
                 printer.PrintBodyIndent();
             }
-        }
-        else if (context.HasElement()) {
+        } else if (context.HasElement()) {
             // 非缩进模式下，元素之间打印一个空格
             printer.Print(' ');
         }
@@ -118,11 +116,9 @@ public class DsonTextWriter : AbstractDsonWriter<string>
             case StringStyle.Auto: {
                 if (CanPrintAsUnquote(value, settings)) {
                     printer.PrintFastPath(value);
-                }
-                else if (CanPrintAsText(value, settings)) {
+                } else if (CanPrintAsText(value, settings)) {
                     PrintText(value);
-                }
-                else {
+                } else {
                     PrintEscaped(value);
                 }
                 break;
@@ -130,8 +126,7 @@ public class DsonTextWriter : AbstractDsonWriter<string>
             case StringStyle.AutoQuote: {
                 if (CanPrintAsUnquote(value, settings)) {
                     printer.PrintFastPath(value);
-                }
-                else {
+                } else {
                     PrintEscaped(value);
                 }
                 break;
@@ -147,8 +142,7 @@ public class DsonTextWriter : AbstractDsonWriter<string>
             case StringStyle.Text: {
                 if (settings.EnableText) { // 类json模式下一定为false
                     PrintText(value);
-                }
-                else {
+                } else {
                     PrintEscaped(value);
                 }
                 break;
@@ -174,8 +168,7 @@ public class DsonTextWriter : AbstractDsonWriter<string>
         int headIndent;
         if (_settings.DsonMode == DsonMode.Standard) {
             headIndent = _settings.StringAlignLeft ? printer.PrettyBodyColum : _settings.ExtraIndent;
-        }
-        else {
+        } else {
             headIndent = 0; // 字符串不能在非标准模式下缩进
         }
         printer.Print('"');
@@ -203,8 +196,7 @@ public class DsonTextWriter : AbstractDsonWriter<string>
             printer.HeadIndent = headIndent;
             printer.BodyIndent = 0;
             PrintLineHead(LineHead.Append);
-        }
-        else {
+        } else {
             headIndent = _settings.ExtraIndent;
             printer.PrintFastPath("@ss "); // 开始符
         }
@@ -369,8 +361,7 @@ public class DsonTextWriter : AbstractDsonWriter<string>
         if (extInt32.HasValue) {
             StyleOut styleOut = style.ToString(extInt32.Value);
             printer.PrintFastPath(styleOut.Value);
-        }
-        else {
+        } else {
             printer.PrintFastPath("null");
         }
         printer.Print(']');
@@ -385,8 +376,7 @@ public class DsonTextWriter : AbstractDsonWriter<string>
         if (extInt64.HasValue) {
             StyleOut styleOut = style.ToString(extInt64.Value);
             printer.PrintFastPath(styleOut.Value);
-        }
-        else {
+        } else {
             printer.PrintFastPath("null");
         }
         printer.Print(']');
@@ -401,8 +391,7 @@ public class DsonTextWriter : AbstractDsonWriter<string>
         if (extDouble.HasValue) {
             StyleOut styleOut = style.ToString(extDouble.Value);
             printer.PrintFastPath(styleOut.Value);
-        }
-        else {
+        } else {
             printer.PrintFastPath("null");
         }
         printer.Print(']');
@@ -416,8 +405,7 @@ public class DsonTextWriter : AbstractDsonWriter<string>
         printer.PrintFastPath(", ");
         if (extString.HasValue) {
             PrintString(printer, extString.Value!, style);
-        }
-        else {
+        } else {
             printer.PrintFastPath("null");
         }
         printer.Print(']');
@@ -496,8 +484,7 @@ public class DsonTextWriter : AbstractDsonWriter<string>
                 printer.PrintFastPath(OffsetTimestamp.NamesMillis);
                 printer.PrintFastPath(": ");
                 printer.PrintFastPath(timestamp.ConvertNanosToMillis().ToString());
-            }
-            else {
+            } else {
                 printer.PrintFastPath(OffsetTimestamp.NamesNanos);
                 printer.PrintFastPath(": ");
                 printer.PrintFastPath(timestamp.Nanos.ToString());
@@ -521,7 +508,11 @@ public class DsonTextWriter : AbstractDsonWriter<string>
         DsonPrinter printer = this._printer;
         WriteCurrentName(printer, dsonType);
 
-        Context newContext = NewContext(GetContext(), contextType, dsonType);
+        Context context = GetContext();
+        if (context._style == ObjectStyle.Flow) {
+            style = ObjectStyle.Flow;
+        }
+        Context newContext = NewContext(context, contextType, dsonType);
         newContext._style = style;
 
         printer.PrintFastPath(contextType.GetStartSymbol()!);
@@ -591,8 +582,7 @@ public class DsonTextWriter : AbstractDsonWriter<string>
         Context? context = GetPooledContext();
         if (context != null) {
             SetPooledContext(null);
-        }
-        else {
+        } else {
             context = new Context();
         }
         context.Init(parent, contextType, dsonType);

@@ -241,14 +241,11 @@ public static class Dsons
         while ((dsonType = reader.ReadDsonType()) != DsonType.EndOfObject) {
             if (dsonType == DsonType.Header) {
                 ReadHeader(reader, topContainer.Header);
-            }
-            else if (dsonType == DsonType.Object) {
+            } else if (dsonType == DsonType.Object) {
                 topContainer.Add(ReadObject(reader));
-            }
-            else if (dsonType == DsonType.Array) {
+            } else if (dsonType == DsonType.Array) {
                 topContainer.Add(ReadArray(reader));
-            }
-            else {
+            } else {
                 throw DsonIOException.InvalidTopDsonType(dsonType);
             }
         }
@@ -267,11 +264,9 @@ public static class Dsons
         foreach (DsonValue dsonValue in topContainer) {
             if (dsonValue.DsonType == DsonType.Object) {
                 WriteObject(writer, dsonValue.AsObject<TName>());
-            }
-            else if (dsonValue.DsonType == DsonType.Array) {
+            } else if (dsonValue.DsonType == DsonType.Array) {
                 WriteArray(writer, dsonValue.AsArray<TName>());
-            }
-            else {
+            } else {
                 throw DsonIOException.InvalidTopDsonType(dsonValue.DsonType);
             }
         }
@@ -289,14 +284,11 @@ public static class Dsons
                                                 ObjectStyle style = ObjectStyle.Indent) where TName : IEquatable<TName> {
         if (dsonValue.DsonType == DsonType.Object) {
             WriteObject(writer, dsonValue.AsObject<TName>(), style);
-        }
-        else if (dsonValue.DsonType == DsonType.Array) {
+        } else if (dsonValue.DsonType == DsonType.Array) {
             WriteArray(writer, dsonValue.AsArray<TName>(), style);
-        }
-        else if (dsonValue.DsonType == DsonType.Header) {
+        } else if (dsonValue.DsonType == DsonType.Header) {
             WriteHeader(writer, dsonValue.AsHeader<TName>());
-        }
-        else {
+        } else {
             throw DsonIOException.InvalidTopDsonType(dsonValue.DsonType);
         }
     }
@@ -316,11 +308,9 @@ public static class Dsons
         }
         if (dsonType == DsonType.Object) {
             return ReadObject(reader);
-        }
-        else if (dsonType == DsonType.Array) {
+        } else if (dsonType == DsonType.Array) {
             return ReadArray(reader);
-        }
-        else if (dsonType == DsonType.Header) {
+        } else if (dsonType == DsonType.Header) {
             return ReadHeader(reader, fileHeader ?? new DsonHeader<TName>());
         }
         throw DsonIOException.InvalidTopDsonType(dsonType);
@@ -348,8 +338,7 @@ public static class Dsons
         while ((dsonType = reader.ReadDsonType()) != DsonType.EndOfObject) {
             if (dsonType == DsonType.Header) {
                 ReadHeader(reader, dsonObject.Header);
-            }
-            else {
+            } else {
                 name = reader.ReadName();
                 value = ReadDsonValue(reader);
                 dsonObject[name] = value;
@@ -380,8 +369,7 @@ public static class Dsons
         while ((dsonType = reader.ReadDsonType()) != DsonType.EndOfObject) {
             if (dsonType == DsonType.Header) {
                 ReadHeader(reader, dsonArray.Header);
-            }
-            else {
+            } else {
                 value = ReadDsonValue(reader);
                 dsonArray.Add(value);
             }
@@ -616,20 +604,14 @@ public static class Dsons
         return stringWriter.ToString();
     }
 
-    /** @param jsonString json字符串或无行首的dson字符串 */
-    public static DsonValue FromJson(string jsonString) {
+    /** @param dsonString 宽松样式的dson字符串 */
+    public static DsonValue FromRelaxedDson(string jsonString) {
         return FromDson(jsonString, DsonMode.Relaxed);
     }
 
     public static DsonValue FromDson(string dsonString, DsonMode dsonMode = DsonMode.Standard) {
-        if (dsonMode == DsonMode.Standard) {
-            using DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.Default, dsonString);
-            return ReadTopDsonValue(reader)!;
-        }
-        else {
-            using DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.Default, NewJsonScanner(dsonString));
-            return ReadTopDsonValue(reader)!;
-        }
+        using DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.Default, dsonString, dsonMode);
+        return ReadTopDsonValue(reader)!;
     }
 
     /** 获取dsonValue的localId -- dson的约定之一 */
@@ -637,11 +619,9 @@ public static class Dsons
         DsonHeader<string> header;
         if (dsonValue is DsonObject<string> dsonObject) {
             header = dsonObject.Header;
-        }
-        else if (dsonValue is DsonArray<string> dsonArray) {
+        } else if (dsonValue is DsonArray<string> dsonArray) {
             header = dsonArray.Header;
-        }
-        else {
+        } else {
             return null;
         }
         if (header.TryGetValue(DsonHeaders.NamesLocalId, out DsonValue wrapped)) {
@@ -653,11 +633,7 @@ public static class Dsons
     #endregion
 
     #region 工厂方法
-
-    public static DsonScanner NewJsonScanner(string jsonString) {
-        return new DsonScanner(IDsonCharStream.NewCharStream(jsonString, DsonMode.Relaxed));
-    }
-
+    
     public static DsonScanner NewStringScanner(string dsonString, DsonMode dsonMode = DsonMode.Standard) {
         return new DsonScanner(IDsonCharStream.NewCharStream(dsonString, dsonMode));
     }

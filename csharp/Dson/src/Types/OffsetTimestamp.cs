@@ -178,8 +178,7 @@ public readonly struct OffsetTimestamp : IEquatable<OffsetTimestamp>
         string sign = offsetSeconds < 0 ? "-" : "+";
         if (offsetSeconds % 60 == 0) { // 没有秒部分
             return sign + FormatTime(Math.Abs(offsetSeconds)).Substring(0, 5);
-        }
-        else {
+        } else {
             return sign + FormatTime(Math.Abs(offsetSeconds));
         }
     }

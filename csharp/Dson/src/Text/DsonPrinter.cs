@@ -112,8 +112,7 @@ public class DsonPrinter : IDisposable
         if (c == '\t') {
             _column--;
             _column += (4 - (_column % 4));
-        }
-        else {
+        } else {
             _column += 1;
         }
     }
@@ -266,8 +265,7 @@ public class DsonPrinter : IDisposable
                 if (unicodeChar && (c < 32 || c > 126)) {
                     PrintFastPath("\\u");
                     PrintRangeFastPath((0x10000 + c).ToString("X"), 1, 5);
-                }
-                else {
+                } else {
                     Print(c);
                 }
                 break;
@@ -311,8 +309,7 @@ public class DsonPrinter : IDisposable
         if (count == 0) return;
         if (count <= _indentionArray.Length) {
             _builder.Append(_indentionArray, 0, count);
-        }
-        else {
+        } else {
             char[] chars = new char[count];
             Array.Fill(chars, ' ');
             _builder.Append(chars);

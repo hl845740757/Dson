@@ -31,7 +31,8 @@ namespace Wjybxx.Dson;
 public static class DsonReaderUtils
 {
     /** 支持读取为bytes和直接写入bytes的数据类型 -- 这些类型不可以存储额外数据在WireType上 */
-    public static readonly IList<DsonType> ValueBytesTypes = new[] {
+    public static readonly IList<DsonType> ValueBytesTypes = new[]
+    {
         DsonType.String, DsonType.Binary, DsonType.Array, DsonType.Object, DsonType.Header
     }.ToImmutableList();
 
@@ -386,8 +387,7 @@ public static class DsonReaderUtils
     public static void WriteValueBytes(IDsonOutput output, DsonType type, byte[] data) {
         if (type == DsonType.String) {
             output.WriteUint32(data.Length);
-        }
-        else {
+        } else {
             output.WriteFixed32(data.Length);
         }
         output.WriteRawBytes(data);
@@ -397,8 +397,7 @@ public static class DsonReaderUtils
         int size;
         if (dsonType == DsonType.String) {
             size = input.ReadUint32();
-        }
-        else {
+        } else {
             size = input.ReadFixed32();
         }
         return input.ReadRawBytes(size);

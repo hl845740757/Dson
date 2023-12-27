@@ -138,8 +138,7 @@ public class MarkableIterator<T> : IEnumerator<T>
                 }
             }
             return true;
-        }
-        else {
+        } else {
             if (_baseIterator.MoveNext()) {
                 _current = _baseIterator.Current;
                 if (_marking) { // 所有读取的值要保存下来

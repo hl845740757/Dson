@@ -48,7 +48,7 @@ public class Json2DsonTest {
     @Test
     void test() {
         DsonValue dsonValue;
-        try (DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.DEFAULT, Dsons.newJsonScanner(jsonString))) {
+        try (DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.DEFAULT, Dsons.newStringScanner(jsonString, DsonMode.RELAXED))) {
             dsonValue = Dsons.readTopDsonValue(reader);
             Assertions.assertInstanceOf(DsonObject.class, dsonValue);
         }
@@ -60,11 +60,11 @@ public class Json2DsonTest {
         try (DsonScanner scanner = Dsons.newStreamScanner(new FileReader(jsonFilePath), DsonMode.RELAXED);
              DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.DEFAULT, scanner)) {
             DsonValue jsonObject = Dsons.readTopDsonValue(reader);
-            DsonValue jsonObject2 = Dsons.fromJson(FileUtils.readFileToString(new File(jsonFilePath), StandardCharsets.UTF_8));
+            DsonValue jsonObject2 = Dsons.fromRelaxedDson(FileUtils.readFileToString(new File(jsonFilePath), StandardCharsets.UTF_8));
             Assertions.assertEquals(jsonObject, jsonObject2);
 
             String dson = Dsons.toDson(jsonObject, ObjectStyle.INDENT, DsonMode.RELAXED);
-            DsonValue jsonObject3 = Dsons.fromJson(dson);
+            DsonValue jsonObject3 = Dsons.fromRelaxedDson(dson);
             Assertions.assertEquals(jsonObject, jsonObject3);
 
             FileUtils.writeStringToFile(new File(dsonFilePath), dson, StandardCharsets.UTF_8);

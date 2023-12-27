@@ -66,8 +66,7 @@ public class NumberStyles
             int iv = (int)value;
             if (iv == value) {
                 return new StyleOut(iv.ToString(), false);
-            }
-            else {
+            } else {
                 string str = value.ToString(CultureInfo.InvariantCulture);
                 return new StyleOut(str, str.IndexOf('E') >= 0);
             }
@@ -80,8 +79,7 @@ public class NumberStyles
             long lv = (long)value;
             if (lv == value) {
                 return new StyleOut(lv.ToString(), false);
-            }
-            else {
+            } else {
                 string str = value.ToString(CultureInfo.InvariantCulture);
                 return new StyleOut(str, str.IndexOf('E') >= 0);
             }
@@ -116,8 +114,7 @@ public class NumberStyles
         public StyleOut ToString(int value) {
             if (value < 0 && value != int.MinValue) {
                 return new StyleOut("-0x" + (-1 * value).ToString("X"), true);
-            }
-            else {
+            } else {
                 return new StyleOut("0x" + value.ToString("X"), true);
             }
         }
@@ -125,8 +122,7 @@ public class NumberStyles
         public StyleOut ToString(long value) {
             if (value < 0 && value != long.MinValue) {
                 return new StyleOut("-0x" + (-1 * value).ToString("X"), true);
-            }
-            else {
+            } else {
                 return new StyleOut("0x" + value.ToString("X"), true);
             }
         }
@@ -176,8 +172,7 @@ public class NumberStyles
         public StyleOut ToString(int value) {
             if (value < 0 && value != int.MinValue) {
                 return new StyleOut("-0b" + ToBinaryString(-1 * value), true);
-            }
-            else {
+            } else {
                 return new StyleOut("0b" + ToBinaryString(value), true);
             }
         }
@@ -185,8 +180,7 @@ public class NumberStyles
         public StyleOut ToString(long value) {
             if (value < 0 && value != long.MinValue) {
                 return new StyleOut("-0b" + ToBinaryString(-1 * value), true);
-            }
-            else {
+            } else {
                 return new StyleOut("0b" + ToBinaryString(value), true);
             }
         }

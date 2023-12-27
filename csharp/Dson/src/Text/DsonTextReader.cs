@@ -122,8 +122,7 @@ public class DsonTextReader : AbstractDsonReader<string>
                 _markedTokenQueue.Add(dsonToken);
             }
             return dsonToken;
-        }
-        else {
+        } else {
             return _pushedTokenQueue.Pop();
         }
     }
@@ -167,8 +166,7 @@ public class DsonTextReader : AbstractDsonReader<string>
         OnReadDsonType(context, dsonType);
         if (dsonType == DsonType.Header) {
             context._headerCount++;
-        }
-        else {
+        } else {
             context._count++;
         }
         return dsonType;
@@ -398,7 +396,7 @@ public class DsonTextReader : AbstractDsonReader<string>
         }
         return null;
     }
-    
+
     /** 处理内置结构体 */
     private DsonType ParseBeginObjectToken(Context context, in DsonToken valueToken) {
         DsonToken? headerTokenWrapper = PopHeaderToken(context);
@@ -494,8 +492,7 @@ public class DsonTextReader : AbstractDsonReader<string>
         // 如果header不是结构体，则封装为结构体，注意...要反序压栈
         if (headerToken.Type == DsonTokenType.BeginHeader) {
             PushToken(headerToken);
-        }
-        else {
+        } else {
             PushToken(TokenEndObject);
             PushToken(new DsonToken(DsonTokenType.String, headerToken.CastAsString(), -1));
             PushToken(TokenColon);
@@ -642,8 +639,7 @@ public class DsonTextReader : AbstractDsonReader<string>
         if ((keyToken = PopToken()).Type == DsonTokenType.Comma
             && (keyToken = PopToken()).Type == DsonTokenType.Comma) {
             throw DsonIOException.InvalidTokenType(context._contextType, keyToken);
-        }
-        else {
+        } else {
             PushToken(keyToken);
         }
     }
@@ -704,10 +700,10 @@ public class DsonTextReader : AbstractDsonReader<string>
 
     private static bool IsHeaderOrBuiltStruct(DsonToken token) {
         return token.Type == DsonTokenType.BuiltinStruct
-               || token.Type == DsonTokenType.BeginHeader 
+               || token.Type == DsonTokenType.BeginHeader
                || token.Type == DsonTokenType.SimpleHeader;
     }
-    
+
     private static void VerifyTokenType(Context context, DsonToken token, DsonTokenType expected) {
         if (token.Type != expected) {
             throw DsonIOException.InvalidTokenType(context._contextType, token, DsonInternals.NewList(expected));
@@ -726,7 +722,7 @@ public class DsonTextReader : AbstractDsonReader<string>
         Context context = GetContext();
         if (context._contextType == DsonContextType.Header) {
             if (DsonHeaders.NamesCompClassName == _currentName) {
-                string compClsName = (string) _nextValue;
+                string compClsName = (string)_nextValue;
                 DsonTokenType tokenType = DsonTexts.TokenTypeOfClsName(compClsName);
                 context._compClsNameToken = new DsonToken(tokenType, compClsName, -1);
             }
@@ -868,8 +864,7 @@ public class DsonTextReader : AbstractDsonReader<string>
         DsonToken endToken;
         if (IsAtType) {
             endToken = SkipStack(1);
-        }
-        else {
+        } else {
             SkipName();
             switch (_currentDsonType) {
                 case DsonType.Header:
@@ -926,8 +921,7 @@ public class DsonTextReader : AbstractDsonReader<string>
         Context? context = GetPooledContext();
         if (context != null) {
             SetPooledContext(null);
-        }
-        else {
+        } else {
             context = new Context();
         }
         context.Init(parent, contextType, dsonType);

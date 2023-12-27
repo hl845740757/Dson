@@ -356,8 +356,7 @@ public static class BinaryUtils
     internal static int WriteInt32(byte[] buffer, int pos, int value) {
         if (value >= 0) {
             return WriteRawVarint32(buffer, pos, (uint)value);
-        }
-        else {
+        } else {
             return WriteRawVarint64(buffer, pos, (ulong)value);
         }
     }
@@ -423,8 +422,7 @@ public static class BinaryUtils
             if (value > 127UL) {
                 buffer[pos++] = (byte)((value & 127UL) | 128UL); // 截取后7位，高位补1
                 value >>= 7;
-            }
-            else {
+            } else {
                 buffer[pos++] = (byte)value;
                 return pos;
             }
@@ -447,8 +445,7 @@ public static class BinaryUtils
             if (value > 127U) {
                 buffer[pos++] = (byte)((value & 127U) | 128U); // 截取后7位，高位补1
                 value >>= 7;
-            }
-            else {
+            } else {
                 buffer[pos++] = (byte)value;
                 return pos;
             }

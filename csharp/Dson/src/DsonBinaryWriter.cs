@@ -42,8 +42,7 @@ public class DsonBinaryWriter<TName> : AbstractDsonWriter<TName> where TName : I
         if (DsonInternals.IsStringKey<TName>()) {
             _textWriter = this as AbstractDsonWriter<string>;
             _binWriter = null;
-        }
-        else {
+        } else {
             _textWriter = null;
             _binWriter = this as AbstractDsonWriter<FieldNumber>;
         }
@@ -78,8 +77,7 @@ public class DsonBinaryWriter<TName> : AbstractDsonWriter<TName> where TName : I
             if (contextType == DsonContextType.Object || contextType == DsonContextType.Header) {
                 if (_textWriter != null) { // 避免装箱
                     output.WriteString(_textWriter._context._curName);
-                }
-                else {
+                } else {
                     output.WriteUint32(_binWriter!._context._curName.FullNumber);
                 }
             }
@@ -226,8 +224,7 @@ public class DsonBinaryWriter<TName> : AbstractDsonWriter<TName> where TName : I
         Context? context = GetPooledContext();
         if (context != null) {
             SetPooledContext(null);
-        }
-        else {
+        } else {
             context = new Context();
         }
         context.Init(parent, contextType, dsonType);

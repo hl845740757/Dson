@@ -204,8 +204,7 @@ public class DsonOutputs
                     int byteCount = Encoding.UTF8.GetBytes(value, 0, value.Length, _buffer, _bufferPos + minByteCountVarIntSize);
                     int newPos = BinaryUtils.WriteUint32(_buffer, _bufferPos, byteCount);
                     _bufferPos = CheckNewBufferPos(newPos + byteCount);
-                }
-                else {
+                } else {
                     // 注意，这里写的编码后的字节长度；而不是字符串长度 -- 提前计算UTF8的长度是很有用的方法
                     int byteCount = Encoding.UTF8.GetByteCount(value);
                     int newPos = BinaryUtils.WriteUint32(_buffer, _bufferPos, byteCount);

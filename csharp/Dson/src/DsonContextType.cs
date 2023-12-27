@@ -44,7 +44,8 @@ public static class DsonContextTypes
     /// 上下文的开始符号
     /// </summary>
     public static string? GetStartSymbol(this DsonContextType contextType) {
-        return contextType switch {
+        return contextType switch
+        {
             DsonContextType.TopLevel => null,
             DsonContextType.Object => "{",
             DsonContextType.Array => "[",
@@ -57,7 +58,8 @@ public static class DsonContextTypes
     /// 上下文的结束符号
     /// </summary>
     public static string? GetEndSymbol(this DsonContextType contextType) {
-        return contextType switch {
+        return contextType switch
+        {
             DsonContextType.TopLevel => null,
             DsonContextType.Object => "}",
             DsonContextType.Array => "]",

@@ -22,7 +22,10 @@ package cn.wjybxx.dson.text;
  */
 public enum ObjectStyle implements IStyle {
 
-    /** 缩进模式 */
+    /**
+     * 缩进模式
+     * 注意：当父节点是Flow模式时，当前节点也将转换为Flow模式
+     */
     INDENT,
 
     /** 流模式 - 线性模式 */

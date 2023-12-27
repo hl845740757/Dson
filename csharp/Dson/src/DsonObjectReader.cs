@@ -115,23 +115,19 @@ public class DsonObjectReader<TName> : AbstractDsonReader<TName> where TName : I
             dsonType = DsonType.Header;
             PushNextValue(context._header);
             context._header = null;
-        }
-        else if (context._contextType.IsLikeArray()) {
+        } else if (context._contextType.IsLikeArray()) {
             DsonValue nextValue = context.NextValue();
             if (nextValue == null) {
                 dsonType = DsonType.EndOfObject;
-            }
-            else {
+            } else {
                 PushNextValue(nextValue);
                 dsonType = nextValue.DsonType;
             }
-        }
-        else {
+        } else {
             KeyValuePair<TName, DsonValue>? nextElement = context.NextElement();
             if (!nextElement.HasValue) {
                 dsonType = DsonType.EndOfObject;
-            }
-            else {
+            } else {
                 PushNextName(nextElement.Value.Key);
                 PushNextValue(nextElement.Value.Value);
                 dsonType = nextElement.Value.Value.DsonType;
@@ -161,8 +157,7 @@ public class DsonObjectReader<TName> : AbstractDsonReader<TName> where TName : I
             DsonValue nextValue = context.NextValue();
             context.ResetItr();
             return nextValue!.DsonType;
-        }
-        else {
+        } else {
             context.MarkItr();
             KeyValuePair<TName, DsonValue>? nextElement = context.NextElement();
             context.ResetItr();
@@ -246,13 +241,11 @@ public class DsonObjectReader<TName> : AbstractDsonReader<TName> where TName : I
             newContext._header = dsonObject.Header.Count > 0 ? dsonObject.Header : null;
             newContext._dsonObject = dsonObject;
             newContext._objectIterator = new MarkableIterator<KeyValuePair<TName, DsonValue>>(dsonObject.GetEnumerator());
-        }
-        else if (dsonValue.DsonType == DsonType.Array) {
+        } else if (dsonValue.DsonType == DsonType.Array) {
             DsonArray<TName> dsonArray = dsonValue.AsArray<TName>();
             newContext._header = dsonArray.Header.Count > 0 ? dsonArray.Header : null;
             newContext._arrayIterator = new MarkableIterator<DsonValue>(dsonArray.GetEnumerator());
-        }
-        else {
+        } else {
             // 其它内置结构体
             newContext._dsonObject = dsonValue.AsHeader<TName>();
             newContext._objectIterator = new MarkableIterator<KeyValuePair<TName, DsonValue>>(dsonValue.AsHeader<TName>().GetEnumerator());
@@ -291,8 +284,7 @@ public class DsonObjectReader<TName> : AbstractDsonReader<TName> where TName : I
         context._header = null;
         if (context._arrayIterator != null) {
             context._arrayIterator.ForEachRemaining(_ => { });
-        }
-        else {
+        } else {
             context._objectIterator!.ForEachRemaining(_ => { });
         }
     }
@@ -309,8 +301,7 @@ public class DsonObjectReader<TName> : AbstractDsonReader<TName> where TName : I
         Context? context = GetPooledContext();
         if (context != null) {
             SetPooledContext(null);
-        }
-        else {
+        } else {
             context = new Context();
         }
         context.Init(parent, contextType, dsonType);
@@ -351,8 +342,7 @@ public class DsonObjectReader<TName> : AbstractDsonReader<TName> where TName : I
         public bool HasNext() {
             if (_objectIterator != null) {
                 return _objectIterator.HasNext();
-            }
-            else {
+            } else {
                 return _arrayIterator!.HasNext();
             }
         }
@@ -360,8 +350,7 @@ public class DsonObjectReader<TName> : AbstractDsonReader<TName> where TName : I
         public void MarkItr() {
             if (_objectIterator != null) {
                 _objectIterator.Mark();
-            }
-            else {
+            } else {
                 _arrayIterator!.Mark();
             }
         }
@@ -369,8 +358,7 @@ public class DsonObjectReader<TName> : AbstractDsonReader<TName> where TName : I
         public void ResetItr() {
             if (_objectIterator != null) {
                 _objectIterator.Reset();
-            }
-            else {
+            } else {
                 _arrayIterator!.Reset();
             }
         }
@@ -405,8 +393,7 @@ public class DsonObjectReader<TName> : AbstractDsonReader<TName> where TName : I
                 TName key = _keyItr.Current;
                 if (_dsonObject.TryGetValue(key!, out DsonValue dsonValue)) {
                     return new KeyValuePair<TName, DsonValue>(key, dsonValue);
-                }
-                else {
+                } else {
                     return new KeyValuePair<TName, DsonValue>(key, _defValue);
                 }
             }

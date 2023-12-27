@@ -184,8 +184,7 @@ public class DsonObjectWriter<TName> : AbstractDsonWriter<TName> where TName : I
         Context? context = GetPooledContext();
         if (context != null) {
             SetPooledContext(null);
-        }
-        else {
+        } else {
             context = new Context();
         }
         context.Init(parent, contextType, dsonType);
@@ -209,8 +208,7 @@ public class DsonObjectWriter<TName> : AbstractDsonWriter<TName> where TName : I
         public DsonHeader<TName> GetHeader() {
             if (_container.DsonType == DsonType.Object) {
                 return _container.AsObject<TName>().Header;
-            }
-            else {
+            } else {
                 return _container.AsArray<TName>().Header;
             }
         }
@@ -218,11 +216,9 @@ public class DsonObjectWriter<TName> : AbstractDsonWriter<TName> where TName : I
         public void Add(DsonValue value) {
             if (_container.DsonType == DsonType.Object) {
                 _container.AsObject<TName>().Append(_curName, value);
-            }
-            else if (_container.DsonType == DsonType.Array) {
+            } else if (_container.DsonType == DsonType.Array) {
                 _container.AsArray<TName>().Add(value);
-            }
-            else {
+            } else {
                 _container.AsHeader<TName>().Append(_curName, value);
             }
         }

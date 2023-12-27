@@ -54,7 +54,7 @@ public class DsonTextReaderTest2 {
                     .build());
             System.out.println("Mode:" + DsonMode.RELAXED);
             System.out.println(dsonString3);
-            DsonValue dsonObject3 = Dsons.fromJson(dsonString3);
+            DsonValue dsonObject3 = Dsons.fromRelaxedDson(dsonString3);
             Assertions.assertEquals(dsonObject, dsonObject3);
         }
 
@@ -73,4 +73,33 @@ public class DsonTextReaderTest2 {
         }
     }
 
+    /** flow样式需要较长的行，才不显得拥挤 */
+    @Test
+    void testFlowStyle() {
+        DsonObject<String> dsonObject = Dsons.fromDson(dsonString).asObject();
+        {
+            String dsonString2 = Dsons.toDson(dsonObject, ObjectStyle.FLOW, DsonTextWriterSettings.newBuilder()
+                    .setExtraIndent(2)
+                    .setSoftLineLength(120)
+                    .setTextAlignLeft(false)
+                    .setTextStringLength(50)
+                    .build());
+            System.out.println("FlowStyle: Standard");
+            System.out.println(dsonString2);
+            DsonValue dsonObject2 = Dsons.fromDson(dsonString2);
+            Assertions.assertEquals(dsonObject, dsonObject2);
+        }
+        System.out.println();
+        {
+            String dsonString3 = Dsons.toDson(dsonObject, ObjectStyle.FLOW, DsonTextWriterSettings.newBuilder()
+                    .setDsonMode(DsonMode.RELAXED)
+                    .setExtraIndent(0)
+                    .setSoftLineLength(120)
+                    .build());
+            System.out.println("FlowStyle: Relaxed");
+            System.out.println(dsonString3);
+            DsonValue dsonObject3 = Dsons.fromRelaxedDson(dsonString3);
+            Assertions.assertEquals(dsonObject, dsonObject3);
+        }
+    }
 }

@@ -67,23 +67,18 @@ public abstract class AbstractCharStream : IDsonCharStream
             if (_readingContent) {
                 if (_position >= curLine.LastReadablePosition()) { // 读完或已在行尾(unread)
                     return OnReadEndOfLine(curLine);
-                }
-                else {
+                } else {
                     _position++;
                 }
-            }
-            else if (curLine.HasContent()) {
+            } else if (curLine.HasContent()) {
                 _readingContent = true;
-            }
-            else {
+            } else {
                 return OnReadEndOfLine(curLine);
             }
-        }
-        else {
+        } else {
             if (_readingContent) {
                 _position++;
-            }
-            else {
+            } else {
                 _readingContent = true;
             }
         }
@@ -112,8 +107,7 @@ public abstract class AbstractCharStream : IDsonCharStream
         this._readingContent = false;
         if (nextLine.HasContent()) {
             this._position = nextLine.ContentStartPos;
-        }
-        else {
+        } else {
             this._position = nextLine.StartPos;
         }
         DiscardReadLines(_lines, nextLine); // 清除部分缓存
@@ -126,8 +120,7 @@ public abstract class AbstractCharStream : IDsonCharStream
             // 有内容的情况下，需要回退到上一行最后一个字符的位置，否则继续unread会出错
             this._position = preLine.LastReadablePosition();
             this._readingContent = true;
-        }
-        else {
+        } else {
             // 无内容的情况下回退到startPos，和read保持一致
             this._position = preLine.StartPos;
             this._readingContent = false;
@@ -148,8 +141,7 @@ public abstract class AbstractCharStream : IDsonCharStream
             if (_position > curLine.ContentStartPos) {
                 CheckUnreadOverFlow(_position - 1);
                 _position--;
-            }
-            else {
+            } else {
                 _readingContent = false;
             }
             return 0;
@@ -160,14 +152,12 @@ public abstract class AbstractCharStream : IDsonCharStream
             LineInfo preLine = _lines[index - 1];
             if (preLine.HasContent()) {
                 CheckUnreadOverFlow(preLine.LastReadablePosition());
-            }
-            else {
+            } else {
                 CheckUnreadOverFlow(preLine.StartPos);
             }
             OnBackToPreLine(preLine);
             return -2;
-        }
-        else {
+        } else {
             if (curLine.Ln != FirstLn) {
                 throw BufferOverFlow(_position);
             }

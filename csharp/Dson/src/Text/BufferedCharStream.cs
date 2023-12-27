@@ -165,8 +165,7 @@ class BufferedCharStream : AbstractCharStream
             int n = _reader.Read(nextBuffer.Buffer, nextBuffer.Widx, len);
             if (n == -1) {
                 _readerEof = true;
-            }
-            else {
+            } else {
                 nextBuffer.AddWidx(n);
             }
         }
@@ -182,8 +181,7 @@ class BufferedCharStream : AbstractCharStream
         if (curLine == null) {
             ln = FirstLn;
             startPos = 0;
-        }
-        else {
+        } else {
             ln = curLine.Ln + 1;
             startPos = curLine.EndPos + 1;
         }
@@ -254,8 +252,7 @@ class BufferedCharStream : AbstractCharStream
             }
             tempLine = new LineInfo(ln, tempLine.StartPos, tempLine.EndPos, lineHead.Value, contentStartPos);
             tempLine.State = state;
-        }
-        else {
+        } else {
             Debug.Assert(tempLine.IsScanCompleted());
             tempLine = new LineInfo(ln, startPos, tempLine.EndPos, LineHead.Comment, -1);
             tempLine.State = state;

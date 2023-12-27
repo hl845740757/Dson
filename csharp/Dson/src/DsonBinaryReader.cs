@@ -41,8 +41,7 @@ public class DsonBinaryReader<TName> : AbstractDsonReader<TName> where TName : I
         if (DsonInternals.IsStringKey<TName>()) {
             this._textReader = this as AbstractDsonReader<string>;
             this._binReader = null;
-        }
-        else {
+        } else {
             this._textReader = null;
             this._binReader = this as AbstractDsonReader<FieldNumber>;
         }
@@ -98,8 +97,7 @@ public class DsonBinaryReader<TName> : AbstractDsonReader<TName> where TName : I
                 filedName = Dsons.InternField(filedName);
             }
             _textReader._currentName = filedName;
-        }
-        else {
+        } else {
             _binReader!._currentName = FieldNumber.OfFullNumber(_input.ReadUint32());
         }
     }
@@ -202,8 +200,7 @@ public class DsonBinaryReader<TName> : AbstractDsonReader<TName> where TName : I
             if (size > 0) {
                 _input.SkipRawBytes(size);
             }
-        }
-        else {
+        } else {
             _input.ReadUint32();
         }
     }
@@ -228,8 +225,7 @@ public class DsonBinaryReader<TName> : AbstractDsonReader<TName> where TName : I
         Context? context = GetPooledContext();
         if (context != null) {
             SetPooledContext(null);
-        }
-        else {
+        } else {
             context = new Context();
         }
         context.Init(parent, contextType, dsonType);

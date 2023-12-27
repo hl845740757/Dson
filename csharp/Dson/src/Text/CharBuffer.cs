@@ -160,8 +160,7 @@ internal class CharBuffer
         if (shiftCount >= Buffer.Length) {
             Ridx = 0;
             Widx = 0;
-        }
-        else {
+        } else {
             Array.Copy(Buffer, shiftCount, Buffer, 0, Buffer.Length - shiftCount);
             Ridx = Math.Max(0, Ridx - shiftCount);
             Widx = Math.Max(0, Widx - shiftCount);

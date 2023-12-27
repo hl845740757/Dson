@@ -532,7 +532,11 @@ public class DsonTextWriter extends AbstractDsonWriter {
         DsonPrinter printer = this.printer;
         writeCurrentName(printer, dsonType);
 
-        Context newContext = newContext(getContext(), contextType, dsonType);
+        Context context = getContext();
+        if (context.style == ObjectStyle.FLOW) {
+            style = ObjectStyle.FLOW;
+        }
+        Context newContext = newContext(context, contextType, dsonType);
         newContext.style = style;
 
         printer.printFastPath(contextType.startSymbol);

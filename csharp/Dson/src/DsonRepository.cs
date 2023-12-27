@@ -107,8 +107,7 @@ public class DsonRepository
         if (idx >= 0) {
             RemoveAt(idx);
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
@@ -160,13 +159,11 @@ public class DsonRepository
                     if (_indexMap.TryGetValue(objectRef.LocalId, out DsonValue targetObj)) {
                         dsonObject[entry.Key] = targetObj; // 迭代时覆盖值是安全的
                     }
-                }
-                else if (value.DsonType.IsContainer()) {
+                } else if (value.DsonType.IsContainer()) {
                     ResolveReference(value);
                 }
             }
-        }
-        else if (dsonValue is DsonArray<string> dsonArray) {
+        } else if (dsonValue is DsonArray<string> dsonArray) {
             for (int i = 0; i < dsonArray.Count; i++) {
                 DsonValue value = dsonArray[i];
                 if (value.DsonType == DsonType.Reference) {
@@ -174,8 +171,7 @@ public class DsonRepository
                     if (_indexMap.TryGetValue(objectRef.LocalId, out DsonValue targetObj)) {
                         dsonArray[i] = targetObj;
                     }
-                }
-                else if (value.DsonType.IsContainer()) {
+                } else if (value.DsonType.IsContainer()) {
                     ResolveReference(value);
                 }
             }

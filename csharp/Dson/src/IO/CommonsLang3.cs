@@ -59,7 +59,8 @@ internal class CommonsLang3
     }
 
     /** 字节数组转16进制 */
-    private static readonly char[] DigitsUpper = {
+    private static readonly char[] DigitsUpper =
+    {
         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
         'A', 'B', 'C', 'D', 'E', 'F'
     };
@@ -92,7 +93,8 @@ internal class CommonsLang3
     }
 
     private static int ToDigit(char c, int index) {
-        return c switch {
+        return c switch
+        {
             '0' => 0,
             '1' => 1,
             '2' => 2,

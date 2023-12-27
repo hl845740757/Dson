@@ -69,8 +69,7 @@ public class DsonScanner : IDisposable
                 _charStream.Unread();
                 if (nextChar == '@') {
                     return new DsonToken(DsonTokenType.BeginObject, "{@", Position);
-                }
-                else {
+                } else {
                     return new DsonToken(DsonTokenType.BeginObject, "{", Position);
                 }
             }
@@ -79,8 +78,7 @@ public class DsonScanner : IDisposable
                 _charStream.Unread();
                 if (nextChar == '@') {
                     return new DsonToken(DsonTokenType.BeginArray, "[@", Position);
-                }
-                else {
+                } else {
                     return new DsonToken(DsonTokenType.BeginArray, "[", Position);
                 }
             }
@@ -149,7 +147,7 @@ public class DsonScanner : IDisposable
     }
 
     private DsonToken ScanHeader() {
-        IDsonCharStream buffer = this._charStream; 
+        IDsonCharStream buffer = this._charStream;
         int beginPos = buffer.Position;
         int firstChar = SkipWhitespace(); // {}下跳过空白字符
         if (firstChar < 0) {
@@ -157,20 +155,20 @@ public class DsonScanner : IDisposable
         }
         string className;
         if (firstChar == '"') {
-            className = ScanString((char) firstChar);
+            className = ScanString((char)firstChar);
         } else {
             // 非双引号模式下，只能由安全字符构成
             if (DsonTexts.IsUnsafeStringChar(firstChar)) {
-                throw InvalidClassName(char.ToString((char) firstChar), Position);
+                throw InvalidClassName(char.ToString((char)firstChar), Position);
             }
             StringBuilder sb = AllocStringBuilder();
-            sb.Append((char) firstChar);
+            sb.Append((char)firstChar);
             int c;
             while ((c = buffer.Read()) >= 0) {
                 if (DsonTexts.IsUnsafeStringChar(c)) {
                     break;
                 }
-                sb.Append((char) c);
+                sb.Append((char)c);
             }
             if (c < 0 || DsonTexts.IsUnsafeStringChar(c)) {
                 buffer.Unread();
@@ -211,8 +209,7 @@ public class DsonScanner : IDisposable
         // // 无{}模式下，clsName后必须是空格或换行缩进
         if (c == -2) {
             buffer.Unread();
-        }
-        else if (c != ' ') {
+        } else if (c != ' ') {
             throw SpaceRequired(Position);
         }
         string className = sb.ToString();
@@ -221,7 +218,7 @@ public class DsonScanner : IDisposable
         }
         return OnReadClassName(className);
     }
-    
+
     private DsonToken OnReadClassName(string className) {
         int position = Position;
         switch (className) {
@@ -333,21 +330,16 @@ public class DsonScanner : IDisposable
             if (c == -2) {
                 if (buffer.LineHead == LineHead.Comment) {
                     buffer.SkipLine();
-                }
-                else if (buffer.LineHead == LineHead.AppendLine) { // 开启新行
+                } else if (buffer.LineHead == LineHead.AppendLine) { // 开启新行
                     sb.Append('\n');
-                }
-                else if (buffer.LineHead == LineHead.SwitchMode) { // 进入纯文本模式
+                } else if (buffer.LineHead == LineHead.SwitchMode) { // 进入纯文本模式
                     Switch2TextMode(buffer, sb);
                 }
-            }
-            else if (c == '\\') { // 处理转义字符
+            } else if (c == '\\') { // 处理转义字符
                 DoEscape(buffer, sb, LineHead.Append);
-            }
-            else if (c == quoteChar) { // 结束
+            } else if (c == quoteChar) { // 结束
                 return sb.ToString();
-            }
-            else {
+            } else {
                 sb.Append((char)c);
             }
         }
@@ -366,18 +358,15 @@ public class DsonScanner : IDisposable
             if (c == -2) {
                 if (buffer.LineHead == LineHead.Comment) {
                     buffer.SkipLine();
-                }
-                else if (buffer.LineHead == LineHead.EndOfText) { // 读取结束
+                } else if (buffer.LineHead == LineHead.EndOfText) { // 读取结束
                     return sb.ToString();
                 }
                 if (buffer.LineHead == LineHead.AppendLine) { // 开启新行
                     sb.Append('\n');
-                }
-                else if (buffer.LineHead == LineHead.SwitchMode) { // 进入转义模式
+                } else if (buffer.LineHead == LineHead.SwitchMode) { // 进入转义模式
                     Switch2EscapeMode(buffer, sb);
                 }
-            }
-            else {
+            } else {
                 sb.Append((char)c);
             }
         }
@@ -392,8 +381,7 @@ public class DsonScanner : IDisposable
                     buffer.Unread();
                     break;
                 }
-            }
-            else {
+            } else {
                 sb.Append((char)c);
             }
         }
@@ -407,11 +395,9 @@ public class DsonScanner : IDisposable
                     buffer.Unread();
                     break;
                 }
-            }
-            else if (c == '\\') {
+            } else if (c == '\\') {
                 DoEscape(buffer, sb, LineHead.SwitchMode);
-            }
-            else {
+            } else {
                 sb.Append((char)c);
             }
         }
