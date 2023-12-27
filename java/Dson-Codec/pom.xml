@@ -14,6 +14,10 @@
     <description>Dson对象序列化模块</description>
     <url>https://github.com/hl845740757/Dson</url>
 
+    <properties>
+        <maven.deploy.skipParents>true</maven.deploy.skipParents>
+    </properties>
+
     <dependencies>
         <!-- dson-core是jdk17,commons是jdk21... -->
         <dependency>
@@ -38,22 +42,4 @@
             <version>${commons-lang3.version}</version>
         </dependency>
     </dependencies>
-
-    <!-- 启用发布 -->
-    <profiles>
-        <profile>
-            <id>release</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-deploy-plugin</artifactId>
-                        <configuration>
-                            <skip>false</skip>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>

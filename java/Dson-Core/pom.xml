@@ -15,21 +15,7 @@
     <description>Dson核心模块</description>
     <url>https://github.com/hl845740757/Dson</url>
 
-    <!-- 启用发布 -->
-    <profiles>
-        <profile>
-            <id>release</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-deploy-plugin</artifactId>
-                        <configuration>
-                            <skip>false</skip>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
+    <properties>
+        <maven.deploy.skipParents>true</maven.deploy.skipParents>
+    </properties>
 </project>
