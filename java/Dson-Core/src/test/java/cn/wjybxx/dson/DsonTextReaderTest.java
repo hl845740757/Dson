@@ -77,7 +77,7 @@ public class DsonTextReaderTest {
      * 但程序反复读写，以及不同方式之间的读写结果应当相同。
      */
     @Test
-    void test() {
+    void test_equivalenceOfAllReaders() {
         DsonArray<String> topContainer1 = Dsons.fromFlatDson(dsonString);
         String dsonString1 = Dsons.toFlatDson(topContainer1);
 //        System.out.println(dsonString1);

@@ -69,10 +69,6 @@ public class DsonTextReader extends AbstractDsonReader {
         this(settings, new DsonScanner(DsonCharStream.newCharStream(dson, dsonMode)));
     }
 
-    public DsonTextReader(DsonTextReaderSettings settings, DsonCharStream charStream) {
-        this(settings, new DsonScanner(charStream));
-    }
-
     public DsonTextReader(DsonTextReaderSettings settings, DsonScanner scanner) {
         super(settings);
         this.scanner = Objects.requireNonNull(scanner);

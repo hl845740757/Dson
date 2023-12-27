@@ -111,7 +111,7 @@ public class DsonPrinter : IDisposable
         _builder.Append(c);
         if (c == '\t') {
             _column--;
-            _column += (4 - (_column % 4));
+            _column += (4 - (_column % 4)); // -1 % 4 => -1
         } else {
             _column += 1;
         }

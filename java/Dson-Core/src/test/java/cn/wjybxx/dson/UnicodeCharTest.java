@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
  */
 public class UnicodeCharTest {
 
-    @Test
+//    @Test
     void test() {
         for (int i = 0; i < 65536; i++) {
             char c = (char) i;

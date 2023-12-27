@@ -45,6 +45,7 @@ public class DsonArrayHeaderTest {
         Assertions.assertEquals(array, copiedArray);
     }
 
+    /** 测试内置结构体打印类型时似乎冲突 */
     @Test
     void testHeaderRef() {
         DsonArray<String> array = new DsonArray<>();
@@ -58,6 +59,7 @@ public class DsonArrayHeaderTest {
         Assertions.assertEquals(array, copiedArray);
     }
 
+    /** 测试自身headeer时是否冲突 */
     @Test
     void testHeader() {
         DsonArray<String> array = new DsonArray<>();

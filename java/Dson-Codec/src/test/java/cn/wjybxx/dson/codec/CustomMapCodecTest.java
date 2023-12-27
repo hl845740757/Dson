@@ -16,11 +16,11 @@
 
 package cn.wjybxx.dson.codec;
 
+import cn.wjybxx.dson.DsonType;
 import cn.wjybxx.dson.codec.binary.BinaryObjectReader;
 import cn.wjybxx.dson.codec.binary.BinaryObjectWriter;
 import cn.wjybxx.dson.codec.binary.BinaryPojoCodecScanIgnore;
 import cn.wjybxx.dson.codec.binary.BinarySerializable;
-import cn.wjybxx.dson.DsonType;
 
 import java.util.IdentityHashMap;
 

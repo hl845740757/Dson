@@ -16,12 +16,12 @@
 
 package cn.wjybxx.dson.codec;
 
+import cn.wjybxx.dson.DsonLites;
+import cn.wjybxx.dson.DsonType;
 import cn.wjybxx.dson.codec.binary.BinaryObjectReader;
 import cn.wjybxx.dson.codec.binary.BinaryObjectWriter;
 import cn.wjybxx.dson.codec.binary.BinaryPojoCodecImpl;
 import cn.wjybxx.dson.codec.binary.DefaultBinaryConverter;
-import cn.wjybxx.dson.DsonLites;
-import cn.wjybxx.dson.DsonType;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

@@ -16,6 +16,7 @@
 
 package cn.wjybxx.dson.codec.codecs;
 
+import cn.wjybxx.dson.DsonType;
 import cn.wjybxx.dson.codec.ConverterUtils;
 import cn.wjybxx.dson.codec.PojoCodecImpl;
 import cn.wjybxx.dson.codec.TypeArgInfo;
@@ -25,7 +26,6 @@ import cn.wjybxx.dson.codec.binary.BinaryPojoCodecScanIgnore;
 import cn.wjybxx.dson.codec.document.DocumentObjectReader;
 import cn.wjybxx.dson.codec.document.DocumentObjectWriter;
 import cn.wjybxx.dson.codec.document.DocumentPojoCodecScanIgnore;
-import cn.wjybxx.dson.DsonType;
 import cn.wjybxx.dson.text.ObjectStyle;
 
 import javax.annotation.Nonnull;

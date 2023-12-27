@@ -16,10 +16,10 @@
 
 package cn.wjybxx.dson.codec.document;
 
-import cn.wjybxx.dson.codec.TypeArgInfo;
 import cn.wjybxx.base.pool.DefaultObjectPool;
 import cn.wjybxx.base.pool.ObjectPool;
 import cn.wjybxx.dson.*;
+import cn.wjybxx.dson.codec.TypeArgInfo;
 import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
 
 import javax.annotation.Nonnull;

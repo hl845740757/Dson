@@ -17,8 +17,6 @@
 package cn.wjybxx.dson.codec;
 
 import cn.wjybxx.base.OptionalBool;
-import cn.wjybxx.dson.codec.binary.*;
-import cn.wjybxx.dson.codec.document.*;
 import cn.wjybxx.dson.DsonLites;
 import cn.wjybxx.dson.WireType;
 import cn.wjybxx.dson.codec.binary.*;

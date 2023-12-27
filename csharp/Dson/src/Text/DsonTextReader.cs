@@ -57,10 +57,6 @@ public class DsonTextReader : AbstractDsonReader<string>
         : this(settings, new DsonScanner(dson, dsonMode)) {
     }
 
-    public DsonTextReader(DsonTextReaderSettings settings, IDsonCharStream charStream)
-        : this(settings, new DsonScanner(charStream)) {
-    }
-
     public DsonTextReader(DsonTextReaderSettings settings, DsonScanner scanner)
         : base(settings) {
         this._scanner = scanner ?? throw new ArgumentNullException(nameof(scanner));

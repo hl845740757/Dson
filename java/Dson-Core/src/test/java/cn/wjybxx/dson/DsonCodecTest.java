@@ -76,7 +76,7 @@ public class DsonCodecTest {
     }
 
     @Test
-    void test() {
+    void testBinary() {
         final byte[] buffer = new byte[8192];
         int totalBytesWritten;
         try (DsonOutput dsonOutput = DsonOutputs.newInstance(buffer)) {
@@ -137,7 +137,7 @@ public class DsonCodecTest {
     }
 
     @Test
-    void testLite() {
+    void testBinaryLite() {
         final byte[] buffer = new byte[4096];
         final int loop = 3;
 

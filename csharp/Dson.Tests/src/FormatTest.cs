@@ -45,7 +45,8 @@ public class FormatTest
     public void FormatTest0() {
         DsonObject<string> dsonObject = Dsons.FromDson(DsonString).AsObject();
         {
-            DsonTextWriterSettings.Builder builder = new DsonTextWriterSettings.Builder() {
+            DsonTextWriterSettings.Builder builder = new DsonTextWriterSettings.Builder()
+            {
                 ExtraIndent = 2,
                 SoftLineLength = 50,
                 TextStringLength = 50,
@@ -61,7 +62,8 @@ public class FormatTest
 
         Console.WriteLine();
         {
-            DsonTextWriterSettings.Builder builder = new DsonTextWriterSettings.Builder() {
+            DsonTextWriterSettings.Builder builder = new DsonTextWriterSettings.Builder()
+            {
                 DsonMode = DsonMode.Relaxed,
                 ExtraIndent = 2,
                 SoftLineLength = 60

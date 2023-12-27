@@ -48,7 +48,7 @@ public class Json2DsonTest {
     @Test
     void test() {
         DsonValue dsonValue;
-        try (DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.DEFAULT, Dsons.newStringScanner(jsonString, DsonMode.RELAXED))) {
+        try (DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.DEFAULT, jsonString, DsonMode.RELAXED)) {
             dsonValue = Dsons.readTopDsonValue(reader);
             Assertions.assertInstanceOf(DsonObject.class, dsonValue);
         }

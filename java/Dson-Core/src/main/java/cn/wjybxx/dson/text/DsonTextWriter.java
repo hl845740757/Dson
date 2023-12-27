@@ -590,7 +590,7 @@ public class DsonTextWriter extends AbstractDsonWriter {
         writeCurrentName(printer, DsonType.HEADER);
         // header总是使用 @{} 包起来，提高辨识度
         printer.print("@{");
-        printer.printFastPath(clsName);
+        printString(printer, clsName, StringStyle.AUTO_QUOTE);
         printer.print('}');
         setNextState();
     }

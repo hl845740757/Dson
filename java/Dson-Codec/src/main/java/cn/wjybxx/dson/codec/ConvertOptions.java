@@ -17,10 +17,10 @@
 package cn.wjybxx.dson.codec;
 
 import cn.wjybxx.base.OptionalBool;
-import cn.wjybxx.dson.codec.binary.BinaryConverter;
-import cn.wjybxx.dson.codec.codecs.MapCodec;
 import cn.wjybxx.dson.DsonReaderSettings;
 import cn.wjybxx.dson.DsonWriterSettings;
+import cn.wjybxx.dson.codec.binary.BinaryConverter;
+import cn.wjybxx.dson.codec.codecs.MapCodec;
 import cn.wjybxx.dson.text.DsonMode;
 import cn.wjybxx.dson.text.DsonTextReaderSettings;
 import cn.wjybxx.dson.text.DsonTextWriterSettings;

@@ -31,7 +31,7 @@ public class DsonTextReaderTest2 {
             """;
 
     @Test
-    void test() {
+    void testIndentStyle() {
         DsonObject<String> dsonObject = Dsons.fromDson(dsonString).asObject();
         {
             String dsonString2 = Dsons.toDson(dsonObject, ObjectStyle.INDENT, DsonTextWriterSettings.newBuilder()

@@ -150,7 +150,7 @@ public class DefaultDocumentConverter implements DocumentConverter {
 
     @Override
     public <U> U readFromDson(CharSequence source, DsonMode dsonMode, @Nonnull TypeArgInfo<U> typeArgInfo) {
-        try (DsonReader textReader = new DsonTextReader(options.textReaderSettings, Dsons.newStringScanner(source, dsonMode));
+        try (DsonReader textReader = new DsonTextReader(options.textReaderSettings, source, dsonMode);
              DocumentObjectReader wrapper = new DefaultDocumentObjectReader(this, toDsonObjectReader(textReader))) {
             return wrapper.readObject(typeArgInfo);
         }

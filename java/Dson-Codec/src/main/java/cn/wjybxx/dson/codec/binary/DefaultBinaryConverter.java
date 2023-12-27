@@ -16,12 +16,12 @@
 
 package cn.wjybxx.dson.codec.binary;
 
+import cn.wjybxx.dson.DsonBinaryLiteReader;
+import cn.wjybxx.dson.DsonBinaryLiteWriter;
 import cn.wjybxx.dson.codec.ConvertOptions;
 import cn.wjybxx.dson.codec.TypeArgInfo;
 import cn.wjybxx.dson.codec.TypeMetaRegistries;
 import cn.wjybxx.dson.codec.TypeMetaRegistry;
-import cn.wjybxx.dson.DsonBinaryLiteReader;
-import cn.wjybxx.dson.DsonBinaryLiteWriter;
 import cn.wjybxx.dson.io.*;
 
 import javax.annotation.Nonnull;

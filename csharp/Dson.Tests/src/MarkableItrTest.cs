@@ -67,8 +67,7 @@ public class MarkableItrTest
 
                 DsonValue realNext = iterator.Next();
                 Assert.That(realNext, Is.SameAs(markedNext));
-            }
-            else {
+            } else {
                 iterator.Next();
             }
         }

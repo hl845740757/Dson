@@ -119,7 +119,7 @@ public final class DsonPrinter implements AutoCloseable {
         builder.append(c);
         if (c == '\t') {
             column--;
-            column += (4 - (column % 4));
+            column += (4 - (column % 4)); // -1 % 4 => -1
         } else {
             column += 1;
         }
