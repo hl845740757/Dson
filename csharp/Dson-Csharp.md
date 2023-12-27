@@ -92,14 +92,14 @@ PS：其实Writer的目标就是尽可能和我们的书写格式一致。
 
 ### 文本左对齐
 
-在新的版本中，我增加行首缩进和纯文本左对齐功能，通过修改测试用例的WriterSetting，我们得到以下文本。  
+在新的版本中，我增加行首缩进和纯文本左对齐功能，运行`DsonTextReaderTest2`测试用力，我们得到以下文本。  
 （仅标准模式下可用）
 
 ```
   - {@{clsName: MyClassInfo, guid: 10001, flags: 0}
   -   name: wjybxx,
   -   age: 28,
-  -   pos: {@Vector3
+  -   pos: {@{Vector3}
   -     x: 0,
   -     y: 0,
   -     z: 0

@@ -56,6 +56,13 @@ public static class DsonTexts
     public const string LabelEndArray = "]";
     public const string LabelBeginHeader = "@{";
 
+    /** 所有内建值类型标签 */
+    public static readonly ISet<string> BuiltinStructLabels = new[]
+    {
+        LabelBinary, LabelExtInt32, LabelExtInt64, LabelExtDouble, LabelExtString,
+        LabelReference, LabelDatetime
+    }.ToImmutableHashSet();
+
     // 行首标签
     public const string HeadComment = "#";
     public const string HeadAppendLine = "-";
@@ -64,7 +71,8 @@ public static class DsonTexts
     public const string HeadEndOfText = "~";
 
     /** 有特殊含义的字符串 */
-    private static readonly ISet<string> ParsableStrings = new[] {
+    private static readonly ISet<string> ParsableStrings = new[]
+    {
         "true", "false",
         "null", "undefine",
         "NaN", "Infinity", "-Infinity"
@@ -310,23 +318,39 @@ public static class DsonTexts
         };
     }
 
+    /** 获取类型名对应的Token类型 */
+    public static DsonTokenType TokenTypeOfClsName(string label) {
+        if (label == null) throw new ArgumentNullException(nameof(label));
+        return label switch  {
+            LabelInt32 =>  DsonTokenType.Int32, 
+            LabelInt64=> DsonTokenType.Int64,
+            LabelFloat => DsonTokenType.Float,
+            LabelDouble => DsonTokenType.Double, 
+            LabelBool => DsonTokenType.Bool, 
+            LabelString => DsonTokenType.String,
+            LabelExtString =>DsonTokenType.String,
+            LabelNull => DsonTokenType.Null, 
+            _ => BuiltinStructLabels.Contains(label) ? DsonTokenType.BuiltinStruct: DsonTokenType.SimpleHeader
+        };
+    }
+    
     /** 获取dsonType关联的无位置Token */
     public static DsonToken ClsNameTokenOfType(DsonType dsonType) {
         return dsonType switch {
-            DsonType.Int32 => new DsonToken(DsonTokenType.ClassName, LabelInt32, -1),
-            DsonType.Int64 => new DsonToken(DsonTokenType.ClassName, LabelInt64, -1),
-            DsonType.Float => new DsonToken(DsonTokenType.ClassName, LabelFloat, -1),
-            DsonType.Double => new DsonToken(DsonTokenType.ClassName, LabelDouble, -1),
-            DsonType.Boolean => new DsonToken(DsonTokenType.ClassName, LabelBool, -1),
-            DsonType.String => new DsonToken(DsonTokenType.ClassName, LabelString, -1),
-            DsonType.Null => new DsonToken(DsonTokenType.ClassName, LabelNull, -1),
-            DsonType.Binary => new DsonToken(DsonTokenType.ClassName, LabelBinary, -1),
-            DsonType.ExtInt32 => new DsonToken(DsonTokenType.ClassName, LabelExtInt32, -1),
-            DsonType.ExtInt64 => new DsonToken(DsonTokenType.ClassName, LabelExtInt64, -1),
-            DsonType.ExtDouble => new DsonToken(DsonTokenType.ClassName, LabelExtDouble, -1),
-            DsonType.ExtString => new DsonToken(DsonTokenType.ClassName, LabelExtString, -1),
-            DsonType.Reference => new DsonToken(DsonTokenType.ClassName, LabelReference, -1),
-            DsonType.Timestamp => new DsonToken(DsonTokenType.ClassName, LabelDatetime, -1),
+            DsonType.Int32 => new DsonToken(DsonTokenType.Int32, LabelInt32, -1),
+            DsonType.Int64 => new DsonToken(DsonTokenType.Int64, LabelInt64, -1),
+            DsonType.Float => new DsonToken(DsonTokenType.Float, LabelFloat, -1),
+            DsonType.Double => new DsonToken(DsonTokenType.Double, LabelDouble, -1),
+            DsonType.Boolean => new DsonToken(DsonTokenType.Bool, LabelBool, -1),
+            DsonType.String => new DsonToken(DsonTokenType.String, LabelString, -1),
+            DsonType.Null => new DsonToken(DsonTokenType.Null, LabelNull, -1),
+            DsonType.Binary => new DsonToken(DsonTokenType.BuiltinStruct, LabelBinary, -1),
+            DsonType.ExtInt32 => new DsonToken(DsonTokenType.BuiltinStruct, LabelExtInt32, -1),
+            DsonType.ExtInt64 => new DsonToken(DsonTokenType.BuiltinStruct, LabelExtInt64, -1),
+            DsonType.ExtDouble => new DsonToken(DsonTokenType.BuiltinStruct, LabelExtDouble, -1),
+            DsonType.ExtString => new DsonToken(DsonTokenType.BuiltinStruct, LabelExtString, -1),
+            DsonType.Reference => new DsonToken(DsonTokenType.BuiltinStruct, LabelReference, -1),
+            DsonType.Timestamp => new DsonToken(DsonTokenType.BuiltinStruct, LabelDatetime, -1),
             _ => throw new ArgumentException(nameof(dsonType))
         };
     }

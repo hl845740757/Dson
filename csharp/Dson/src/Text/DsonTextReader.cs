@@ -35,8 +35,6 @@ public class DsonTextReader : AbstractDsonReader<string>
 {
     private static readonly List<DsonTokenType> ValueSeparatorTokens =
         DsonInternals.NewList(DsonTokenType.Comma, DsonTokenType.EndObject, DsonTokenType.EndArray);
-    private static readonly List<DsonTokenType> HeaderTokens =
-        DsonInternals.NewList(DsonTokenType.BeginHeader, DsonTokenType.ClassName);
 
     private static readonly DsonToken TokenBeginHeader = new DsonToken(DsonTokenType.BeginHeader, "@{", -1);
     private static readonly DsonToken TokenClassname = new DsonToken(DsonTokenType.UnquoteString, DsonHeaders.NamesClassName, -1);
@@ -270,10 +268,10 @@ public class DsonTextReader : AbstractDsonReader<string>
                 PushNextValue(DsonNull.Null);
                 return DsonType.Null;
             }
+            case DsonTokenType.BuiltinStruct: return ParseAbbreviatedStruct(context, valueToken);
             case DsonTokenType.UnquoteString: return ParseUnquoteStringToken(context, valueToken);
             case DsonTokenType.BeginObject: return ParseBeginObjectToken(context, valueToken);
             case DsonTokenType.BeginArray: return ParseBeginArrayToken(context, valueToken);
-            case DsonTokenType.ClassName: return ParseClassNameToken(context, valueToken);
             case DsonTokenType.BeginHeader: {
                 // object的header已经处理，这里只有topLevel和array可以再出现header
                 if (context._contextType.IsLikeObject()) {
@@ -364,7 +362,7 @@ public class DsonTextReader : AbstractDsonReader<string>
     }
 
     /** 处理内置结构体的单值语法糖 */
-    private DsonType ParseClassNameToken(Context context, in DsonToken valueToken) {
+    private DsonType ParseAbbreviatedStruct(Context context, in DsonToken valueToken) {
         // 1.className不能出现在topLevel，topLevel只能出现header结构体 @{}
         if (context._contextType == DsonContextType.TopLevel) {
             throw DsonIOException.InvalidTokenType(context._contextType, valueToken);
@@ -386,26 +384,37 @@ public class DsonTextReader : AbstractDsonReader<string>
         throw DsonIOException.InvalidTokenType(context._contextType, valueToken);
     }
 
+    private DsonToken? PopHeaderToken(Context context) {
+        DsonToken headerToken = PopToken();
+        if (IsHeaderOrBuiltStruct(headerToken)) {
+            return headerToken;
+        }
+        PushToken(headerToken);
+        if (context._contextType != DsonContextType.Header && context._compClsNameToken.HasValue) {
+            headerToken = context._compClsNameToken.Value;
+            if (IsHeaderOrBuiltStruct(headerToken)) {
+                return headerToken;
+            }
+        }
+        return null;
+    }
+    
     /** 处理内置结构体 */
     private DsonType ParseBeginObjectToken(Context context, in DsonToken valueToken) {
-        DsonToken? headerToken;
-        if (valueToken.LastChar() == '@') { // {@
-            headerToken = PopToken();
-            EnsureHeadersToken(context, headerToken.Value);
-        }
-        else if (context._contextType != DsonContextType.Header) {
-            headerToken = context._compClsNameToken;
-        }
-        else {
-            headerToken = null;
-        }
-        if (!headerToken.HasValue) {
+        DsonToken? headerTokenWrapper = PopHeaderToken(context);
+        if (!headerTokenWrapper.HasValue) {
             PushNextValue(valueToken);
             return DsonType.Object;
         }
-
+        DsonToken headerToken = headerTokenWrapper.Value;
+        if (headerToken.Type != DsonTokenType.BuiltinStruct) {
+            // 转换SimpleHeader为标准Header，token需要push以供context保存
+            EscapeHeaderAndPush(headerToken);
+            PushNextValue(valueToken);
+            return DsonType.Object;
+        }
         // 内置结构体
-        string clsName = headerToken.Value.CastAsString();
+        string clsName = headerToken.CastAsString();
         switch (clsName) {
             case DsonTexts.LabelReference: {
                 PushNextValue(ScanRef(context));
@@ -416,8 +425,8 @@ public class DsonTextReader : AbstractDsonReader<string>
                 return DsonType.Timestamp;
             }
             default: {
-                EscapeHeaderAndPush(headerToken.Value);
-                PushNextValue(valueToken); // push以供context保存
+                PushToken(headerToken); // 非Object形式内置结构体
+                PushNextValue(valueToken);
                 return DsonType.Object;
             }
         }
@@ -425,23 +434,21 @@ public class DsonTextReader : AbstractDsonReader<string>
 
     /** 处理内置二元组 */
     private DsonType ParseBeginArrayToken(Context context, in DsonToken valueToken) {
-        DsonToken? headerToken;
-        if (valueToken.LastChar() == '@') { // [@
-            headerToken = PopToken();
-            EnsureHeadersToken(context, headerToken.Value);
+        DsonToken? headerTokenWrapper = PopHeaderToken(context);
+        if (!headerTokenWrapper.HasValue) {
+            PushNextValue(valueToken);
+            return DsonType.Object;
         }
-        else if (context._contextType != DsonContextType.Header) {
-            headerToken = context._compClsNameToken;
-        }
-        else {
-            headerToken = null;
-        }
-        if (!headerToken.HasValue) {
+        DsonToken headerToken = headerTokenWrapper.Value;
+        if (headerToken.Type != DsonTokenType.BuiltinStruct) {
+            // 转换SimpleHeader为标准Header，token需要push以供context保存
+            EscapeHeaderAndPush(headerToken);
             PushNextValue(valueToken);
             return DsonType.Array;
         }
         // 内置元组
-        switch (headerToken.Value.CastAsString()) {
+        string clsName = headerToken.CastAsString();
+        switch (clsName) {
             case DsonTexts.LabelBinary: {
                 Tuple2 tuple2 = ScanTuple2(context);
                 byte[] data = Convert.FromHexString(tuple2.Value);
@@ -476,8 +483,8 @@ public class DsonTextReader : AbstractDsonReader<string>
                 return DsonType.ExtString;
             }
             default: {
-                EscapeHeaderAndPush(headerToken.Value);
-                PushNextValue(valueToken); // push以供context保存
+                PushToken(headerToken); // 非数组形式内置结构体
+                PushNextValue(valueToken);
                 return DsonType.Array;
             }
         }
@@ -695,13 +702,12 @@ public class DsonTextReader : AbstractDsonReader<string>
         }
     }
 
-    private static void EnsureHeadersToken(Context context, DsonToken token) {
-        if (token.Type != DsonTokenType.BeginHeader && token.Type != DsonTokenType.ClassName) {
-            throw DsonIOException.InvalidTokenType(context._contextType, token,
-                DsonInternals.NewList(DsonTokenType.BeginHeader, DsonTokenType.ClassName));
-        }
+    private static bool IsHeaderOrBuiltStruct(DsonToken token) {
+        return token.Type == DsonTokenType.BuiltinStruct
+               || token.Type == DsonTokenType.BeginHeader 
+               || token.Type == DsonTokenType.SimpleHeader;
     }
-
+    
     private static void VerifyTokenType(Context context, DsonToken token, DsonTokenType expected) {
         if (token.Type != expected) {
             throw DsonIOException.InvalidTokenType(context._contextType, token, DsonInternals.NewList(expected));
@@ -720,7 +726,9 @@ public class DsonTextReader : AbstractDsonReader<string>
         Context context = GetContext();
         if (context._contextType == DsonContextType.Header) {
             if (DsonHeaders.NamesCompClassName == _currentName) {
-                context._compClsNameToken = new DsonToken(DsonTokenType.ClassName, _nextValue, -1);
+                string compClsName = (string) _nextValue;
+                DsonTokenType tokenType = DsonTexts.TokenTypeOfClsName(compClsName);
+                context._compClsNameToken = new DsonToken(tokenType, compClsName, -1);
             }
             // else 其它属性
         }

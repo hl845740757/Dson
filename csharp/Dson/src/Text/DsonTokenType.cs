@@ -36,10 +36,10 @@ public enum DsonTokenType
     /** 数组结束符，']' */
     EndArray,
 
-    /** 对象头开始符 '@{' */
+    /** 对象头开始符 '@{' -- @{k1:v1, k2:v2}} */
     BeginHeader,
-    /** Header的简写形式 '@clsName' -- clsName不是基础类型 */
-    ClassName,
+    /** 简单对象头 '@{‘ -- @{clsName} */
+    SimpleHeader,
 
     /** KV分隔符，冒号 ':' */
     Colon,
@@ -60,6 +60,8 @@ public enum DsonTokenType
     String,
     /** 显式声明 '@N' */
     Null,
+    /** 内建结构体 */
+    BuiltinStruct,
 
     /** 无引号字符串，scan的时候不解析，使得返回后可以根据上下文推断其类型 */
     UnquoteString,

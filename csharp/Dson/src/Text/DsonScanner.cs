@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 #pragma warning disable CS1591
@@ -87,7 +88,7 @@ public class DsonScanner : IDisposable
             case ']': return new DsonToken(DsonTokenType.EndArray, "]", Position);
             case ':': return new DsonToken(DsonTokenType.Colon, ":", Position);
             case ',': return new DsonToken(DsonTokenType.Comma, ",", Position);
-            case '@': return ParseHeaderToken();
+            case '@': return ParseTypeToken();
             case '"': return new DsonToken(DsonTokenType.String, ScanString((char)c), Position);
             default: return new DsonToken(DsonTokenType.UnquoteString, ScanUnquotedString((char)c), Position);
         }
@@ -134,63 +135,93 @@ public class DsonScanner : IDisposable
 
     #region header
 
-    private DsonToken ParseHeaderToken() {
-        try {
-            string className = ScanClassName();
-            if (className == "{") {
-                return new DsonToken(DsonTokenType.BeginHeader, "@{", Position);
-            }
-            return OnReadClassName(className);
-        }
-        catch (Exception e) {
-            throw DsonParseException.Wrap(e);
-        }
-    }
-
-    private string ScanClassName() {
+    private DsonToken ParseTypeToken() {
         int firstChar = _charStream.Read();
         if (firstChar < 0) {
             throw InvalidClassName("@", Position);
         }
-        // header是结构体
+        // '@{' 对应的是header，header可能是 {k:v} 或 @{clsName} 简写形式 -- 需要判别
         if (firstChar == '{') {
-            return "{";
+            return ScanHeader();
         }
-        // header是 '@clsName' 简写形式
+        // '@' 对应的是内建值类型，@i @L ...
+        return ScanBuiltinValue(firstChar);
+    }
+
+    private DsonToken ScanHeader() {
+        IDsonCharStream buffer = this._charStream; 
+        int beginPos = buffer.Position;
+        int firstChar = SkipWhitespace(); // {}下跳过空白字符
+        if (firstChar < 0) {
+            throw InvalidClassName("@{", Position);
+        }
         string className;
         if (firstChar == '"') {
-            className = ScanString((char)firstChar);
-        }
-        else {
+            className = ScanString((char) firstChar);
+        } else {
             // 非双引号模式下，只能由安全字符构成
             if (DsonTexts.IsUnsafeStringChar(firstChar)) {
-                throw InvalidClassName(char.ToString((char)firstChar), Position);
+                throw InvalidClassName(char.ToString((char) firstChar), Position);
             }
-            // 非双引号模式下，不支持换行继续输入，且clsName后必须是空格或换行符
-            IDsonCharStream buffer = this._charStream;
             StringBuilder sb = AllocStringBuilder();
-            sb.Append((char)firstChar);
+            sb.Append((char) firstChar);
             int c;
             while ((c = buffer.Read()) >= 0) {
                 if (DsonTexts.IsUnsafeStringChar(c)) {
                     break;
                 }
-                sb.Append((char)c);
+                sb.Append((char) c);
             }
-            if (c == -2) {
+            if (c < 0 || DsonTexts.IsUnsafeStringChar(c)) {
                 buffer.Unread();
-            }
-            else if (c != ' ') {
-                throw SpaceRequired(Position);
             }
             className = sb.ToString();
         }
+        // {} 模式下，下一个字符必须是 ':' 或 '}‘
+        int nextChar = SkipWhitespace();
+        if (nextChar == ':') { // 结构体样式，需要回退
+            while (buffer.Position > beginPos) {
+                buffer.Unread();
+            }
+            return new DsonToken(DsonTokenType.BeginHeader, "{", beginPos);
+        } else if (nextChar == '}') { // 简单缩写形式
+            return new DsonToken(DsonTokenType.SimpleHeader, className, Position);
+        } else {
+            throw InvalidClassName(className, Position);
+        }
+    }
+
+    /** 内建值无引号，且类型标签后必须是空格或换行缩进 */
+    private DsonToken ScanBuiltinValue(int firstChar) {
+        Debug.Assert(firstChar != '"');
+        // 非双引号模式下，只能由安全字符构成
+        if (DsonTexts.IsUnsafeStringChar(firstChar)) {
+            throw InvalidClassName(char.ToString((char)firstChar), Position);
+        }
+        IDsonCharStream buffer = this._charStream;
+        StringBuilder sb = AllocStringBuilder();
+        sb.Append((char)firstChar);
+        int c;
+        while ((c = buffer.Read()) >= 0) {
+            if (DsonTexts.IsUnsafeStringChar(c)) {
+                break;
+            }
+            sb.Append((char)c);
+        }
+        // // 无{}模式下，clsName后必须是空格或换行缩进
+        if (c == -2) {
+            buffer.Unread();
+        }
+        else if (c != ' ') {
+            throw SpaceRequired(Position);
+        }
+        string className = sb.ToString();
         if (string.IsNullOrWhiteSpace(className)) {
             throw InvalidClassName(className, Position);
         }
-        return className;
+        return OnReadClassName(className);
     }
-
+    
     private DsonToken OnReadClassName(string className) {
         int position = Position;
         switch (className) {
@@ -234,7 +265,7 @@ public class DsonScanner : IDisposable
                 return new DsonToken(DsonTokenType.String, ScanText(), Position);
             }
         }
-        return new DsonToken(DsonTokenType.ClassName, className, Position);
+        return new DsonToken(DsonTokenType.BuiltinStruct, className, Position);
     }
 
     #endregion

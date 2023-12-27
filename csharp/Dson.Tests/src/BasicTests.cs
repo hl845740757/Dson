@@ -32,7 +32,7 @@ public class BasicTests
     internal const string DsonString = @"           
             - @{clsName: FileHeader, intro: 预留设计，允许定义文件头}
             -
-            - {@MyStruct
+            - {@{MyStruct}
             -   name : wjybxx,
             -   age:28,
             -   介绍: 这是一段中文而且非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常长 ,
@@ -42,7 +42,7 @@ public class BasicTests
             -   bin : [@bin 0, 35df2e75e6a4be9e6f4571c64cb6d08b0d6bc46c1754f6e9eb4a6e57e2fd53],
             - }
             -
-            - {@MyStruct
+            - {@{MyStruct}
             -   name : wjybxx,
             -   intro: ""hello world"",
             -   ref1 : {@ref localId: 10001, ns: 16148b3b4e7b8923d398},

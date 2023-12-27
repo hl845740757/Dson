@@ -47,18 +47,6 @@ public readonly struct DsonToken : IEquatable<DsonToken>
         return (string)Value!;
     }
 
-    /** 获取字符串value的第一个char */
-    public char FirstChar() {
-        var value = (string)this.Value!;
-        return value[0];
-    }
-
-    /** 获取字符串value的最后一个char */
-    public char LastChar() {
-        string value = (string)this.Value!;
-        return value[value.Length - 1];
-    }
-
     #region equals
 
     // Equals默认不比较位置

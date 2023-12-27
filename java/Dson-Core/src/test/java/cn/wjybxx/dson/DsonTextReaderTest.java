@@ -35,7 +35,7 @@ public class DsonTextReaderTest {
     static final String dsonString = """
             - @{clsName: FileHeader, intro: 预留设计，允许定义文件头}
             -
-            - {@MyStruct
+            - {@{MyStruct}
             - \tname : wjybxx,
             - \tage:28,
             - \t介绍: 这是一段中文而且非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常长 ,
@@ -45,7 +45,7 @@ public class DsonTextReaderTest {
             - \tbin : [@bin 0, 35df2e75e6a4be9e6f4571c64cb6d08b0d6bc46c1754f6e9eb4a6e57e2fd53],
             - }
             -
-            - {@MyStruct
+            - {@{MyStruct}
             - \tname : wjybxx,
             - \tintro: "hello world",
             - \tref1 : {@ref localId: 10001, ns: 16148b3b4e7b8923d398},

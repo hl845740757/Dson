@@ -27,7 +27,7 @@ public class FormatTest
             - {@{clsName:MyClassInfo, guid :10001, flags: 0}
             -   name : wjybxx,
             -   age: 28,
-            -   pos :{@Vector3 x: 0, y: 0, z: 0},
+            -   pos :{@{Vector3} x: 0, y: 0, z: 0},
             -   address: [
             -     beijing,
             -     chengdu

@@ -16,7 +16,7 @@ public class DsonTextReaderTest2 {
             - {@{clsName:MyClassInfo, guid :10001, flags: 0}
             -   name : wjybxx,
             -   age: 28,
-            -   pos :{@Vector3 x: 0, y: 0, z: 0},
+            -   pos :{@{Vector3} x: 0, y: 0, z: 0},
             -   address: [
             -     beijing,
             -     chengdu
@@ -36,11 +36,11 @@ public class DsonTextReaderTest2 {
         {
             String dsonString2 = Dsons.toDson(dsonObject, ObjectStyle.INDENT, DsonTextWriterSettings.newBuilder()
                     .setExtraIndent(2)
-                    .setSoftLineLength(50)
-                    .setTextAlignLeft(true)
+                    .setSoftLineLength(60)
+                    .setTextAlignLeft(false)
                     .setTextStringLength(50)
                     .build());
-            System.out.println("Mode:" + DsonMode.STANDARD);
+            System.out.println("Mode:" + DsonMode.STANDARD + ", alignLeft:false");
             System.out.println(dsonString2);
             DsonValue dsonObject2 = Dsons.fromDson(dsonString2);
             Assertions.assertEquals(dsonObject, dsonObject2);
@@ -56,6 +56,20 @@ public class DsonTextReaderTest2 {
             System.out.println(dsonString3);
             DsonValue dsonObject3 = Dsons.fromJson(dsonString3);
             Assertions.assertEquals(dsonObject, dsonObject3);
+        }
+
+        // 标准模式 -- 纯文本左对齐
+        {
+            String dsonString2 = Dsons.toDson(dsonObject, ObjectStyle.INDENT, DsonTextWriterSettings.newBuilder()
+                    .setExtraIndent(2)
+                    .setSoftLineLength(50)
+                    .setTextAlignLeft(true)
+                    .setTextStringLength(50)
+                    .build());
+            System.out.println("Mode:" + DsonMode.STANDARD + ", alignLeft: true");
+            System.out.println(dsonString2);
+            DsonValue dsonObject2 = Dsons.fromDson(dsonString2);
+            Assertions.assertEquals(dsonObject, dsonObject2);
         }
     }
 

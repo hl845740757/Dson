@@ -84,7 +84,7 @@ public class DsonScanner implements AutoCloseable {
             case ']' -> new DsonToken(DsonTokenType.END_ARRAY, "]", getPosition());
             case ':' -> new DsonToken(DsonTokenType.COLON, ":", getPosition());
             case ',' -> new DsonToken(DsonTokenType.COMMA, ",", getPosition());
-            case '@' -> parseHeaderToken();
+            case '@' -> parseTypeToken();
             case '"' -> new DsonToken(DsonTokenType.STRING, scanString((char) c), getPosition());
             default -> new DsonToken(DsonTokenType.UNQUOTE_STRING, scanUnquotedString((char) c), getPosition());
         };
@@ -134,28 +134,26 @@ public class DsonScanner implements AutoCloseable {
 
     // region header
 
-    private DsonToken parseHeaderToken() {
-        try {
-            String className = scanClassName();
-            if (className.equals("{")) {
-                return new DsonToken(DsonTokenType.BEGIN_HEADER, "@{", getPosition());
-            }
-            return onReadClassName(className);
-        } catch (Exception e) {
-            throw DsonParseException.wrap(e);
-        }
-    }
-
-    private String scanClassName() {
+    private DsonToken parseTypeToken() {
         int firstChar = charStream.read();
         if (firstChar < 0) {
             throw invalidClassName("@", getPosition());
         }
-        // header是结构体
+        // '@{' 对应的是header，header可能是 {k:v} 或 @{clsName} 简写形式 -- 需要判别
         if (firstChar == '{') {
-            return "{";
+            return scanHeader();
         }
-        // header是 '@clsName' 简写形式
+        // '@' 对应的是内建值类型，@i @L ...
+        return scanBuiltinValue(firstChar);
+    }
+
+    private DsonToken scanHeader() {
+        DsonCharStream buffer = this.charStream;
+        final int beginPos = buffer.getPosition();
+        int firstChar = skipWhitespace(); // {}下跳过空白字符
+        if (firstChar < 0) {
+            throw invalidClassName("@{", getPosition());
+        }
         String className;
         if (firstChar == '"') {
             className = scanString((char) firstChar);
@@ -164,8 +162,6 @@ public class DsonScanner implements AutoCloseable {
             if (DsonTexts.isUnsafeStringChar(firstChar)) {
                 throw invalidClassName(Character.toString((char) firstChar), getPosition());
             }
-            // 非双引号模式下，不支持换行继续输入，且clsName后必须是空格或换行符
-            DsonCharStream buffer = this.charStream;
             StringBuilder sb = allocStringBuilder();
             sb.append((char) firstChar);
             int c;
@@ -175,17 +171,53 @@ public class DsonScanner implements AutoCloseable {
                 }
                 sb.append((char) c);
             }
-            if (c == -2) {
+            if (c < 0 || DsonTexts.isUnsafeStringChar(c)) {
                 buffer.unread();
-            } else if (c != ' ') {
-                throw spaceRequired(getPosition());
             }
             className = sb.toString();
         }
+        // {} 模式下，下一个字符必须是 ':' 或 '}‘
+        int nextChar = skipWhitespace();
+        if (nextChar == ':') { // 结构体样式，需要回退
+            while (buffer.getPosition() > beginPos) {
+                buffer.unread();
+            }
+            return new DsonToken(DsonTokenType.BEGIN_HEADER, "{", beginPos);
+        } else if (nextChar == '}') { // 简单缩写形式
+            return new DsonToken(DsonTokenType.SIMPLE_HEADER, className, getPosition());
+        } else {
+            throw invalidClassName(className, getPosition());
+        }
+    }
+
+    /** 内建值无引号，且类型标签后必须是空格或换行缩进 */
+    private DsonToken scanBuiltinValue(int firstChar) {
+        assert firstChar != '"';
+        // 非双引号模式下，只能由安全字符构成
+        if (DsonTexts.isUnsafeStringChar(firstChar)) {
+            throw invalidClassName(Character.toString((char) firstChar), getPosition());
+        }
+        DsonCharStream buffer = this.charStream;
+        StringBuilder sb = allocStringBuilder();
+        sb.append((char) firstChar);
+        int c;
+        while ((c = buffer.read()) >= 0) {
+            if (DsonTexts.isUnsafeStringChar(c)) {
+                break;
+            }
+            sb.append((char) c);
+        }
+        // 类型标签后必须是空格或换行缩进
+        if (c == -2) {
+            buffer.unread();
+        } else if (c != ' ') {
+            throw spaceRequired(getPosition());
+        }
+        String className = sb.toString();
         if (DsonInternals.isBlank(className)) {
             throw invalidClassName(className, getPosition());
         }
-        return className;
+        return onReadClassName(className);
     }
 
     private DsonToken onReadClassName(String className) {
@@ -231,7 +263,7 @@ public class DsonScanner implements AutoCloseable {
                 return new DsonToken(DsonTokenType.STRING, scanText(), getPosition());
             }
         }
-        return new DsonToken(DsonTokenType.CLASS_NAME, className, getPosition());
+        return new DsonToken(DsonTokenType.BUILTIN_STRUCT, className, getPosition());
     }
 
     // endregion

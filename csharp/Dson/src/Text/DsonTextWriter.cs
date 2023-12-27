@@ -572,9 +572,10 @@ public class DsonTextWriter : AbstractDsonWriter<string>
 
         DsonPrinter printer = this._printer;
         WriteCurrentName(printer, DsonType.Header);
-
-        printer.Print('@');
+        // header总是使用 @{} 包起来，提高辨识度
+        printer.Print("@{");
         printer.PrintFastPath(clsName);
+        printer.Print('}');
         if (context._style != ObjectStyle.Indent) {
             printer.Print(' ');
         }

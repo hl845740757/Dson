@@ -57,16 +57,6 @@ public class DsonToken {
         return (String) value;
     }
 
-    public char firstChar() {
-        String value = (String) this.value;
-        return value.charAt(0);
-    }
-
-    public char lastChar() {
-        String value = (String) this.value;
-        return value.charAt(value.length() - 1);
-    }
-
     //
 
     public boolean fullEquals(DsonToken dsonToken) {
