@@ -437,7 +437,7 @@ public class DsonTextReader : AbstractDsonReader<string>
         DsonToken? headerTokenWrapper = PopHeaderToken(context);
         if (!headerTokenWrapper.HasValue) {
             PushNextValue(valueToken);
-            return DsonType.Object;
+            return DsonType.Array;
         }
         DsonToken headerToken = headerTokenWrapper.Value;
         if (headerToken.Type != DsonTokenType.BuiltinStruct) {

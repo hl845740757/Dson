@@ -128,7 +128,7 @@ Dson支持的值类型和内置结构体包括：
 | es  | extString | 12 | *<b>带类型标签的string</b>* | {<br> int32 type;<br> string value; <br>}                                            | 格式固定二元数组 \[@es type, value] <br> - \[@es 10, <br/>- @ss ^\[\\u4e00-\\u9fa5_a-zA-Z0-9]+$ <br/> ~ ]          |
 | ref | reference | 13 | 引用                    | {<br> string namespace;<br> string localId;<br> int32 type; <br> int32 policy; <br>} | 格式为单值 '@ref localId' 格式或 object格式 <br/> @ref abcdefg <br> {@ref ns: wjybxx, localId: abcdefg, type: 0}     |
 | dt  | datetime  | 14 | 日期时间                  | { <br>  int64 seconds; <br> int32 nanos;<br> int32 offset;<br> int32 enables; <br> } | 无需引号<br/> @dt 2023-06-17T18:37:00 <br/>{@dt date: 2023-06-17, time: 18:37:00, offset: +08:00, millis: 100} |
-|     | header    | 29 | 对象头                   |                                                                                      | 对象形式： @{clsName: Vector3 } <br/> 简写形式： @Vector3                                                            |
+|     | header    | 29 | 对象头                   |                                                                                      | 对象形式： @{clsName: Vector3 } <br/> 简写形式： @{Vector3}                                                          |
 |     | array     | 30 | 数组                    |                                                                                      | \[ 1, 2, 3, 4, 5 ]                                                                                         |
 |     | object    | 31 | 对象/结构体                |                                                                                      | { name: wjybxx, age: 28 }                                                                                  |
 
@@ -342,7 +342,7 @@ PS：对于配置文件，引用的最大作用是复用和减少嵌套。
     # 不声明header
     { x: 0, y: 0, z: 0 }
     # 只声明ClassName
-    {@Vector3 x: 0, y: 0, z: 0 }
+    {@{Vector3} x: 0, y: 0, z: 0 }
     # 声明复杂的header
     {@{clsName: Vector3, localId: 321123} x: 1, y: 1, z: 1} 
 ```
@@ -464,7 +464,7 @@ Dson主要解决的问题有三个：
 2. [C#库使用指南](https://github.com/hl845740757/Dson/blob/dev/csharp/Dson-Csharp.md)。
 
 ```
-	nuget Wjybxx.Dson 1.0.0
+	nuget Wjybxx.Dson 1.2.0
 ```
 
 ## Dson编辑器（缺失）
