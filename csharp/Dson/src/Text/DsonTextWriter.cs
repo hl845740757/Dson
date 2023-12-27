@@ -101,7 +101,7 @@ public class DsonTextWriter : AbstractDsonWriter<string>
                 printer.PrintBodyIndent();
             }
         }
-        else if (context._count > 0) {
+        else if (context.HasElement()) {
             // 非缩进模式下，元素之间打印一个空格
             printer.Print(' ');
         }
@@ -576,9 +576,6 @@ public class DsonTextWriter : AbstractDsonWriter<string>
         printer.Print("@{");
         printer.PrintFastPath(clsName);
         printer.Print('}');
-        if (context._style != ObjectStyle.Indent) {
-            printer.Print(' ');
-        }
         SetNextState();
     }
 

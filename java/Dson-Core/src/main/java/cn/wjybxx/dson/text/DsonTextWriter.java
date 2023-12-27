@@ -113,7 +113,7 @@ public class DsonTextWriter extends AbstractDsonWriter {
                 printLineHead(LineHead.APPEND_LINE);
                 printer.printBodyIndent();
             }
-        } else if (context.count > 0) {
+        } else if (context.hasElement()) {
             // 非缩进模式下，元素之间打印一个空格
             printer.print(' ');
         }
@@ -588,9 +588,6 @@ public class DsonTextWriter extends AbstractDsonWriter {
         printer.print("@{");
         printer.printFastPath(clsName);
         printer.print('}');
-        if (context.style != ObjectStyle.INDENT) {
-            printer.print(' ');
-        }
         setNextState();
     }
 

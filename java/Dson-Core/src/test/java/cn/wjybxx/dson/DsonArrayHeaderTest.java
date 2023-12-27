@@ -57,4 +57,18 @@ public class DsonArrayHeaderTest {
         DsonValue copiedArray = Dsons.fromDson(dsonString, DsonMode.RELAXED);
         Assertions.assertEquals(array, copiedArray);
     }
+
+    @Test
+    void testHeader() {
+        DsonArray<String> array = new DsonArray<>();
+        array.add(new DsonReference(new ObjectRef("10001"))); // 会打印类型
+        array.add(new DsonInt32(64));
+        array.getHeader().append(DsonHeader.NAMES_CLASS_NAME, new DsonString("MyArray"));
+
+        String dsonString = Dsons.toDson(array, ObjectStyle.FLOW, DsonMode.RELAXED);
+        System.out.println(dsonString);
+
+        DsonValue copiedArray = Dsons.fromDson(dsonString, DsonMode.RELAXED);
+        Assertions.assertEquals(array, copiedArray);
+    }
 }
