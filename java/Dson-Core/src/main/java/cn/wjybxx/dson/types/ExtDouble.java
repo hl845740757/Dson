@@ -28,8 +28,8 @@ import cn.wjybxx.dson.Dsons;
 public class ExtDouble implements Comparable<ExtDouble> {
 
     private final int type;
+    private final boolean hasValue; // 比较时放前面
     private final double value;
-    private final boolean hasValue;
 
     public ExtDouble(int type, double value) {
         this(type, value, true);

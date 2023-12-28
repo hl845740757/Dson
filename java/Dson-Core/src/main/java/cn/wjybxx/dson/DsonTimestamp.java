@@ -8,7 +8,7 @@ import javax.annotation.Nonnull;
  * @author wjybxx
  * date - 2023/6/17
  */
-public class DsonTimestamp extends DsonValue {
+public final class DsonTimestamp extends DsonValue {
 
     private final OffsetTimestamp value;
 

@@ -20,8 +20,7 @@ import cn.wjybxx.dson.*;
 import cn.wjybxx.dson.internal.CommonsLang3;
 import cn.wjybxx.dson.internal.DsonInternals;
 import cn.wjybxx.dson.io.DsonChunk;
-import cn.wjybxx.dson.types.ObjectRef;
-import cn.wjybxx.dson.types.OffsetTimestamp;
+import cn.wjybxx.dson.types.*;
 
 import java.io.Writer;
 
@@ -348,7 +347,7 @@ public class DsonTextWriter extends AbstractDsonWriter {
     }
 
     @Override
-    protected void doWriteBinary(DsonBinary binary) {
+    protected void doWriteBinary(Binary binary) {
         DsonPrinter printer = this.printer;
         writeCurrentName(printer, DsonType.BINARY);
         printer.printFastPath("[@bin ");
@@ -370,7 +369,7 @@ public class DsonTextWriter extends AbstractDsonWriter {
     }
 
     @Override
-    protected void doWriteExtInt32(DsonExtInt32 extInt32, WireType wireType, INumberStyle style) {
+    protected void doWriteExtInt32(ExtInt32 extInt32, WireType wireType, INumberStyle style) {
         DsonPrinter printer = this.printer;
         writeCurrentName(printer, DsonType.EXT_INT32);
         printer.printFastPath("[@ei ");
@@ -386,7 +385,7 @@ public class DsonTextWriter extends AbstractDsonWriter {
     }
 
     @Override
-    protected void doWriteExtInt64(DsonExtInt64 extInt64, WireType wireType, INumberStyle style) {
+    protected void doWriteExtInt64(ExtInt64 extInt64, WireType wireType, INumberStyle style) {
         DsonPrinter printer = this.printer;
         writeCurrentName(printer, DsonType.EXT_INT64);
         printer.printFastPath("[@eL ");
@@ -402,7 +401,7 @@ public class DsonTextWriter extends AbstractDsonWriter {
     }
 
     @Override
-    protected void doWriteExtDouble(DsonExtDouble extDouble, INumberStyle style) {
+    protected void doWriteExtDouble(ExtDouble extDouble, INumberStyle style) {
         DsonPrinter printer = this.printer;
         writeCurrentName(printer, DsonType.EXT_DOUBLE);
         printer.printFastPath("[@ed ");
@@ -418,7 +417,7 @@ public class DsonTextWriter extends AbstractDsonWriter {
     }
 
     @Override
-    protected void doWriteExtString(DsonExtString extString, StringStyle style) {
+    protected void doWriteExtString(ExtString extString, StringStyle style) {
         DsonPrinter printer = this.printer;
         writeCurrentName(printer, DsonType.EXT_STRING);
         printer.printFastPath("[@es ");

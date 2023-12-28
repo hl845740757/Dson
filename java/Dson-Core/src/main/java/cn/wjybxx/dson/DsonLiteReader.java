@@ -16,8 +16,7 @@
 
 package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.types.ObjectRef;
-import cn.wjybxx.dson.types.OffsetTimestamp;
+import cn.wjybxx.dson.types.*;
 
 import javax.annotation.Nonnull;
 
@@ -116,15 +115,15 @@ public interface DsonLiteReader extends AutoCloseable {
 
     void readNull(int name);
 
-    DsonBinary readBinary(int name);
+    Binary readBinary(int name);
 
-    DsonExtInt32 readExtInt32(int name);
+    ExtInt32 readExtInt32(int name);
 
-    DsonExtInt64 readExtInt64(int name);
+    ExtInt64 readExtInt64(int name);
 
-    DsonExtDouble readExtDouble(int name);
+    ExtDouble readExtDouble(int name);
 
-    DsonExtString readExtString(int name);
+    ExtString readExtString(int name);
 
     ObjectRef readRef(int name);
 

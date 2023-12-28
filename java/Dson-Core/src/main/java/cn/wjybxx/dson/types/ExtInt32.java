@@ -27,8 +27,8 @@ import cn.wjybxx.dson.Dsons;
 public class ExtInt32 implements Comparable<ExtInt32> {
 
     private final int type;
+    private final boolean hasValue; // 比较时放前面
     private final int value;
-    private final boolean hasValue;
 
     public ExtInt32(int type, int value) {
         this(type, value, true);

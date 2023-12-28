@@ -18,8 +18,7 @@ package cn.wjybxx.dson;
 
 import cn.wjybxx.dson.internal.DsonInternals;
 import cn.wjybxx.dson.io.*;
-import cn.wjybxx.dson.types.ObjectRef;
-import cn.wjybxx.dson.types.OffsetTimestamp;
+import cn.wjybxx.dson.types.*;
 
 import java.util.List;
 
@@ -136,7 +135,7 @@ public class DsonReaderUtils {
 
     // region binary
 
-    public static void writeBinary(DsonOutput output, DsonBinary binary) {
+    public static void writeBinary(DsonOutput output, Binary binary) {
         int sizeOfBinaryType = BinaryUtils.computeRawVarInt32Size(binary.getType());
         output.writeFixed32(sizeOfBinaryType + binary.getData().length);
         output.writeUint32(binary.getType());
@@ -150,14 +149,14 @@ public class DsonReaderUtils {
         output.writeRawBytes(chunk.getBuffer(), chunk.getOffset(), chunk.getLength());
     }
 
-    public static DsonBinary readDsonBinary(DsonInput input) {
+    public static Binary readDsonBinary(DsonInput input) {
         int size = input.readFixed32();
         int oldLimit = input.pushLimit(size);
-        DsonBinary binary;
+        Binary binary;
         {
             int type = input.readUint32();
             int dataLength = input.getBytesUntilLimit();
-            binary = new DsonBinary(type, input.readRawBytes(dataLength));
+            binary = new Binary(type, input.readRawBytes(dataLength));
         }
         input.popLimit(oldLimit);
         return binary;
@@ -166,7 +165,7 @@ public class DsonReaderUtils {
     // endregion
 
     // region 内置二元组
-    public static void writeExtInt32(DsonOutput output, DsonExtInt32 extInt32, WireType wireType) {
+    public static void writeExtInt32(DsonOutput output, ExtInt32 extInt32, WireType wireType) {
         output.writeUint32(extInt32.getType());
         output.writeBool(extInt32.hasValue());
         if (extInt32.hasValue()) {
@@ -174,14 +173,14 @@ public class DsonReaderUtils {
         }
     }
 
-    public static DsonExtInt32 readDsonExtInt32(DsonInput input, WireType wireType) {
+    public static ExtInt32 readDsonExtInt32(DsonInput input, WireType wireType) {
         int type = input.readUint32();
         boolean hasValue = input.readBool();
         int value = hasValue ? wireType.readInt32(input) : 0;
-        return new DsonExtInt32(type, value, hasValue);
+        return new ExtInt32(type, value, hasValue);
     }
 
-    public static void writeExtInt64(DsonOutput output, DsonExtInt64 extInt64, WireType wireType) {
+    public static void writeExtInt64(DsonOutput output, ExtInt64 extInt64, WireType wireType) {
         output.writeUint32(extInt64.getType());
         output.writeBool(extInt64.hasValue());
         if (extInt64.hasValue()) {
@@ -189,14 +188,14 @@ public class DsonReaderUtils {
         }
     }
 
-    public static DsonExtInt64 readDsonExtInt64(DsonInput input, WireType wireType) {
+    public static ExtInt64 readDsonExtInt64(DsonInput input, WireType wireType) {
         int type = input.readUint32();
         boolean hasValue = input.readBool();
         long value = hasValue ? wireType.readInt64(input) : 0;
-        return new DsonExtInt64(type, value, hasValue);
+        return new ExtInt64(type, value, hasValue);
     }
 
-    public static void writeExtDouble(DsonOutput output, DsonExtDouble extDouble, int wireType) {
+    public static void writeExtDouble(DsonOutput output, ExtDouble extDouble, int wireType) {
         output.writeUint32(extDouble.getType());
         output.writeBool(extDouble.hasValue());
         if (extDouble.hasValue()) {
@@ -204,25 +203,25 @@ public class DsonReaderUtils {
         }
     }
 
-    public static DsonExtDouble readDsonExtDouble(DsonInput input, int wireType) {
+    public static ExtDouble readDsonExtDouble(DsonInput input, int wireType) {
         int type = input.readUint32();
         boolean hasValue = input.readBool();
         double value = hasValue ? readDouble(input, wireType) : 0;
-        return new DsonExtDouble(type, value, hasValue);
+        return new ExtDouble(type, value, hasValue);
     }
 
-    public static int wireTypeOfExtString(DsonExtString extString) {
+    public static int wireTypeOfExtString(ExtString extString) {
         int v = 0;
         if (extString.getType() != 0) {
-            v |= DsonExtString.MASK_TYPE;
+            v |= ExtString.MASK_TYPE;
         }
         if (extString.hasValue()) {
-            v |= DsonExtString.MASK_VALUE;
+            v |= ExtString.MASK_VALUE;
         }
         return v;
     }
 
-    public static void writeExtString(DsonOutput output, DsonExtString extString) {
+    public static void writeExtString(DsonOutput output, ExtString extString) {
         if (extString.getType() != 0) {
             output.writeUint32(extString.getType());
         }
@@ -231,10 +230,10 @@ public class DsonReaderUtils {
         }
     }
 
-    public static DsonExtString readDsonExtString(DsonInput input, int wireTypeBits) {
-        int type = DsonInternals.isEnabled(wireTypeBits, DsonExtString.MASK_TYPE) ? input.readUint32() : 0;
-        String value = DsonInternals.isEnabled(wireTypeBits, DsonExtString.MASK_VALUE) ? input.readString() : null;
-        return new DsonExtString(type, value);
+    public static ExtString readDsonExtString(DsonInput input, int wireTypeBits) {
+        int type = DsonInternals.isEnabled(wireTypeBits, ExtString.MASK_TYPE) ? input.readUint32() : 0;
+        String value = DsonInternals.isEnabled(wireTypeBits, ExtString.MASK_VALUE) ? input.readString() : null;
+        return new ExtString(type, value);
     }
     // endregion
 
@@ -375,10 +374,10 @@ public class DsonReaderUtils {
                 return;
             }
             case EXT_STRING -> {
-                if (DsonInternals.isEnabled(wireTypeBits, DsonExtString.MASK_TYPE)) {
+                if (DsonInternals.isEnabled(wireTypeBits, ExtString.MASK_TYPE)) {
                     input.readUint32(); // 子类型
                 }
-                if (DsonInternals.isEnabled(wireTypeBits, DsonExtString.MASK_VALUE)) {
+                if (DsonInternals.isEnabled(wireTypeBits, ExtString.MASK_VALUE)) {
                     skip = input.readUint32(); // string长度
                     input.skipRawBytes(skip);
                 }

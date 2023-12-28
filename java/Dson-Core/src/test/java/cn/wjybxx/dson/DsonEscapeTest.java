@@ -33,10 +33,10 @@ public class DsonEscapeTest {
     @Test
     void test() {
         DsonValue value = Dsons.fromDson(dsonString);
-        DsonExtString reg1 = value.asObject().get("reg1").asExtString();
+        DsonExtString reg1 = value.asObject().get("reg1").asDsonExtString();
         Assertions.assertEquals(regExp, reg1.getValue());
 
-        DsonExtString reg2 = value.asObject().get("reg2").asExtString();
+        DsonExtString reg2 = value.asObject().get("reg2").asDsonExtString();
         Assertions.assertEquals(regExp, reg2.getValue());
 
         DsonString reg3 = value.asObject().get("reg3").asDsonString();

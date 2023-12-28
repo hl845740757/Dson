@@ -16,6 +16,8 @@
 
 package cn.wjybxx.dson;
 
+import cn.wjybxx.dson.types.ExtString;
+
 import javax.annotation.Nonnull;
 import java.util.Objects;
 
@@ -25,18 +27,20 @@ import java.util.Objects;
  * @author wjybxx
  * date - 2023/4/19
  */
-public class DsonExtString extends DsonValue implements Comparable<DsonExtString> {
+public final class DsonExtString extends DsonValue implements Comparable<DsonExtString> {
 
-    public static final int MASK_TYPE = 1;
-    public static final int MASK_VALUE = 1 << 1;
-
-    private final int type;
-    private final String value;
+    private final ExtString extString;
 
     public DsonExtString(int type, String value) {
-        Dsons.checkSubType(type);
-        this.type = type;
-        this.value = value;
+        this(new ExtString(type, value));
+    }
+
+    public DsonExtString(ExtString extString) {
+        this.extString = Objects.requireNonNull(extString);
+    }
+
+    public ExtString extString() {
+        return extString;
     }
 
     @Nonnull
@@ -46,18 +50,24 @@ public class DsonExtString extends DsonValue implements Comparable<DsonExtString
     }
 
     public int getType() {
-        return type;
+        return extString.getType();
     }
 
     public String getValue() {
-        return value;
+        return extString.getValue();
     }
 
     public boolean hasValue() {
-        return value != null;
+        return extString.hasValue();
     }
 
     //region equals
+
+    @Override
+    public int compareTo(DsonExtString that) {
+        return extString.compareTo(that.extString);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -65,39 +75,19 @@ public class DsonExtString extends DsonValue implements Comparable<DsonExtString
 
         DsonExtString that = (DsonExtString) o;
 
-        if (type != that.type) return false;
-        return Objects.equals(value, that.value);
+        return extString.equals(that.extString);
     }
 
     @Override
     public int hashCode() {
-        int result = type;
-        result = 31 * result + (value != null ? value.hashCode() : 0);
-        return result;
-    }
-
-    @Override
-    public int compareTo(DsonExtString that) {
-        int r = Integer.compare(type, that.type);
-        if (r != 0) {
-            return r;
-        }
-        if (value != null && that.value != null) {
-            return value.compareTo(that.value);
-        }
-        if (value == null) {
-            return -1;
-        } else {
-            return 1;
-        }
+        return extString.hashCode();
     }
     // endregion
 
     @Override
     public String toString() {
         return "DsonExtString{" +
-                "type=" + type +
-                ", value='" + value + '\'' +
+                "extString=" + extString +
                 '}';
     }
 }

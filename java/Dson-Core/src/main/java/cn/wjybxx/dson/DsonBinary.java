@@ -17,9 +17,10 @@
 package cn.wjybxx.dson;
 
 import cn.wjybxx.dson.io.DsonChunk;
+import cn.wjybxx.dson.types.Binary;
 
 import javax.annotation.Nonnull;
-import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * 你通常不应该修改data中的数据。
@@ -31,31 +32,26 @@ import java.util.Arrays;
  */
 public class DsonBinary extends DsonValue {
 
-    private final int type;
-    private final byte[] data;
+    private final Binary binary;
 
     public DsonBinary(byte[] data) {
-        this(0, data);
+        this(new Binary(0, data));
     }
 
     public DsonBinary(int type, byte[] data) {
-        Dsons.checkSubType(type);
-        Dsons.checkBinaryLength(data.length); // 顺带NPE
-        this.type = type;
-        this.data = data;
+        this(new Binary(type, data));
     }
 
     public DsonBinary(int type, DsonChunk chunk) {
-        Dsons.checkSubType(type);
-        Dsons.checkBinaryLength(chunk.getLength()); // 顺带NPE
-        this.type = type;
-        this.data = chunk.payload();
+        this(new Binary(type, chunk.payload()));
     }
 
-    /** 默认采取拷贝的方式，保证安全性 */
-    public DsonBinary(DsonBinary src) {
-        this.type = src.type;
-        this.data = src.data.clone();
+    public DsonBinary(Binary binary) {
+        this.binary = Objects.requireNonNull(binary);
+    }
+
+    public Binary binary() {
+        return binary;
     }
 
     @Nonnull
@@ -65,17 +61,17 @@ public class DsonBinary extends DsonValue {
     }
 
     public int getType() {
-        return type;
+        return binary.getType();
     }
 
     /** 最好不要持有data的引用，否则可能由于共享数据产生错误 */
     public byte[] getData() {
-        return data;
+        return binary.getData();
     }
 
     /** 创建一个拷贝 */
     public DsonBinary copy() {
-        return new DsonBinary(type, data.clone());
+        return new DsonBinary(binary.copy());
     }
 
     //region equals
@@ -87,15 +83,12 @@ public class DsonBinary extends DsonValue {
 
         DsonBinary that = (DsonBinary) o;
 
-        if (type != that.type) return false;
-        return Arrays.equals(data, that.data);
+        return binary.equals(that.binary);
     }
 
     @Override
     public int hashCode() {
-        int result = type;
-        result = 31 * result + Arrays.hashCode(data);
-        return result;
+        return binary.hashCode();
     }
 
     // endregion
@@ -103,9 +96,7 @@ public class DsonBinary extends DsonValue {
     @Override
     public String toString() {
         return "DsonBinary{" +
-                "type=" + type +
-                ", data=" + Arrays.toString(data) +
+                "binary=" + binary +
                 '}';
     }
-
 }

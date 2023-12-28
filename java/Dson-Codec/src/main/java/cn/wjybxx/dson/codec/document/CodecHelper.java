@@ -18,8 +18,7 @@ package cn.wjybxx.dson.codec.document;
 
 import cn.wjybxx.dson.*;
 import cn.wjybxx.dson.codec.DsonCodecException;
-import cn.wjybxx.dson.types.ObjectRef;
-import cn.wjybxx.dson.types.OffsetTimestamp;
+import cn.wjybxx.dson.types.*;
 
 /**
  * 1.int扩展之间可以相互转换，当int的扩展不可以直接转换为其它数值类型
@@ -143,7 +142,7 @@ class CodecHelper {
         reader.readNull(name);
     }
 
-    static DsonBinary readBinary(DsonReader reader, String name) {
+    static Binary readBinary(DsonReader reader, String name) {
         DsonType dsonType = readOrGetDsonType(reader);
         return switch (dsonType) {
             case BINARY -> reader.readBinary(name);
@@ -155,10 +154,10 @@ class CodecHelper {
         };
     }
 
-    static DsonExtInt32 readExtInt32(DsonReader reader, String name) {
+    static ExtInt32 readExtInt32(DsonReader reader, String name) {
         DsonType dsonType = readOrGetDsonType(reader);
         return switch (dsonType) {
-            case INT32 -> new DsonExtInt32(0, reader.readInt32(name));
+            case INT32 -> new ExtInt32(0, reader.readInt32(name));
             case EXT_INT32 -> reader.readExtInt32(name);
             case NULL -> {
                 reader.readNull(name);
@@ -168,10 +167,10 @@ class CodecHelper {
         };
     }
 
-    static DsonExtInt64 readExtInt64(DsonReader reader, String name) {
+    static ExtInt64 readExtInt64(DsonReader reader, String name) {
         DsonType dsonType = readOrGetDsonType(reader);
         return switch (dsonType) {
-            case INT64 -> new DsonExtInt64(0, reader.readInt64(name));
+            case INT64 -> new ExtInt64(0, reader.readInt64(name));
             case EXT_INT64 -> reader.readExtInt64(name);
             case NULL -> {
                 reader.readNull(name);
@@ -181,10 +180,10 @@ class CodecHelper {
         };
     }
 
-    static DsonExtDouble readExtDouble(DsonReader reader, String name) {
+    static ExtDouble readExtDouble(DsonReader reader, String name) {
         DsonType dsonType = readOrGetDsonType(reader);
         return switch (dsonType) {
-            case DOUBLE -> new DsonExtDouble(0, reader.readDouble(name));
+            case DOUBLE -> new ExtDouble(0, reader.readDouble(name));
             case EXT_DOUBLE -> reader.readExtDouble(name);
             case NULL -> {
                 reader.readNull(name);
@@ -194,10 +193,10 @@ class CodecHelper {
         };
     }
 
-    static DsonExtString readExtString(DsonReader reader, String name) {
+    static ExtString readExtString(DsonReader reader, String name) {
         DsonType dsonType = readOrGetDsonType(reader);
         return switch (dsonType) {
-            case STRING -> new DsonExtString(0, reader.readString(name));
+            case STRING -> new ExtString(0, reader.readString(name));
             case EXT_STRING -> reader.readExtString(name);
             case NULL -> {
                 reader.readNull(name);

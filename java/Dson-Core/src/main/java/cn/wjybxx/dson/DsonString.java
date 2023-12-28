@@ -23,7 +23,7 @@ import java.util.Objects;
  * @author wjybxx
  * date - 2023/4/19
  */
-public class DsonString extends DsonValue implements Comparable<DsonString> {
+public final class DsonString extends DsonValue implements Comparable<DsonString> {
 
     private final String value;
 

@@ -47,7 +47,7 @@ public class DsonNumberTest {
                     for (int i = 1; i <= value.size(); i++) {
                         String name = "value" + i;
                         DsonValue dsonValue = value.get(name);
-                        DsonNumber dsonNumber = dsonValue.asNumber();
+                        DsonNumber dsonNumber = dsonValue.asDsonNumber();
                         if (dsonNumber == null) {
                             break;
                         }
@@ -62,7 +62,7 @@ public class DsonNumberTest {
                     for (int i = 1; i <= value.size(); i++) {
                         String name = "value" + i;
                         DsonValue dsonValue = value.get(name);
-                        DsonNumber dsonNumber = dsonValue.asNumber();
+                        DsonNumber dsonNumber = dsonValue.asDsonNumber();
                         if (dsonNumber == null) {
                             break;
                         }

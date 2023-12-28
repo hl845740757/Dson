@@ -18,8 +18,7 @@ package cn.wjybxx.dson.codec.binary;
 
 import cn.wjybxx.dson.*;
 import cn.wjybxx.dson.codec.*;
-import cn.wjybxx.dson.types.ObjectRef;
-import cn.wjybxx.dson.types.OffsetTimestamp;
+import cn.wjybxx.dson.types.*;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -186,27 +185,27 @@ public class DefaultBinaryObjectReader implements BinaryObjectReader {
     }
 
     @Override
-    public DsonBinary readBinary(int name) {
+    public Binary readBinary(int name) {
         return readName(name) ? CodecHelper.readBinary(reader, name) : null;
     }
 
     @Override
-    public DsonExtInt32 readExtInt32(int name) {
+    public ExtInt32 readExtInt32(int name) {
         return readName(name) ? CodecHelper.readExtInt32(reader, name) : null;
     }
 
     @Override
-    public DsonExtInt64 readExtInt64(int name) {
+    public ExtInt64 readExtInt64(int name) {
         return readName(name) ? CodecHelper.readExtInt64(reader, name) : null;
     }
 
     @Override
-    public DsonExtDouble readExtDouble(int name) {
+    public ExtDouble readExtDouble(int name) {
         return readName(name) ? CodecHelper.readExtDouble(reader, name) : null;
     }
 
     @Override
-    public DsonExtString readExtString(int name) {
+    public ExtString readExtString(int name) {
         return readName(name) ? CodecHelper.readExtString(reader, name) : null;
     }
 

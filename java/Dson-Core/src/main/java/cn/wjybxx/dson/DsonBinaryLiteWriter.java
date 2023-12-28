@@ -18,8 +18,7 @@ package cn.wjybxx.dson;
 
 import cn.wjybxx.dson.io.DsonChunk;
 import cn.wjybxx.dson.io.DsonOutput;
-import cn.wjybxx.dson.types.ObjectRef;
-import cn.wjybxx.dson.types.OffsetTimestamp;
+import cn.wjybxx.dson.types.*;
 
 import java.util.Objects;
 
@@ -129,7 +128,7 @@ public class DsonBinaryLiteWriter extends AbstractDsonLiteWriter {
     }
 
     @Override
-    protected void doWriteBinary(DsonBinary binary) {
+    protected void doWriteBinary(Binary binary) {
         DsonOutput output = this.output;
         writeFullTypeAndCurrentName(output, DsonType.BINARY, 0);
         DsonReaderUtils.writeBinary(output, binary);
@@ -143,21 +142,21 @@ public class DsonBinaryLiteWriter extends AbstractDsonLiteWriter {
     }
 
     @Override
-    protected void doWriteExtInt32(DsonExtInt32 extInt32, WireType wireType) {
+    protected void doWriteExtInt32(ExtInt32 extInt32, WireType wireType) {
         DsonOutput output = this.output;
         writeFullTypeAndCurrentName(output, DsonType.EXT_INT32, wireType.getNumber());
         DsonReaderUtils.writeExtInt32(output, extInt32, wireType);
     }
 
     @Override
-    protected void doWriteExtInt64(DsonExtInt64 extInt64, WireType wireType) {
+    protected void doWriteExtInt64(ExtInt64 extInt64, WireType wireType) {
         DsonOutput output = this.output;
         writeFullTypeAndCurrentName(output, DsonType.EXT_INT64, wireType.getNumber());
         DsonReaderUtils.writeExtInt64(output, extInt64, wireType);
     }
 
     @Override
-    protected void doWriteExtDouble(DsonExtDouble extDouble) {
+    protected void doWriteExtDouble(ExtDouble extDouble) {
         int wireType = DsonReaderUtils.wireTypeOfDouble(extDouble.getValue());
         DsonOutput output = this.output;
         writeFullTypeAndCurrentName(output, DsonType.EXT_DOUBLE, wireType);
@@ -165,7 +164,7 @@ public class DsonBinaryLiteWriter extends AbstractDsonLiteWriter {
     }
 
     @Override
-    protected void doWriteExtString(DsonExtString extString) {
+    protected void doWriteExtString(ExtString extString) {
         DsonOutput output = this.output;
         writeFullTypeAndCurrentName(output, DsonType.EXT_STRING, DsonReaderUtils.wireTypeOfExtString(extString));
         DsonReaderUtils.writeExtString(output, extString);

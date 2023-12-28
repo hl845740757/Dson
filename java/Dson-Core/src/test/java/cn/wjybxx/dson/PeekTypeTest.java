@@ -207,11 +207,11 @@ public class PeekTypeTest {
                 reader.readNull(name);
                 yield DsonNull.NULL;
             }
-            case BINARY -> reader.readBinary(name);
-            case EXT_INT32 -> reader.readExtInt32(name);
-            case EXT_INT64 -> reader.readExtInt64(name);
-            case EXT_DOUBLE -> reader.readExtDouble(name);
-            case EXT_STRING -> reader.readExtString(name);
+            case BINARY -> new DsonBinary(reader.readBinary(name));
+            case EXT_INT32 -> new DsonExtInt32(reader.readExtInt32(name));
+            case EXT_INT64 -> new DsonExtInt64(reader.readExtInt64(name));
+            case EXT_DOUBLE -> new DsonExtDouble(reader.readExtDouble(name));
+            case EXT_STRING -> new DsonExtString(reader.readExtString(name));
             case REFERENCE -> new DsonReference(reader.readRef(name));
             case TIMESTAMP -> new DsonTimestamp(reader.readTimestamp(name));
             default -> throw new AssertionError();

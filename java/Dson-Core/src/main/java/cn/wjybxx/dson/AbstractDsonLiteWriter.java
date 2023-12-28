@@ -18,8 +18,7 @@ package cn.wjybxx.dson;
 
 import cn.wjybxx.dson.io.DsonChunk;
 import cn.wjybxx.dson.io.DsonIOException;
-import cn.wjybxx.dson.types.ObjectRef;
-import cn.wjybxx.dson.types.OffsetTimestamp;
+import cn.wjybxx.dson.types.*;
 
 import java.util.List;
 import java.util.Objects;
@@ -173,10 +172,10 @@ public abstract class AbstractDsonLiteWriter implements DsonLiteWriter {
     }
 
     @Override
-    public void writeBinary(int name, DsonBinary dsonBinary) {
-        Objects.requireNonNull(dsonBinary);
+    public void writeBinary(int name, Binary binary) {
+        Objects.requireNonNull(binary);
         advanceToValueState(name);
-        doWriteBinary(dsonBinary);
+        doWriteBinary(binary);
         setNextState();
     }
 
@@ -191,7 +190,7 @@ public abstract class AbstractDsonLiteWriter implements DsonLiteWriter {
     }
 
     @Override
-    public void writeExtInt32(int name, DsonExtInt32 extInt32, WireType wireType) {
+    public void writeExtInt32(int name, ExtInt32 extInt32, WireType wireType) {
         Objects.requireNonNull(extInt32);
         advanceToValueState(name);
         doWriteExtInt32(extInt32, wireType);
@@ -199,7 +198,7 @@ public abstract class AbstractDsonLiteWriter implements DsonLiteWriter {
     }
 
     @Override
-    public void writeExtInt64(int name, DsonExtInt64 extInt64, WireType wireType) {
+    public void writeExtInt64(int name, ExtInt64 extInt64, WireType wireType) {
         Objects.requireNonNull(extInt64);
         advanceToValueState(name);
         doWriteExtInt64(extInt64, wireType);
@@ -207,7 +206,7 @@ public abstract class AbstractDsonLiteWriter implements DsonLiteWriter {
     }
 
     @Override
-    public void writeExtDouble(int name, DsonExtDouble extDouble) {
+    public void writeExtDouble(int name, ExtDouble extDouble) {
         Objects.requireNonNull(extDouble);
         advanceToValueState(name);
         doWriteExtDouble(extDouble);
@@ -215,7 +214,7 @@ public abstract class AbstractDsonLiteWriter implements DsonLiteWriter {
     }
 
     @Override
-    public void writeExtString(int name, DsonExtString extString) {
+    public void writeExtString(int name, ExtString extString) {
         Objects.requireNonNull(extString);
         advanceToValueState(name);
         doWriteExtString(extString);
@@ -252,17 +251,17 @@ public abstract class AbstractDsonLiteWriter implements DsonLiteWriter {
 
     protected abstract void doWriteNull();
 
-    protected abstract void doWriteBinary(DsonBinary binary);
+    protected abstract void doWriteBinary(Binary binary);
 
     protected abstract void doWriteBinary(int type, DsonChunk chunk);
 
-    protected abstract void doWriteExtInt32(DsonExtInt32 extInt32, WireType wireType);
+    protected abstract void doWriteExtInt32(ExtInt32 extInt32, WireType wireType);
 
-    protected abstract void doWriteExtInt64(DsonExtInt64 extInt64, WireType wireType);
+    protected abstract void doWriteExtInt64(ExtInt64 extInt64, WireType wireType);
 
-    protected abstract void doWriteExtDouble(DsonExtDouble extDouble);
+    protected abstract void doWriteExtDouble(ExtDouble extDouble);
 
-    protected abstract void doWriteExtString(DsonExtString extString);
+    protected abstract void doWriteExtString(ExtString extString);
 
     protected abstract void doWriteRef(ObjectRef objectRef);
 

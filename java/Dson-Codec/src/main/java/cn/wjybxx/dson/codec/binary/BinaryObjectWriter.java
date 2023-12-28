@@ -16,13 +16,16 @@
 
 package cn.wjybxx.dson.codec.binary;
 
-import cn.wjybxx.dson.*;
+import cn.wjybxx.dson.DsonLiteWriter;
+import cn.wjybxx.dson.DsonType;
+import cn.wjybxx.dson.WireType;
 import cn.wjybxx.dson.codec.ConvertOptions;
 import cn.wjybxx.dson.codec.TypeArgInfo;
 import cn.wjybxx.dson.io.DsonChunk;
 import cn.wjybxx.dson.text.INumberStyle;
 import cn.wjybxx.dson.text.ObjectStyle;
 import cn.wjybxx.dson.text.StringStyle;
+import cn.wjybxx.dson.types.*;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -63,22 +66,22 @@ public interface BinaryObjectWriter extends AutoCloseable {
 
     void writeBytes(int name, int type, @Nonnull DsonChunk chunk);
 
-    void writeBinary(int name, DsonBinary binary);
+    void writeBinary(int name, Binary binary);
 
     //
-    void writeExtInt32(int name, DsonExtInt32 value, WireType wireType);
+    void writeExtInt32(int name, ExtInt32 value, WireType wireType);
 
     void writeExtInt32(int name, int type, int value, WireType wireType);
 
-    void writeExtInt64(int name, DsonExtInt64 value, WireType wireType);
+    void writeExtInt64(int name, ExtInt64 value, WireType wireType);
 
     void writeExtInt64(int name, int type, long value, WireType wireType);
 
-    void writeExtDouble(int name, DsonExtDouble value);
+    void writeExtDouble(int name, ExtDouble value);
 
     void writeExtDouble(int name, int type, double value);
 
-    void writeExtString(int name, DsonExtString value);
+    void writeExtString(int name, ExtString value);
 
     void writeExtString(int name, int type, @Nullable String value);
 

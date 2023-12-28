@@ -19,6 +19,7 @@ package cn.wjybxx.dson.types;
 import cn.wjybxx.dson.Dsons;
 
 import java.util.Arrays;
+import java.util.HexFormat;
 
 /**
  * 你通常不应该修改data中的数据。
@@ -50,11 +51,6 @@ public class Binary {
         this.data = src.data.clone();
     }
 
-    /** 创建一个拷贝 */
-    public Binary copy() {
-        return new Binary(type, data.clone());
-    }
-
     public int getType() {
         return type;
     }
@@ -62,6 +58,11 @@ public class Binary {
     /** 最好不要持有data的引用，否则可能由于共享数据产生错误 */
     public byte[] getData() {
         return data;
+    }
+
+    /** 创建一个拷贝 */
+    public Binary copy() {
+        return new Binary(type, data.clone());
     }
 
     //region equals
@@ -90,7 +91,7 @@ public class Binary {
     public String toString() {
         return "Binary{" +
                 "type=" + type +
-                ", data=" + Arrays.toString(data) +
+                ", data=" + HexFormat.of().formatHex(data) +
                 '}';
     }
 

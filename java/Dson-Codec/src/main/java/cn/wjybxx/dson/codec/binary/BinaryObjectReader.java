@@ -18,11 +18,12 @@ package cn.wjybxx.dson.codec.binary;
 
 import cn.wjybxx.base.CollectionUtils;
 import cn.wjybxx.base.annotation.StableName;
-import cn.wjybxx.dson.*;
+import cn.wjybxx.dson.DsonContextType;
+import cn.wjybxx.dson.DsonLiteReader;
+import cn.wjybxx.dson.DsonType;
 import cn.wjybxx.dson.codec.ConvertOptions;
 import cn.wjybxx.dson.codec.TypeArgInfo;
-import cn.wjybxx.dson.types.ObjectRef;
-import cn.wjybxx.dson.types.OffsetTimestamp;
+import cn.wjybxx.dson.types.*;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -62,19 +63,19 @@ public interface BinaryObjectReader extends AutoCloseable {
 
     /** 可读取Binary */
     default byte[] readBytes(int name) {
-        DsonBinary binary = readBinary(name);
+        Binary binary = readBinary(name);
         return binary == null ? null : binary.getData();
     }
 
-    DsonBinary readBinary(int name);
+    Binary readBinary(int name);
 
-    DsonExtInt32 readExtInt32(int name);
+    ExtInt32 readExtInt32(int name);
 
-    DsonExtInt64 readExtInt64(int name);
+    ExtInt64 readExtInt64(int name);
 
-    DsonExtDouble readExtDouble(int name);
+    ExtDouble readExtDouble(int name);
 
-    DsonExtString readExtString(int name);
+    ExtString readExtString(int name);
 
     ObjectRef readRef(int name);
 

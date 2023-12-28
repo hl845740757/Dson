@@ -281,11 +281,11 @@ public class DsonLites {
                 reader.readNull(name);
                 yield DsonNull.NULL;
             }
-            case BINARY -> reader.readBinary(name);
-            case EXT_INT32 -> reader.readExtInt32(name);
-            case EXT_INT64 -> reader.readExtInt64(name);
-            case EXT_DOUBLE -> reader.readExtDouble(name);
-            case EXT_STRING -> reader.readExtString(name);
+            case BINARY -> new DsonBinary(reader.readBinary(name));
+            case EXT_INT32 -> new DsonExtInt32(reader.readExtInt32(name));
+            case EXT_INT64 -> new DsonExtInt64(reader.readExtInt64(name));
+            case EXT_DOUBLE -> new DsonExtDouble(reader.readExtDouble(name));
+            case EXT_STRING -> new DsonExtString(reader.readExtString(name));
             case REFERENCE -> new DsonReference(reader.readRef(name));
             case TIMESTAMP -> new DsonTimestamp(reader.readTimestamp(name));
             case HEADER -> {
@@ -336,7 +336,7 @@ public class DsonLites {
                 return result;
             }
             case BINARY -> {
-                return new DsonBinary(dsonValue.asBinary());
+                return new DsonBinary(dsonValue.asBinary().copy());
             }
             default -> {
                 return dsonValue;
@@ -345,13 +345,13 @@ public class DsonLites {
     }
 
     private static void copyKVPair(AbstractDsonObject<FieldNumber> src, AbstractDsonObject<FieldNumber> dest, int stack) {
-        if (src.size() > 0) {
+        if (!src.isEmpty()) {
             src.forEach((s, dsonValue) -> dest.put(s, mutableDeepCopy(dsonValue, stack + 1)));
         }
     }
 
     private static void copyElements(AbstractDsonArray src, AbstractDsonArray dest, int stack) {
-        if (src.size() > 0) {
+        if (!src.isEmpty()) {
             src.forEach(e -> dest.add(mutableDeepCopy(e, stack + 1)));
         }
     }

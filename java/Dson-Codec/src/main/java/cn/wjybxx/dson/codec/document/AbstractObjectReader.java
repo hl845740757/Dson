@@ -19,8 +19,7 @@ package cn.wjybxx.dson.codec.document;
 import cn.wjybxx.base.ObjectUtils;
 import cn.wjybxx.dson.*;
 import cn.wjybxx.dson.codec.*;
-import cn.wjybxx.dson.types.ObjectRef;
-import cn.wjybxx.dson.types.OffsetTimestamp;
+import cn.wjybxx.dson.types.*;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -166,27 +165,27 @@ abstract class AbstractObjectReader implements DocumentObjectReader {
     }
 
     @Override
-    public DsonBinary readBinary(String name) {
+    public Binary readBinary(String name) {
         return readName(name) ? CodecHelper.readBinary(reader, name) : null;
     }
 
     @Override
-    public DsonExtInt32 readExtInt32(String name) {
+    public ExtInt32 readExtInt32(String name) {
         return readName(name) ? CodecHelper.readExtInt32(reader, name) : null;
     }
 
     @Override
-    public DsonExtInt64 readExtInt64(String name) {
+    public ExtInt64 readExtInt64(String name) {
         return readName(name) ? CodecHelper.readExtInt64(reader, name) : null;
     }
 
     @Override
-    public DsonExtDouble readExtDouble(String name) {
+    public ExtDouble readExtDouble(String name) {
         return readName(name) ? CodecHelper.readExtDouble(reader, name) : null;
     }
 
     @Override
-    public DsonExtString readExtString(String name) {
+    public ExtString readExtString(String name) {
         return readName(name) ? CodecHelper.readExtString(reader, name) : null;
     }
 

@@ -20,8 +20,7 @@ import cn.wjybxx.dson.io.DsonChunk;
 import cn.wjybxx.dson.text.INumberStyle;
 import cn.wjybxx.dson.text.ObjectStyle;
 import cn.wjybxx.dson.text.StringStyle;
-import cn.wjybxx.dson.types.ObjectRef;
-import cn.wjybxx.dson.types.OffsetTimestamp;
+import cn.wjybxx.dson.types.*;
 
 import java.util.Objects;
 
@@ -71,17 +70,17 @@ public interface DsonWriter extends AutoCloseable {
 
     void writeNull(String name);
 
-    void writeBinary(String name, DsonBinary dsonBinary);
+    void writeBinary(String name, Binary binary);
 
     void writeBinary(String name, int type, DsonChunk chunk);
 
-    void writeExtInt32(String name, DsonExtInt32 extInt32, WireType wireType, INumberStyle style);
+    void writeExtInt32(String name, ExtInt32 extInt32, WireType wireType, INumberStyle style);
 
-    void writeExtInt64(String name, DsonExtInt64 extInt64, WireType wireType, INumberStyle style);
+    void writeExtInt64(String name, ExtInt64 extInt64, WireType wireType, INumberStyle style);
 
-    void writeExtDouble(String name, DsonExtDouble extDouble, INumberStyle style);
+    void writeExtDouble(String name, ExtDouble extDouble, INumberStyle style);
 
-    void writeExtString(String name, DsonExtString extString, StringStyle style);
+    void writeExtString(String name, ExtString extString, StringStyle style);
 
     void writeRef(String name, ObjectRef objectRef);
 

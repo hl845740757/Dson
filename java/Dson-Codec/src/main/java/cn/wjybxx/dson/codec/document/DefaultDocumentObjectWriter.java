@@ -24,8 +24,7 @@ import cn.wjybxx.dson.text.INumberStyle;
 import cn.wjybxx.dson.text.IStyle;
 import cn.wjybxx.dson.text.ObjectStyle;
 import cn.wjybxx.dson.text.StringStyle;
-import cn.wjybxx.dson.types.ObjectRef;
-import cn.wjybxx.dson.types.OffsetTimestamp;
+import cn.wjybxx.dson.types.*;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -147,7 +146,7 @@ public class DefaultDocumentObjectWriter implements DocumentObjectWriter {
         if (value == null) {
             writeNull(name);
         } else {
-            writer.writeBinary(name, new DsonBinary(0, value));
+            writer.writeBinary(name, new Binary(0, value));
         }
     }
 
@@ -156,7 +155,7 @@ public class DefaultDocumentObjectWriter implements DocumentObjectWriter {
         if (value == null) {
             writeNull(name);
         } else {
-            writer.writeBinary(name, new DsonBinary(type, value));
+            writer.writeBinary(name, new Binary(type, value));
         }
     }
 
@@ -166,7 +165,7 @@ public class DefaultDocumentObjectWriter implements DocumentObjectWriter {
     }
 
     @Override
-    public void writeBinary(String name, DsonBinary binary) {
+    public void writeBinary(String name, Binary binary) {
         if (binary == null) {
             writeNull(name);
         } else {
@@ -175,7 +174,7 @@ public class DefaultDocumentObjectWriter implements DocumentObjectWriter {
     }
 
     @Override
-    public void writeExtInt32(String name, DsonExtInt32 value, WireType wireType, INumberStyle style) {
+    public void writeExtInt32(String name, ExtInt32 value, WireType wireType, INumberStyle style) {
         if (value == null) {
             writeNull(name);
         } else {
@@ -185,11 +184,11 @@ public class DefaultDocumentObjectWriter implements DocumentObjectWriter {
 
     @Override
     public void writeExtInt32(String name, int type, int value, WireType wireType, INumberStyle style) {
-        writer.writeExtInt32(name, new DsonExtInt32(type, value), wireType, style);
+        writer.writeExtInt32(name, new ExtInt32(type, value), wireType, style);
     }
 
     @Override
-    public void writeExtInt64(String name, DsonExtInt64 value, WireType wireType, INumberStyle style) {
+    public void writeExtInt64(String name, ExtInt64 value, WireType wireType, INumberStyle style) {
         if (value == null) {
             writeNull(name);
         } else {
@@ -199,11 +198,11 @@ public class DefaultDocumentObjectWriter implements DocumentObjectWriter {
 
     @Override
     public void writeExtInt64(String name, int type, long value, WireType wireType, INumberStyle style) {
-        writer.writeExtInt64(name, new DsonExtInt64(type, value), wireType, style);
+        writer.writeExtInt64(name, new ExtInt64(type, value), wireType, style);
     }
 
     @Override
-    public void writeExtDouble(String name, DsonExtDouble value, INumberStyle style) {
+    public void writeExtDouble(String name, ExtDouble value, INumberStyle style) {
         if (value == null) {
             writeNull(name);
         } else {
@@ -213,11 +212,11 @@ public class DefaultDocumentObjectWriter implements DocumentObjectWriter {
 
     @Override
     public void writeExtDouble(String name, int type, double value, INumberStyle style) {
-        writer.writeExtDouble(name, new DsonExtDouble(type, value), style);
+        writer.writeExtDouble(name, new ExtDouble(type, value), style);
     }
 
     @Override
-    public void writeExtString(String name, DsonExtString value, StringStyle style) {
+    public void writeExtString(String name, ExtString value, StringStyle style) {
         if (value == null) {
             writeNull(name);
         } else {
@@ -227,7 +226,7 @@ public class DefaultDocumentObjectWriter implements DocumentObjectWriter {
 
     @Override
     public void writeExtString(String name, int type, String value, StringStyle style) {
-        writer.writeExtString(name, new DsonExtString(type, value), style);
+        writer.writeExtString(name, new ExtString(type, value), style);
     }
 
     @Override
@@ -366,7 +365,7 @@ public class DefaultDocumentObjectWriter implements DocumentObjectWriter {
             return;
         }
         TypeMeta typeMeta = converter.typeMetaRegistry.ofType(encodeClass);
-        if (typeMeta != null && typeMeta.classNames.size() > 0) {
+        if (typeMeta != null && !typeMeta.classNames.isEmpty()) {
             writer.writeSimpleHeader(typeMeta.mainClassName());
         }
     }

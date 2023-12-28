@@ -18,8 +18,7 @@ package cn.wjybxx.dson;
 
 import cn.wjybxx.dson.internal.MarkableIterator;
 import cn.wjybxx.dson.io.DsonIOException;
-import cn.wjybxx.dson.types.ObjectRef;
-import cn.wjybxx.dson.types.OffsetTimestamp;
+import cn.wjybxx.dson.types.*;
 
 import java.util.*;
 
@@ -205,27 +204,27 @@ public class DsonObjectLiteReader extends AbstractDsonLiteReader {
     }
 
     @Override
-    protected DsonBinary doReadBinary() {
+    protected Binary doReadBinary() {
         return popNextValue().asBinary().copy(); // 需要拷贝
     }
 
     @Override
-    protected DsonExtInt32 doReadExtInt32() {
+    protected ExtInt32 doReadExtInt32() {
         return popNextValue().asExtInt32();
     }
 
     @Override
-    protected DsonExtInt64 doReadExtInt64() {
+    protected ExtInt64 doReadExtInt64() {
         return popNextValue().asExtInt64();
     }
 
     @Override
-    protected DsonExtDouble doReadExtDouble() {
+    protected ExtDouble doReadExtDouble() {
         return popNextValue().asExtDouble();
     }
 
     @Override
-    protected DsonExtString doReadExtString() {
+    protected ExtString doReadExtString() {
         return popNextValue().asExtString();
     }
 
@@ -249,11 +248,11 @@ public class DsonObjectLiteReader extends AbstractDsonLiteReader {
         DsonValue dsonValue = popNextValue();
         if (dsonValue.getDsonType() == DsonType.OBJECT) {
             DsonObject<FieldNumber> dsonObject = dsonValue.asObjectLite();
-            newContext.header = dsonObject.getHeader().size() > 0 ? dsonObject.getHeader() : null;
+            newContext.header = !dsonObject.getHeader().isEmpty() ? dsonObject.getHeader() : null;
             newContext.objectIterator = new MarkableIterator<>(dsonObject.entrySet().iterator());
         } else if (dsonValue.getDsonType() == DsonType.ARRAY) {
             DsonArray<FieldNumber> dsonArray = dsonValue.asArrayLite();
-            newContext.header = dsonArray.getHeader().size() > 0 ? dsonArray.getHeader() : null;
+            newContext.header = !dsonArray.getHeader().isEmpty() ? dsonArray.getHeader() : null;
             newContext.arrayIterator = new MarkableIterator<>(dsonArray.iterator());
         } else {
             // 其它内置结构体

@@ -16,7 +16,10 @@
 
 package cn.wjybxx.dson;
 
+import cn.wjybxx.dson.types.ExtInt64;
+
 import javax.annotation.Nonnull;
+import java.util.Objects;
 
 /**
  * long值的简单扩展
@@ -24,30 +27,28 @@ import javax.annotation.Nonnull;
  * @author wjybxx
  * date - 2023/4/19
  */
-public class DsonExtInt64 extends DsonValue implements Comparable<DsonExtInt64> {
+public final class DsonExtInt64 extends DsonValue implements Comparable<DsonExtInt64> {
 
-    private final int type;
-    private final boolean hasValue; // 比较时放前面
-    private final long value;
+    private final ExtInt64 extInt64;
 
     public DsonExtInt64(int type, long value) {
-        this(type, value, true);
+        this(new ExtInt64(type, value));
     }
 
     public DsonExtInt64(int type, Long value) {
-        this(type, value == null ? 0 : value, value != null);
+        this(new ExtInt64(type, value));
     }
 
     public DsonExtInt64(int type, long value, boolean hasValue) {
-        Dsons.checkSubType(type);
-        Dsons.checkHasValue(value, hasValue);
-        this.type = type;
-        this.value = value;
-        this.hasValue = hasValue;
+        this(new ExtInt64(type, value, hasValue));
     }
 
-    public static DsonExtInt64 emptyOf(int type) {
-        return new DsonExtInt64(type, 0, false);
+    public DsonExtInt64(ExtInt64 extInt64) {
+        this.extInt64 = Objects.requireNonNull(extInt64);
+    }
+
+    public ExtInt64 extInt64() {
+        return extInt64;
     }
 
     @Nonnull
@@ -57,18 +58,22 @@ public class DsonExtInt64 extends DsonValue implements Comparable<DsonExtInt64> 
     }
 
     public int getType() {
-        return type;
+        return extInt64.getType();
     }
 
     public long getValue() {
-        return value;
+        return extInt64.getValue();
     }
 
     public boolean hasValue() {
-        return hasValue;
+        return extInt64.hasValue();
     }
 
     // region equals
+    @Override
+    public int compareTo(DsonExtInt64 that) {
+        return extInt64.compareTo(that.extInt64);
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -77,30 +82,12 @@ public class DsonExtInt64 extends DsonValue implements Comparable<DsonExtInt64> 
 
         DsonExtInt64 that = (DsonExtInt64) o;
 
-        if (type != that.type) return false;
-        if (hasValue != that.hasValue) return false;
-        return value == that.value;
+        return extInt64.equals(that.extInt64);
     }
 
     @Override
     public int hashCode() {
-        int result = type;
-        result = 31 * result + (hasValue ? 1 : 0);
-        result = 31 * result + (int) (value ^ (value >>> 32));
-        return result;
-    }
-
-    @Override
-    public int compareTo(DsonExtInt64 that) {
-        int r = Integer.compare(type, that.type);
-        if (r != 0) {
-            return r;
-        }
-        r = Boolean.compare(hasValue, that.hasValue);
-        if (r != 0) {
-            return r;
-        }
-        return Long.compare(value, that.value);
+        return extInt64.hashCode();
     }
 
     // endregion
@@ -108,9 +95,7 @@ public class DsonExtInt64 extends DsonValue implements Comparable<DsonExtInt64> 
     @Override
     public String toString() {
         return "DsonExtInt64{" +
-                "type=" + type +
-                ", value=" + value +
-                ", hasValue=" + hasValue +
+                "extInt64=" + extInt64 +
                 '}';
     }
 }

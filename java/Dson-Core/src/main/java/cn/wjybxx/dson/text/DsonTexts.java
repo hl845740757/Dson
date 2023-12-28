@@ -276,7 +276,7 @@ public class DsonTexts {
     public static DsonTokenType tokenTypeOfClsName(String label) {
         Objects.requireNonNull(label);
         return switch (label) {
-            case LABEL_INT32 ->  DsonTokenType.INT32;
+            case LABEL_INT32 -> DsonTokenType.INT32;
             case LABEL_INT64 -> DsonTokenType.INT64;
             case LABEL_FLOAT -> DsonTokenType.FLOAT;
             case LABEL_DOUBLE -> DsonTokenType.DOUBLE;

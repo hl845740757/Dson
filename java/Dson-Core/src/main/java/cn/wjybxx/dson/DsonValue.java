@@ -16,8 +16,7 @@
 
 package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.types.ObjectRef;
-import cn.wjybxx.dson.types.OffsetTimestamp;
+import cn.wjybxx.dson.types.*;
 
 import javax.annotation.Nonnull;
 
@@ -55,6 +54,26 @@ public abstract class DsonValue {
         return ((DsonString) this).getValue();
     }
 
+    public Binary asBinary() {
+        return ((DsonBinary) this).binary();
+    }
+
+    public ExtInt32 asExtInt32() {
+        return ((DsonExtInt32) this).extInt32();
+    }
+
+    public ExtInt64 asExtInt64() {
+        return ((DsonExtInt64) this).extInt64();
+    }
+
+    public ExtDouble asExtDouble() {
+        return ((DsonExtDouble) this).extDouble();
+    }
+
+    public ExtString asExtString() {
+        return ((DsonExtString) this).extString();
+    }
+
     public ObjectRef asReference() {
         return ((DsonReference) this).getValue();
     }
@@ -63,16 +82,6 @@ public abstract class DsonValue {
         return ((DsonTimestamp) this).getValue();
     }
 
-    public DsonNumber asNumber() {
-        return (DsonNumber) this;
-    }
-
-    public boolean isNumber() {
-        return switch (getDsonType()) {
-            case INT32, INT64, FLOAT, DOUBLE -> true;
-            default -> false;
-        };
-    }
 
     // endregion
 
@@ -102,6 +111,26 @@ public abstract class DsonValue {
         return (DsonString) this;
     }
 
+    public DsonBinary asDsonBinary() {
+        return (DsonBinary) this;
+    }
+
+    public DsonExtInt32 asDsonExtInt32() {
+        return (DsonExtInt32) this;
+    }
+
+    public DsonExtInt64 asDsonExtInt64() {
+        return (DsonExtInt64) this;
+    }
+
+    public DsonExtDouble asDsonExtDouble() {
+        return (DsonExtDouble) this;
+    }
+
+    public DsonExtString asDsonExtString() {
+        return (DsonExtString) this;
+    }
+
     public DsonReference asDsonReference() {
         return (DsonReference) this;
     }
@@ -110,33 +139,16 @@ public abstract class DsonValue {
         return (DsonTimestamp) this;
     }
 
-    // endregion
-
-    // region Dson特定类型
-
-    public DsonNull asNull() {
+    public DsonNull asDsonNull() {
         return (DsonNull) this;
     }
 
-    public DsonBinary asBinary() {
-        return (DsonBinary) this;
+    public DsonNumber asDsonNumber() {
+        return (DsonNumber) this;
     }
+    // endregion
 
-    public DsonExtInt32 asExtInt32() {
-        return (DsonExtInt32) this;
-    }
-
-    public DsonExtInt64 asExtInt64() {
-        return (DsonExtInt64) this;
-    }
-
-    public DsonExtDouble asExtDouble() {
-        return (DsonExtDouble) this;
-    }
-
-    public DsonExtString asExtString() {
-        return (DsonExtString) this;
-    }
+    // region Dson特定类型
 
     @SuppressWarnings("unchecked")
     public DsonHeader<String> asHeader() {

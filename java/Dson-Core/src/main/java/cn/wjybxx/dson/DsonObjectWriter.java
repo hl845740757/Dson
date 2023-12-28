@@ -4,8 +4,7 @@ import cn.wjybxx.dson.io.DsonChunk;
 import cn.wjybxx.dson.text.INumberStyle;
 import cn.wjybxx.dson.text.ObjectStyle;
 import cn.wjybxx.dson.text.StringStyle;
-import cn.wjybxx.dson.types.ObjectRef;
-import cn.wjybxx.dson.types.OffsetTimestamp;
+import cn.wjybxx.dson.types.*;
 
 import java.util.Objects;
 
@@ -85,8 +84,8 @@ public class DsonObjectWriter extends AbstractDsonWriter {
     }
 
     @Override
-    protected void doWriteBinary(DsonBinary binary) {
-        getContext().add(binary.copy()); // 需要拷贝
+    protected void doWriteBinary(Binary binary) {
+        getContext().add(new DsonBinary(binary.copy())); // 需要拷贝
     }
 
     @Override
@@ -95,23 +94,23 @@ public class DsonObjectWriter extends AbstractDsonWriter {
     }
 
     @Override
-    protected void doWriteExtInt32(DsonExtInt32 extInt32, WireType wireType, INumberStyle style) {
-        getContext().add(extInt32); // 不可变对象
+    protected void doWriteExtInt32(ExtInt32 extInt32, WireType wireType, INumberStyle style) {
+        getContext().add(new DsonExtInt32(extInt32));
     }
 
     @Override
-    protected void doWriteExtInt64(DsonExtInt64 extInt64, WireType wireType, INumberStyle style) {
-        getContext().add(extInt64);
+    protected void doWriteExtInt64(ExtInt64 extInt64, WireType wireType, INumberStyle style) {
+        getContext().add(new DsonExtInt64(extInt64));
     }
 
     @Override
-    protected void doWriteExtDouble(DsonExtDouble extDouble, INumberStyle style) {
-        getContext().add(extDouble);
+    protected void doWriteExtDouble(ExtDouble extDouble, INumberStyle style) {
+        getContext().add(new DsonExtDouble(extDouble));
     }
 
     @Override
-    protected void doWriteExtString(DsonExtString extString, StringStyle style) {
-        getContext().add(extString);
+    protected void doWriteExtString(ExtString extString, StringStyle style) {
+        getContext().add(new DsonExtString(extString));
     }
 
     @Override

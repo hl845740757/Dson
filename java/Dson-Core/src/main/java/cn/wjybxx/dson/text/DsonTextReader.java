@@ -20,8 +20,7 @@ import cn.wjybxx.dson.*;
 import cn.wjybxx.dson.internal.CommonsLang3;
 import cn.wjybxx.dson.internal.DsonInternals;
 import cn.wjybxx.dson.io.DsonIOException;
-import cn.wjybxx.dson.types.ObjectRef;
-import cn.wjybxx.dson.types.OffsetTimestamp;
+import cn.wjybxx.dson.types.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -450,34 +449,34 @@ public class DsonTextReader extends AbstractDsonReader {
             case DsonTexts.LABEL_BINARY -> {
                 Tuple2 tuple2 = scanTuple2(context);
                 byte[] data = CommonsLang3.decodeHex(tuple2.value.toCharArray());
-                pushNextValue(new DsonBinary(tuple2.type, data));
+                pushNextValue(new Binary(tuple2.type, data));
                 yield DsonType.BINARY;
             }
             case DsonTexts.LABEL_EXTINT32 -> {
                 Tuple2 tuple2 = scanTuple2(context);
                 boolean hasValue = !tuple2.isUnquoteNull();
                 int value = hasValue ? DsonTexts.parseInt(tuple2.value) : 0;
-                pushNextValue(new DsonExtInt32(tuple2.type, value, hasValue));
+                pushNextValue(new ExtInt32(tuple2.type, value, hasValue));
                 yield DsonType.EXT_INT32;
             }
             case DsonTexts.LABEL_EXTINT64 -> {
                 Tuple2 tuple2 = scanTuple2(context);
                 boolean hasValue = !tuple2.isUnquoteNull();
                 long value = hasValue ? DsonTexts.parseLong(tuple2.value) : 0;
-                pushNextValue(new DsonExtInt64(tuple2.type, value, hasValue));
+                pushNextValue(new ExtInt64(tuple2.type, value, hasValue));
                 yield DsonType.EXT_INT64;
             }
             case DsonTexts.LABEL_EXTDOUBLE -> {
                 Tuple2 tuple2 = scanTuple2(context);
                 boolean hasValue = !tuple2.isUnquoteNull();
                 double value = hasValue ? DsonTexts.parseDouble(tuple2.value) : 0;
-                pushNextValue(new DsonExtDouble(tuple2.type, value, hasValue));
+                pushNextValue(new ExtDouble(tuple2.type, value, hasValue));
                 yield DsonType.EXT_DOUBLE;
             }
             case DsonTexts.LABEL_EXTSTRING -> {
                 Tuple2 tuple2 = scanTuple2(context);
                 String value = tuple2.isUnquoteNull() ? null : tuple2.value;
-                pushNextValue(new DsonExtString(tuple2.type, value));
+                pushNextValue(new ExtString(tuple2.type, value));
                 yield DsonType.EXT_STRING;
             }
             default -> {
@@ -781,28 +780,28 @@ public class DsonTextReader extends AbstractDsonReader {
     }
 
     @Override
-    protected DsonBinary doReadBinary() {
-        return (DsonBinary) Objects.requireNonNull(popNextValue());
+    protected Binary doReadBinary() {
+        return (Binary) Objects.requireNonNull(popNextValue());
     }
 
     @Override
-    protected DsonExtInt32 doReadExtInt32() {
-        return (DsonExtInt32) Objects.requireNonNull(popNextValue());
+    protected ExtInt32 doReadExtInt32() {
+        return (ExtInt32) Objects.requireNonNull(popNextValue());
     }
 
     @Override
-    protected DsonExtInt64 doReadExtInt64() {
-        return (DsonExtInt64) Objects.requireNonNull(popNextValue());
+    protected ExtInt64 doReadExtInt64() {
+        return (ExtInt64) Objects.requireNonNull(popNextValue());
     }
 
     @Override
-    protected DsonExtDouble doReadExtDouble() {
-        return (DsonExtDouble) Objects.requireNonNull(popNextValue());
+    protected ExtDouble doReadExtDouble() {
+        return (ExtDouble) Objects.requireNonNull(popNextValue());
     }
 
     @Override
-    protected DsonExtString doReadExtString() {
-        return (DsonExtString) Objects.requireNonNull(popNextValue());
+    protected ExtString doReadExtString() {
+        return (ExtString) Objects.requireNonNull(popNextValue());
     }
 
     @Override

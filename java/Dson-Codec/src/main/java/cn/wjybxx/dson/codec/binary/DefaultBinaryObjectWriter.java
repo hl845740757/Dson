@@ -19,6 +19,7 @@ package cn.wjybxx.dson.codec.binary;
 import cn.wjybxx.dson.*;
 import cn.wjybxx.dson.codec.*;
 import cn.wjybxx.dson.io.DsonChunk;
+import cn.wjybxx.dson.types.*;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -125,7 +126,7 @@ public class DefaultBinaryObjectWriter implements BinaryObjectWriter {
         if (value == null) {
             writeNull(name);
         } else {
-            writer.writeBinary(name, new DsonBinary(0, value));
+            writer.writeBinary(name, new Binary(0, value));
         }
     }
 
@@ -134,7 +135,7 @@ public class DefaultBinaryObjectWriter implements BinaryObjectWriter {
         if (value == null) {
             writeNull(name);
         } else {
-            writer.writeBinary(name, new DsonBinary(type, value));
+            writer.writeBinary(name, new Binary(type, value));
         }
     }
 
@@ -144,7 +145,7 @@ public class DefaultBinaryObjectWriter implements BinaryObjectWriter {
     }
 
     @Override
-    public void writeBinary(int name, DsonBinary binary) {
+    public void writeBinary(int name, Binary binary) {
         if (binary == null) {
             writeNull(name);
         } else {
@@ -153,7 +154,7 @@ public class DefaultBinaryObjectWriter implements BinaryObjectWriter {
     }
 
     @Override
-    public void writeExtInt32(int name, DsonExtInt32 value, WireType wireType) {
+    public void writeExtInt32(int name, ExtInt32 value, WireType wireType) {
         if (value == null) {
             writeNull(name);
         } else {
@@ -163,11 +164,11 @@ public class DefaultBinaryObjectWriter implements BinaryObjectWriter {
 
     @Override
     public void writeExtInt32(int name, int type, int value, WireType wireType) {
-        writer.writeExtInt32(name, new DsonExtInt32(type, value), wireType);
+        writer.writeExtInt32(name, new ExtInt32(type, value), wireType);
     }
 
     @Override
-    public void writeExtInt64(int name, DsonExtInt64 value, WireType wireType) {
+    public void writeExtInt64(int name, ExtInt64 value, WireType wireType) {
         if (value == null) {
             writeNull(name);
         } else {
@@ -177,11 +178,11 @@ public class DefaultBinaryObjectWriter implements BinaryObjectWriter {
 
     @Override
     public void writeExtInt64(int name, int type, long value, WireType wireType) {
-        writer.writeExtInt64(name, new DsonExtInt64(type, value), wireType);
+        writer.writeExtInt64(name, new ExtInt64(type, value), wireType);
     }
 
     @Override
-    public void writeExtDouble(int name, DsonExtDouble value) {
+    public void writeExtDouble(int name, ExtDouble value) {
         if (value == null) {
             writeNull(name);
         } else {
@@ -191,11 +192,11 @@ public class DefaultBinaryObjectWriter implements BinaryObjectWriter {
 
     @Override
     public void writeExtDouble(int name, int type, double value) {
-        writer.writeExtDouble(name, new DsonExtDouble(type, value));
+        writer.writeExtDouble(name, new ExtDouble(type, value));
     }
 
     @Override
-    public void writeExtString(int name, DsonExtString value) {
+    public void writeExtString(int name, ExtString value) {
         if (value == null) {
             writeNull(name);
         } else {
@@ -205,7 +206,7 @@ public class DefaultBinaryObjectWriter implements BinaryObjectWriter {
 
     @Override
     public void writeExtString(int name, int type, String value) {
-        writer.writeExtString(name, new DsonExtString(type, value));
+        writer.writeExtString(name, new ExtString(type, value));
     }
 
     // endregion
@@ -314,7 +315,7 @@ public class DefaultBinaryObjectWriter implements BinaryObjectWriter {
             return;
         }
         TypeMeta typeMeta = converter.typeMetaRegistry.ofType(encodeClass);
-        if (typeMeta != null && typeMeta.classIds.size() > 0) {
+        if (typeMeta != null && !typeMeta.classIds.isEmpty()) {
             long classGuid = converter.options.classIdConverter.toGuid(typeMeta.mainClassId());
             writer.writeStartHeader();
             writer.writeInt64(DsonHeader.NUMBERS_CLASS_ID, classGuid, WireType.UINT);

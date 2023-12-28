@@ -16,7 +16,10 @@
 
 package cn.wjybxx.dson;
 
+import cn.wjybxx.dson.types.ExtInt32;
+
 import javax.annotation.Nonnull;
+import java.util.Objects;
 
 /**
  * long值的简单扩展
@@ -24,30 +27,29 @@ import javax.annotation.Nonnull;
  * @author wjybxx
  * date - 2023/4/19
  */
-public class DsonExtInt32 extends DsonValue implements Comparable<DsonExtInt32> {
+public final class DsonExtInt32 extends DsonValue implements Comparable<DsonExtInt32> {
 
-    private final int type;
-    private final boolean hasValue; // 比较时放前面
-    private final int value;
+    private final ExtInt32 extInt32;
 
     public DsonExtInt32(int type, int value) {
-        this(type, value, true);
+        this(new ExtInt32(type, value));
     }
 
     public DsonExtInt32(int type, Integer value) {
-        this(type, value == null ? 0 : value, value != null);
+        this(new ExtInt32(type, value));
     }
 
     public DsonExtInt32(int type, int value, boolean hasValue) {
-        Dsons.checkSubType(type);
-        Dsons.checkHasValue(value, hasValue);
-        this.type = type;
-        this.value = value;
-        this.hasValue = hasValue;
+        this(new ExtInt32(type, value, hasValue));
     }
 
-    public static DsonExtInt32 emptyOf(int type) {
-        return new DsonExtInt32(type, 0, false);
+    public DsonExtInt32(ExtInt32 extInt32) {
+        Objects.requireNonNull(extInt32);
+        this.extInt32 = extInt32;
+    }
+
+    public ExtInt32 extInt32() {
+        return extInt32;
     }
 
     @Nonnull
@@ -57,18 +59,23 @@ public class DsonExtInt32 extends DsonValue implements Comparable<DsonExtInt32> 
     }
 
     public int getType() {
-        return type;
+        return extInt32.getType();
     }
 
     public int getValue() {
-        return value;
+        return extInt32.getValue();
     }
 
     public boolean hasValue() {
-        return hasValue;
+        return extInt32.hasValue();
     }
 
     // region equals
+
+    @Override
+    public int compareTo(DsonExtInt32 o) {
+        return extInt32.compareTo(o.extInt32);
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -77,30 +84,12 @@ public class DsonExtInt32 extends DsonValue implements Comparable<DsonExtInt32> 
 
         DsonExtInt32 that = (DsonExtInt32) o;
 
-        if (type != that.type) return false;
-        if (hasValue != that.hasValue) return false;
-        return value == that.value;
+        return extInt32.equals(that.extInt32);
     }
 
     @Override
     public int hashCode() {
-        int result = type;
-        result = 31 * result + (hasValue ? 1 : 0);
-        result = 31 * result + value;
-        return result;
-    }
-
-    @Override
-    public int compareTo(DsonExtInt32 that) {
-        int r = Integer.compare(type, that.type);
-        if (r != 0) {
-            return r;
-        }
-        r = Boolean.compare(hasValue, that.hasValue);
-        if (r != 0) {
-            return r;
-        }
-        return Integer.compare(value, that.value);
+        return extInt32.hashCode();
     }
 
     // endregion
@@ -108,9 +97,7 @@ public class DsonExtInt32 extends DsonValue implements Comparable<DsonExtInt32> 
     @Override
     public String toString() {
         return "DsonExtInt32{" +
-                "type=" + type +
-                ", value=" + value +
-                ", hasValue=" + hasValue +
+                "extInt32=" + extInt32 +
                 '}';
     }
 }

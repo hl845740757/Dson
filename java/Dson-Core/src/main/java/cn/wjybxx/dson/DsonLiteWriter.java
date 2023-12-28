@@ -17,8 +17,7 @@
 package cn.wjybxx.dson;
 
 import cn.wjybxx.dson.io.DsonChunk;
-import cn.wjybxx.dson.types.ObjectRef;
-import cn.wjybxx.dson.types.OffsetTimestamp;
+import cn.wjybxx.dson.types.*;
 
 /**
  * 由于java的泛型是擦除实现，我们为避免拆装箱开销，提供了几乎重复的实现。
@@ -68,17 +67,17 @@ public interface DsonLiteWriter extends AutoCloseable {
 
     void writeNull(int name);
 
-    void writeBinary(int name, DsonBinary dsonBinary);
+    void writeBinary(int name, Binary binary);
 
     void writeBinary(int name, int type, DsonChunk chunk);
 
-    void writeExtInt32(int name, DsonExtInt32 extInt32, WireType wireType);
+    void writeExtInt32(int name, ExtInt32 extInt32, WireType wireType);
 
-    void writeExtInt64(int name, DsonExtInt64 extInt64, WireType wireType);
+    void writeExtInt64(int name, ExtInt64 extInt64, WireType wireType);
 
-    void writeExtDouble(int name, DsonExtDouble extDouble);
+    void writeExtDouble(int name, ExtDouble extDouble);
 
-    void writeExtString(int name, DsonExtString extString);
+    void writeExtString(int name, ExtString extString);
 
     void writeRef(int name, ObjectRef objectRef);
 

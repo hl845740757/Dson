@@ -28,6 +28,9 @@ import java.util.Objects;
  */
 public class ExtString implements Comparable<ExtString> {
 
+    public static final int MASK_TYPE = 1;
+    public static final int MASK_VALUE = 1 << 1;
+
     private final int type;
     private final String value;
 

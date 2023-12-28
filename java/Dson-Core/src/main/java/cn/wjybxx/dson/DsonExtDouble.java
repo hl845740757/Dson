@@ -16,7 +16,10 @@
 
 package cn.wjybxx.dson;
 
+import cn.wjybxx.dson.types.ExtDouble;
+
 import javax.annotation.Nonnull;
+import java.util.Objects;
 
 /**
  * double的简单扩展
@@ -25,42 +28,28 @@ import javax.annotation.Nonnull;
  * @author wjybxx
  * date - 2023/12/2
  */
-public class DsonExtDouble extends DsonValue implements Comparable<DsonExtDouble> {
+public final class DsonExtDouble extends DsonValue implements Comparable<DsonExtDouble> {
 
-    private final int type;
-    private final boolean hasValue; // 比较时放前面
-    private final double value;
+    private final ExtDouble extDouble;
 
     public DsonExtDouble(int type, double value) {
-        this(type, value, true);
+        this(new ExtDouble(type, value));
     }
 
     public DsonExtDouble(int type, Double value) {
-        this(type, value == null ? 0 : value, value != null);
+        this(new ExtDouble(type, value));
     }
 
     public DsonExtDouble(int type, double value, boolean hasValue) {
-        Dsons.checkSubType(type);
-        Dsons.checkHasValue(value, hasValue);
-        this.type = type;
-        this.value = value;
-        this.hasValue = hasValue;
+        this(new ExtDouble(type, value, hasValue));
     }
 
-    public static DsonExtDouble emptyOf(int type) {
-        return new DsonExtDouble(type, 0, false);
+    public DsonExtDouble(ExtDouble extDouble) {
+        this.extDouble = Objects.requireNonNull(extDouble);
     }
 
-    public int getType() {
-        return type;
-    }
-
-    public double getValue() {
-        return value;
-    }
-
-    public boolean hasValue() {
-        return hasValue;
+    public ExtDouble extDouble() {
+        return extDouble;
     }
 
     @Nonnull
@@ -69,7 +58,24 @@ public class DsonExtDouble extends DsonValue implements Comparable<DsonExtDouble
         return DsonType.EXT_DOUBLE;
     }
 
+    public int getType() {
+        return extDouble.getType();
+    }
+
+    public double getValue() {
+        return extDouble.getValue();
+    }
+
+    public boolean hasValue() {
+        return extDouble.hasValue();
+    }
+
     //region equals
+
+    @Override
+    public int compareTo(DsonExtDouble that) {
+        return extDouble.compareTo(that.extDouble);
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -78,42 +84,20 @@ public class DsonExtDouble extends DsonValue implements Comparable<DsonExtDouble
 
         DsonExtDouble that = (DsonExtDouble) o;
 
-        if (type != that.type) return false;
-        if (Double.compare(value, that.value) != 0) return false;
-        return hasValue == that.hasValue;
+        return extDouble.equals(that.extDouble);
     }
 
     @Override
     public int hashCode() {
-        int result;
-        long temp;
-        result = type;
-        temp = Double.doubleToLongBits(value);
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
-        result = 31 * result + (hasValue ? 1 : 0);
-        return result;
+        return extDouble.hashCode();
     }
 
-    @Override
-    public int compareTo(DsonExtDouble that) {
-        int r = Integer.compare(type, that.type);
-        if (r != 0) {
-            return r;
-        }
-        r = Boolean.compare(hasValue, that.hasValue);
-        if (r != 0) {
-            return r;
-        }
-        return Double.compare(value, that.value);
-    }
     // endregion
 
     @Override
     public String toString() {
         return "DsonExtDouble{" +
-                "type=" + type +
-                ", value=" + value +
-                ", hasValue=" + hasValue +
+                "extDouble=" + extDouble +
                 '}';
     }
 }

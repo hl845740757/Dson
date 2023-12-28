@@ -18,11 +18,11 @@ package cn.wjybxx.dson.codec.document;
 
 import cn.wjybxx.base.CollectionUtils;
 import cn.wjybxx.base.annotation.StableName;
-import cn.wjybxx.dson.*;
+import cn.wjybxx.dson.DsonContextType;
+import cn.wjybxx.dson.DsonType;
 import cn.wjybxx.dson.codec.ConvertOptions;
 import cn.wjybxx.dson.codec.TypeArgInfo;
-import cn.wjybxx.dson.types.ObjectRef;
-import cn.wjybxx.dson.types.OffsetTimestamp;
+import cn.wjybxx.dson.types.*;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -55,19 +55,19 @@ public interface DocumentObjectReader extends AutoCloseable {
 
     /** 可读取Binary */
     default byte[] readBytes(String name) {
-        DsonBinary binary = readBinary(name);
+        Binary binary = readBinary(name);
         return binary == null ? null : binary.getData();
     }
 
-    DsonBinary readBinary(String name);
+    Binary readBinary(String name);
 
-    DsonExtInt32 readExtInt32(String name);
+    ExtInt32 readExtInt32(String name);
 
-    DsonExtInt64 readExtInt64(String name);
+    ExtInt64 readExtInt64(String name);
 
-    DsonExtDouble readExtDouble(String name);
+    ExtDouble readExtDouble(String name);
 
-    DsonExtString readExtString(String name);
+    ExtString readExtString(String name);
 
     ObjectRef readRef(String name);
 

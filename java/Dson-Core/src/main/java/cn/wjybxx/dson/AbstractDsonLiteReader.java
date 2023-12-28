@@ -17,8 +17,7 @@
 package cn.wjybxx.dson;
 
 import cn.wjybxx.dson.io.DsonIOException;
-import cn.wjybxx.dson.types.ObjectRef;
-import cn.wjybxx.dson.types.OffsetTimestamp;
+import cn.wjybxx.dson.types.*;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -272,41 +271,41 @@ public abstract class AbstractDsonLiteReader implements DsonLiteReader {
     }
 
     @Override
-    public DsonBinary readBinary(int name) {
+    public Binary readBinary(int name) {
         advanceToValueState(name, DsonType.BINARY);
-        DsonBinary value = doReadBinary();
+        Binary value = doReadBinary();
         setNextState();
         return value;
     }
 
     @Override
-    public DsonExtInt32 readExtInt32(int name) {
+    public ExtInt32 readExtInt32(int name) {
         advanceToValueState(name, DsonType.EXT_INT32);
-        DsonExtInt32 value = doReadExtInt32();
+        ExtInt32 value = doReadExtInt32();
         setNextState();
         return value;
     }
 
     @Override
-    public DsonExtInt64 readExtInt64(int name) {
+    public ExtInt64 readExtInt64(int name) {
         advanceToValueState(name, DsonType.EXT_INT64);
-        DsonExtInt64 value = doReadExtInt64();
+        ExtInt64 value = doReadExtInt64();
         setNextState();
         return value;
     }
 
     @Override
-    public DsonExtDouble readExtDouble(int name) {
+    public ExtDouble readExtDouble(int name) {
         advanceToValueState(name, DsonType.EXT_DOUBLE);
-        DsonExtDouble value = doReadExtDouble();
+        ExtDouble value = doReadExtDouble();
         setNextState();
         return value;
     }
 
     @Override
-    public DsonExtString readExtString(int name) {
+    public ExtString readExtString(int name) {
         advanceToValueState(name, DsonType.EXT_STRING);
-        DsonExtString value = doReadExtString();
+        ExtString value = doReadExtString();
         setNextState();
         return value;
     }
@@ -341,15 +340,15 @@ public abstract class AbstractDsonLiteReader implements DsonLiteReader {
 
     protected abstract void doReadNull();
 
-    protected abstract DsonBinary doReadBinary();
+    protected abstract Binary doReadBinary();
 
-    protected abstract DsonExtInt32 doReadExtInt32();
+    protected abstract ExtInt32 doReadExtInt32();
 
-    protected abstract DsonExtInt64 doReadExtInt64();
+    protected abstract ExtInt64 doReadExtInt64();
 
-    protected abstract DsonExtDouble doReadExtDouble();
+    protected abstract ExtDouble doReadExtDouble();
 
-    protected abstract DsonExtString doReadExtString();
+    protected abstract ExtString doReadExtString();
 
     protected abstract ObjectRef doReadRef();
 

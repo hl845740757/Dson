@@ -22,7 +22,7 @@ import javax.annotation.Nonnull;
  * @author wjybxx
  * date - 2023/4/19
  */
-public class DsonBool extends DsonValue implements Comparable<DsonBool> {
+public final class DsonBool extends DsonValue implements Comparable<DsonBool> {
 
     public static final DsonBool TRUE = new DsonBool(true);
     public static final DsonBool FALSE = new DsonBool(false);

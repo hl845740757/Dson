@@ -18,8 +18,7 @@ package cn.wjybxx.dson;
 
 import cn.wjybxx.dson.io.DsonIOException;
 import cn.wjybxx.dson.io.DsonInput;
-import cn.wjybxx.dson.types.ObjectRef;
-import cn.wjybxx.dson.types.OffsetTimestamp;
+import cn.wjybxx.dson.types.*;
 
 import java.util.Objects;
 
@@ -130,27 +129,27 @@ public class DsonBinaryLiteReader extends AbstractDsonLiteReader {
     }
 
     @Override
-    protected DsonBinary doReadBinary() {
+    protected Binary doReadBinary() {
         return DsonReaderUtils.readDsonBinary(input);
     }
 
     @Override
-    protected DsonExtInt32 doReadExtInt32() {
+    protected ExtInt32 doReadExtInt32() {
         return DsonReaderUtils.readDsonExtInt32(input, currentWireType);
     }
 
     @Override
-    protected DsonExtInt64 doReadExtInt64() {
+    protected ExtInt64 doReadExtInt64() {
         return DsonReaderUtils.readDsonExtInt64(input, currentWireType);
     }
 
     @Override
-    protected DsonExtDouble doReadExtDouble() {
+    protected ExtDouble doReadExtDouble() {
         return DsonReaderUtils.readDsonExtDouble(input, currentWireTypeBits);
     }
 
     @Override
-    protected DsonExtString doReadExtString() {
+    protected ExtString doReadExtString() {
         return DsonReaderUtils.readDsonExtString(input, currentWireTypeBits);
     }
 

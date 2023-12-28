@@ -22,7 +22,7 @@ import javax.annotation.Nonnull;
  * @author wjybxx
  * date - 2023/4/19
  */
-public class DsonFloat extends DsonNumber implements Comparable<DsonFloat> {
+public final class DsonFloat extends DsonNumber implements Comparable<DsonFloat> {
 
     private final float value;
 

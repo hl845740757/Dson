@@ -25,7 +25,7 @@ import java.util.Objects;
  * @author wjybxx
  * date - 2023/5/27
  */
-public class DsonReference extends DsonValue {
+public final class DsonReference extends DsonValue {
 
     private final ObjectRef value;
 
