@@ -230,50 +230,50 @@ public class DsonScanner : IDisposable
         switch (className) {
             case DsonTexts.LabelInt32: {
                 DsonToken nextToken = NextToken(skipValue);
+                CheckToken(StringTokenTypes, nextToken.Type, position);
                 if (skipValue) {
                     return new DsonToken(DsonTokenType.Int32, null, Position);
                 }
-                CheckToken(StringTokenTypes, nextToken.Type, position);
                 return new DsonToken(DsonTokenType.Int32, DsonTexts.ParseInt(nextToken.CastAsString()), Position);
             }
             case DsonTexts.LabelInt64: {
                 DsonToken nextToken = NextToken(skipValue);
+                CheckToken(StringTokenTypes, nextToken.Type, position);
                 if (skipValue) {
                     return new DsonToken(DsonTokenType.Int64, null, Position);
                 }
-                CheckToken(StringTokenTypes, nextToken.Type, position);
                 return new DsonToken(DsonTokenType.Int64, DsonTexts.ParseLong(nextToken.CastAsString()), Position);
             }
             case DsonTexts.LabelFloat: {
                 DsonToken nextToken = NextToken(skipValue);
+                CheckToken(StringTokenTypes, nextToken.Type, position);
                 if (skipValue) {
                     return new DsonToken(DsonTokenType.Float, null, Position);
                 }
-                CheckToken(StringTokenTypes, nextToken.Type, position);
                 return new DsonToken(DsonTokenType.Float, DsonTexts.ParseFloat(nextToken.CastAsString()), Position);
             }
             case DsonTexts.LabelDouble: {
                 DsonToken nextToken = NextToken(skipValue);
+                CheckToken(StringTokenTypes, nextToken.Type, position);
                 if (skipValue) {
                     return new DsonToken(DsonTokenType.Double, null, Position);
                 }
-                CheckToken(StringTokenTypes, nextToken.Type, position);
                 return new DsonToken(DsonTokenType.Double, DsonTexts.ParseDouble(nextToken.CastAsString()), Position);
             }
             case DsonTexts.LabelBool: {
                 DsonToken nextToken = NextToken(skipValue);
+                CheckToken(StringTokenTypes, nextToken.Type, position);
                 if (skipValue) {
                     return new DsonToken(DsonTokenType.Bool, null, Position);
                 }
-                CheckToken(StringTokenTypes, nextToken.Type, position);
                 return new DsonToken(DsonTokenType.Bool, DsonTexts.ParseBool(nextToken.CastAsString()), Position);
             }
             case DsonTexts.LabelNull: {
                 DsonToken nextToken = NextToken(skipValue);
+                CheckToken(StringTokenTypes, nextToken.Type, position);
                 if (skipValue) {
                     return new DsonToken(DsonTokenType.Null, null, Position);
                 }
-                CheckToken(StringTokenTypes, nextToken.Type, position);
                 DsonTexts.CheckNullString(nextToken.CastAsString());
                 return new DsonToken(DsonTokenType.Null, null, Position);
             }

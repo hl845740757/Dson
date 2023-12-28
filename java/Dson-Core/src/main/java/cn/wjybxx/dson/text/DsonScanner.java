@@ -233,50 +233,50 @@ public class DsonScanner implements AutoCloseable {
         switch (className) {
             case DsonTexts.LABEL_INT32 -> {
                 DsonToken nextToken = nextToken(skipValue);
+                checkToken(STRING_TOKEN_TYPES, nextToken.getType(), position);
                 if (skipValue) {
                     return new DsonToken(DsonTokenType.INT32, null, getPosition());
                 }
-                checkToken(STRING_TOKEN_TYPES, nextToken.getType(), position);
                 return new DsonToken(DsonTokenType.INT32, DsonTexts.parseInt(nextToken.castAsString()), getPosition());
             }
             case DsonTexts.LABEL_INT64 -> {
                 DsonToken nextToken = nextToken(skipValue);
+                checkToken(STRING_TOKEN_TYPES, nextToken.getType(), position);
                 if (skipValue) {
                     return new DsonToken(DsonTokenType.INT64, null, getPosition());
                 }
-                checkToken(STRING_TOKEN_TYPES, nextToken.getType(), position);
                 return new DsonToken(DsonTokenType.INT64, DsonTexts.parseLong(nextToken.castAsString()), getPosition());
             }
             case DsonTexts.LABEL_FLOAT -> {
                 DsonToken nextToken = nextToken(skipValue);
+                checkToken(STRING_TOKEN_TYPES, nextToken.getType(), position);
                 if (skipValue) {
                     return new DsonToken(DsonTokenType.FLOAT, null, getPosition());
                 }
-                checkToken(STRING_TOKEN_TYPES, nextToken.getType(), position);
                 return new DsonToken(DsonTokenType.FLOAT, DsonTexts.parseFloat(nextToken.castAsString()), getPosition());
             }
             case DsonTexts.LABEL_DOUBLE -> {
                 DsonToken nextToken = nextToken(skipValue);
+                checkToken(STRING_TOKEN_TYPES, nextToken.getType(), position);
                 if (skipValue) {
                     return new DsonToken(DsonTokenType.DOUBLE, null, getPosition());
                 }
-                checkToken(STRING_TOKEN_TYPES, nextToken.getType(), position);
                 return new DsonToken(DsonTokenType.DOUBLE, DsonTexts.parseDouble(nextToken.castAsString()), getPosition());
             }
             case DsonTexts.LABEL_BOOL -> {
                 DsonToken nextToken = nextToken(skipValue);
+                checkToken(STRING_TOKEN_TYPES, nextToken.getType(), position);
                 if (skipValue) {
                     return new DsonToken(DsonTokenType.BOOL, null, getPosition());
                 }
-                checkToken(STRING_TOKEN_TYPES, nextToken.getType(), position);
                 return new DsonToken(DsonTokenType.BOOL, DsonTexts.parseBool(nextToken.castAsString()), getPosition());
             }
             case DsonTexts.LABEL_NULL -> {
                 DsonToken nextToken = nextToken(skipValue);
+                checkToken(STRING_TOKEN_TYPES, nextToken.getType(), position);
                 if (skipValue) {
                     return new DsonToken(DsonTokenType.NULL, null, getPosition());
                 }
-                checkToken(STRING_TOKEN_TYPES, nextToken.getType(), position);
                 DsonTexts.checkNullString(nextToken.castAsString());
                 return new DsonToken(DsonTokenType.NULL, null, getPosition());
             }
