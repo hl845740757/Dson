@@ -17,7 +17,7 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
+using Wjybxx.Dson.Types;
 
 #pragma warning disable CS1591
 namespace Wjybxx.Dson;
@@ -25,46 +25,42 @@ namespace Wjybxx.Dson;
 /// <summary>
 /// Dson具备类型标签的Int64类型
 /// </summary>
-public class DsonExtInt64 : DsonValue, IEquatable<DsonExtInt64>, IComparable<DsonExtInt64>, IComparable
+public sealed class DsonExtInt64 : DsonValue, IEquatable<DsonExtInt64>, IComparable<DsonExtInt64>, IComparable
 {
-    private readonly int _type;
-    private readonly bool _hasVal; // 比较时放前面
-    private readonly long _value;
+    private readonly ExtInt64 _extInt64;
 
     public DsonExtInt64(int type, long? value)
-        : this(type, value ?? 0, value.HasValue) {
+        : this(new ExtInt64(type, value)) {
     }
 
-    public DsonExtInt64(int type, long value, bool hasVal = true) {
-        Dsons.CheckSubType(type);
-        Dsons.CheckHasValue(value, hasVal);
-        _type = type;
-        _value = value;
-        _hasVal = hasVal;
+    public DsonExtInt64(int type, long value, bool hasVal = true)
+        : this(new ExtInt64(type, value, hasVal)) {
     }
 
+    public DsonExtInt64(ExtInt64 extInt64) {
+        _extInt64 = extInt64;
+    }
+
+    public ExtInt64 ExtInt64 => _extInt64;
     public override DsonType DsonType => DsonType.ExtInt64;
-    public int Type => _type;
-    public bool HasValue => _hasVal;
-    public long Value => _value;
+    public int Type => _extInt64.Type;
+    public bool HasValue => _extInt64.HasValue;
+    public long Value => _extInt64.Value;
 
     #region equals
 
     public bool Equals(DsonExtInt64? other) {
         if (ReferenceEquals(null, other)) return false;
         if (ReferenceEquals(this, other)) return true;
-        return _type == other._type && _value == other._value && _hasVal == other._hasVal;
+        return _extInt64.Equals(other._extInt64);
     }
 
     public override bool Equals(object? obj) {
-        if (ReferenceEquals(null, obj)) return false;
-        if (ReferenceEquals(this, obj)) return true;
-        if (obj.GetType() != this.GetType()) return false;
-        return Equals((DsonExtInt64)obj);
+        return ReferenceEquals(this, obj) || obj is DsonExtInt64 other && Equals(other);
     }
 
     public override int GetHashCode() {
-        return HashCode.Combine(_type, _value, _hasVal);
+        return _extInt64.GetHashCode();
     }
 
     public static bool operator ==(DsonExtInt64? left, DsonExtInt64? right) {
@@ -78,11 +74,7 @@ public class DsonExtInt64 : DsonValue, IEquatable<DsonExtInt64>, IComparable<Dso
     public int CompareTo(DsonExtInt64? other) {
         if (ReferenceEquals(this, other)) return 0;
         if (ReferenceEquals(null, other)) return 1;
-        var typeComparison = _type.CompareTo(other._type);
-        if (typeComparison != 0) return typeComparison;
-        var hasValComparison = _hasVal.CompareTo(other._hasVal);
-        if (hasValComparison != 0) return hasValComparison;
-        return _value.CompareTo(other._value);
+        return _extInt64.CompareTo(other._extInt64);
     }
 
     public int CompareTo(object? obj) {
@@ -91,25 +83,9 @@ public class DsonExtInt64 : DsonValue, IEquatable<DsonExtInt64>, IComparable<Dso
         return obj is DsonExtInt64 other ? CompareTo(other) : throw new ArgumentException($"Object must be of type {nameof(DsonExtInt64)}");
     }
 
-    public static bool operator <(DsonExtInt64? left, DsonExtInt64? right) {
-        return Comparer<DsonExtInt64>.Default.Compare(left, right) < 0;
-    }
-
-    public static bool operator >(DsonExtInt64? left, DsonExtInt64? right) {
-        return Comparer<DsonExtInt64>.Default.Compare(left, right) > 0;
-    }
-
-    public static bool operator <=(DsonExtInt64? left, DsonExtInt64? right) {
-        return Comparer<DsonExtInt64>.Default.Compare(left, right) <= 0;
-    }
-
-    public static bool operator >=(DsonExtInt64? left, DsonExtInt64? right) {
-        return Comparer<DsonExtInt64>.Default.Compare(left, right) >= 0;
-    }
-
     #endregion
 
     public override string ToString() {
-        return $"{nameof(DsonType)}: {DsonType}, {nameof(_type)}: {_type}, {nameof(_hasVal)}: {_hasVal}, {nameof(_value)}: {_value}";
+        return $"{nameof(DsonType)}: {DsonType}, {nameof(_extInt64)}: {_extInt64}";
     }
 }

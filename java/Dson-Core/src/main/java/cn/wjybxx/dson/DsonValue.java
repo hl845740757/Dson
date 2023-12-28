@@ -82,7 +82,6 @@ public abstract class DsonValue {
         return ((DsonTimestamp) this).getValue();
     }
 
-
     // endregion
 
     // region 装箱类型
@@ -146,6 +145,11 @@ public abstract class DsonValue {
     public DsonNumber asDsonNumber() {
         return (DsonNumber) this;
     }
+
+    public boolean isNumber() {
+        return getDsonType().isNumber();
+    }
+
     // endregion
 
     // region Dson特定类型

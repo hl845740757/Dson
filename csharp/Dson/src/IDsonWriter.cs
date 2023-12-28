@@ -31,7 +31,7 @@ namespace Wjybxx.Dson;
 /// 4. C#由于有值类型，直接使用<see cref="FieldNumber"/>作为name参数，可大幅简化api
 /// </summary>
 /// <typeparam name="TName">name的类型，string或<see cref="FieldNumber"/></typeparam>
-public interface IDsonWriter<in TName> : IDisposable where TName : IEquatable<TName>
+public interface IDsonWriter<TName> : IDisposable where TName : IEquatable<TName>
 {
     /** 刷新写缓冲区 */
     void Flush();
@@ -40,6 +40,11 @@ public interface IDsonWriter<in TName> : IDisposable where TName : IEquatable<TN
     /// 获取当前上下文的类型
     /// </summary>
     DsonContextType ContextType { get; }
+
+    /// <summary>
+    /// 获取当前写入的name -- 如果先调用WriteName
+    /// </summary>
+    TName CurrentName { get; }
 
     /// <summary>
     /// 当前是否处于等待写入name的状态
@@ -76,17 +81,17 @@ public interface IDsonWriter<in TName> : IDisposable where TName : IEquatable<TN
 
     void WriteNull(TName name);
 
-    void WriteBinary(TName name, DsonBinary dsonBinary);
+    void WriteBinary(TName name, Binary binary);
 
     void WriteBinary(TName name, int type, DsonChunk chunk);
 
-    void WriteExtInt32(TName name, DsonExtInt32 value, WireType wireType, INumberStyle? style = null);
+    void WriteExtInt32(TName name, ExtInt32 extInt32, WireType wireType, INumberStyle? style = null);
 
-    void WriteExtInt64(TName name, DsonExtInt64 value, WireType wireType, INumberStyle? style = null);
+    void WriteExtInt64(TName name, ExtInt64 extInt64, WireType wireType, INumberStyle? style = null);
 
-    void WriteExtDouble(TName name, DsonExtDouble value, INumberStyle? style = null);
+    void WriteExtDouble(TName name, ExtDouble extDouble, INumberStyle? style = null);
 
-    void WriteExtString(TName name, DsonExtString value, StringStyle style = StringStyle.Auto);
+    void WriteExtString(TName name, ExtString extString, StringStyle style = StringStyle.Auto);
 
     void WriteRef(TName name, ObjectRef objectRef);
 

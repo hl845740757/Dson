@@ -446,34 +446,34 @@ public class DsonTextReader : AbstractDsonReader<string>
             case DsonTexts.LabelBinary: {
                 Tuple2 tuple2 = ScanTuple2(context);
                 byte[] data = Convert.FromHexString(tuple2.Value);
-                PushNextValue(new DsonBinary(tuple2.Type, data));
+                PushNextValue(new Binary(tuple2.Type, data));
                 return DsonType.Binary;
             }
             case DsonTexts.LabelExtInt32: {
                 Tuple2 tuple2 = ScanTuple2(context);
                 bool hasValue = !tuple2.IsUnquoteNull();
                 int value = hasValue ? DsonTexts.ParseInt(tuple2.Value) : 0;
-                PushNextValue(new DsonExtInt32(tuple2.Type, value, hasValue));
+                PushNextValue(new ExtInt32(tuple2.Type, value, hasValue));
                 return DsonType.ExtInt32;
             }
             case DsonTexts.LabelExtInt64: {
                 Tuple2 tuple2 = ScanTuple2(context);
                 bool hasValue = !tuple2.IsUnquoteNull();
                 long value = hasValue ? DsonTexts.ParseLong(tuple2.Value) : 0;
-                PushNextValue(new DsonExtInt64(tuple2.Type, value, hasValue));
+                PushNextValue(new ExtInt64(tuple2.Type, value, hasValue));
                 return DsonType.ExtInt64;
             }
             case DsonTexts.LabelExtDouble: {
                 Tuple2 tuple2 = ScanTuple2(context);
                 bool hasValue = !tuple2.IsUnquoteNull();
                 double value = hasValue ? DsonTexts.ParseDouble(tuple2.Value) : 0;
-                PushNextValue(new DsonExtDouble(tuple2.Type, value, hasValue));
+                PushNextValue(new ExtDouble(tuple2.Type, value, hasValue));
                 return DsonType.ExtDouble;
             }
             case DsonTexts.LabelExtString: {
                 Tuple2 tuple2 = ScanTuple2(context);
                 string? value = tuple2.IsUnquoteNull() ? null : tuple2.Value;
-                PushNextValue(new DsonExtString(tuple2.Type, value));
+                PushNextValue(new ExtString(tuple2.Type, value));
                 return DsonType.ExtString;
             }
             default: {
@@ -766,34 +766,34 @@ public class DsonTextReader : AbstractDsonReader<string>
         PopNextValue();
     }
 
-    protected override DsonBinary DoReadBinary() {
+    protected override Binary DoReadBinary() {
         object value = PopNextValue();
         if (value == null) throw new InvalidOperationException();
-        return (DsonBinary)value;
+        return (Binary)value;
     }
 
-    protected override DsonExtInt32 DoReadExtInt32() {
+    protected override ExtInt32 DoReadExtInt32() {
         object value = PopNextValue();
         if (value == null) throw new InvalidOperationException();
-        return (DsonExtInt32)value;
+        return (ExtInt32)value;
     }
 
-    protected override DsonExtInt64 DoReadExtInt64() {
+    protected override ExtInt64 DoReadExtInt64() {
         object value = PopNextValue();
         if (value == null) throw new InvalidOperationException();
-        return (DsonExtInt64)value;
+        return (ExtInt64)value;
     }
 
-    protected override DsonExtDouble DoReadExtDouble() {
+    protected override ExtDouble DoReadExtDouble() {
         object value = PopNextValue();
         if (value == null) throw new InvalidOperationException();
-        return (DsonExtDouble)value;
+        return (ExtDouble)value;
     }
 
-    protected override DsonExtString DoReadExtString() {
+    protected override ExtString DoReadExtString() {
         object value = PopNextValue();
         if (value == null) throw new InvalidOperationException();
-        return (DsonExtString)value;
+        return (ExtString)value;
     }
 
     protected override ObjectRef DoReadRef() {

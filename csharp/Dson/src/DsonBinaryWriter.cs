@@ -130,7 +130,7 @@ public class DsonBinaryWriter<TName> : AbstractDsonWriter<TName> where TName : I
         WriteFullTypeAndCurrentName(output, DsonType.Null, 0);
     }
 
-    protected override void DoWriteBinary(DsonBinary binary) {
+    protected override void DoWriteBinary(Binary binary) {
         IDsonOutput output = this._output;
         WriteFullTypeAndCurrentName(output, DsonType.Binary, 0);
         DsonReaderUtils.WriteBinary(output, binary);
@@ -142,26 +142,26 @@ public class DsonBinaryWriter<TName> : AbstractDsonWriter<TName> where TName : I
         DsonReaderUtils.WriteBinary(output, type, chunk);
     }
 
-    protected override void DoWriteExtInt32(DsonExtInt32 extInt32, WireType wireType, INumberStyle style) {
+    protected override void DoWriteExtInt32(ExtInt32 extInt32, WireType wireType, INumberStyle style) {
         IDsonOutput output = this._output;
         WriteFullTypeAndCurrentName(output, DsonType.ExtInt32, (int)wireType);
         DsonReaderUtils.WriteExtInt32(output, extInt32, wireType);
     }
 
-    protected override void DoWriteExtInt64(DsonExtInt64 extInt64, WireType wireType, INumberStyle style) {
+    protected override void DoWriteExtInt64(ExtInt64 extInt64, WireType wireType, INumberStyle style) {
         IDsonOutput output = this._output;
         WriteFullTypeAndCurrentName(output, DsonType.ExtInt64, (int)wireType);
         DsonReaderUtils.WriteExtInt64(output, extInt64, wireType);
     }
 
-    protected override void DoWriteExtDouble(DsonExtDouble extDouble, INumberStyle style) {
+    protected override void DoWriteExtDouble(ExtDouble extDouble, INumberStyle style) {
         int wireType = DsonReaderUtils.WireTypeOfDouble(extDouble.Value);
         IDsonOutput output = this._output;
         WriteFullTypeAndCurrentName(output, DsonType.ExtDouble, wireType);
         DsonReaderUtils.WriteExtDouble(output, extDouble, wireType);
     }
 
-    protected override void DoWriteExtString(DsonExtString extString, StringStyle style) {
+    protected override void DoWriteExtString(ExtString extString, StringStyle style) {
         IDsonOutput output = this._output;
         WriteFullTypeAndCurrentName(output, DsonType.ExtString, DsonReaderUtils.WireTypeOfExtString(extString));
         DsonReaderUtils.WriteExtString(output, extString);

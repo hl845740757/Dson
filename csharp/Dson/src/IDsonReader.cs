@@ -124,15 +124,15 @@ public interface IDsonReader<TName> : IDisposable where TName : IEquatable<TName
 
     void ReadNull(TName name);
 
-    DsonBinary ReadBinary(TName name);
+    Binary ReadBinary(TName name);
 
-    DsonExtInt32 ReadExtInt32(TName name);
+    ExtInt32 ReadExtInt32(TName name);
 
-    DsonExtInt64 ReadExtInt64(TName name);
+    ExtInt64 ReadExtInt64(TName name);
 
-    DsonExtDouble ReadExtDouble(TName name);
+    ExtDouble ReadExtDouble(TName name);
 
-    DsonExtString ReadExtString(TName name);
+    ExtString ReadExtString(TName name);
 
     ObjectRef ReadRef(TName name);
 

@@ -42,11 +42,19 @@ public abstract class DsonValue
 
     public string AsString() => ((DsonString)this).Value;
 
+    public Binary AsBinary() => ((DsonBinary)this).Binary;
+
+    public ExtInt32 AsExtInt32() => ((DsonExtInt32)this).ExtInt32;
+
+    public ExtInt64 AsExtInt64() => ((DsonExtInt64)this).ExtInt64;
+
+    public ExtDouble AsExtDouble() => ((DsonExtDouble)this).ExtDouble;
+
+    public ExtString AsExtString() => ((DsonExtString)this).ExtString;
+
     public ObjectRef AsReference() => ((DsonReference)this).Value;
 
     public OffsetTimestamp AsTimestamp() => ((DsonTimestamp)this).Value;
-
-    public DsonNumber AsNumber() => ((DsonNumber)this);
 
     #endregion
 
@@ -64,25 +72,28 @@ public abstract class DsonValue
 
     public DsonString AsDsonString() => (DsonString)this;
 
+    public DsonBinary AsDsonBinary() => (DsonBinary)this;
+
+    public DsonExtInt32 AsDsonExtInt32() => (DsonExtInt32)this;
+
+    public DsonExtInt64 AsDsonExtInt64() => (DsonExtInt64)this;
+
+    public DsonExtDouble AsDsonExtDouble() => (DsonExtDouble)this;
+
+    public DsonExtString AsDsonExtString() => (DsonExtString)this;
     public DsonReference AsDsonReference() => (DsonReference)this;
 
     public DsonTimestamp AsDsonTimestamp() => (DsonTimestamp)this;
 
+    public DsonNull AsDsonNull() => (DsonNull)this;
+
+    public DsonNumber AsDsonNumber() => ((DsonNumber)this);
+
+    public bool IsNumber => DsonType.IsNumber();
+    
     #endregion
 
     #region Dson特定类型
-
-    public DsonNull AsNull() => (DsonNull)this;
-
-    public DsonBinary AsBinary() => (DsonBinary)this;
-
-    public DsonExtInt32 AsExtInt32() => (DsonExtInt32)this;
-
-    public DsonExtInt64 AsExtInt64() => (DsonExtInt64)this;
-
-    public DsonExtDouble AsExtDouble() => (DsonExtDouble)this;
-
-    public DsonExtString AsExtString() => (DsonExtString)this;
 
     public DsonHeader<T> AsHeader<T>() => (DsonHeader<T>)this;
 
@@ -101,12 +112,6 @@ public abstract class DsonValue
     public DsonArray<FieldNumber> AsArrayLite() => (DsonArray<FieldNumber>)this;
 
     public DsonObject<FieldNumber> AsObjectLite() => (DsonObject<FieldNumber>)this;
-
-    #endregion
-
-    #region util
-
-    public bool IsNumber => DsonType.IsNumber();
 
     #endregion
 }

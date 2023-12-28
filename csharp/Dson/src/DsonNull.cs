@@ -24,7 +24,7 @@ namespace Wjybxx.Dson;
 /// <summary>
 /// DsonNull
 /// </summary>
-public class DsonNull : DsonValue, IEquatable<DsonNull>
+public sealed class DsonNull : DsonValue, IEquatable<DsonNull>
 {
     /** 静态DsonNull实例 */
     public static readonly DsonNull Null = new DsonNull();

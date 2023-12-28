@@ -68,6 +68,16 @@ public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName> where TName
 
     public DsonContextType ContextType => _context._contextType;
 
+    public TName CurrentName {
+        get {
+            Context context = this._context;
+            if (context._state != DsonWriterState.Value) {
+                throw InvalidState(DsonInternals.NewList(DsonWriterState.Value), context._state);
+            }
+            return context._curName;
+        }
+    }
+
     public bool IsAtName => _context._state == DsonWriterState.Name;
 
     public void WriteName(TName name) {
@@ -168,15 +178,13 @@ public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName> where TName
         SetNextState();
     }
 
-    public void WriteBinary(TName name, DsonBinary dsonBinary) {
-        if (dsonBinary == null) throw new ArgumentNullException(nameof(dsonBinary));
+    public void WriteBinary(TName name, Binary binary) {
         AdvanceToValueState(name);
-        DoWriteBinary(dsonBinary);
+        DoWriteBinary(binary);
         SetNextState();
     }
 
     public void WriteBinary(TName name, int type, DsonChunk chunk) {
-        if (chunk == null) throw new ArgumentNullException(nameof(chunk));
         Dsons.CheckSubType(type);
         Dsons.CheckBinaryLength(chunk.Length);
         AdvanceToValueState(name);
@@ -184,31 +192,27 @@ public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName> where TName
         SetNextState();
     }
 
-    public void WriteExtInt32(TName name, DsonExtInt32 value, WireType wireType, INumberStyle? style = null) {
-        if (value == null) throw new ArgumentNullException(nameof(value));
+    public void WriteExtInt32(TName name, ExtInt32 extInt32, WireType wireType, INumberStyle? style = null) {
         AdvanceToValueState(name);
-        DoWriteExtInt32(value, wireType, style ?? NumberStyles.Simple);
+        DoWriteExtInt32(extInt32, wireType, style ?? NumberStyles.Simple);
         SetNextState();
     }
 
-    public void WriteExtInt64(TName name, DsonExtInt64 value, WireType wireType, INumberStyle? style = null) {
-        if (value == null) throw new ArgumentNullException(nameof(value));
+    public void WriteExtInt64(TName name, ExtInt64 extInt64, WireType wireType, INumberStyle? style = null) {
         AdvanceToValueState(name);
-        DoWriteExtInt64(value, wireType, style ?? NumberStyles.Simple);
+        DoWriteExtInt64(extInt64, wireType, style ?? NumberStyles.Simple);
         SetNextState();
     }
 
-    public void WriteExtDouble(TName name, DsonExtDouble value, INumberStyle? style = null) {
-        if (value == null) throw new ArgumentNullException(nameof(value));
+    public void WriteExtDouble(TName name, ExtDouble extDouble, INumberStyle? style = null) {
         AdvanceToValueState(name);
-        DoWriteExtDouble(value, style ?? NumberStyles.Simple);
+        DoWriteExtDouble(extDouble, style ?? NumberStyles.Simple);
         SetNextState();
     }
 
-    public void WriteExtString(TName name, DsonExtString value, StringStyle style = StringStyle.Auto) {
-        if (value == null) throw new ArgumentNullException(nameof(value));
+    public void WriteExtString(TName name, ExtString extString, StringStyle style = StringStyle.Auto) {
         AdvanceToValueState(name);
-        DoWriteExtString(value, style);
+        DoWriteExtString(extString, style);
         SetNextState();
     }
 
@@ -238,17 +242,17 @@ public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName> where TName
 
     protected abstract void DoWriteNull();
 
-    protected abstract void DoWriteBinary(DsonBinary binary);
+    protected abstract void DoWriteBinary(Binary binary);
 
     protected abstract void DoWriteBinary(int type, DsonChunk chunk);
 
-    protected abstract void DoWriteExtInt32(DsonExtInt32 extInt32, WireType wireType, INumberStyle style);
+    protected abstract void DoWriteExtInt32(ExtInt32 extInt32, WireType wireType, INumberStyle style);
 
-    protected abstract void DoWriteExtInt64(DsonExtInt64 extInt64, WireType wireType, INumberStyle style);
+    protected abstract void DoWriteExtInt64(ExtInt64 extInt64, WireType wireType, INumberStyle style);
 
-    protected abstract void DoWriteExtDouble(DsonExtDouble extDouble, INumberStyle style);
+    protected abstract void DoWriteExtDouble(ExtDouble extDouble, INumberStyle style);
 
-    protected abstract void DoWriteExtString(DsonExtString extString, StringStyle style);
+    protected abstract void DoWriteExtString(ExtString extString, StringStyle style);
 
     protected abstract void DoWriteRef(ObjectRef objectRef);
 

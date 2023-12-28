@@ -201,23 +201,23 @@ public class DsonObjectReader<TName> : AbstractDsonReader<TName> where TName : I
         PopNextValue();
     }
 
-    protected override DsonBinary DoReadBinary() {
+    protected override Binary DoReadBinary() {
         return PopNextValue().AsBinary().Copy(); // 需要拷贝
     }
 
-    protected override DsonExtInt32 DoReadExtInt32() {
+    protected override ExtInt32 DoReadExtInt32() {
         return PopNextValue().AsExtInt32();
     }
 
-    protected override DsonExtInt64 DoReadExtInt64() {
+    protected override ExtInt64 DoReadExtInt64() {
         return PopNextValue().AsExtInt64();
     }
 
-    protected override DsonExtDouble DoReadExtDouble() {
+    protected override ExtDouble DoReadExtDouble() {
         return PopNextValue().AsExtDouble();
     }
 
-    protected override DsonExtString DoReadExtString() {
+    protected override ExtString DoReadExtString() {
         return PopNextValue().AsExtString();
     }
 

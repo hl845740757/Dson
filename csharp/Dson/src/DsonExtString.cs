@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using Wjybxx.Dson.Types;
 
 #pragma warning disable CS1591
 namespace Wjybxx.Dson;
@@ -24,45 +25,42 @@ namespace Wjybxx.Dson;
 /// <summary>
 /// Dson具备类型标签的String，支持value为null
 /// </summary>
-public class DsonExtString : DsonValue, IEquatable<DsonExtString>, IComparable<DsonExtString>, IComparable
+public sealed class DsonExtString : DsonValue, IEquatable<DsonExtString>, IComparable<DsonExtString>, IComparable
 {
-    public const int MaskType = 1;
-    public const int MaskValue = 1 << 1;
+    private readonly ExtString _extString;
 
-    private readonly int _type;
-    private readonly string? _value;
-
-    public DsonExtString(int type, string? value) {
-        _type = type;
-        _value = value;
+    public DsonExtString(int type, string? value)
+        : this(new ExtString(type, value)) {
     }
 
+    public DsonExtString(ExtString extString) {
+        _extString = extString;
+    }
+
+    public ExtString ExtString => _extString;
     public override DsonType DsonType => DsonType.ExtString;
-    public int Type => _type;
-    public bool HasValue => _value != null;
+    public int Type => _extString.Type;
+    public bool HasValue => _extString.HasValue;
 
     /// <summary>
     /// value可能为null
     /// </summary>
-    public string? Value => _value;
+    public string? Value => _extString.Value;
 
     #region equals
 
     public bool Equals(DsonExtString? other) {
         if (ReferenceEquals(null, other)) return false;
         if (ReferenceEquals(this, other)) return true;
-        return _type == other._type && _value == other._value;
+        return _extString.Equals(other._extString);
     }
 
     public override bool Equals(object? obj) {
-        if (ReferenceEquals(null, obj)) return false;
-        if (ReferenceEquals(this, obj)) return true;
-        if (obj.GetType() != this.GetType()) return false;
-        return Equals((DsonExtString)obj);
+        return ReferenceEquals(this, obj) || obj is DsonExtString other && Equals(other);
     }
 
     public override int GetHashCode() {
-        return HashCode.Combine(_type, _value);
+        return _extString.GetHashCode();
     }
 
     public static bool operator ==(DsonExtString? left, DsonExtString? right) {
@@ -76,9 +74,7 @@ public class DsonExtString : DsonValue, IEquatable<DsonExtString>, IComparable<D
     public int CompareTo(DsonExtString? other) {
         if (ReferenceEquals(this, other)) return 0;
         if (ReferenceEquals(null, other)) return 1;
-        var typeComparison = _type.CompareTo(other._type);
-        if (typeComparison != 0) return typeComparison;
-        return string.Compare(_value, other._value, StringComparison.Ordinal);
+        return _extString.CompareTo(other._extString);
     }
 
     public int CompareTo(object? obj) {
@@ -90,6 +86,6 @@ public class DsonExtString : DsonValue, IEquatable<DsonExtString>, IComparable<D
     #endregion
 
     public override string ToString() {
-        return $"{nameof(DsonType)}: {DsonType}, {nameof(_type)}: {_type}, {nameof(_value)}: {_value}";
+        return $"{nameof(DsonType)}: {DsonType}, {nameof(_extString)}: {_extString}";
     }
 }

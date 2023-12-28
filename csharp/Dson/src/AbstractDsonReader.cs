@@ -256,37 +256,37 @@ public abstract class AbstractDsonReader<TName> : IDsonReader<TName> where TName
         SetNextState();
     }
 
-    public DsonBinary ReadBinary(TName name) {
+    public Binary ReadBinary(TName name) {
         AdvanceToValueState(name, DsonType.Binary);
-        DsonBinary value = DoReadBinary();
+        Binary value = DoReadBinary();
         SetNextState();
         return value;
     }
 
-    public DsonExtInt32 ReadExtInt32(TName name) {
+    public ExtInt32 ReadExtInt32(TName name) {
         AdvanceToValueState(name, DsonType.ExtInt32);
-        DsonExtInt32 value = DoReadExtInt32();
+        ExtInt32 value = DoReadExtInt32();
         SetNextState();
         return value;
     }
 
-    public DsonExtInt64 ReadExtInt64(TName name) {
+    public ExtInt64 ReadExtInt64(TName name) {
         AdvanceToValueState(name, DsonType.ExtInt64);
-        DsonExtInt64 value = DoReadExtInt64();
+        ExtInt64 value = DoReadExtInt64();
         SetNextState();
         return value;
     }
 
-    public DsonExtDouble ReadExtDouble(TName name) {
+    public ExtDouble ReadExtDouble(TName name) {
         AdvanceToValueState(name, DsonType.ExtDouble);
-        DsonExtDouble value = DoReadExtDouble();
+        ExtDouble value = DoReadExtDouble();
         SetNextState();
         return value;
     }
 
-    public DsonExtString ReadExtString(TName name) {
+    public ExtString ReadExtString(TName name) {
         AdvanceToValueState(name, DsonType.ExtString);
-        DsonExtString value = DoReadExtString();
+        ExtString value = DoReadExtString();
         SetNextState();
         return value;
     }
@@ -319,15 +319,15 @@ public abstract class AbstractDsonReader<TName> : IDsonReader<TName> where TName
 
     protected abstract void DoReadNull();
 
-    protected abstract DsonBinary DoReadBinary();
+    protected abstract Binary DoReadBinary();
 
-    protected abstract DsonExtInt32 DoReadExtInt32();
+    protected abstract ExtInt32 DoReadExtInt32();
 
-    protected abstract DsonExtInt64 DoReadExtInt64();
+    protected abstract ExtInt64 DoReadExtInt64();
 
-    protected abstract DsonExtDouble DoReadExtDouble();
+    protected abstract ExtDouble DoReadExtDouble();
 
-    protected abstract DsonExtString DoReadExtString();
+    protected abstract ExtString DoReadExtString();
 
     protected abstract ObjectRef DoReadRef();
 

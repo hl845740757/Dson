@@ -133,24 +133,24 @@ public class DsonBinaryReader<TName> : AbstractDsonReader<TName> where TName : I
     protected override void DoReadNull() {
     }
 
-    protected override DsonBinary DoReadBinary() {
-        return DsonReaderUtils.ReadDsonBinary(_input);
+    protected override Binary DoReadBinary() {
+        return DsonReaderUtils.ReadBinary(_input);
     }
 
-    protected override DsonExtInt32 DoReadExtInt32() {
-        return DsonReaderUtils.ReadDsonExtInt32(_input, _currentWireType);
+    protected override ExtInt32 DoReadExtInt32() {
+        return DsonReaderUtils.ReadExtInt32(_input, _currentWireType);
     }
 
-    protected override DsonExtInt64 DoReadExtInt64() {
-        return DsonReaderUtils.ReadDsonExtInt64(_input, _currentWireType);
+    protected override ExtInt64 DoReadExtInt64() {
+        return DsonReaderUtils.ReadExtInt64(_input, _currentWireType);
     }
 
-    protected override DsonExtDouble DoReadExtDouble() {
-        return DsonReaderUtils.ReadDsonExtDouble(_input, _currentWireTypeBits);
+    protected override ExtDouble DoReadExtDouble() {
+        return DsonReaderUtils.ReadExtDouble(_input, _currentWireTypeBits);
     }
 
-    protected override DsonExtString DoReadExtString() {
-        return DsonReaderUtils.ReadDsonExtString(_input, _currentWireTypeBits);
+    protected override ExtString DoReadExtString() {
+        return DsonReaderUtils.ReadExtString(_input, _currentWireTypeBits);
     }
 
     protected override ObjectRef DoReadRef() {

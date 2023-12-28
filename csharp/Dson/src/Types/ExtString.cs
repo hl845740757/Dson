@@ -26,6 +26,9 @@ namespace Wjybxx.Dson.Types;
 /// </summary>
 public readonly struct ExtString : IEquatable<ExtString>, IComparable<ExtString>, IComparable
 {
+    public const int MaskType = 1;
+    public const int MaskValue = 1 << 1;
+    
     private readonly int _type;
     private readonly string? _value;
 

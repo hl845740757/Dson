@@ -30,6 +30,10 @@ public readonly struct Binary : IEquatable<Binary>
     private readonly int _type;
     private readonly byte[] _data;
 
+    public Binary(byte[] data)
+        : this(0, data) {
+    }
+
     public Binary(int type, byte[] data) {
         if (data == null) throw new ArgumentNullException(nameof(data));
         Dsons.CheckSubType(type);
@@ -49,6 +53,10 @@ public readonly struct Binary : IEquatable<Binary>
     /// 不宜修改返回的数据
     /// </summary>
     public byte[] Data => _data;
+
+    public Binary Copy() {
+        return new Binary(_type, (byte[])_data.Clone());
+    }
 
     #region equals
 

@@ -22,7 +22,7 @@ import javax.annotation.Nonnull;
  * @author wjybxx
  * date - 2023/4/19
  */
-public class DsonNull extends DsonValue implements Comparable<DsonNull> {
+public final class DsonNull extends DsonValue implements Comparable<DsonNull> {
 
     public static final DsonNull NULL = new DsonNull();
     /** 用于不存在对应key时的返回值，用于特殊情况下的测试 */

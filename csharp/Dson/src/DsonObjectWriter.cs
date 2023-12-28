@@ -98,28 +98,28 @@ public class DsonObjectWriter<TName> : AbstractDsonWriter<TName> where TName : I
         GetContext().Add(DsonNull.Null);
     }
 
-    protected override void DoWriteBinary(DsonBinary binary) {
-        GetContext().Add(binary.Copy()); // 需要拷贝
+    protected override void DoWriteBinary(Binary binary) {
+        GetContext().Add(new DsonBinary(binary.Copy())); // 需要拷贝
     }
 
     protected override void DoWriteBinary(int type, DsonChunk chunk) {
         GetContext().Add(new DsonBinary(type, chunk));
     }
 
-    protected override void DoWriteExtInt32(DsonExtInt32 extInt32, WireType wireType, INumberStyle style) {
-        GetContext().Add(extInt32); // 不可变对象
+    protected override void DoWriteExtInt32(ExtInt32 extInt32, WireType wireType, INumberStyle style) {
+        GetContext().Add(new DsonExtInt32(extInt32));
     }
 
-    protected override void DoWriteExtInt64(DsonExtInt64 extInt64, WireType wireType, INumberStyle style) {
-        GetContext().Add(extInt64);
+    protected override void DoWriteExtInt64(ExtInt64 extInt64, WireType wireType, INumberStyle style) {
+        GetContext().Add(new DsonExtInt64(extInt64));
     }
 
-    protected override void DoWriteExtDouble(DsonExtDouble extDouble, INumberStyle style) {
-        GetContext().Add(extDouble);
+    protected override void DoWriteExtDouble(ExtDouble extDouble, INumberStyle style) {
+        GetContext().Add(new DsonExtDouble(extDouble));
     }
 
-    protected override void DoWriteExtString(DsonExtString extString, StringStyle style) {
-        GetContext().Add(extString);
+    protected override void DoWriteExtString(ExtString extString, StringStyle style) {
+        GetContext().Add(new DsonExtString(extString));
     }
 
     protected override void DoWriteRef(ObjectRef objectRef) {

@@ -17,7 +17,7 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
+using Wjybxx.Dson.Types;
 
 #pragma warning disable CS1591
 namespace Wjybxx.Dson;
@@ -25,46 +25,42 @@ namespace Wjybxx.Dson;
 /// <summary>
 /// Dson具备类型标签的Int32类型
 /// </summary>
-public class DsonExtInt32 : DsonValue, IEquatable<DsonExtInt32>, IComparable<DsonExtInt32>, IComparable
+public sealed class DsonExtInt32 : DsonValue, IEquatable<DsonExtInt32>, IComparable<DsonExtInt32>, IComparable
 {
-    private readonly int _type;
-    private readonly bool _hasVal; // 比较时放前面
-    private readonly int _value;
+    private readonly ExtInt32 _extInt32;
 
     public DsonExtInt32(int type, int? value)
-        : this(type, value ?? 0, value.HasValue) {
+        : this(new ExtInt32(type, value)) {
     }
 
-    public DsonExtInt32(int type, int value, bool hasVal = true) {
-        Dsons.CheckSubType(type);
-        Dsons.CheckHasValue(value, hasVal);
-        _type = type;
-        _value = value;
-        _hasVal = hasVal;
+    public DsonExtInt32(int type, int value, bool hasVal = true)
+        : this(new ExtInt32(type, value, hasVal)) {
     }
 
+    public DsonExtInt32(ExtInt32 extInt32) {
+        _extInt32 = extInt32;
+    }
+
+    public ExtInt32 ExtInt32 => _extInt32;
     public override DsonType DsonType => DsonType.ExtInt32;
-    public int Type => _type;
-    public bool HasValue => _hasVal;
-    public int Value => _value;
+    public int Type => _extInt32.Type;
+    public bool HasValue => _extInt32.HasValue;
+    public int Value => _extInt32.Value;
 
     #region equals
 
     public bool Equals(DsonExtInt32? other) {
         if (ReferenceEquals(null, other)) return false;
         if (ReferenceEquals(this, other)) return true;
-        return _type == other._type && _value == other._value && _hasVal == other._hasVal;
+        return _extInt32.Equals(other._extInt32);
     }
 
     public override bool Equals(object? obj) {
-        if (ReferenceEquals(null, obj)) return false;
-        if (ReferenceEquals(this, obj)) return true;
-        if (obj.GetType() != this.GetType()) return false;
-        return Equals((DsonExtInt32)obj);
+        return ReferenceEquals(this, obj) || obj is DsonExtInt32 other && Equals(other);
     }
 
     public override int GetHashCode() {
-        return HashCode.Combine(_type, _value, _hasVal);
+        return _extInt32.GetHashCode();
     }
 
     public static bool operator ==(DsonExtInt32? left, DsonExtInt32? right) {
@@ -78,11 +74,7 @@ public class DsonExtInt32 : DsonValue, IEquatable<DsonExtInt32>, IComparable<Dso
     public int CompareTo(DsonExtInt32? other) {
         if (ReferenceEquals(this, other)) return 0;
         if (ReferenceEquals(null, other)) return 1;
-        var typeComparison = _type.CompareTo(other._type);
-        if (typeComparison != 0) return typeComparison;
-        var hasValComparison = _hasVal.CompareTo(other._hasVal);
-        if (hasValComparison != 0) return hasValComparison;
-        return _value.CompareTo(other._value);
+        return _extInt32.CompareTo(other._extInt32);
     }
 
     public int CompareTo(object? obj) {
@@ -91,25 +83,9 @@ public class DsonExtInt32 : DsonValue, IEquatable<DsonExtInt32>, IComparable<Dso
         return obj is DsonExtInt32 other ? CompareTo(other) : throw new ArgumentException($"Object must be of type {nameof(DsonExtInt32)}");
     }
 
-    public static bool operator <(DsonExtInt32? left, DsonExtInt32? right) {
-        return Comparer<DsonExtInt32>.Default.Compare(left, right) < 0;
-    }
-
-    public static bool operator >(DsonExtInt32? left, DsonExtInt32? right) {
-        return Comparer<DsonExtInt32>.Default.Compare(left, right) > 0;
-    }
-
-    public static bool operator <=(DsonExtInt32? left, DsonExtInt32? right) {
-        return Comparer<DsonExtInt32>.Default.Compare(left, right) <= 0;
-    }
-
-    public static bool operator >=(DsonExtInt32? left, DsonExtInt32? right) {
-        return Comparer<DsonExtInt32>.Default.Compare(left, right) >= 0;
-    }
-
     #endregion
 
     public override string ToString() {
-        return $"{nameof(DsonType)}: {DsonType}, {nameof(_type)}: {_type}, {nameof(_hasVal)}: {_hasVal}, {nameof(_value)}: {_value}";
+        return $"{nameof(DsonType)}: {DsonType}, {nameof(_extInt32)}: {_extInt32}";
     }
 }

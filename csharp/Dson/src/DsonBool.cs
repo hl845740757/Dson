@@ -25,7 +25,7 @@ namespace Wjybxx.Dson;
 /// <summary>
 /// DsonBool
 /// </summary>
-public class DsonBool : DsonValue, IComparable<DsonBool>, IEquatable<DsonBool>, IComparable
+public sealed class DsonBool : DsonValue, IComparable<DsonBool>, IEquatable<DsonBool>, IComparable
 {
     /** 静态True实例 */
     public static readonly DsonBool True = new DsonBool(true);

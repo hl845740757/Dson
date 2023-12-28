@@ -149,7 +149,7 @@ public class DsonReaderUtils {
         output.writeRawBytes(chunk.getBuffer(), chunk.getOffset(), chunk.getLength());
     }
 
-    public static Binary readDsonBinary(DsonInput input) {
+    public static Binary readBinary(DsonInput input) {
         int size = input.readFixed32();
         int oldLimit = input.pushLimit(size);
         Binary binary;
@@ -173,7 +173,7 @@ public class DsonReaderUtils {
         }
     }
 
-    public static ExtInt32 readDsonExtInt32(DsonInput input, WireType wireType) {
+    public static ExtInt32 readExtInt32(DsonInput input, WireType wireType) {
         int type = input.readUint32();
         boolean hasValue = input.readBool();
         int value = hasValue ? wireType.readInt32(input) : 0;
@@ -188,7 +188,7 @@ public class DsonReaderUtils {
         }
     }
 
-    public static ExtInt64 readDsonExtInt64(DsonInput input, WireType wireType) {
+    public static ExtInt64 readExtInt64(DsonInput input, WireType wireType) {
         int type = input.readUint32();
         boolean hasValue = input.readBool();
         long value = hasValue ? wireType.readInt64(input) : 0;
@@ -203,7 +203,7 @@ public class DsonReaderUtils {
         }
     }
 
-    public static ExtDouble readDsonExtDouble(DsonInput input, int wireType) {
+    public static ExtDouble readExtDouble(DsonInput input, int wireType) {
         int type = input.readUint32();
         boolean hasValue = input.readBool();
         double value = hasValue ? readDouble(input, wireType) : 0;
@@ -230,7 +230,7 @@ public class DsonReaderUtils {
         }
     }
 
-    public static ExtString readDsonExtString(DsonInput input, int wireTypeBits) {
+    public static ExtString readExtString(DsonInput input, int wireTypeBits) {
         int type = DsonInternals.isEnabled(wireTypeBits, ExtString.MASK_TYPE) ? input.readUint32() : 0;
         String value = DsonInternals.isEnabled(wireTypeBits, ExtString.MASK_VALUE) ? input.readString() : null;
         return new ExtString(type, value);

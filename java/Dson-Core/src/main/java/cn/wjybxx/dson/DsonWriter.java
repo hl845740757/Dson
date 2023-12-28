@@ -40,10 +40,11 @@ public interface DsonWriter extends AutoCloseable {
     @Override
     void close();
 
-    /**
-     * 获取当前上下文的类型
-     */
+    /** 获取当前上下文的类型 */
     DsonContextType getContextType();
+
+    /** 获取当前写入的name -- 如果先调用WriteName */
+    String getCurrentName();
 
     /** 当前是否处于等待写入name的状态 */
     boolean isAtName();

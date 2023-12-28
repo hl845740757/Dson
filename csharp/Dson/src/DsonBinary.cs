@@ -19,6 +19,7 @@
 using System;
 using System.Linq;
 using Wjybxx.Dson.IO;
+using Wjybxx.Dson.Types;
 
 #pragma warning disable CS1591
 namespace Wjybxx.Dson;
@@ -28,49 +29,39 @@ namespace Wjybxx.Dson;
 /// </summary>
 public class DsonBinary : DsonValue, IEquatable<DsonBinary>
 {
-    private readonly int _type;
-    private readonly byte[] _data;
+    private readonly Binary _binary;
 
-    public DsonBinary(int type, byte[] data) {
-        if (data == null) throw new ArgumentNullException(nameof(data));
-        Dsons.CheckSubType(type);
-        Dsons.CheckBinaryLength(data.Length);
-        _type = type;
-        _data = data;
+    public DsonBinary(byte[] data)
+        : this(new Binary(0, data)) {
     }
 
-    public DsonBinary(int type, DsonChunk chunk) {
-        if (chunk == null) throw new ArgumentNullException(nameof(chunk));
-        Dsons.CheckSubType(type);
-        Dsons.CheckBinaryLength(chunk.Length);
-        _type = type;
-        _data = chunk.Payload();
+    public DsonBinary(int type, byte[] data)
+        : this(new Binary(type, data)) {
     }
 
-    public DsonBinary(DsonBinary src) {
-        this._type = src._type;
-        this._data = (byte[])src._data.Clone();
+    public DsonBinary(int type, DsonChunk chunk)
+        : this(new Binary(type, chunk.Payload())) {
     }
 
+    public DsonBinary(Binary binary) {
+        _binary = binary;
+    }
+
+    public Binary Binary => _binary;
     public override DsonType DsonType => DsonType.Binary;
+    public int Type => _binary.Type;
 
     /// <summary>
-    /// 子类型
-    /// </summary>
-    public int Type => _type;
-
-    /// <summary>
-    /// 数据部分
     /// 不宜修改返回的数据
     /// </summary>
-    public byte[] Data => _data;
+    public byte[] Data => _binary.Data;
 
     /// <summary>
     /// 创建一个副本
     /// </summary>
     /// <returns></returns>
     public DsonBinary Copy() {
-        return new DsonBinary(this);
+        return new DsonBinary(_binary.Copy());
     }
 
     #region equals
@@ -78,7 +69,7 @@ public class DsonBinary : DsonValue, IEquatable<DsonBinary>
     public bool Equals(DsonBinary? other) {
         if (ReferenceEquals(null, other)) return false;
         if (ReferenceEquals(this, other)) return true;
-        return _type == other._type && _data.SequenceEqual(other._data); // 比较数组元素需要使用SequenceEqual
+        return _binary.Equals(other._binary);
     }
 
     public override bool Equals(object? obj) {
@@ -89,7 +80,7 @@ public class DsonBinary : DsonValue, IEquatable<DsonBinary>
     }
 
     public override int GetHashCode() {
-        return HashCode.Combine(_type, _data);
+        return _binary.GetHashCode();
     }
 
     public static bool operator ==(DsonBinary? left, DsonBinary? right) {
@@ -103,6 +94,6 @@ public class DsonBinary : DsonValue, IEquatable<DsonBinary>
     #endregion
 
     public override string ToString() {
-        return $"{nameof(DsonType)}: {DsonType}, {nameof(_type)}: {_type}, {nameof(_data)}: {Convert.ToHexString(_data)}";
+        return $"{nameof(DsonType)}: {DsonType}, {nameof(_binary)}: {_binary}";
     }
 }

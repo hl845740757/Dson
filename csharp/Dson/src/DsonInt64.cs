@@ -25,7 +25,7 @@ namespace Wjybxx.Dson;
 /// <summary>
 /// DsonInt64
 /// </summary>
-public class DsonInt64 : DsonNumber, IEquatable<DsonInt64>, IComparable<DsonInt64>, IComparable
+public sealed class DsonInt64 : DsonNumber, IEquatable<DsonInt64>, IComparable<DsonInt64>, IComparable
 {
     private readonly long _value;
 

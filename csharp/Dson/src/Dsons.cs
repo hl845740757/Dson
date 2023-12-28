@@ -485,11 +485,11 @@ public static class Dsons
                 reader.ReadNull(name);
                 return DsonNull.Null;
             }
-            case DsonType.Binary: return reader.ReadBinary(name);
-            case DsonType.ExtInt32: return reader.ReadExtInt32(name);
-            case DsonType.ExtInt64: return reader.ReadExtInt64(name);
-            case DsonType.ExtDouble: return reader.ReadExtDouble(name);
-            case DsonType.ExtString: return reader.ReadExtString(name);
+            case DsonType.Binary: return new DsonBinary(reader.ReadBinary(name));
+            case DsonType.ExtInt32: return new DsonExtInt32(reader.ReadExtInt32(name));
+            case DsonType.ExtInt64: return new DsonExtInt64(reader.ReadExtInt64(name));
+            case DsonType.ExtDouble: return new DsonExtDouble(reader.ReadExtDouble(name));
+            case DsonType.ExtString: return new DsonExtString(reader.ReadExtString(name));
             case DsonType.Reference: return new DsonReference(reader.ReadRef(name));
             case DsonType.Timestamp: return new DsonTimestamp(reader.ReadTimestamp(name));
             case DsonType.Header: {
@@ -542,7 +542,7 @@ public static class Dsons
                 return result;
             }
             case DsonType.Binary: {
-                return new DsonBinary(dsonValue.AsBinary());
+                return new DsonBinary(dsonValue.AsBinary().Copy());
             }
             default: {
                 return dsonValue;
@@ -633,7 +633,7 @@ public static class Dsons
     #endregion
 
     #region 工厂方法
-    
+
     public static DsonScanner NewStringScanner(string dsonString, DsonMode dsonMode = DsonMode.Standard) {
         return new DsonScanner(IDsonCharStream.NewCharStream(dsonString, dsonMode));
     }

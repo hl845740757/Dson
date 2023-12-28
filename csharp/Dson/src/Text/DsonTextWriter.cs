@@ -332,7 +332,7 @@ public class DsonTextWriter : AbstractDsonWriter<string>
         printer.PrintFastPath("null");
     }
 
-    protected override void DoWriteBinary(DsonBinary binary) {
+    protected override void DoWriteBinary(Binary binary) {
         DsonPrinter printer = this._printer;
         WriteCurrentName(printer, DsonType.Binary);
         printer.PrintFastPath("[@bin ");
@@ -352,7 +352,7 @@ public class DsonTextWriter : AbstractDsonWriter<string>
         printer.Print(']');
     }
 
-    protected override void DoWriteExtInt32(DsonExtInt32 extInt32, WireType wireType, INumberStyle style) {
+    protected override void DoWriteExtInt32(ExtInt32 extInt32, WireType wireType, INumberStyle style) {
         DsonPrinter printer = this._printer;
         WriteCurrentName(printer, DsonType.ExtInt32);
         printer.PrintFastPath("[@ei ");
@@ -367,7 +367,7 @@ public class DsonTextWriter : AbstractDsonWriter<string>
         printer.Print(']');
     }
 
-    protected override void DoWriteExtInt64(DsonExtInt64 extInt64, WireType wireType, INumberStyle style) {
+    protected override void DoWriteExtInt64(ExtInt64 extInt64, WireType wireType, INumberStyle style) {
         DsonPrinter printer = this._printer;
         WriteCurrentName(printer, DsonType.ExtInt64);
         printer.PrintFastPath("[@eL ");
@@ -382,7 +382,7 @@ public class DsonTextWriter : AbstractDsonWriter<string>
         printer.Print(']');
     }
 
-    protected override void DoWriteExtDouble(DsonExtDouble extDouble, INumberStyle style) {
+    protected override void DoWriteExtDouble(ExtDouble extDouble, INumberStyle style) {
         DsonPrinter printer = this._printer;
         WriteCurrentName(printer, DsonType.ExtDouble);
         printer.PrintFastPath("[@ed ");
@@ -397,7 +397,7 @@ public class DsonTextWriter : AbstractDsonWriter<string>
         printer.Print(']');
     }
 
-    protected override void DoWriteExtString(DsonExtString extString, StringStyle style) {
+    protected override void DoWriteExtString(ExtString extString, StringStyle style) {
         DsonPrinter printer = this._printer;
         WriteCurrentName(printer, DsonType.ExtString);
         printer.PrintFastPath("[@es ");

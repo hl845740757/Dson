@@ -17,7 +17,7 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
+using Wjybxx.Dson.Types;
 
 #pragma warning disable CS1591
 namespace Wjybxx.Dson;
@@ -25,46 +25,42 @@ namespace Wjybxx.Dson;
 /// <summary>
 /// Dson具有类型标签的双精度浮点数
 /// </summary>
-public class DsonExtDouble : DsonValue, IEquatable<DsonExtDouble>, IComparable<DsonExtDouble>, IComparable
+public sealed class DsonExtDouble : DsonValue, IEquatable<DsonExtDouble>, IComparable<DsonExtDouble>, IComparable
 {
-    private readonly int _type;
-    private readonly bool _hasVal; // 比较时放前面
-    private readonly double _value;
+    private readonly ExtDouble _extDouble;
 
     public DsonExtDouble(int type, double? value)
-        : this(type, value ?? 0, value.HasValue) {
+        : this(new ExtDouble(type, value)) {
     }
 
-    public DsonExtDouble(int type, double value, bool hasVal = true) {
-        Dsons.CheckSubType(type);
-        Dsons.CheckHasValue(value, hasVal);
-        _type = type;
-        _value = value;
-        _hasVal = hasVal;
+    public DsonExtDouble(int type, double value, bool hasVal = true)
+        : this(new ExtDouble(type, value, hasVal)) {
     }
 
+    public DsonExtDouble(ExtDouble extDouble) {
+        _extDouble = extDouble;
+    }
+
+    public ExtDouble ExtDouble => _extDouble;
     public override DsonType DsonType => DsonType.ExtDouble;
-    public int Type => _type;
-    public bool HasValue => _hasVal;
-    public double Value => _value;
+    public int Type => _extDouble.Type;
+    public bool HasValue => _extDouble.HasValue;
+    public double Value => _extDouble.Value;
 
     #region equals
 
     public bool Equals(DsonExtDouble? other) {
         if (ReferenceEquals(null, other)) return false;
         if (ReferenceEquals(this, other)) return true;
-        return _type == other._type && _value.Equals(other._value) && _hasVal == other._hasVal;
+        return _extDouble.Equals(other._extDouble);
     }
 
     public override bool Equals(object? obj) {
-        if (ReferenceEquals(null, obj)) return false;
-        if (ReferenceEquals(this, obj)) return true;
-        if (obj.GetType() != this.GetType()) return false;
-        return Equals((DsonExtDouble)obj);
+        return ReferenceEquals(this, obj) || obj is DsonExtDouble other && Equals(other);
     }
 
     public override int GetHashCode() {
-        return HashCode.Combine(_type, _value, _hasVal);
+        return _extDouble.GetHashCode();
     }
 
     public static bool operator ==(DsonExtDouble? left, DsonExtDouble? right) {
@@ -78,11 +74,7 @@ public class DsonExtDouble : DsonValue, IEquatable<DsonExtDouble>, IComparable<D
     public int CompareTo(DsonExtDouble? other) {
         if (ReferenceEquals(this, other)) return 0;
         if (ReferenceEquals(null, other)) return 1;
-        var typeComparison = _type.CompareTo(other._type);
-        if (typeComparison != 0) return typeComparison;
-        var hasValComparison = _hasVal.CompareTo(other._hasVal);
-        if (hasValComparison != 0) return hasValComparison;
-        return _value.CompareTo(other._value);
+        return _extDouble.CompareTo(other._extDouble);
     }
 
     public int CompareTo(object? obj) {
@@ -91,25 +83,9 @@ public class DsonExtDouble : DsonValue, IEquatable<DsonExtDouble>, IComparable<D
         return obj is DsonExtDouble other ? CompareTo(other) : throw new ArgumentException($"Object must be of type {nameof(DsonExtDouble)}");
     }
 
-    public static bool operator <(DsonExtDouble? left, DsonExtDouble? right) {
-        return Comparer<DsonExtDouble>.Default.Compare(left, right) < 0;
-    }
-
-    public static bool operator >(DsonExtDouble? left, DsonExtDouble? right) {
-        return Comparer<DsonExtDouble>.Default.Compare(left, right) > 0;
-    }
-
-    public static bool operator <=(DsonExtDouble? left, DsonExtDouble? right) {
-        return Comparer<DsonExtDouble>.Default.Compare(left, right) <= 0;
-    }
-
-    public static bool operator >=(DsonExtDouble? left, DsonExtDouble? right) {
-        return Comparer<DsonExtDouble>.Default.Compare(left, right) >= 0;
-    }
-
     #endregion
 
     public override string ToString() {
-        return $"{nameof(DsonType)}: {DsonType}, {nameof(_type)}: {_type}, {nameof(_hasVal)}: {_hasVal}, {nameof(_value)}: {_value}";
+        return $"{nameof(DsonType)}: {DsonType}, {nameof(_extDouble)}: {_extDouble}";
     }
 }

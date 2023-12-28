@@ -76,6 +76,15 @@ public abstract class AbstractDsonWriter implements DsonWriter {
     }
 
     @Override
+    public String getCurrentName() {
+        Context context = this.context;
+        if (context.state != DsonWriterState.VALUE) {
+            throw invalidState(List.of(DsonWriterState.VALUE), context.state);
+        }
+        return context.curName;
+    }
+
+    @Override
     public boolean isAtName() {
         return context.state == DsonWriterState.NAME;
     }
