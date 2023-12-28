@@ -28,9 +28,16 @@ final class StringCharStream extends AbstractCharStream {
 
     private CharSequence buffer;
 
-    public StringCharStream(CharSequence buffer, DsonMode dsonMode) {
-        super(dsonMode);
+    public StringCharStream(CharSequence buffer) {
         this.buffer = Objects.requireNonNull(buffer);
+        int idx = DsonTexts.indexOfNonWhitespace(buffer, 0);
+        if (idx < 0) {
+            dsonMode = DsonMode.RELAXED;
+            setPosition(buffer.length());
+        } else {
+            dsonMode = DsonTexts.detectDsonMode(buffer.charAt(idx));
+            setPosition(idx - 1);
+        }
     }
 
     @Override

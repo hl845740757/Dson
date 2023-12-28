@@ -31,7 +31,7 @@ final class BufferedCharStream extends AbstractCharStream {
 
     private static final int MIN_BUFFER_SIZE = 32;
     /** 行首前面超过1000个空白字符是有问题的 */
-    private static final int MAX_BUFFER_SIZE = 1024;
+    private static final int MAX_BUFFER_SIZE = 4096;
 
     private Reader reader;
     private final boolean autoClose;
@@ -45,19 +45,41 @@ final class BufferedCharStream extends AbstractCharStream {
     /** reader是否已到达文件尾部 -- 部分reader在到达文件尾部的时候不可继续读 */
     private boolean readerEof;
 
-    BufferedCharStream(Reader reader, DsonMode dsonMode) {
-        this(reader, dsonMode, 512, true);
+    BufferedCharStream(Reader reader) {
+        this(reader, 512, true);
     }
 
-    BufferedCharStream(Reader reader, DsonMode dsonMode, int bufferSize, boolean autoClose) {
-        super(dsonMode);
+    BufferedCharStream(Reader reader, int bufferSize, boolean autoClose) {
         Objects.requireNonNull(reader);
         bufferSize = Math.max(MIN_BUFFER_SIZE, bufferSize);
-
         this.reader = reader;
         this.autoClose = autoClose;
         this.buffer = new CharBuffer(new char[bufferSize]);
         this.nextBuffer = new CharBuffer(new char[64]);
+        try {
+            detectDsonMode();
+        } catch (IOException e) {
+            throw new DsonIOException("invalid dson input", e);
+        }
+    }
+
+    private void detectDsonMode() throws IOException {
+        CharBuffer nextBuffer = this.nextBuffer;
+        int discardBytes = 0;
+        while (!readerEof) {
+            readToBuffer(nextBuffer);
+            int idx = DsonTexts.indexOfNonWhitespace(nextBuffer, 0);
+            if (idx < 0) {
+                discardBytes += nextBuffer.readableChars();
+                nextBuffer.shift(nextBuffer.capacity());
+                continue;
+            }
+            dsonMode = DsonTexts.detectDsonMode(nextBuffer.charAt(idx));
+            setPosition(discardBytes + idx - 1);
+            return;
+        }
+        dsonMode = DsonMode.RELAXED;
+        setPosition(discardBytes);
     }
 
     @Override

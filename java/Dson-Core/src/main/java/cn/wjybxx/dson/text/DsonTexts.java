@@ -149,7 +149,7 @@ public class DsonTexts {
         return true;
     }
 
-    //
+    // region bool/null
 
     public static boolean parseBool(String str) {
         if (str.equals("true") || str.equals("1")) return true;
@@ -163,6 +163,7 @@ public class DsonTexts {
         }
         throw new IllegalArgumentException("invalid null str: " + str);
     }
+    // endregion
 
     //region 数字
 
@@ -312,4 +313,41 @@ public class DsonTexts {
             default -> throw new IllegalArgumentException();
         };
     }
+
+    /** 检测dson文本的类型 -- 对于文件，可以通过规范命名规范来表达 */
+    public static DsonMode detectDsonMode(CharSequence dsonString) {
+        for (int i = 0, len = dsonString.length(); i < len; i++) {
+            char firstChar = dsonString.charAt(i);
+            if (Character.isWhitespace(firstChar)) {
+                continue;
+            }
+            return detectDsonMode(firstChar);
+        }
+        return DsonMode.RELAXED;
+    }
+
+    public static DsonMode detectDsonMode(char firstChar) {
+        LineHead lineHead = LineHead.forLabel(Character.toString(firstChar));
+        if (lineHead != null) {
+            return DsonMode.STANDARD;
+        }
+        if (firstChar != '{' && firstChar != '[' && firstChar != '@') {
+            throw new IllegalArgumentException("the string is not a valid dson string");
+        }
+        return DsonMode.RELAXED;
+    }
+
+    /** 索引首个非空白字符的位置 */
+    public static int indexOfNonWhitespace(CharSequence cs, final int startIndex) {
+        if (startIndex < 0) {
+            throw new IndexOutOfBoundsException(startIndex);
+        }
+        for (int idx = startIndex, length = cs.length(); idx < length; idx++) {
+            if (!Character.isWhitespace(cs.charAt(idx))) {
+                return idx;
+            }
+        }
+        return -1;
+    }
+
 }

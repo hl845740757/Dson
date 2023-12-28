@@ -63,10 +63,9 @@ public interface DocumentConverter extends Converter {
      * 从数据源中读取一个对象
      *
      * @param source      数据源
-     * @param dsonMode    文本模式
      * @param typeArgInfo 要读取的目标类型信息，部分实现支持投影
      */
-    <U> U readFromDson(CharSequence source, DsonMode dsonMode, TypeArgInfo<U> typeArgInfo);
+    <U> U readFromDson(CharSequence source, TypeArgInfo<U> typeArgInfo);
 
     /**
      * 将一个对象写入指定writer
@@ -81,10 +80,9 @@ public interface DocumentConverter extends Converter {
      * 从数据源中读取一个对象
      *
      * @param source      用于支持大数据源
-     * @param dsonMode    文本模式
      * @param typeArgInfo 要读取的目标类型信息，部分实现支持投影
      */
-    <U> U readFromDson(Reader source, DsonMode dsonMode, TypeArgInfo<U> typeArgInfo);
+    <U> U readFromDson(Reader source, TypeArgInfo<U> typeArgInfo);
 
     /**
      * @param value       顶层对象必须的容器对象，Object和数组
@@ -103,20 +101,16 @@ public interface DocumentConverter extends Converter {
 
     // region 快捷方法
 
-    default String writeAsDson(Object value, TypeArgInfo<?> typeArgInfo) {
-        return writeAsDson(value, DsonMode.STANDARD, typeArgInfo);
-    }
-
-    default <U> U readFromDson(CharSequence source, TypeArgInfo<U> typeArgInfo) {
-        return readFromDson(source, DsonMode.STANDARD, typeArgInfo);
-    }
-
     default String writeAsDson(Object value) {
         return writeAsDson(value, DsonMode.STANDARD, TypeArgInfo.OBJECT);
     }
 
+    default String writeAsDson(Object value, TypeArgInfo<?> typeArgInfo) {
+        return writeAsDson(value, DsonMode.STANDARD, typeArgInfo);
+    }
+
     default Object readFromDson(CharSequence source) {
-        return readFromDson(source, DsonMode.STANDARD, TypeArgInfo.OBJECT);
+        return readFromDson(source, TypeArgInfo.OBJECT);
     }
 
     // endregion

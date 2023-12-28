@@ -25,15 +25,19 @@ import java.util.Objects;
  */
 public abstract class AbstractCharStream implements DsonCharStream {
 
-    protected final DsonMode dsonMode;
+    protected DsonMode dsonMode;
     private final List<LineInfo> lines = new ArrayList<>();
     private LineInfo curLine;
     private boolean readingContent = false;
     private int position = -1;
     private boolean eof = false;
 
-    public AbstractCharStream(DsonMode dsonMode) {
-        this.dsonMode = dsonMode;
+    public AbstractCharStream() {
+    }
+
+    /** 应该只在初始化时使用 */
+    protected final void setPosition(int position) {
+        this.position = position;
     }
 
     protected final void addLine(LineInfo lineInfo) {

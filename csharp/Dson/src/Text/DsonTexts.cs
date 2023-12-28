@@ -157,6 +157,8 @@ public static class DsonTexts
         return true;
     }
 
+    #region bool/null
+
     public static bool ParseBool(string str) {
         if (str == "true" || str == "1") return true;
         if (str == "false" || str == "0") return false;
@@ -169,6 +171,7 @@ public static class DsonTexts
         }
         throw new ArgumentException("invalid null str: " + str);
     }
+    #endregion
 
     #region 数字
 
@@ -289,6 +292,8 @@ public static class DsonTexts
 
     #endregion
 
+    #region linehead扩展
+
     /** 通过行首label字符查找行首枚举 */
     public static LineHead? LineHeadOfLabel(string label) {
         return label switch
@@ -314,6 +319,7 @@ public static class DsonTexts
             _ => throw new InvalidOperationException()
         };
     }
+    #endregion
 
     /** 获取类型名对应的Token类型 */
     public static DsonTokenType TokenTypeOfClsName(string label) {
@@ -352,5 +358,44 @@ public static class DsonTexts
             DsonType.Timestamp => new DsonToken(DsonTokenType.BuiltinStruct, LabelDatetime, -1),
             _ => throw new ArgumentException(nameof(dsonType))
         };
+    }
+
+    /** 检测dson文本的类型 -- 对于文件，可以通过规范命名规范来表达 */
+    public static DsonMode DetectDsonMode(string dsonString) {
+        for (int i = 0, len = dsonString.Length; i < len; i++) {
+            char firstChar = dsonString[i];
+            if (char.IsWhiteSpace(firstChar)) {
+                continue;
+            }
+            return DetectDsonMode(firstChar);
+        }
+        return DsonMode.Relaxed;
+    }
+    
+    /**
+     * 首个字符的范围：行首和对象开始符
+     */
+    public static DsonMode DetectDsonMode(char firstChar) {
+        LineHead? lineHead = LineHeadOfLabel(firstChar.ToString());
+        if (lineHead.HasValue) {
+            return DsonMode.Standard;
+        }
+        if (firstChar != '{' && firstChar != '[' && firstChar != '@') {
+            throw new ArgumentException("the string is not a valid dson string");
+        }
+        return DsonMode.Relaxed;
+    }
+    
+    /** 索引首个非空白字符的位置 */
+    public static int IndexOfNonWhitespace(string str, int startIndex) {
+        if (startIndex < 0) {
+            throw new IndexOutOfRangeException("Index out of range: " + startIndex);
+        }
+        for (int idx = startIndex, length = str.Length; idx < length; idx++) {
+            if (!char.IsWhiteSpace(str[idx])) {
+                return idx;
+            }
+        }
+        return -1;
     }
 }

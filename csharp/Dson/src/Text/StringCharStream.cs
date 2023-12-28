@@ -26,9 +26,16 @@ class StringCharStream : AbstractCharStream
     private string _buffer;
 #nullable enable
 
-    public StringCharStream(string buffer, DsonMode dsonMode)
-        : base(dsonMode) {
+    public StringCharStream(string buffer) {
         this._buffer = buffer ?? throw new ArgumentNullException(nameof(buffer));
+        int idx = DsonTexts.IndexOfNonWhitespace(buffer, 0);
+        if (idx < 0) {
+            _dsonMode = DsonMode.Relaxed;
+            SetPosition(buffer.Length);
+        } else {
+            _dsonMode = DsonTexts.DetectDsonMode(buffer[idx]);
+            SetPosition(idx - 1);
+        }
     }
 
     public override void Dispose() {
@@ -104,7 +111,7 @@ class StringCharStream : AbstractCharStream
         LineHead? lineHead = LineHead.Comment;
         int contentStartPos = -1;
         int lastReadablePos = LineInfo.LastReadablePosition(state, endPos);
-        if (DsonMode == DsonMode.Relaxed) {
+        if (_dsonMode == DsonMode.Relaxed) {
             if (startPos <= lastReadablePos) {
                 lineHead = LineHead.Append;
                 contentStartPos = startPos;

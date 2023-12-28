@@ -48,7 +48,7 @@ public class Json2DsonTest {
     @Test
     void test() {
         DsonValue dsonValue;
-        try (DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.DEFAULT, jsonString, DsonMode.RELAXED)) {
+        try (DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.DEFAULT, jsonString)) {
             dsonValue = Dsons.readTopDsonValue(reader);
             Assertions.assertInstanceOf(DsonObject.class, dsonValue);
         }
@@ -57,14 +57,15 @@ public class Json2DsonTest {
     private static void testBigFile() throws IOException {
         String jsonFilePath = "D:\\github-mine\\Dson\\testres\\test.json";
         String dsonFilePath = "D:\\github-mine\\Dson\\testres\\testout.dson";
-        try (DsonScanner scanner = Dsons.newStreamScanner(new FileReader(jsonFilePath), DsonMode.RELAXED);
+        try (DsonScanner scanner = Dsons.newStreamScanner(new FileReader(jsonFilePath));
              DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.DEFAULT, scanner)) {
             DsonValue jsonObject = Dsons.readTopDsonValue(reader);
-            DsonValue jsonObject2 = Dsons.fromRelaxedDson(FileUtils.readFileToString(new File(jsonFilePath), StandardCharsets.UTF_8));
+            CharSequence dsonString = FileUtils.readFileToString(new File(jsonFilePath), StandardCharsets.UTF_8);
+            DsonValue jsonObject2 = Dsons.fromDson(dsonString);
             Assertions.assertEquals(jsonObject, jsonObject2);
 
             String dson = Dsons.toDson(jsonObject, ObjectStyle.INDENT, DsonMode.RELAXED);
-            DsonValue jsonObject3 = Dsons.fromRelaxedDson(dson);
+            DsonValue jsonObject3 = Dsons.fromDson(dson);
             Assertions.assertEquals(jsonObject, jsonObject3);
 
             FileUtils.writeStringToFile(new File(dsonFilePath), dson, StandardCharsets.UTF_8);

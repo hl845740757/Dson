@@ -103,23 +103,15 @@ public interface DsonCharStream extends AutoCloseable {
     // region 工厂方法
 
     static DsonCharStream newCharStream(CharSequence dsonString) {
-        return new StringCharStream(dsonString, DsonMode.STANDARD);
-    }
-
-    static DsonCharStream newCharStream(CharSequence dsonString, DsonMode dsonMode) {
-        return new StringCharStream(dsonString, dsonMode);
+        return new StringCharStream(dsonString);
     }
 
     static DsonCharStream newBufferedCharStream(Reader reader) {
-        return new BufferedCharStream(reader, DsonMode.STANDARD);
+        return new BufferedCharStream(reader);
     }
 
-    static DsonCharStream newBufferedCharStream(Reader reader, DsonMode dsonMode) {
-        return new BufferedCharStream(reader, dsonMode);
-    }
-
-    static DsonCharStream newBufferedCharStream(Reader reader, DsonMode dsonMode, int bufferSize, boolean autoClose) {
-        return new BufferedCharStream(reader, dsonMode, bufferSize, autoClose);
+    static DsonCharStream newBufferedCharStream(Reader reader, int bufferSize, boolean autoClose) {
+        return new BufferedCharStream(reader, bufferSize, autoClose);
     }
 
     // endregion

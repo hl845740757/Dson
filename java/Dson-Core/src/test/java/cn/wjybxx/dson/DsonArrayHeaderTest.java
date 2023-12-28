@@ -41,7 +41,7 @@ public class DsonArrayHeaderTest {
         String dsonString = Dsons.toDson(array, ObjectStyle.FLOW, DsonMode.RELAXED);
         System.out.println(dsonString);
 
-        DsonValue copiedArray = Dsons.fromDson(dsonString, DsonMode.RELAXED);
+        DsonValue copiedArray = Dsons.fromDson(dsonString);
         Assertions.assertEquals(array, copiedArray);
     }
 
@@ -55,7 +55,7 @@ public class DsonArrayHeaderTest {
         String dsonString = Dsons.toDson(array, ObjectStyle.FLOW, DsonMode.RELAXED);
         System.out.println(dsonString);
 
-        DsonValue copiedArray = Dsons.fromDson(dsonString, DsonMode.RELAXED);
+        DsonValue copiedArray = Dsons.fromDson(dsonString);
         Assertions.assertEquals(array, copiedArray);
     }
 
@@ -70,7 +70,7 @@ public class DsonArrayHeaderTest {
         String dsonString = Dsons.toDson(array, ObjectStyle.FLOW, DsonMode.RELAXED);
         System.out.println(dsonString);
 
-        DsonValue copiedArray = Dsons.fromDson(dsonString, DsonMode.RELAXED);
+        DsonValue copiedArray = Dsons.fromDson(dsonString);
         Assertions.assertEquals(array, copiedArray);
     }
 }

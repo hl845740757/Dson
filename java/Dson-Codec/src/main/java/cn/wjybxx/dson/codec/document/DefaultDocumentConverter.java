@@ -149,8 +149,8 @@ public class DefaultDocumentConverter implements DocumentConverter {
     }
 
     @Override
-    public <U> U readFromDson(CharSequence source, DsonMode dsonMode, @Nonnull TypeArgInfo<U> typeArgInfo) {
-        try (DsonReader textReader = new DsonTextReader(options.textReaderSettings, source, dsonMode);
+    public <U> U readFromDson(CharSequence source, @Nonnull TypeArgInfo<U> typeArgInfo) {
+        try (DsonReader textReader = new DsonTextReader(options.textReaderSettings, source);
              DocumentObjectReader wrapper = new DefaultDocumentObjectReader(this, toDsonObjectReader(textReader))) {
             return wrapper.readObject(typeArgInfo);
         }
@@ -168,8 +168,8 @@ public class DefaultDocumentConverter implements DocumentConverter {
     }
 
     @Override
-    public <U> U readFromDson(Reader source, DsonMode dsonMode, @Nonnull TypeArgInfo<U> typeArgInfo) {
-        try (DsonReader textReader = new DsonTextReader(options.textReaderSettings, Dsons.newStreamScanner(source, dsonMode, 256, true));
+    public <U> U readFromDson(Reader source, @Nonnull TypeArgInfo<U> typeArgInfo) {
+        try (DsonReader textReader = new DsonTextReader(options.textReaderSettings, Dsons.newStreamScanner(source, 256, true));
              DocumentObjectReader wrapper = new DefaultDocumentObjectReader(this, toDsonObjectReader(textReader))) {
             return wrapper.readObject(typeArgInfo);
         }

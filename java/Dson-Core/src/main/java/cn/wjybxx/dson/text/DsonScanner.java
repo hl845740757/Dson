@@ -33,8 +33,8 @@ public class DsonScanner implements AutoCloseable {
     private StringBuilder pooledStringBuilder = new StringBuilder(64);
     private final char[] hexBuffer = new char[4];
 
-    public DsonScanner(String dson, DsonMode dsonMode) {
-        this.charStream = new StringCharStream(dson, dsonMode);
+    public DsonScanner(CharSequence dson) {
+        this.charStream = new StringCharStream(dson);
     }
 
     public DsonScanner(DsonCharStream charStream) {

@@ -53,8 +53,8 @@ public class DsonTextReader : AbstractDsonReader<string>
     private readonly List<DsonToken> _markedTokenQueue = new(6);
 #nullable enable
 
-    public DsonTextReader(DsonTextReaderSettings settings, string dson, DsonMode dsonMode = DsonMode.Standard)
-        : this(settings, new DsonScanner(dson, dsonMode)) {
+    public DsonTextReader(DsonTextReaderSettings settings, string dsonString)
+        : this(settings, new DsonScanner(dsonString)) {
     }
 
     public DsonTextReader(DsonTextReaderSettings settings, DsonScanner scanner)

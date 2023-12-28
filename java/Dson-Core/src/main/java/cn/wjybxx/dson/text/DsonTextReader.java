@@ -60,12 +60,8 @@ public class DsonTextReader extends AbstractDsonReader {
     private boolean marking;
     private final ArrayDeque<DsonToken> markedTokenQueue = new ArrayDeque<>(6);
 
-    public DsonTextReader(DsonTextReaderSettings settings, CharSequence dson) {
-        this(settings, new DsonScanner(DsonCharStream.newCharStream(dson)));
-    }
-
-    public DsonTextReader(DsonTextReaderSettings settings, CharSequence dson, DsonMode dsonMode) {
-        this(settings, new DsonScanner(DsonCharStream.newCharStream(dson, dsonMode)));
+    public DsonTextReader(DsonTextReaderSettings settings, CharSequence dsonString) {
+        this(settings, new DsonScanner(dsonString));
     }
 
     public DsonTextReader(DsonTextReaderSettings settings, DsonScanner scanner) {

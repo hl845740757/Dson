@@ -604,13 +604,9 @@ public static class Dsons
         return stringWriter.ToString();
     }
 
-    /** @param dsonString 宽松样式的dson字符串 */
-    public static DsonValue FromRelaxedDson(string jsonString) {
-        return FromDson(jsonString, DsonMode.Relaxed);
-    }
-
-    public static DsonValue FromDson(string dsonString, DsonMode dsonMode = DsonMode.Standard) {
-        using DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.Default, dsonString, dsonMode);
+    /** 默认只读取第一个值 */
+    public static DsonValue FromDson(string dsonString) {
+        using DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.Default, dsonString);
         return ReadTopDsonValue(reader)!;
     }
 
@@ -634,13 +630,12 @@ public static class Dsons
 
     #region 工厂方法
 
-    public static DsonScanner NewStringScanner(string dsonString, DsonMode dsonMode = DsonMode.Standard) {
-        return new DsonScanner(IDsonCharStream.NewCharStream(dsonString, dsonMode));
+    public static DsonScanner NewStringScanner(string dsonString) {
+        return new DsonScanner(IDsonCharStream.NewCharStream(dsonString));
     }
 
-    public static DsonScanner NewStreamScanner(TextReader reader, DsonMode dsonMode = DsonMode.Standard,
-                                               int bufferSize = 512, bool autoClose = true) {
-        return new DsonScanner(IDsonCharStream.NewBufferedCharStream(reader, dsonMode, bufferSize, autoClose));
+    public static DsonScanner NewStreamScanner(TextReader reader, int bufferSize = 512, bool autoClose = true) {
+        return new DsonScanner(IDsonCharStream.NewBufferedCharStream(reader, bufferSize, autoClose));
     }
 
     #endregion

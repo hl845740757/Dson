@@ -28,15 +28,19 @@ namespace Wjybxx.Dson.Text;
 /// </summary>
 public abstract class AbstractCharStream : IDsonCharStream
 {
-    protected readonly DsonMode DsonMode;
+    protected DsonMode _dsonMode;
     private readonly List<LineInfo> _lines = new List<LineInfo>();
     private LineInfo? _curLine;
     private bool _readingContent = false;
     private int _position = -1;
     private bool _eof = false;
 
-    internal AbstractCharStream(DsonMode dsonMode) {
-        this.DsonMode = dsonMode;
+    internal AbstractCharStream() {
+    }
+
+    /** 应该只在初始化时使用 */
+    protected void SetPosition(int position) {
+        _position = position;
     }
 
     protected void AddLine(LineInfo lineInfo) {

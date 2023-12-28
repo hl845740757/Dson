@@ -20,6 +20,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
+using Wjybxx.Dson.IO;
 
 namespace Wjybxx.Dson.Text;
 
@@ -27,7 +28,7 @@ class BufferedCharStream : AbstractCharStream
 {
     private const int MinBufferSize = 32;
     /** 行首前面超过1000个空白字符是有问题的 */
-    private const int MaxBufferSize = 1024;
+    private const int MaxBufferSize = 4096;
 
 #nullable disable
     private TextReader _reader;
@@ -43,12 +44,39 @@ class BufferedCharStream : AbstractCharStream
     /** reader是否已到达文件尾部 -- 部分reader在到达文件尾部的时候不可继续读 */
     private bool _readerEof;
 
-    public BufferedCharStream(TextReader reader, DsonMode dsonMode,
-                              int bufferSize = 64, bool autoClose = true) : base(dsonMode) {
+    public BufferedCharStream(TextReader reader, int bufferSize = 64, bool autoClose = true) {
+        bufferSize = Math.Max(MinBufferSize, bufferSize);
         this._reader = reader ?? throw new ArgumentNullException(nameof(reader));
-        this._buffer = new CharBuffer(Math.Max(MinBufferSize, bufferSize));
+        this._buffer = new CharBuffer(bufferSize);
         this._nextBuffer = new CharBuffer(64);
         this._autoClose = autoClose;
+        try {
+            DetectDsonMode();
+        }
+        catch (Exception e) {
+            throw new DsonIOException("invalid dson input", e);
+        }
+    }
+
+    private void DetectDsonMode() {
+        CharBuffer nextBuffer = this._nextBuffer;
+        int discardBytes = 0;
+        while (!_readerEof) {
+            ReadToBuffer(nextBuffer);
+            for (int idx = 0, len = nextBuffer.Length; idx < len; idx++) {
+                char firstChar = nextBuffer.CharAt(idx);
+                if (char.IsWhiteSpace(firstChar)) {
+                    continue;
+                }
+                _dsonMode = DsonTexts.DetectDsonMode(firstChar);
+                SetPosition(discardBytes + idx - 1);
+                return;
+            }
+            discardBytes += nextBuffer.Length;
+            nextBuffer.Shift(nextBuffer.Capacity);
+        }
+        _dsonMode = DsonMode.Relaxed;
+        SetPosition(discardBytes);
     }
 
     public override void Dispose() {
@@ -192,7 +220,7 @@ class BufferedCharStream : AbstractCharStream
         if (tempLine.StartPos > tempLine.EndPos) { // 无效行，没有输入
             return false;
         }
-        if (DsonMode == DsonMode.Relaxed) {
+        if (_dsonMode == DsonMode.Relaxed) {
             if (startPos > tempLine.LastReadablePosition()) { // 空行(仅换行符)
                 tempLine = new LineInfo(ln, startPos, tempLine.EndPos, LineHead.Append, -1);
             }

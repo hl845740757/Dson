@@ -54,7 +54,7 @@ public class DsonTextReaderTest2 {
                     .build());
             System.out.println("Mode:" + DsonMode.RELAXED);
             System.out.println(dsonString3);
-            DsonValue dsonObject3 = Dsons.fromRelaxedDson(dsonString3);
+            DsonValue dsonObject3 = Dsons.fromDson(dsonString3);
             Assertions.assertEquals(dsonObject, dsonObject3);
         }
 
@@ -98,7 +98,7 @@ public class DsonTextReaderTest2 {
                     .build());
             System.out.println("FlowStyle: Relaxed");
             System.out.println(dsonString3);
-            DsonValue dsonObject3 = Dsons.fromRelaxedDson(dsonString3);
+            DsonValue dsonObject3 = Dsons.fromDson(dsonString3);
             Assertions.assertEquals(dsonObject, dsonObject3);
         }
     }

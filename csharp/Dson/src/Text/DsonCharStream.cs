@@ -108,27 +108,20 @@ public interface IDsonCharStream : IDisposable
 
     #region 工厂方法
 
-    /** 创建一个基于json字符串的字符流 */
-    public static IDsonCharStream NewJsonStream(string jsonString) {
-        return new StringCharStream(jsonString, DsonMode.Relaxed);
-    }
-
     /** 创建一个基于string的字符流 */
-    public static IDsonCharStream NewCharStream(string dsonString, DsonMode dsonMode = DsonMode.Standard) {
-        return new StringCharStream(dsonString, dsonMode);
+    public static IDsonCharStream NewCharStream(string dsonString) {
+        return new StringCharStream(dsonString);
     }
 
     /// <summary>
     /// 创建一个基于TextReader的带缓存的Dson字符串流
     /// </summary>
     /// <param name="reader">Stream流</param>
-    /// <param name="dsonMode">文本模式</param>
     /// <param name="bufferSize">缓冲区大小</param>
     /// <param name="autoClose">是否自动关闭Stream</param>
     /// <returns></returns>
-    public static IDsonCharStream NewBufferedCharStream(TextReader reader, DsonMode dsonMode = DsonMode.Standard,
-                                                        int bufferSize = 512, bool autoClose = true) {
-        return new BufferedCharStream(reader, dsonMode, bufferSize, autoClose);
+    public static IDsonCharStream NewBufferedCharStream(TextReader reader, int bufferSize = 512, bool autoClose = true) {
+        return new BufferedCharStream(reader, bufferSize, autoClose);
     }
 
     #endregion

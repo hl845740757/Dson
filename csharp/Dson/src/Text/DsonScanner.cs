@@ -37,8 +37,8 @@ public class DsonScanner : IDisposable
     private readonly char[] _hexBuffer = new char[4];
 #nullable enable
 
-    public DsonScanner(string dson, DsonMode dsonMode = DsonMode.Standard) {
-        _charStream = new StringCharStream(dson, dsonMode);
+    public DsonScanner(string dson) {
+        _charStream = new StringCharStream(dson);
     }
 
     public DsonScanner(IDsonCharStream charStream) {
