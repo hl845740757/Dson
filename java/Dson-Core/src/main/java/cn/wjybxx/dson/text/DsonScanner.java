@@ -53,6 +53,13 @@ public class DsonScanner implements AutoCloseable {
     }
 
     public DsonToken nextToken() {
+        return nextToken(false);
+    }
+
+    /**
+     * @param skipValue 是否跳过值解析；如果为true，则仅扫描而不截取内容解析；这对于快速扫描确定位置时特别有用
+     */
+    public DsonToken nextToken(boolean skipValue) {
         if (charStream == null) {
             throw new DsonParseException("Scanner closed");
         }
@@ -84,9 +91,9 @@ public class DsonScanner implements AutoCloseable {
             case ']' -> new DsonToken(DsonTokenType.END_ARRAY, "]", getPosition());
             case ':' -> new DsonToken(DsonTokenType.COLON, ":", getPosition());
             case ',' -> new DsonToken(DsonTokenType.COMMA, ",", getPosition());
-            case '@' -> parseTypeToken();
-            case '"' -> new DsonToken(DsonTokenType.STRING, scanString((char) c), getPosition());
-            default -> new DsonToken(DsonTokenType.UNQUOTE_STRING, scanUnquotedString((char) c), getPosition());
+            case '@' -> parseTypeToken(skipValue);
+            case '"' -> new DsonToken(DsonTokenType.STRING, scanString((char) c, skipValue), getPosition());
+            default -> new DsonToken(DsonTokenType.UNQUOTE_STRING, scanUnquotedString((char) c, skipValue), getPosition());
         };
     }
 
@@ -134,7 +141,7 @@ public class DsonScanner implements AutoCloseable {
 
     // region header
 
-    private DsonToken parseTypeToken() {
+    private DsonToken parseTypeToken(boolean skipValue) {
         int firstChar = charStream.read();
         if (firstChar < 0) {
             throw invalidClassName("@", getPosition());
@@ -144,9 +151,10 @@ public class DsonScanner implements AutoCloseable {
             return scanHeader();
         }
         // '@' 对应的是内建值类型，@i @L ...
-        return scanBuiltinValue(firstChar);
+        return scanBuiltinValue(firstChar, skipValue);
     }
 
+    /** header不处理跳过逻辑 -- 1.header信息很重要 2.header比例较低 */
     private DsonToken scanHeader() {
         DsonCharStream buffer = this.charStream;
         final int beginPos = buffer.getPosition();
@@ -156,7 +164,7 @@ public class DsonScanner implements AutoCloseable {
         }
         String className;
         if (firstChar == '"') {
-            className = scanString((char) firstChar);
+            className = scanString((char) firstChar, false);
         } else {
             // 非双引号模式下，只能由安全字符构成
             if (DsonTexts.isUnsafeStringChar(firstChar)) {
@@ -191,7 +199,7 @@ public class DsonScanner implements AutoCloseable {
     }
 
     /** 内建值无引号，且类型标签后必须是空格或换行缩进 */
-    private DsonToken scanBuiltinValue(int firstChar) {
+    private DsonToken scanBuiltinValue(int firstChar, boolean skipValue) {
         assert firstChar != '"';
         // 非双引号模式下，只能由安全字符构成
         if (DsonTexts.isUnsafeStringChar(firstChar)) {
@@ -217,50 +225,68 @@ public class DsonScanner implements AutoCloseable {
         if (DsonInternals.isBlank(className)) {
             throw invalidClassName(className, getPosition());
         }
-        return onReadClassName(className);
+        return onReadClassName(className, skipValue);
     }
 
-    private DsonToken onReadClassName(String className) {
+    private DsonToken onReadClassName(String className, boolean skipValue) {
         final int position = getPosition();
         switch (className) {
             case DsonTexts.LABEL_INT32 -> {
-                DsonToken nextToken = nextToken();
+                DsonToken nextToken = nextToken(skipValue);
+                if (skipValue) {
+                    return new DsonToken(DsonTokenType.INT32, null, getPosition());
+                }
                 checkToken(STRING_TOKEN_TYPES, nextToken.getType(), position);
                 return new DsonToken(DsonTokenType.INT32, DsonTexts.parseInt(nextToken.castAsString()), getPosition());
             }
             case DsonTexts.LABEL_INT64 -> {
-                DsonToken nextToken = nextToken();
+                DsonToken nextToken = nextToken(skipValue);
+                if (skipValue) {
+                    return new DsonToken(DsonTokenType.INT64, null, getPosition());
+                }
                 checkToken(STRING_TOKEN_TYPES, nextToken.getType(), position);
                 return new DsonToken(DsonTokenType.INT64, DsonTexts.parseLong(nextToken.castAsString()), getPosition());
             }
             case DsonTexts.LABEL_FLOAT -> {
-                DsonToken nextToken = nextToken();
+                DsonToken nextToken = nextToken(skipValue);
+                if (skipValue) {
+                    return new DsonToken(DsonTokenType.FLOAT, null, getPosition());
+                }
                 checkToken(STRING_TOKEN_TYPES, nextToken.getType(), position);
                 return new DsonToken(DsonTokenType.FLOAT, DsonTexts.parseFloat(nextToken.castAsString()), getPosition());
             }
             case DsonTexts.LABEL_DOUBLE -> {
-                DsonToken nextToken = nextToken();
+                DsonToken nextToken = nextToken(skipValue);
+                if (skipValue) {
+                    return new DsonToken(DsonTokenType.DOUBLE, null, getPosition());
+                }
                 checkToken(STRING_TOKEN_TYPES, nextToken.getType(), position);
                 return new DsonToken(DsonTokenType.DOUBLE, DsonTexts.parseDouble(nextToken.castAsString()), getPosition());
             }
             case DsonTexts.LABEL_BOOL -> {
-                DsonToken nextToken = nextToken();
+                DsonToken nextToken = nextToken(skipValue);
+                if (skipValue) {
+                    return new DsonToken(DsonTokenType.BOOL, null, getPosition());
+                }
                 checkToken(STRING_TOKEN_TYPES, nextToken.getType(), position);
                 return new DsonToken(DsonTokenType.BOOL, DsonTexts.parseBool(nextToken.castAsString()), getPosition());
             }
             case DsonTexts.LABEL_NULL -> {
-                DsonToken nextToken = nextToken();
+                DsonToken nextToken = nextToken(skipValue);
+                if (skipValue) {
+                    return new DsonToken(DsonTokenType.NULL, null, getPosition());
+                }
                 checkToken(STRING_TOKEN_TYPES, nextToken.getType(), position);
                 DsonTexts.checkNullString(nextToken.castAsString());
                 return new DsonToken(DsonTokenType.NULL, null, getPosition());
             }
             case DsonTexts.LABEL_STRING -> {
-                DsonToken nextToken = nextToken();
+                DsonToken nextToken = nextToken(skipValue);
                 checkToken(STRING_TOKEN_TYPES, nextToken.getType(), position);
                 return new DsonToken(DsonTokenType.STRING, nextToken.castAsString(), getPosition());
             }
             case DsonTexts.LABEL_TEXT -> {
-                return new DsonToken(DsonTokenType.STRING, scanText(), getPosition());
+                return new DsonToken(DsonTokenType.STRING, scanText(skipValue), getPosition());
             }
         }
         return new DsonToken(DsonTokenType.BUILTIN_STRUCT, className, getPosition());
@@ -293,11 +319,17 @@ public class DsonScanner implements AutoCloseable {
      * （该方法只使用扫描元素，不适合扫描标签）
      *
      * @param firstChar 第一个非空白字符
+     * @param skipValue 是否跳过值解析
      */
-    private String scanUnquotedString(final char firstChar) {
-        DsonCharStream buffer = this.charStream;
+    private String scanUnquotedString(final char firstChar, boolean skipValue) {
         StringBuilder sb = allocStringBuilder();
-        sb.append((char) firstChar);
+        scanUnquotedString(firstChar, sb);
+        return skipValue ? null : sb.toString();
+    }
+
+    private void scanUnquotedString(char firstChar, StringBuilder sb) {
+        DsonCharStream buffer = this.charStream;
+        sb.append(firstChar);
         int c;
         while ((c = buffer.read()) != -1) {
             if (c == -2) {
@@ -312,7 +344,6 @@ public class DsonScanner implements AutoCloseable {
             sb.append((char) c);
         }
         buffer.unread();
-        return sb.toString();
     }
 
     /**
@@ -320,9 +351,14 @@ public class DsonScanner implements AutoCloseable {
      *
      * @param quoteChar 引号字符
      */
-    private String scanString(char quoteChar) {
-        DsonCharStream buffer = this.charStream;
+    private String scanString(char quoteChar, boolean skipValue) {
         StringBuilder sb = allocStringBuilder();
+        scanString(quoteChar, sb);
+        return skipValue ? null : sb.toString();
+    }
+
+    private void scanString(char quoteChar, StringBuilder sb) {
+        DsonCharStream buffer = this.charStream;
         int c;
         while ((c = buffer.read()) != -1) {
             if (c == -2) {
@@ -336,7 +372,7 @@ public class DsonScanner implements AutoCloseable {
             } else if (c == '\\') { // 处理转义字符
                 doEscape(buffer, sb, LineHead.APPEND);
             } else if (c == quoteChar) { // 结束
-                return sb.toString();
+                return;
             } else {
                 sb.append((char) c);
             }
@@ -345,16 +381,21 @@ public class DsonScanner implements AutoCloseable {
     }
 
     /** 扫描文本段 */
-    private String scanText() {
-        DsonCharStream buffer = this.charStream;
+    private String scanText(boolean skipValue) {
         StringBuilder sb = allocStringBuilder();
+        scanText(sb);
+        return skipValue ? null : sb.toString();
+    }
+
+    private void scanText(StringBuilder sb) {
+        DsonCharStream buffer = this.charStream;
         int c;
         while ((c = buffer.read()) != -1) {
             if (c == -2) {
                 if (buffer.getLineHead() == LineHead.COMMENT) {
                     buffer.skipLine();
                 } else if (buffer.getLineHead() == LineHead.END_OF_TEXT) { // 读取结束
-                    return sb.toString();
+                    return;
                 }
                 if (buffer.getLineHead() == LineHead.APPEND_LINE) { // 开启新行
                     sb.append('\n');

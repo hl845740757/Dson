@@ -123,6 +123,13 @@ public class DsonTextReader : AbstractDsonReader<string>
         }
     }
 
+    private DsonToken SkipToken() {
+        if (_pushedTokenQueue.Count == 0) {
+            return _scanner.NextToken(skipValue: true);
+        }
+        return _pushedTokenQueue.Pop();
+    }
+
     private void PushToken(DsonToken token) {
         // if (token == null) throw new ArgumentNullException(nameof(token));
         _pushedTokenQueue.Push(token);
@@ -881,7 +888,7 @@ public class DsonTextReader : AbstractDsonReader<string>
     /** @return 触发结束的token */
     private DsonToken SkipStack(int stack) {
         while (stack > 0) {
-            DsonToken token = PopToken();
+            DsonToken token = _marking ? PopToken() : SkipToken();
             switch (token.Type) {
                 case DsonTokenType.BeginArray:
                 case DsonTokenType.BeginObject:

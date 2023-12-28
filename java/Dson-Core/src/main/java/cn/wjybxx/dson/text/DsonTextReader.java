@@ -110,6 +110,13 @@ public class DsonTextReader extends AbstractDsonReader {
         }
     }
 
+    private DsonToken skipToken() {
+        if (pushedTokenQueue.isEmpty()) {
+            return scanner.nextToken(true);
+        }
+        return pushedTokenQueue.pop();
+    }
+
     private void pushToken(DsonToken token) {
         Objects.requireNonNull(token);
         pushedTokenQueue.push(token);
@@ -875,7 +882,7 @@ public class DsonTextReader extends AbstractDsonReader {
     /** @return 触发结束的token */
     private DsonToken skipStack(int stack) {
         while (stack > 0) {
-            DsonToken token = popToken();
+            DsonToken token = marking ? popToken() : skipToken();
             switch (token.getType()) {
                 case BEGIN_ARRAY, BEGIN_OBJECT, BEGIN_HEADER -> stack++;
                 case END_ARRAY, END_OBJECT -> {

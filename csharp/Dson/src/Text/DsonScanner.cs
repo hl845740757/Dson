@@ -53,8 +53,13 @@ public class DsonScanner : IDisposable
         _pooledStringBuilder = null;
     }
 
-    /** 扫描下一个Token */
-    public DsonToken NextToken() {
+    /// <summary>
+    /// 扫描下一个token
+    /// </summary>
+    /// <param name="skipValue">是否跳过值的解析；如果为true，则仅扫描而不截取内容解析；这对于快速扫描确定位置时特别有用</param>
+    /// <returns></returns>
+    /// <exception cref="DsonParseException"></exception>
+    public DsonToken NextToken(bool skipValue = false) {
         if (_charStream == null) {
             throw new DsonParseException("Scanner closed");
         }
@@ -86,9 +91,9 @@ public class DsonScanner : IDisposable
             case ']': return new DsonToken(DsonTokenType.EndArray, "]", Position);
             case ':': return new DsonToken(DsonTokenType.Colon, ":", Position);
             case ',': return new DsonToken(DsonTokenType.Comma, ",", Position);
-            case '@': return ParseTypeToken();
-            case '"': return new DsonToken(DsonTokenType.String, ScanString((char)c), Position);
-            default: return new DsonToken(DsonTokenType.UnquoteString, ScanUnquotedString((char)c), Position);
+            case '@': return ParseTypeToken(skipValue);
+            case '"': return new DsonToken(DsonTokenType.String, ScanString((char)c, skipValue), Position);
+            default: return new DsonToken(DsonTokenType.UnquoteString, ScanUnquotedString((char)c, skipValue), Position);
         }
     }
 
@@ -133,7 +138,7 @@ public class DsonScanner : IDisposable
 
     #region header
 
-    private DsonToken ParseTypeToken() {
+    private DsonToken ParseTypeToken(bool skipValue) {
         int firstChar = _charStream.Read();
         if (firstChar < 0) {
             throw InvalidClassName("@", Position);
@@ -143,9 +148,10 @@ public class DsonScanner : IDisposable
             return ScanHeader();
         }
         // '@' 对应的是内建值类型，@i @L ...
-        return ScanBuiltinValue(firstChar);
+        return ScanBuiltinValue(firstChar, skipValue);
     }
 
+    /** header不处理跳过逻辑 -- 1.header信息很重要 2.header比例较低 */
     private DsonToken ScanHeader() {
         IDsonCharStream buffer = this._charStream;
         int beginPos = buffer.Position;
@@ -155,7 +161,7 @@ public class DsonScanner : IDisposable
         }
         string className;
         if (firstChar == '"') {
-            className = ScanString((char)firstChar);
+            className = ScanString((char)firstChar, false)!;
         } else {
             // 非双引号模式下，只能由安全字符构成
             if (DsonTexts.IsUnsafeStringChar(firstChar)) {
@@ -190,7 +196,7 @@ public class DsonScanner : IDisposable
     }
 
     /** 内建值无引号，且类型标签后必须是空格或换行缩进 */
-    private DsonToken ScanBuiltinValue(int firstChar) {
+    private DsonToken ScanBuiltinValue(int firstChar, bool skipValue) {
         Debug.Assert(firstChar != '"');
         // 非双引号模式下，只能由安全字符构成
         if (DsonTexts.IsUnsafeStringChar(firstChar)) {
@@ -216,50 +222,68 @@ public class DsonScanner : IDisposable
         if (string.IsNullOrWhiteSpace(className)) {
             throw InvalidClassName(className, Position);
         }
-        return OnReadClassName(className);
+        return OnReadClassName(className, skipValue);
     }
 
-    private DsonToken OnReadClassName(string className) {
+    private DsonToken OnReadClassName(string className, bool skipValue) {
         int position = Position;
         switch (className) {
             case DsonTexts.LabelInt32: {
-                DsonToken nextToken = NextToken();
+                DsonToken nextToken = NextToken(skipValue);
+                if (skipValue) {
+                    return new DsonToken(DsonTokenType.Int32, null, Position);
+                }
                 CheckToken(StringTokenTypes, nextToken.Type, position);
                 return new DsonToken(DsonTokenType.Int32, DsonTexts.ParseInt(nextToken.CastAsString()), Position);
             }
             case DsonTexts.LabelInt64: {
-                DsonToken nextToken = NextToken();
+                DsonToken nextToken = NextToken(skipValue);
+                if (skipValue) {
+                    return new DsonToken(DsonTokenType.Int64, null, Position);
+                }
                 CheckToken(StringTokenTypes, nextToken.Type, position);
                 return new DsonToken(DsonTokenType.Int64, DsonTexts.ParseLong(nextToken.CastAsString()), Position);
             }
             case DsonTexts.LabelFloat: {
-                DsonToken nextToken = NextToken();
+                DsonToken nextToken = NextToken(skipValue);
+                if (skipValue) {
+                    return new DsonToken(DsonTokenType.Float, null, Position);
+                }
                 CheckToken(StringTokenTypes, nextToken.Type, position);
                 return new DsonToken(DsonTokenType.Float, DsonTexts.ParseFloat(nextToken.CastAsString()), Position);
             }
             case DsonTexts.LabelDouble: {
-                DsonToken nextToken = NextToken();
+                DsonToken nextToken = NextToken(skipValue);
+                if (skipValue) {
+                    return new DsonToken(DsonTokenType.Double, null, Position);
+                }
                 CheckToken(StringTokenTypes, nextToken.Type, position);
                 return new DsonToken(DsonTokenType.Double, DsonTexts.ParseDouble(nextToken.CastAsString()), Position);
             }
             case DsonTexts.LabelBool: {
-                DsonToken nextToken = NextToken();
+                DsonToken nextToken = NextToken(skipValue);
+                if (skipValue) {
+                    return new DsonToken(DsonTokenType.Bool, null, Position);
+                }
                 CheckToken(StringTokenTypes, nextToken.Type, position);
                 return new DsonToken(DsonTokenType.Bool, DsonTexts.ParseBool(nextToken.CastAsString()), Position);
             }
             case DsonTexts.LabelNull: {
-                DsonToken nextToken = NextToken();
+                DsonToken nextToken = NextToken(skipValue);
+                if (skipValue) {
+                    return new DsonToken(DsonTokenType.Null, null, Position);
+                }
                 CheckToken(StringTokenTypes, nextToken.Type, position);
                 DsonTexts.CheckNullString(nextToken.CastAsString());
                 return new DsonToken(DsonTokenType.Null, null, Position);
             }
             case DsonTexts.LabelString: {
-                DsonToken nextToken = NextToken();
+                DsonToken nextToken = NextToken(skipValue);
                 CheckToken(StringTokenTypes, nextToken.Type, position);
                 return new DsonToken(DsonTokenType.String, nextToken.CastAsString(), Position);
             }
             case DsonTexts.LabelText: {
-                return new DsonToken(DsonTokenType.String, ScanText(), Position);
+                return new DsonToken(DsonTokenType.String, ScanText(skipValue), Position);
             }
         }
         return new DsonToken(DsonTokenType.BuiltinStruct, className, Position);
@@ -295,11 +319,17 @@ public class DsonScanner : IDisposable
     /// （该方法只使用扫描元素，不适合扫描标签）
     /// </summary>
     /// <param name="firstChar">第一个非空白字符</param>
+    /// <param name="skipValue">是否跳过结果</param>
     /// <returns></returns>
-    private string ScanUnquotedString(in char firstChar) {
-        IDsonCharStream buffer = this._charStream;
+    private string? ScanUnquotedString(char firstChar, bool skipValue) {
         StringBuilder sb = AllocStringBuilder();
-        sb.Append((char)firstChar);
+        ScanUnquotedString(firstChar, sb);
+        return skipValue ? null : sb.ToString();
+    }
+
+    private void ScanUnquotedString(char firstChar, StringBuilder sb) {
+        IDsonCharStream buffer = this._charStream;
+        sb.Append(firstChar);
         int c;
         while ((c = buffer.Read()) != -1) {
             if (c == -2) {
@@ -314,17 +344,22 @@ public class DsonScanner : IDisposable
             sb.Append((char)c);
         }
         buffer.Unread();
-        return sb.ToString();
     }
 
     /// <summary>
     /// 扫描双引号字符串
     /// </summary>
     /// <param name="quoteChar">引号字符</param>
+    /// <param name="skipValue">是否跳过结果</param>
     /// <returns></returns>
-    private string ScanString(char quoteChar) {
-        IDsonCharStream buffer = this._charStream;
+    private string? ScanString(char quoteChar, bool skipValue) {
         StringBuilder sb = AllocStringBuilder();
+        ScanString(quoteChar, sb);
+        return skipValue ? null : sb.ToString();
+    }
+
+    private void ScanString(char quoteChar, StringBuilder sb) {
+        IDsonCharStream buffer = this._charStream;
         int c;
         while ((c = buffer.Read()) != -1) {
             if (c == -2) {
@@ -338,7 +373,7 @@ public class DsonScanner : IDisposable
             } else if (c == '\\') { // 处理转义字符
                 DoEscape(buffer, sb, LineHead.Append);
             } else if (c == quoteChar) { // 结束
-                return sb.ToString();
+                return;
             } else {
                 sb.Append((char)c);
             }
@@ -349,17 +384,23 @@ public class DsonScanner : IDisposable
     /// <summary>
     /// 扫描纯文本段
     /// </summary>
+    /// <param name="skipValue">是否跳过结果</param>
     /// <returns></returns>
-    private string ScanText() {
-        IDsonCharStream buffer = this._charStream;
+    private string? ScanText(bool skipValue) {
         StringBuilder sb = AllocStringBuilder();
+        ScanText(sb);
+        return skipValue ? null : sb.ToString();
+    }
+
+    private void ScanText(StringBuilder sb) {
+        IDsonCharStream buffer = this._charStream;
         int c;
         while ((c = buffer.Read()) != -1) {
             if (c == -2) {
                 if (buffer.LineHead == LineHead.Comment) {
                     buffer.SkipLine();
                 } else if (buffer.LineHead == LineHead.EndOfText) { // 读取结束
-                    return sb.ToString();
+                    return;
                 }
                 if (buffer.LineHead == LineHead.AppendLine) { // 开启新行
                     sb.Append('\n');
