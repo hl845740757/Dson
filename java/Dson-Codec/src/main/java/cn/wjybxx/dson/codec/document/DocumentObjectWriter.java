@@ -127,6 +127,8 @@ public interface DocumentObjectWriter extends AutoCloseable {
 
     ConvertOptions options();
 
+    String getCurrentName();
+
     void writeName(String name);
 
     void writeValueBytes(String name, DsonType dsonType, byte[] data);

@@ -120,6 +120,8 @@ public interface BinaryObjectWriter extends AutoCloseable {
 
     ConvertOptions options();
 
+    int getCurrentName();
+
     void writeName(int name);
 
     void writeValueBytes(int name, DsonType dsonType, byte[] data);

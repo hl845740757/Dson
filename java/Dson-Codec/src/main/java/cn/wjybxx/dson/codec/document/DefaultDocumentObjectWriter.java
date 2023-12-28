@@ -61,6 +61,11 @@ public class DefaultDocumentObjectWriter implements DocumentObjectWriter {
     }
 
     @Override
+    public String getCurrentName() {
+        return writer.getCurrentName();
+    }
+
+    @Override
     public void writeName(String name) {
         writer.writeName(name);
     }

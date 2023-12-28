@@ -18,6 +18,7 @@ package cn.wjybxx.dson.codec.binary;
 
 import cn.wjybxx.dson.codec.*;
 import cn.wjybxx.dson.codec.codecs.*;
+import cn.wjybxx.dson.types.*;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -54,33 +55,50 @@ public class BinaryConverterUtils extends ConverterUtils {
                 newCodec(new CollectionCodec<>(LinkedList.class, LinkedList::new)),
                 newCodec(new CollectionCodec<>(ArrayDeque.class, ArrayDeque::new)),
                 newCodec(new MapCodec<>(IdentityHashMap.class, IdentityHashMap::new)),
-                newCodec(new MapCodec<>(ConcurrentHashMap.class, ConcurrentHashMap::new))
+                newCodec(new MapCodec<>(ConcurrentHashMap.class, ConcurrentHashMap::new)),
+
+                // dson内建结构
+                newCodec(new BinaryCodec()),
+                newCodec(new ExtInt32Codec()),
+                newCodec(new ExtInt64Codec()),
+                newCodec(new ExtDoubleCodec()),
+                newCodec(new ExtStringCodec())
         );
 
         Map<Class<?>, BinaryPojoCodec<?>> codecMap = BinaryCodecRegistries.newCodecMap(entryList);
         CODEC_REGISTRY = new DefaultCodecRegistry(codecMap);
 
         TYPE_META_REGISTRY = TypeMetaRegistries.fromMetas(
-                TypeMeta.of(int[].class, ClassId.ofDefaultNameSpace(1)),
-                TypeMeta.of(long[].class, ClassId.ofDefaultNameSpace(2)),
-                TypeMeta.of(float[].class, ClassId.ofDefaultNameSpace(3)),
-                TypeMeta.of(double[].class, ClassId.ofDefaultNameSpace(4)),
-                TypeMeta.of(boolean[].class, ClassId.ofDefaultNameSpace(5)),
-                TypeMeta.of(String[].class, ClassId.ofDefaultNameSpace(6)),
-                TypeMeta.of(short[].class, ClassId.ofDefaultNameSpace(7)),
-                TypeMeta.of(char[].class, ClassId.ofDefaultNameSpace(8)),
+                entryOfClass(int[].class, (1)),
+                entryOfClass(long[].class, (2)),
+                entryOfClass(float[].class, (3)),
+                entryOfClass(double[].class, (4)),
+                entryOfClass(boolean[].class, (5)),
+                entryOfClass(String[].class, (6)),
+                entryOfClass(short[].class, (7)),
+                entryOfClass(char[].class, (8)),
 
-                TypeMeta.of(Object[].class, ClassId.ofDefaultNameSpace(11)),
-                TypeMeta.of(Collection.class, ClassId.ofDefaultNameSpace(12)),
-                TypeMeta.of(Map.class, ClassId.ofDefaultNameSpace(13)),
+                entryOfClass(Object[].class, (11)),
+                entryOfClass(Collection.class, (12)),
+                entryOfClass(Map.class, (13)),
 
                 // 常用具体类型集合
-                TypeMeta.of(LinkedList.class, ClassId.ofDefaultNameSpace(21)),
-                TypeMeta.of(ArrayDeque.class, ClassId.ofDefaultNameSpace(22)),
-                TypeMeta.of(IdentityHashMap.class, ClassId.ofDefaultNameSpace(23)),
-                TypeMeta.of(ConcurrentHashMap.class, ClassId.ofDefaultNameSpace(24))
+                entryOfClass(LinkedList.class, (21)),
+                entryOfClass(ArrayDeque.class, (22)),
+                entryOfClass(IdentityHashMap.class, (23)),
+                entryOfClass(ConcurrentHashMap.class, (24)),
 
+                // dson内建结构
+                entryOfClass(Binary.class, (31)),
+                entryOfClass(ExtInt32.class, (32)),
+                entryOfClass(ExtInt64.class, (33)),
+                entryOfClass(ExtDouble.class, (34)),
+                entryOfClass(ExtString.class, (35))
         );
+    }
+
+    private static TypeMeta entryOfClass(Class<?> clazz, int clsId) {
+        return TypeMeta.of(clazz, ClassId.ofDefaultNameSpace(clsId));
     }
 
     private static <T> BinaryPojoCodec<T> newCodec(BinaryPojoCodecImpl<T> codecImpl) {

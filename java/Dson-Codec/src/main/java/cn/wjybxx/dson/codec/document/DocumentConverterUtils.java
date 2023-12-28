@@ -22,6 +22,7 @@ import cn.wjybxx.dson.codec.TypeMetaRegistries;
 import cn.wjybxx.dson.codec.TypeMetaRegistry;
 import cn.wjybxx.dson.codec.codecs.*;
 import cn.wjybxx.dson.text.ObjectStyle;
+import cn.wjybxx.dson.types.*;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -58,7 +59,14 @@ public class DocumentConverterUtils extends ConverterUtils {
                 newCodec(new CollectionCodec<>(LinkedList.class, LinkedList::new)),
                 newCodec(new CollectionCodec<>(ArrayDeque.class, ArrayDeque::new)),
                 newCodec(new MapCodec<>(IdentityHashMap.class, IdentityHashMap::new)),
-                newCodec(new MapCodec<>(ConcurrentHashMap.class, ConcurrentHashMap::new))
+                newCodec(new MapCodec<>(ConcurrentHashMap.class, ConcurrentHashMap::new)),
+
+                // dson内建结构
+                newCodec(new BinaryCodec()),
+                newCodec(new ExtInt32Codec()),
+                newCodec(new ExtInt64Codec()),
+                newCodec(new ExtDoubleCodec()),
+                newCodec(new ExtStringCodec())
         );
 
         Map<Class<?>, DocumentPojoCodec<?>> codecMap = DocumentCodecRegistries.newCodecMap(entryList);
@@ -82,12 +90,23 @@ public class DocumentConverterUtils extends ConverterUtils {
                 entryOfClass(LinkedList.class),
                 entryOfClass(ArrayDeque.class),
                 entryOfClass(IdentityHashMap.class),
-                entryOfClass(ConcurrentHashMap.class)
+                entryOfClass(ConcurrentHashMap.class),
+
+                // dson内建结构
+                entryOfClass(Binary.class, "bi"),
+                entryOfClass(ExtInt32.class, "ei"),
+                entryOfClass(ExtInt64.class, "eL"),
+                entryOfClass(ExtDouble.class, "ed"),
+                entryOfClass(ExtString.class, "es")
         );
     }
 
     private static TypeMeta entryOfClass(Class<?> clazz) {
         return TypeMeta.of(clazz, ObjectStyle.INDENT, clazz.getSimpleName());
+    }
+
+    private static TypeMeta entryOfClass(Class<?> clazz, String clsName) {
+        return TypeMeta.of(clazz, ObjectStyle.INDENT, Objects.requireNonNull(clsName));
     }
 
     private static <T> DocumentPojoCodec<T> newCodec(DocumentPojoCodecImpl<T> codecImpl) {

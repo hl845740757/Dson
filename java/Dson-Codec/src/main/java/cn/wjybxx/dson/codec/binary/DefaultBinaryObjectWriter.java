@@ -56,6 +56,11 @@ public class DefaultBinaryObjectWriter implements BinaryObjectWriter {
     }
 
     @Override
+    public int getCurrentName() {
+        return writer.getCurrentName();
+    }
+
+    @Override
     public void writeName(int name) {
         writer.writeName(name);
     }
