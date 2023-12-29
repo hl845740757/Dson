@@ -330,9 +330,31 @@ public class DsonScanner implements AutoCloseable {
      * @param skipValue 是否跳过值解析
      */
     private String scanUnquotedString(final char firstChar, boolean skipValue) {
+        if (skipValue) {
+            skipUnquotedString();
+            return null;
+        }
         StringBuilder sb = allocStringBuilder();
         scanUnquotedString(firstChar, sb);
-        return skipValue ? null : sb.toString();
+        return sb.toString();
+    }
+
+    /** 无引号字符串应该的占比是极高的，skip值得处理 */
+    private void skipUnquotedString() {
+        DsonCharStream buffer = this.charStream;
+        int c;
+        while ((c = buffer.read()) != -1) {
+            if (c == -2) {
+                if (buffer.getLineHead() == LineHead.COMMENT) {
+                    buffer.skipLine();
+                }
+                continue;
+            }
+            if (DsonTexts.isUnsafeStringChar(c)) {
+                break;
+            }
+        }
+        buffer.unread();
     }
 
     private void scanUnquotedString(char firstChar, StringBuilder sb) {

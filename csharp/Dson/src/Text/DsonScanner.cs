@@ -329,11 +329,33 @@ public class DsonScanner : IDisposable
     /// <param name="skipValue">是否跳过结果</param>
     /// <returns></returns>
     private string? ScanUnquotedString(char firstChar, bool skipValue) {
+        if (skipValue) {
+            SkipUnquotedString();
+            return null;
+        }
         StringBuilder sb = AllocStringBuilder();
         ScanUnquotedString(firstChar, sb);
-        return skipValue ? null : sb.ToString();
+        return sb.ToString();
     }
-
+    
+    /** 无引号字符串应该的占比是极高的，skip值得处理 */
+    private void SkipUnquotedString() {
+        IDsonCharStream buffer = this._charStream;
+        int c;
+        while ((c = buffer.Read()) != -1) {
+            if (c == -2) {
+                if (buffer.LineHead == LineHead.Comment) {
+                    buffer.SkipLine();
+                }
+                continue;
+            }
+            if (DsonTexts.IsUnsafeStringChar(c)) {
+                break;
+            }
+        }
+        buffer.Unread();
+    }
+    
     private void ScanUnquotedString(char firstChar, StringBuilder sb) {
         IDsonCharStream buffer = this._charStream;
         sb.Append(firstChar);
