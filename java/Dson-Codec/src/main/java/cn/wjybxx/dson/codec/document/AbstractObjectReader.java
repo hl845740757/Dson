@@ -19,6 +19,9 @@ package cn.wjybxx.dson.codec.document;
 import cn.wjybxx.base.ObjectUtils;
 import cn.wjybxx.dson.*;
 import cn.wjybxx.dson.codec.*;
+import cn.wjybxx.dson.text.DsonTextReader;
+import cn.wjybxx.dson.text.DsonTexts;
+import cn.wjybxx.dson.text.DsonToken;
 import cn.wjybxx.dson.types.*;
 
 import javax.annotation.Nonnull;
@@ -123,6 +126,13 @@ abstract class AbstractObjectReader implements DocumentObjectReader {
         return enumLite;
     }
 
+    @Override
+    public void setComponentType(DsonType dsonType) {
+        if (reader instanceof DsonTextReader textReader) {
+            DsonToken token = DsonTexts.clsNameTokenOfType(dsonType);
+            textReader.setCompClsNameToken(token);
+        }
+    }
     // endregion
 
     // region 简单值

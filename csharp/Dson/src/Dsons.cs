@@ -610,6 +610,22 @@ public static class Dsons
         return ReadTopDsonValue(reader)!;
     }
 
+    /** 获取dsonValue的clsName -- dson的约定之一 */
+    public static string? GetClassName(DsonValue dsonValue) {
+        DsonHeader<string> header;
+        if (dsonValue is DsonObject<string> dsonObject) {
+            header = dsonObject.Header;
+        } else if (dsonValue is DsonArray<string> dsonArray) {
+            header = dsonArray.Header;
+        } else {
+            return null;
+        }
+        if (header.TryGetValue(DsonHeaders.NamesClassName, out DsonValue wrapped)) {
+            return wrapped is DsonString dsonString ? dsonString.Value : null;
+        }
+        return null;
+    }
+    
     /** 获取dsonValue的localId -- dson的约定之一 */
     public static string? GetLocalId(DsonValue dsonValue) {
         DsonHeader<string> header;

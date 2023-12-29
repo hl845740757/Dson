@@ -465,6 +465,20 @@ public final class Dsons {
         }
     }
 
+    /** 获取dsonValue的clsName -- dson的约定之一 */
+    public static String getClassName(DsonValue dsonValue) {
+        DsonHeader<?> header;
+        if (dsonValue instanceof DsonObject<?> dsonObject) {
+            header = dsonObject.getHeader();
+        } else if (dsonValue instanceof DsonArray<?> dsonArray) {
+            header = dsonArray.getHeader();
+        } else {
+            return null;
+        }
+        DsonValue wrapped = header.get(DsonHeader.NAMES_CLASS_NAME);
+        return wrapped instanceof DsonString dsonString ? dsonString.getValue() : null;
+    }
+
     /** 获取dsonValue的localId -- dson的约定之一 */
     public static String getLocalId(DsonValue dsonValue) {
         DsonHeader<?> header;

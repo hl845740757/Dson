@@ -172,6 +172,9 @@ public interface DocumentObjectReader extends AutoCloseable {
     byte[] readValueAsBytes(String name);
 
     <T> T decodeKey(String keyString, Class<T> keyDeclared);
+
+    /** 设置值的类型 -- 可让reader精确解析文本 */
+    void setComponentType(DsonType dsonType);
     // endregion
 
     // region 快捷方法
