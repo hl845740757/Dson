@@ -13,6 +13,8 @@ import org.junit.jupiter.api.Test;
 public class DsonTextReaderTest2 {
 
     static final String dsonString = """
+            - @doc 以下是一个简单的DsonObject示例
+            -
             - {@{clsName:MyClassInfo, guid :10001, flags: 0}
             -   name : wjybxx,
             -   age: 28,
@@ -25,8 +27,8 @@ public class DsonTextReaderTest2 {
             |   我是wjybxx，是一个游戏开发者，Dson是我设计的文档型数据表达法，
             | 你可以通过github联系到我。
             -   thanks
-            ~   , url: @ss https://www.github.com/hl845740757
-            ~   , time: {@dt date: 2023-06-17, time: 18:37:00, millis: 100, offset: +08:00}
+            ~   , url: @sL https://www.github.com/hl845740757
+            -   , time: {@dt date: 2023-06-17, time: 18:37:00, millis: 100, offset: +08:00}
             - }
             """;
 
@@ -71,6 +73,7 @@ public class DsonTextReaderTest2 {
             DsonValue dsonObject2 = Dsons.fromDson(dsonString2);
             Assertions.assertEquals(dsonObject, dsonObject2);
         }
+        System.out.println();
     }
 
     /** flow样式需要较长的行，才不显得拥挤 */
@@ -90,6 +93,7 @@ public class DsonTextReaderTest2 {
             Assertions.assertEquals(dsonObject, dsonObject2);
         }
         System.out.println();
+
         {
             String dsonString3 = Dsons.toDson(dsonObject, ObjectStyle.FLOW, DsonTextWriterSettings.newBuilder()
                     .setDsonMode(DsonMode.RELAXED)
@@ -101,5 +105,6 @@ public class DsonTextReaderTest2 {
             DsonValue dsonObject3 = Dsons.fromDson(dsonString3);
             Assertions.assertEquals(dsonObject, dsonObject3);
         }
+        System.out.println();
     }
 }

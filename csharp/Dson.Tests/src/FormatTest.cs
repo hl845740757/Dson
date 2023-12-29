@@ -24,6 +24,8 @@ namespace Wjybxx.Dson.Tests;
 public class FormatTest
 {
     internal static readonly string DsonString = @"
+            - @doc 以下是一个简单的DsonObject示例
+            -
             - {@{clsName:MyClassInfo, guid :10001, flags: 0}
             -   name : wjybxx,
             -   age: 28,
@@ -36,14 +38,47 @@ public class FormatTest
             |   我是wjybxx，是一个游戏开发者，Dson是我设计的文档型数据表达法，
             | 你可以通过github联系到我。
             -   thanks
-            ~   , url: @ss https://www.github.com/hl845740757
-            ~   , time: {@dt date: 2023-06-17, time: 18:37:00, millis: 100, offset: +08:00}
+            ~   , url: @sL https://www.github.com/hl845740757
+            -   , time: {@dt date: 2023-06-17, time: 18:37:00, millis: 100, offset: +08:00}
             - }";
 
 
     [Test]
     public void FormatTest0() {
         DsonObject<string> dsonObject = Dsons.FromDson(DsonString).AsObject();
+        // 标准模式
+        {
+            DsonTextWriterSettings.Builder builder = new DsonTextWriterSettings.Builder()
+            {
+                ExtraIndent = 2,
+                SoftLineLength = 60,
+                TextStringLength = 50,
+                TextAlignLeft = false
+            };
+            string dsonString2 = dsonObject.ToDson(ObjectStyle.Indent, builder.Build());
+            Console.WriteLine("Mode:" + DsonMode.Standard + ", alignLeft: false");
+            Console.WriteLine(dsonString2);
+
+            DsonValue dsonObject2 = Dsons.FromDson(dsonString2);
+            Assert.That(dsonObject2, Is.EqualTo(dsonObject));
+        }
+        Console.WriteLine();
+        // 宽松模式
+        {
+            DsonTextWriterSettings.Builder builder = new DsonTextWriterSettings.Builder()
+            {
+                DsonMode = DsonMode.Relaxed,
+                ExtraIndent = 2,
+                SoftLineLength = 60
+            };
+            string dsonString3 = dsonObject.ToDson(ObjectStyle.Indent, builder.Build());
+            Console.WriteLine("Mode:" + DsonMode.Relaxed + ", alignLeft: false");
+            Console.WriteLine(dsonString3);
+            DsonValue dsonObject3 = Dsons.FromDson(dsonString3);
+            Assert.That(dsonObject3, Is.EqualTo(dsonObject));
+        }
+        Console.WriteLine();
+        // 标准模式纯文本左对齐
         {
             DsonTextWriterSettings.Builder builder = new DsonTextWriterSettings.Builder()
             {
@@ -53,26 +88,11 @@ public class FormatTest
                 TextAlignLeft = true
             };
             string dsonString2 = dsonObject.ToDson(ObjectStyle.Indent, builder.Build());
-            Console.WriteLine("Mode:" + DsonMode.Standard);
+            Console.WriteLine("Mode:" + DsonMode.Standard + ", alignLeft: true");
             Console.WriteLine(dsonString2);
 
             DsonValue dsonObject2 = Dsons.FromDson(dsonString2);
             Assert.That(dsonObject2, Is.EqualTo(dsonObject));
-        }
-
-        Console.WriteLine();
-        {
-            DsonTextWriterSettings.Builder builder = new DsonTextWriterSettings.Builder()
-            {
-                DsonMode = DsonMode.Relaxed,
-                ExtraIndent = 2,
-                SoftLineLength = 60
-            };
-            string dsonString3 = dsonObject.ToDson(ObjectStyle.Indent, builder.Build());
-            Console.WriteLine("Mode:" + DsonMode.Relaxed);
-            Console.WriteLine(dsonString3);
-            DsonValue dsonObject3 = Dsons.FromDson(dsonString3);
-            Assert.That(dsonObject3, Is.EqualTo(dsonObject));
         }
     }
 }
