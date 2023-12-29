@@ -287,7 +287,8 @@ public class DsonTexts {
             case LABEL_FLOAT -> DsonTokenType.FLOAT;
             case LABEL_DOUBLE -> DsonTokenType.DOUBLE;
             case LABEL_BOOL -> DsonTokenType.BOOL;
-            case LABEL_STRING, LABEL_TEXT -> DsonTokenType.STRING;
+            case LABEL_STRING, LABEL_TEXT, LABEL_STRING_LINE -> DsonTokenType.STRING;
+            case LABEL_DOC -> DsonTokenType.DOC;
             case LABEL_NULL -> DsonTokenType.NULL;
             default -> {
                 if (BUILTIN_STRUCT_LABELS.contains(label)) {

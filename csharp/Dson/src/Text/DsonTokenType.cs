@@ -65,4 +65,6 @@ public enum DsonTokenType
 
     /** 无引号字符串，scan的时候不解析，使得返回后可以根据上下文推断其类型 */
     UnquoteString,
+    /** 文档/注释 -- 默认情况下不使用 */
+    Doc,
 }

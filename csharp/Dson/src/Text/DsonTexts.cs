@@ -338,6 +338,8 @@ public static class DsonTexts
             LabelBool => DsonTokenType.Bool,
             LabelString => DsonTokenType.String,
             LabelExtString => DsonTokenType.String,
+            LabelStringLine => DsonTokenType.String,
+            LabelDoc => DsonTokenType.Doc,
             LabelNull => DsonTokenType.Null,
             _ => BuiltinStructLabels.Contains(label) ? DsonTokenType.BuiltinStruct : DsonTokenType.SimpleHeader
         };
