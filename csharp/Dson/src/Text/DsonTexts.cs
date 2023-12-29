@@ -39,8 +39,11 @@ public static class DsonTexts
     public const string LabelBool = "b";
     public const string LabelString = "s";
     public const string LabelNull = "N";
-    /** 长文本，字符串不需要加引号，不对内容进行转义，可直接换行 */
+    
+    /** 纯文本，字符串不需要加引号，不对内容进行转义，可直接换行 */
     public const string LabelText = "ss";
+    /** 注释/文档 -- 简单的单行纯文本 */
+    public const string LabelDoc = "doc";
 
     public const string LabelBinary = "bin";
     public const string LabelExtInt32 = "ei";

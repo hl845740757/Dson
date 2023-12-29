@@ -40,8 +40,11 @@ public class DsonTexts {
     public static final String LABEL_BOOL = "b";
     public static final String LABEL_STRING = "s";
     public static final String LABEL_NULL = "N";
-    /** 长文本，字符串不需要加引号，不对内容进行转义，可直接换行 */
+
+    /** 纯文本，字符串不需要加引号，不对内容进行转义，可直接换行 */
     public static final String LABEL_TEXT = "ss";
+    /** 注释/文档 -- 简单的单行纯文本 */
+    public static final String LABEL_DOC = "doc";
 
     public static final String LABEL_BINARY = "bin";
     public static final String LABEL_EXTINT32 = "ei";

@@ -41,7 +41,10 @@ public class DsonCharStreamTest {
             - {x: 0.1, y: 0.1, z: 0.1},
             - {x: 0.2, y: 0.2, z: 0.2}
             - ]
+            -
             # 这是一行注释
+            - @doc 这也是一行注释
+            -
             - {
             - k1: @i 1,
             - k2: @L 987654321,

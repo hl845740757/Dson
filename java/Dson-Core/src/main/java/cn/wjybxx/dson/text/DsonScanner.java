@@ -288,9 +288,14 @@ public class DsonScanner implements AutoCloseable {
             case DsonTexts.LABEL_TEXT -> {
                 return new DsonToken(DsonTokenType.STRING, scanText(skipValue), getPosition());
             }
+            case DsonTexts.LABEL_DOC -> {
+                charStream.skipLine();
+                return nextToken(skipValue);
+            }
         }
         return new DsonToken(DsonTokenType.BUILTIN_STRUCT, className, getPosition());
     }
+
 
     // endregion
 
@@ -382,9 +387,24 @@ public class DsonScanner implements AutoCloseable {
 
     /** 扫描文本段 */
     private String scanText(boolean skipValue) {
+        if (skipValue) {
+            skipText();
+            return null;
+        }
         StringBuilder sb = allocStringBuilder();
         scanText(sb);
-        return skipValue ? null : sb.toString();
+        return sb.toString();
+    }
+
+    private void skipText() {
+        DsonCharStream buffer = this.charStream;
+        int c;
+        while ((c = buffer.read()) != -1) {
+            if (c == -2 && buffer.getLineHead() == LineHead.END_OF_TEXT) {
+                break;
+            }
+        }
+        throw new DsonParseException("End of file in Dson string.");
     }
 
     private void scanText(StringBuilder sb) {
