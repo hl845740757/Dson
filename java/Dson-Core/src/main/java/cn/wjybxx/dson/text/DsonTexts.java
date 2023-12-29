@@ -41,8 +41,10 @@ public class DsonTexts {
     public static final String LABEL_STRING = "s";
     public static final String LABEL_NULL = "N";
 
-    /** 纯文本，字符串不需要加引号，不对内容进行转义，可直接换行 */
+    /** 多行纯文本，字符串不需要加引号，不对内容进行转义，可直接换行 */
     public static final String LABEL_TEXT = "ss";
+    /** 单行纯文本，字符串不需要加引号，不对内容进行转义 */
+    public static final String LABEL_STRING_LINE = "sL";
     /** 注释/文档 -- 简单的单行纯文本 */
     public static final String LABEL_DOC = "doc";
 

@@ -70,6 +70,7 @@ public class DsonCharStreamTest {
             - saklhskalhlsajlxlsamlkjalj
             - salkhjsaljsljldjaslna
             ~
+            - @sL 这是一行长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长的纯文本
             """; // 换行结束与不换行是不同的
 
     /** 根据CharStream还原tokenString，测试是否相等 */

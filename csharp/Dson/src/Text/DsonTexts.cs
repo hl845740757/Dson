@@ -40,8 +40,10 @@ public static class DsonTexts
     public const string LabelString = "s";
     public const string LabelNull = "N";
     
-    /** 纯文本，字符串不需要加引号，不对内容进行转义，可直接换行 */
+    /** 多行纯文本，字符串不需要加引号，不对内容进行转义，可直接换行 */
     public const string LabelText = "ss";
+    /** 单行纯文本，字符串不需要加引号，不对内容进行转义 */
+    public const string LabelStringLine = "sL";
     /** 注释/文档 -- 简单的单行纯文本 */
     public const string LabelDoc = "doc";
 

@@ -285,6 +285,9 @@ public class DsonScanner : IDisposable
             case DsonTexts.LabelText: {
                 return new DsonToken(DsonTokenType.String, ScanText(skipValue), Position);
             }
+            case DsonTexts.LabelStringLine: {
+                return new DsonToken(DsonTokenType.String, ScanSingleLineText(skipValue), Position);
+            }
             case DsonTexts.LabelDoc: {
                 _charStream.SkipLine();
                 return NextToken(skipValue);
@@ -433,6 +436,26 @@ public class DsonScanner : IDisposable
         throw new DsonParseException("End of file in Dson string.");
     }
 
+    /** 扫描单行文本 */
+    private string? ScanSingleLineText(bool skipValue) {
+        if (skipValue) {
+            _charStream.SkipLine();
+            return null;
+        }
+        StringBuilder sb = AllocStringBuilder();
+        ScanSingleLineText(sb);
+        return sb.ToString();
+    }
+
+    private void ScanSingleLineText(StringBuilder sb) {
+        IDsonCharStream buffer = this._charStream;
+        int c;
+        while ((c = buffer.Read()) >= 0) {
+            sb.Append((char) c);
+        }
+        buffer.Unread();
+    }
+    
     private static void Switch2TextMode(IDsonCharStream buffer, StringBuilder sb) {
         int c;
         while ((c = buffer.Read()) != -1) {

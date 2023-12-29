@@ -288,6 +288,9 @@ public class DsonScanner implements AutoCloseable {
             case DsonTexts.LABEL_TEXT -> {
                 return new DsonToken(DsonTokenType.STRING, scanText(skipValue), getPosition());
             }
+            case DsonTexts.LABEL_STRING_LINE -> {
+                return new DsonToken(DsonTokenType.STRING, scanSingleLineText(skipValue), getPosition());
+            }
             case DsonTexts.LABEL_DOC -> {
                 charStream.skipLine();
                 return nextToken(skipValue);
@@ -427,6 +430,26 @@ public class DsonScanner implements AutoCloseable {
             }
         }
         throw new DsonParseException("End of file in Dson string.");
+    }
+
+    /** 扫描单行文本 */
+    private String scanSingleLineText(boolean skipValue) {
+        if (skipValue) {
+            charStream.skipLine();
+            return null;
+        }
+        StringBuilder sb = allocStringBuilder();
+        scanSingleLineText(sb);
+        return sb.toString();
+    }
+
+    private void scanSingleLineText(StringBuilder sb) {
+        DsonCharStream buffer = this.charStream;
+        int c;
+        while ((c = buffer.read()) >= 0) {
+            sb.append((char) c);
+        }
+        buffer.unread();
     }
 
     private static void switch2TextMode(DsonCharStream buffer, StringBuilder sb) {
