@@ -15,7 +15,4 @@
     <description>Dson核心模块</description>
     <url>https://github.com/hl845740757/Dson</url>
 
-    <properties>
-        <maven.deploy.skipParents>true</maven.deploy.skipParents>
-    </properties>
 </project>

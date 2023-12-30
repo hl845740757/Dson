@@ -14,10 +14,6 @@
     <description>Dson序列化注解处理器</description>
     <url>https://github.com/hl845740757/Dson</url>
 
-    <properties>
-        <maven.deploy.skipParents>true</maven.deploy.skipParents>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>cn.wjybxx.commons</groupId>
