@@ -126,8 +126,14 @@ public enum DsonType {
         return this == OBJECT || this == ARRAY;
     }
 
+    /** DsonType是否是容器类型或Header */
     public boolean isContainerOrHeader() {
         return this == OBJECT || this == ARRAY || this == HEADER;
+    }
+
+    /** Dson是否是KV结构 */
+    public boolean isObjectLike() {
+        return this == OBJECT || this == HEADER;
     }
 
     public static DsonType forNumber(int number) {

@@ -45,8 +45,6 @@ public class DsonTexts {
     public static final String LABEL_TEXT = "ss";
     /** 单行纯文本，字符串不需要加引号，不对内容进行转义 */
     public static final String LABEL_STRING_LINE = "sL";
-    /** 注释/文档 -- 简单的单行纯文本 */
-    public static final String LABEL_DOC = "doc";
 
     public static final String LABEL_BINARY = "bin";
     public static final String LABEL_EXTINT32 = "ei";
@@ -91,7 +89,7 @@ public class DsonTexts {
     private static final BitSet unsafeCharSet = new BitSet(128);
 
     static {
-        char[] tokenCharArray = "{}[],:\"@\\".toCharArray();
+        char[] tokenCharArray = "{}[],:/@\"\\".toCharArray();
         char[] reservedCharArray = "()".toCharArray();
         for (char c : tokenCharArray) {
             unsafeCharSet.set(c);
@@ -288,7 +286,6 @@ public class DsonTexts {
             case LABEL_DOUBLE -> DsonTokenType.DOUBLE;
             case LABEL_BOOL -> DsonTokenType.BOOL;
             case LABEL_STRING, LABEL_TEXT, LABEL_STRING_LINE -> DsonTokenType.STRING;
-            case LABEL_DOC -> DsonTokenType.DOC;
             case LABEL_NULL -> DsonTokenType.NULL;
             default -> {
                 if (BUILTIN_STRUCT_LABELS.contains(label)) {

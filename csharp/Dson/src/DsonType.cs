@@ -137,6 +137,11 @@ public static class DsonTypes
         return dsonType == DsonType.Object || dsonType == DsonType.Array || dsonType == DsonType.Header;
     }
 
+    /** Dson是否是KV结构 */
+    public static bool IsObjectLike(this DsonType dsonType) {
+        return dsonType == DsonType.Object || dsonType == DsonType.Header;
+    }
+
     /** 通过Number获取对应的枚举 */
     public static DsonType ForNumber(int number) {
         return LookUp[number];

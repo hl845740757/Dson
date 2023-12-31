@@ -39,13 +39,11 @@ public static class DsonTexts
     public const string LabelBool = "b";
     public const string LabelString = "s";
     public const string LabelNull = "N";
-    
+
     /** 多行纯文本，字符串不需要加引号，不对内容进行转义，可直接换行 */
     public const string LabelText = "ss";
     /** 单行纯文本，字符串不需要加引号，不对内容进行转义 */
     public const string LabelStringLine = "sL";
-    /** 注释/文档 -- 简单的单行纯文本 */
-    public const string LabelDoc = "doc";
 
     public const string LabelBinary = "bin";
     public const string LabelExtInt32 = "ei";
@@ -90,7 +88,7 @@ public static class DsonTexts
     private static readonly BitArray UnsafeCharSet = new BitArray(128);
 
     static DsonTexts() {
-        char[] tokenCharArray = "{}[],:\"@\\".ToCharArray();
+        char[] tokenCharArray = "{}[],:/@\"\\".ToCharArray();
         char[] reservedCharArray = "()".ToCharArray();
         foreach (char c in tokenCharArray) {
             UnsafeCharSet.Set(c, true);
@@ -176,6 +174,7 @@ public static class DsonTexts
         }
         throw new ArgumentException("invalid null str: " + str);
     }
+
     #endregion
 
     #region 数字
@@ -324,6 +323,7 @@ public static class DsonTexts
             _ => throw new InvalidOperationException()
         };
     }
+
     #endregion
 
     /** 获取类型名对应的Token类型 */
@@ -339,7 +339,6 @@ public static class DsonTexts
             LabelString => DsonTokenType.String,
             LabelExtString => DsonTokenType.String,
             LabelStringLine => DsonTokenType.String,
-            LabelDoc => DsonTokenType.Doc,
             LabelNull => DsonTokenType.Null,
             _ => BuiltinStructLabels.Contains(label) ? DsonTokenType.BuiltinStruct : DsonTokenType.SimpleHeader
         };
@@ -378,7 +377,7 @@ public static class DsonTexts
         }
         return DsonMode.Relaxed;
     }
-    
+
     /**
      * 首个字符的范围：行首和对象开始符
      */
@@ -392,7 +391,7 @@ public static class DsonTexts
         }
         return DsonMode.Relaxed;
     }
-    
+
     /** 索引首个非空白字符的位置 */
     public static int IndexOfNonWhitespace(string str, int startIndex) {
         if (startIndex < 0) {

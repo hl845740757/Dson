@@ -43,7 +43,7 @@ public class DsonCharStreamTest {
             - ]
             -
             # 这是一行注释
-            - @doc 这也是一行注释
+            - // 这也是一行注释
             -
             - {
             - k1: @i 1,

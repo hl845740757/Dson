@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 public class DsonTextReaderTest2 {
 
     static final String dsonString = """
-            - @doc 以下是一个简单的DsonObject示例
+            # 以下是一个简单的DsonObject示例
             -
             - {@{clsName:MyClassInfo, guid :10001, flags: 0}
             -   name : wjybxx,

@@ -63,38 +63,50 @@ public class DsonScanner implements AutoCloseable {
         if (charStream == null) {
             throw new DsonParseException("Scanner closed");
         }
-        int c = skipWhitespace();
-        if (c == -1) {
-            return new DsonToken(DsonTokenType.EOF, "eof", getPosition());
+        while (true) {
+            int c = skipWhitespace();
+            if (c == -1) {
+                return new DsonToken(DsonTokenType.EOF, "eof", getPosition());
+            }
+            switch (c) {
+                case '{': {
+                    // peek下一个字符，判断是否有修饰自身的header
+                    int nextChar = charStream.read();
+                    charStream.unread();
+                    if (nextChar == '@') {
+                        return new DsonToken(DsonTokenType.BEGIN_OBJECT, "{@", getPosition());
+                    } else {
+                        return new DsonToken(DsonTokenType.BEGIN_OBJECT, "{", getPosition());
+                    }
+                }
+                case '[': {
+                    int nextChar = charStream.read();
+                    charStream.unread();
+                    if (nextChar == '@') {
+                        return new DsonToken(DsonTokenType.BEGIN_ARRAY, "[@", getPosition());
+                    } else {
+                        return new DsonToken(DsonTokenType.BEGIN_ARRAY, "[", getPosition());
+                    }
+                }
+                case '}':
+                    return new DsonToken(DsonTokenType.END_OBJECT, "}", getPosition());
+                case ']':
+                    return new DsonToken(DsonTokenType.END_ARRAY, "]", getPosition());
+                case ':':
+                    return new DsonToken(DsonTokenType.COLON, ":", getPosition());
+                case ',':
+                    return new DsonToken(DsonTokenType.COMMA, ",", getPosition());
+                case '"':
+                    return new DsonToken(DsonTokenType.STRING, scanString((char) c, skipValue), getPosition());
+                case '@':
+                    return parseTypeToken(skipValue);
+                case '/':
+                    skipComment();
+                    continue;
+                default:
+                    return new DsonToken(DsonTokenType.UNQUOTE_STRING, scanUnquotedString((char) c, skipValue), getPosition());
+            }
         }
-        return switch (c) {
-            case '{' -> {
-                // peek下一个字符，判断是否有修饰自身的header
-                int nextChar = charStream.read();
-                charStream.unread();
-                if (nextChar == '@') {
-                    yield new DsonToken(DsonTokenType.BEGIN_OBJECT, "{@", getPosition());
-                } else {
-                    yield new DsonToken(DsonTokenType.BEGIN_OBJECT, "{", getPosition());
-                }
-            }
-            case '[' -> {
-                int nextChar = charStream.read();
-                charStream.unread();
-                if (nextChar == '@') {
-                    yield new DsonToken(DsonTokenType.BEGIN_ARRAY, "[@", getPosition());
-                } else {
-                    yield new DsonToken(DsonTokenType.BEGIN_ARRAY, "[", getPosition());
-                }
-            }
-            case '}' -> new DsonToken(DsonTokenType.END_OBJECT, "}", getPosition());
-            case ']' -> new DsonToken(DsonTokenType.END_ARRAY, "]", getPosition());
-            case ':' -> new DsonToken(DsonTokenType.COLON, ":", getPosition());
-            case ',' -> new DsonToken(DsonTokenType.COMMA, ",", getPosition());
-            case '@' -> parseTypeToken(skipValue);
-            case '"' -> new DsonToken(DsonTokenType.STRING, scanString((char) c, skipValue), getPosition());
-            default -> new DsonToken(DsonTokenType.UNQUOTE_STRING, scanUnquotedString((char) c, skipValue), getPosition());
-        };
     }
 
     // region common
@@ -291,14 +303,9 @@ public class DsonScanner implements AutoCloseable {
             case DsonTexts.LABEL_STRING_LINE -> {
                 return new DsonToken(DsonTokenType.STRING, scanSingleLineText(skipValue), getPosition());
             }
-            case DsonTexts.LABEL_DOC -> {
-                charStream.skipLine();
-                return nextToken(skipValue);
-            }
         }
         return new DsonToken(DsonTokenType.BUILTIN_STRUCT, className, getPosition());
     }
-
 
     // endregion
 
@@ -320,6 +327,15 @@ public class DsonScanner implements AutoCloseable {
             }
         }
         return c;
+    }
+
+    private void skipComment() {
+        DsonCharStream buffer = this.charStream;
+        int nextChar = buffer.read();
+        if (nextChar != '/') {
+            throw new DsonParseException("invalid comment format: Single slash, position: " + getPosition());
+        }
+        buffer.skipLine();
     }
 
     /**

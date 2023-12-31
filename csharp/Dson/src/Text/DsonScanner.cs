@@ -63,37 +63,44 @@ public class DsonScanner : IDisposable
         if (_charStream == null) {
             throw new DsonParseException("Scanner closed");
         }
-        int c = SkipWhitespace();
-        if (c == -1) {
-            return new DsonToken(DsonTokenType.Eof, "eof", Position);
-        }
-        switch (c) {
-            case '{': {
-                // peek下一个字符，判断是否有修饰自身的header
-                int nextChar = _charStream.Read();
-                _charStream.Unread();
-                if (nextChar == '@') {
-                    return new DsonToken(DsonTokenType.BeginObject, "{@", Position);
-                } else {
-                    return new DsonToken(DsonTokenType.BeginObject, "{", Position);
-                }
+        while (true) {
+            int c = SkipWhitespace();
+            if (c == -1) {
+                return new DsonToken(DsonTokenType.Eof, "eof", Position);
             }
-            case '[': {
-                int nextChar = _charStream.Read();
-                _charStream.Unread();
-                if (nextChar == '@') {
-                    return new DsonToken(DsonTokenType.BeginArray, "[@", Position);
-                } else {
-                    return new DsonToken(DsonTokenType.BeginArray, "[", Position);
+            switch (c) {
+                case '{': {
+                    // peek下一个字符，判断是否有修饰自身的header
+                    int nextChar = _charStream.Read();
+                    _charStream.Unread();
+                    if (nextChar == '@') {
+                        return new DsonToken(DsonTokenType.BeginObject, "{@", Position);
+                    } else {
+                        return new DsonToken(DsonTokenType.BeginObject, "{", Position);
+                    }
                 }
+                case '[': {
+                    int nextChar = _charStream.Read();
+                    _charStream.Unread();
+                    if (nextChar == '@') {
+                        return new DsonToken(DsonTokenType.BeginArray, "[@", Position);
+                    } else {
+                        return new DsonToken(DsonTokenType.BeginArray, "[", Position);
+                    }
+                }
+                case '}': return new DsonToken(DsonTokenType.EndObject, "}", Position);
+                case ']': return new DsonToken(DsonTokenType.EndArray, "]", Position);
+                case ':': return new DsonToken(DsonTokenType.Colon, ":", Position);
+                case ',': return new DsonToken(DsonTokenType.Comma, ",", Position);
+                case '"': return new DsonToken(DsonTokenType.String, ScanString((char)c, skipValue), Position);
+                case '@': return ParseTypeToken(skipValue);
+                case '/': {
+                    SkipComment();
+                    continue;
+                }
+                    ;
+                default: return new DsonToken(DsonTokenType.UnquoteString, ScanUnquotedString((char)c, skipValue), Position);
             }
-            case '}': return new DsonToken(DsonTokenType.EndObject, "}", Position);
-            case ']': return new DsonToken(DsonTokenType.EndArray, "]", Position);
-            case ':': return new DsonToken(DsonTokenType.Colon, ":", Position);
-            case ',': return new DsonToken(DsonTokenType.Comma, ",", Position);
-            case '@': return ParseTypeToken(skipValue);
-            case '"': return new DsonToken(DsonTokenType.String, ScanString((char)c, skipValue), Position);
-            default: return new DsonToken(DsonTokenType.UnquoteString, ScanUnquotedString((char)c, skipValue), Position);
         }
     }
 
@@ -288,10 +295,6 @@ public class DsonScanner : IDisposable
             case DsonTexts.LabelStringLine: {
                 return new DsonToken(DsonTokenType.String, ScanSingleLineText(skipValue), Position);
             }
-            case DsonTexts.LabelDoc: {
-                _charStream.SkipLine();
-                return NextToken(skipValue);
-            }
         }
         return new DsonToken(DsonTokenType.BuiltinStruct, className, Position);
     }
@@ -321,6 +324,15 @@ public class DsonScanner : IDisposable
         return c;
     }
 
+    private void SkipComment() {
+        IDsonCharStream buffer = this._charStream;
+        int nextChar = buffer.Read();
+        if (nextChar != '/') {
+            throw new DsonParseException("invalid comment format: Single slash, position: " + Position);
+        }
+        buffer.SkipLine();
+    }
+
     /// <summary>
     /// 扫描无引号字符串，无引号字符串不支持切换到独立行
     /// （该方法只使用扫描元素，不适合扫描标签）
@@ -337,7 +349,7 @@ public class DsonScanner : IDisposable
         ScanUnquotedString(firstChar, sb);
         return sb.ToString();
     }
-    
+
     /** 无引号字符串应该的占比是极高的，skip值得处理 */
     private void SkipUnquotedString() {
         IDsonCharStream buffer = this._charStream;
@@ -355,7 +367,7 @@ public class DsonScanner : IDisposable
         }
         buffer.Unread();
     }
-    
+
     private void ScanUnquotedString(char firstChar, StringBuilder sb) {
         IDsonCharStream buffer = this._charStream;
         sb.Append(firstChar);
@@ -430,7 +442,7 @@ public class DsonScanner : IDisposable
         int c;
         while ((c = buffer.Read()) != -1) {
             if (c == -2 && buffer.LineHead == LineHead.EndOfText) {
-              break;
+                break;
             }
         }
         throw new DsonParseException("End of file in Dson string.");
@@ -473,11 +485,11 @@ public class DsonScanner : IDisposable
         IDsonCharStream buffer = this._charStream;
         int c;
         while ((c = buffer.Read()) >= 0) {
-            sb.Append((char) c);
+            sb.Append((char)c);
         }
         buffer.Unread();
     }
-    
+
     private static void Switch2TextMode(IDsonCharStream buffer, StringBuilder sb) {
         int c;
         while ((c = buffer.Read()) != -1) {
