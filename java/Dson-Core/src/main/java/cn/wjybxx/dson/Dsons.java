@@ -437,6 +437,10 @@ public final class Dsons {
         }
     }
 
+    public static String toDson(DsonValue dsonValue) {
+        return toDson(dsonValue, ObjectStyle.INDENT, DsonTextWriterSettings.DEFAULT);
+    }
+
     public static String toDson(DsonValue dsonValue, ObjectStyle style) {
         return toDson(dsonValue, style, DsonTextWriterSettings.DEFAULT);
     }

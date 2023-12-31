@@ -136,23 +136,13 @@ public class Projection
 
     /**
      * 1.如果投影为Array，则投可投影顶层的Header，返回值必定为{@link DsonArray}
-     * 2.如果投影为Object，则只返回第一个对象的投影，且无法对顶层Header投影
+     * 2.如果投影为Object，则只返回第一个对象的投影，顶层Header被当做普通对象投影。
      */
     public DsonValue? Project(IDsonReader<string> reader) {
         if (root is DefaultNode defaultNode && defaultNode.arrayLike) {
-            DsonType dsonType = reader.ReadDsonType();
-            if (dsonType == DsonType.EndOfObject) {
-                return new DsonArray<string>(0);
-            }
-            Matcher matcher = new Matcher(reader, root);
-            return matcher.ProjectArray();
+            return new Matcher(reader, root).ProjectArray(true);
         } else {
             DsonType dsonType = reader.ReadDsonType();
-            // 跳过header
-            while (dsonType == DsonType.Header) {
-                reader.SkipValue();
-                dsonType = reader.ReadDsonType();
-            }
             if (dsonType == DsonType.EndOfObject) {
                 return null;
             }
@@ -183,10 +173,16 @@ public class Projection
                 if (currentDsonType == DsonType.Array) {
                     return new DsonArray<string>(0);
                 }
+                if (currentDsonType == DsonType.Header) {
+                    return new DsonHeader<string>();
+                }
                 return new DsonObject<string>(0);
             }
             if (currentDsonType == DsonType.Array) {
-                return ProjectArray();
+                return ProjectArray(false);
+            }
+            if (currentDsonType == DsonType.Header) {
+                return ProjectHeader();
             }
             return ProjectObject();
         }
@@ -227,12 +223,38 @@ public class Projection
             return dsonObject;
         }
 
-        internal DsonArray<string> ProjectArray() {
+        private DsonHeader<string> ProjectHeader() {
+            DsonHeader<string> dsonObject = new DsonHeader<string>();
+            DsonType dsonType;
+            string name;
+            DsonValue value;
+            reader.ReadStartHeader();
+            while ((dsonType = reader.ReadDsonType()) != DsonType.EndOfObject) {
+                name = reader.ReadName();
+                if (node.TestField(name)) {
+                    Node fieldNode = node.GetFieldNode(name);
+                    if (NeedMatcher(fieldNode)) {
+                        value = new Matcher(reader, fieldNode).Project();
+                    } else {
+                        value = Dsons.ReadDsonValue(reader);
+                    }
+                    dsonObject[name] = value;
+                } else {
+                    reader.SkipValue();
+                }
+            }
+            reader.ReadEndHeader();
+            return dsonObject;
+        }
+
+        internal DsonArray<string> ProjectArray(bool topContainer) {
             DsonArray<string> dsonArray = new DsonArray<string>();
             DsonType dsonType;
             DsonValue value;
             int index = 0;
-            reader.ReadStartArray();
+            if (!topContainer) {
+                reader.ReadStartArray();
+            }
             while ((dsonType = reader.ReadDsonType()) != DsonType.EndOfObject) {
                 if (dsonType == DsonType.Header) {
                     if (node.TestHeader()) {
@@ -254,7 +276,9 @@ public class Projection
                     }
                 }
             }
-            reader.ReadEndArray();
+            if (!topContainer) {
+                reader.ReadEndArray();
+            }
             return dsonArray;
         }
     }
@@ -364,7 +388,7 @@ public class Projection
         }
 
         public override bool TestType(DsonType dsonType) {
-            return arrayLike ? dsonType == DsonType.Array : dsonType == DsonType.Object;
+            return arrayLike ? dsonType == DsonType.Array : dsonType.IsObjectLike();
         }
 
         public override bool TestHeader() {

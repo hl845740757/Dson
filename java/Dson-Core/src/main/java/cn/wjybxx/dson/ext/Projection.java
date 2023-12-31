@@ -105,23 +105,13 @@ public class Projection {
 
     /**
      * 1.如果投影为Array，则投可投影顶层的Header，返回值必定为{@link DsonArray}
-     * 2.如果投影为Object，则只返回第一个对象的投影，且无法对顶层Header投影
+     * 2.如果投影为Object，则只返回第一个对象的投影，顶层Header被当做普通对象投影。
      */
     public DsonValue project(DsonReader reader) {
-        if (root instanceof DefaultNode defaultNode && defaultNode.arrayLike) {
-            DsonType dsonType = reader.readDsonType();
-            if (dsonType == DsonType.END_OF_OBJECT) {
-                return new DsonArray<>(0);
-            }
-            Matcher matcher = new Matcher(reader, root);
-            return matcher.projectArray();
+        if (root instanceof DefaultNode node && node.arrayLike) {
+            return new Matcher(reader, root).projectArray(true);
         } else {
             DsonType dsonType = reader.readDsonType();
-            // 跳过header
-            while (dsonType == DsonType.HEADER) {
-                reader.skipValue();
-                dsonType = reader.readDsonType();
-            }
             if (dsonType == DsonType.END_OF_OBJECT) {
                 return null;
             }
@@ -152,10 +142,16 @@ public class Projection {
                 if (currentDsonType == DsonType.ARRAY) {
                     return new DsonArray<>(0);
                 }
+                if (currentDsonType == DsonType.HEADER) {
+                    return new DsonHeader<>();
+                }
                 return new DsonObject<>(0);
             }
             if (currentDsonType == DsonType.ARRAY) {
-                return projectArray();
+                return projectArray(false);
+            }
+            if (currentDsonType == DsonType.HEADER) {
+                return projectHeader();
             }
             return projectObject();
         }
@@ -196,12 +192,38 @@ public class Projection {
             return dsonObject;
         }
 
-        DsonArray<String> projectArray() {
+        private DsonHeader<String> projectHeader() {
+            DsonHeader<String> dsonObject = new DsonHeader<>();
+            DsonType dsonType;
+            String name;
+            DsonValue value;
+            reader.readStartHeader();
+            while ((dsonType = reader.readDsonType()) != DsonType.END_OF_OBJECT) {
+                name = reader.readName();
+                if (node.testField(name)) {
+                    Node fieldNode = node.getFieldNode(name);
+                    if (needMatcher(fieldNode)) {
+                        value = new Matcher(reader, fieldNode).project();
+                    } else {
+                        value = Dsons.readDsonValue(reader);
+                    }
+                    dsonObject.put(name, value);
+                } else {
+                    reader.skipValue();
+                }
+            }
+            reader.readEndHeader();
+            return dsonObject;
+        }
+
+        DsonArray<String> projectArray(boolean topContainer) {
             DsonArray<String> dsonArray = new DsonArray<>();
             DsonType dsonType;
             DsonValue value;
             int index = 0;
-            reader.readStartArray();
+            if (!topContainer) {
+                reader.readStartArray();
+            }
             while ((dsonType = reader.readDsonType()) != DsonType.END_OF_OBJECT) {
                 if (dsonType == DsonType.HEADER) {
                     if (node.testHeader()) {
@@ -223,7 +245,9 @@ public class Projection {
                     }
                 }
             }
-            reader.readEndArray();
+            if (!topContainer) {
+                reader.readEndArray();
+            }
             return dsonArray;
         }
 
@@ -336,7 +360,7 @@ public class Projection {
 
         @Override
         public boolean testType(DsonType dsonType) {
-            return arrayLike ? dsonType == DsonType.ARRAY : dsonType == DsonType.OBJECT;
+            return arrayLike ? dsonType == DsonType.ARRAY : dsonType.isObjectLike();
         }
 
         public boolean testHeader() {
