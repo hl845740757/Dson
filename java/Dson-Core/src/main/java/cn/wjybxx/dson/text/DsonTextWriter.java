@@ -106,8 +106,8 @@ public class DsonTextWriter extends AbstractDsonWriter {
             if (context.hasElement() && printer.getColumn() < printer.getPrettyBodyColum()) {
                 // 当前行是字符串结束行，字符串结束位置尚未到达缩进，不换行
                 printer.printSpace(printer.getPrettyBodyColum() - printer.getColumn());
-            } else if (printer.getColumn() > printer.getPrettyBodyColum()) {
-                // 当前行有内容了才换行缩进
+            } else if (context.count == 0 || printer.getColumn() > printer.getPrettyBodyColum()) {
+                // 当前行有内容了才换行缩进；首个元素需要缩进
                 printer.println();
                 printLineHead(LineHead.APPEND_LINE);
                 printer.printBodyIndent();

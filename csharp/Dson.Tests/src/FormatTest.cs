@@ -24,7 +24,7 @@ namespace Wjybxx.Dson.Tests;
 public class FormatTest
 {
     internal static readonly string DsonString = @"
-            - @doc 以下是一个简单的DsonObject示例
+            # 以下是一个简单的DsonObject示例
             -
             - {@{clsName:MyClassInfo, guid :10001, flags: 0}
             -   name : wjybxx,

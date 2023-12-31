@@ -93,8 +93,8 @@ public class DsonTextWriter : AbstractDsonWriter<string>
             if (context.HasElement() && printer.Column < printer.PrettyBodyColum) {
                 // 当前行是字符串结束行，字符串结束位置尚未到达缩进，不换行
                 printer.PrintSpace(printer.PrettyBodyColum - printer.Column);
-            } else if (printer.Column > printer.PrettyBodyColum) {
-                // 当前行有内容了才换行缩进
+            } else if (context._count == 0 || printer.Column > printer.PrettyBodyColum) {
+                // 当前行有内容了才换行缩进；首个元素需要缩进
                 printer.Println();
                 PrintLineHead(LineHead.AppendLine);
                 printer.PrintBodyIndent();
