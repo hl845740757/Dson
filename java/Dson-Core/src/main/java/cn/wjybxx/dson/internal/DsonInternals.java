@@ -119,6 +119,14 @@ public class DsonInternals {
         return true;
     }
 
+    public static <E> HashSet<E> newHashSet(int size) {
+        return new HashSet<>(capacity(size));
+    }
+
+    public static <K, V> HashMap<K, V> newHashMap(int size) {
+        return new HashMap<>(capacity(size));
+    }
+
     @Nonnull
     public static <E> List<E> toImmutableList(@Nullable Collection<E> src) {
         return (src == null || src.isEmpty()) ? List.of() : List.copyOf(src);
@@ -159,6 +167,21 @@ public class DsonInternals {
         } else {
             return map.keySet().iterator().next();
         }
+    }
+
+    private static final int MAX_POWER_OF_TWO = 1 << 30;
+
+    public static int capacity(int expectedSize) {
+        if (expectedSize < 0) {
+            throw new IllegalArgumentException("expectedSize");
+        }
+        if (expectedSize < 3) {
+            return 4;
+        }
+        if (expectedSize < MAX_POWER_OF_TWO) {
+            return (int) ((float) expectedSize / 0.75F + 1.0F);
+        }
+        return Integer.MAX_VALUE;
     }
 
     // endregion
