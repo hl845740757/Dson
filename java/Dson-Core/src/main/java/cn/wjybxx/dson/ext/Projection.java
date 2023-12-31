@@ -48,6 +48,7 @@ import java.util.*;
  * 7. $slice [skip, count] 表示跳过skip个元素，截取指定个数的元素部分；
  * 8. $elem 表示数组元素进行投影。
  * 9. Object的投影为Object，Array的投影为Array。
+ * 10. 点号'.'默认不是路径分隔符，需要快捷语法时需要用户自行定义。
  * <p>
  * Q：为什么不支持反向索引？
  * A：我们不会在普通配置上存储数组的元素个数，因此反向索引必须解析所有的数组元素，用户直接获取所有元素即可。。。
@@ -109,7 +110,7 @@ public class Projection {
      */
     public DsonValue project(DsonReader reader) {
         if (root instanceof DefaultNode node && node.arrayLike) {
-            return new Matcher(reader, root).projectArray(true);
+            return new Matcher(reader, root).projectTopArray();
         } else {
             DsonType dsonType = reader.readDsonType();
             if (dsonType == DsonType.END_OF_OBJECT) {
@@ -148,7 +149,7 @@ public class Projection {
                 return new DsonObject<>(0);
             }
             if (currentDsonType == DsonType.ARRAY) {
-                return projectArray(false);
+                return projectArray();
             }
             if (currentDsonType == DsonType.HEADER) {
                 return projectHeader();
@@ -158,38 +159,6 @@ public class Projection {
 
         private static boolean needMatcher(Node fieldNode) {
             return fieldNode.isProjectNode() && !(fieldNode instanceof SelectNode);
-        }
-
-        DsonObject<String> projectObject() {
-            DsonObject<String> dsonObject = new DsonObject<>();
-            DsonType dsonType;
-            String name;
-            DsonValue value;
-            reader.readStartObject();
-            while ((dsonType = reader.readDsonType()) != DsonType.END_OF_OBJECT) {
-                if (dsonType == DsonType.HEADER) {
-                    if (node.testHeader()) {
-                        Dsons.readHeader(reader, dsonObject.getHeader());
-                    } else {
-                        reader.skipValue();
-                    }
-                } else {
-                    name = reader.readName();
-                    if (node.testField(name)) {
-                        Node fieldNode = node.getFieldNode(name);
-                        if (needMatcher(fieldNode)) {
-                            value = new Matcher(reader, fieldNode).project();
-                        } else {
-                            value = Dsons.readDsonValue(reader);
-                        }
-                        dsonObject.put(name, value);
-                    } else {
-                        reader.skipValue();
-                    }
-                }
-            }
-            reader.readEndObject();
-            return dsonObject;
         }
 
         private DsonHeader<String> projectHeader() {
@@ -216,14 +185,52 @@ public class Projection {
             return dsonObject;
         }
 
-        DsonArray<String> projectArray(boolean topContainer) {
+        DsonObject<String> projectObject() {
+            DsonObject<String> dsonObject = new DsonObject<>();
+            DsonType dsonType;
+            String name;
+            DsonValue value;
+            reader.readStartObject();
+            while ((dsonType = reader.readDsonType()) != DsonType.END_OF_OBJECT) {
+                if (dsonType == DsonType.HEADER) {
+                    if (node.testHeader()) {
+                        Dsons.readHeader(reader, dsonObject.getHeader());
+                    } else {
+                        reader.skipValue();
+                    }
+                    if (node.remainCount(dsonObject.size()) == 0) {
+                        reader.skipToEndOfObject(); // 不再继续读；header不在计数中，因此放header后
+                        break;
+                    }
+                    continue;
+                }
+                name = reader.readName();
+                if (node.testField(name)) {
+                    Node fieldNode = node.getFieldNode(name);
+                    if (needMatcher(fieldNode)) {
+                        value = new Matcher(reader, fieldNode).project();
+                    } else {
+                        value = Dsons.readDsonValue(reader);
+                    }
+                    dsonObject.put(name, value);
+                    if (node.remainCount(dsonObject.size()) == 0) {
+                        reader.skipToEndOfObject();
+                        break;
+                    }
+                } else {
+                    reader.skipValue();
+                }
+            }
+            reader.readEndObject();
+            return dsonObject;
+        }
+
+        DsonArray<String> projectArray() {
             DsonArray<String> dsonArray = new DsonArray<>();
             DsonType dsonType;
             DsonValue value;
             int index = 0;
-            if (!topContainer) {
-                reader.readStartArray();
-            }
+            reader.readStartArray();
             while ((dsonType = reader.readDsonType()) != DsonType.END_OF_OBJECT) {
                 if (dsonType == DsonType.HEADER) {
                     if (node.testHeader()) {
@@ -231,22 +238,64 @@ public class Projection {
                     } else {
                         reader.skipValue();
                     }
+                    if (node.remainCount(dsonArray.size()) == 0) {
+                        reader.skipToEndOfObject(); // 不再继续读；header不在计数中，因此放header后
+                        break;
+                    }
+                    continue;
+                }
+
+                if (node.testElement(index++)) {
+                    Node elemNode = node.getElemNode();
+                    if (needMatcher(elemNode)) {
+                        value = new Matcher(reader, elemNode).project();
+                    } else {
+                        value = Dsons.readDsonValue(reader);
+                    }
+                    dsonArray.add(value);
+                    if (node.remainCount(dsonArray.size()) == 0) {
+                        reader.skipToEndOfObject();
+                        break;
+                    }
                 } else {
-                    if (node.testElement(index++)) {
-                        Node elemNode = node.getElemNode();
-                        if (needMatcher(elemNode)) {
-                            value = new Matcher(reader, elemNode).project();
-                        } else {
-                            value = Dsons.readDsonValue(reader);
-                        }
-                        dsonArray.add(value);
+                    reader.skipValue();
+                }
+            }
+            reader.readEndArray();
+            return dsonArray;
+        }
+
+        DsonArray<String> projectTopArray() {
+            DsonArray<String> dsonArray = new DsonArray<>();
+            DsonType dsonType;
+            DsonValue value;
+            int index = 0;
+            while ((dsonType = reader.readDsonType()) != DsonType.END_OF_OBJECT) {
+                if (dsonType == DsonType.HEADER) {
+                    if (node.testHeader()) {
+                        Dsons.readHeader(reader, dsonArray.getHeader());
                     } else {
                         reader.skipValue();
                     }
+                    if (node.remainCount(dsonArray.size()) == 0) {
+                        break; // 不再继续读；header不在计数中，因此放header后
+                    }
+                    continue;
                 }
-            }
-            if (!topContainer) {
-                reader.readEndArray();
+                if (node.testElement(index++)) {
+                    Node elemNode = node.getElemNode();
+                    if (needMatcher(elemNode)) {
+                        value = new Matcher(reader, elemNode).project();
+                    } else {
+                        value = Dsons.readDsonValue(reader);
+                    }
+                    dsonArray.add(value);
+                    if (node.remainCount(dsonArray.size()) == 0) {
+                        break;
+                    }
+                } else {
+                    reader.skipValue();
+                }
             }
             return dsonArray;
         }
@@ -284,6 +333,9 @@ public class Projection {
         /** 测试数组的特点下标元素是否需要返回 */
         public abstract boolean testElement(int index);
 
+        /** 剩余需要投影的成员数量，-1表示未知 */
+        public abstract int remainCount(int current);
+
         /** 获取字段投影的Node信息 */
         @Nonnull
         public abstract Node getFieldNode(String key);
@@ -305,6 +357,8 @@ public class Projection {
         final SelectMode selectMode;
         /** 字段的投影信息 */
         final Map<String, Node> fieldNodes;
+        /** 被选择的字段数 */
+        final int selectCount;
 
         /** 数组切片信息 */
         final SliceSpec sliceSpec;
@@ -330,6 +384,8 @@ public class Projection {
                         count++;
                     }
                 }
+                this.selectCount = count;
+
                 final DsonValue allValue = projectInfo.get(key_all);
                 if (isTrue(allValue)) { // 指定$all的情况下直接进入反选模式
                     selectMode = SelectMode.INVERT;
@@ -391,6 +447,17 @@ public class Projection {
             return index < sliceSpec.skip + sliceSpec.count; // 有限投影
         }
 
+        @Override
+        public int remainCount(int current) {
+            if (arrayLike) {
+                if (sliceSpec.count == -1) {
+                    return -1;
+                }
+                return Math.max(0, sliceSpec.count - current);
+            }
+            return selectMode == SelectMode.NORMAL ? Math.max(0, selectCount - current) : -1;
+        }
+
         @Nonnull
         @Override
         public Node getFieldNode(String key) {
@@ -442,6 +509,11 @@ public class Projection {
             return false;
         }
 
+        @Override
+        public int remainCount(int current) {
+            return 0;
+        }
+
         @Nonnull
         @Override
         public Node getFieldNode(String key) {
@@ -478,6 +550,11 @@ public class Projection {
             return false;
         }
 
+        @Override
+        public int remainCount(int current) {
+            return 0;
+        }
+
         @Nonnull
         @Override
         public Node getFieldNode(String key) {
@@ -512,6 +589,11 @@ public class Projection {
         @Override
         public boolean testElement(int index) {
             return true;
+        }
+
+        @Override
+        public int remainCount(int current) {
+            return -1;
         }
 
         @Nonnull

@@ -149,7 +149,7 @@ Dson支持的值类型和内置结构体包括：
 
 ps: 当@作用于普通值类型和内置简单结构体时，我们称@声明的是其类型；当@作用于object和array时，我们称@声明的是对象的头信息。
 
-## `//`行尾注释
+## //行尾注释
 
 在将宽松模式作为正式成员后(v1.4)，支持非行首标记的注释成为必要，因此引入了`//`格式的行尾注释，`//`可用于标准模式，也可用于宽松模式。
 
@@ -466,12 +466,12 @@ Dson主要解决的问题有三个：
       # java maven坐标(最新可查看Mvn中央仓库)
       <groupId>cn.wjybxx.dson</groupId>
       <artifactId>dson-core</artifactId>
-      <version>1.2.0</version>
+      <version>1.4.0</version>
    ```  
 2. [C#库使用指南](https://github.com/hl845740757/Dson/blob/dev/csharp/Dson-Csharp.md)。
 
 ```
-	nuget Wjybxx.Dson 1.2.0
+	nuget Wjybxx.Dson 1.4.0
 ```
 
 ## Dson编辑器（缺失）

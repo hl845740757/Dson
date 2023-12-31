@@ -66,6 +66,7 @@ namespace Wjybxx.Dson.Collections;
 /// 7. $slice [skip, count] 表示跳过skip个元素，截取指定个数的元素部分；
 /// 8. $elem 表示数组元素进行投影。
 /// 9. Object的投影为Object，Array的投影为Array。
+/// 10. 点号'.'默认不是路径分隔符，需要快捷语法时需要用户自行定义。
 ///
 /// Q：为什么不支持反向索引？
 /// A：我们不会在普通配置上存储数组的元素个数，因此反向索引必须解析所有的数组元素，用户直接获取所有元素即可。。。
@@ -140,7 +141,7 @@ public class Projection
      */
     public DsonValue? Project(IDsonReader<string> reader) {
         if (root is DefaultNode defaultNode && defaultNode.arrayLike) {
-            return new Matcher(reader, root).ProjectArray(true);
+            return new Matcher(reader, root).ProjectTopArray();
         } else {
             DsonType dsonType = reader.ReadDsonType();
             if (dsonType == DsonType.EndOfObject) {
@@ -151,7 +152,7 @@ public class Projection
         }
     }
 
-    class Matcher
+    readonly struct Matcher
     {
         readonly IDsonReader<string> reader;
         readonly Node node;
@@ -179,7 +180,7 @@ public class Projection
                 return new DsonObject<string>(0);
             }
             if (currentDsonType == DsonType.Array) {
-                return ProjectArray(false);
+                return ProjectArray();
             }
             if (currentDsonType == DsonType.Header) {
                 return ProjectHeader();
@@ -189,38 +190,6 @@ public class Projection
 
         private static bool NeedMatcher(Node fieldNode) {
             return fieldNode.IsProjectNode() && !(fieldNode is SelectNode);
-        }
-
-        internal DsonObject<string> ProjectObject() {
-            DsonObject<string> dsonObject = new DsonObject<string>();
-            DsonType dsonType;
-            string name;
-            DsonValue value;
-            reader.ReadStartObject();
-            while ((dsonType = reader.ReadDsonType()) != DsonType.EndOfObject) {
-                if (dsonType == DsonType.Header) {
-                    if (node.TestHeader()) {
-                        Dsons.ReadHeader(reader, dsonObject.Header);
-                    } else {
-                        reader.SkipValue();
-                    }
-                } else {
-                    name = reader.ReadName();
-                    if (node.TestField(name)) {
-                        Node fieldNode = node.GetFieldNode(name);
-                        if (NeedMatcher(fieldNode)) {
-                            value = new Matcher(reader, fieldNode).Project();
-                        } else {
-                            value = Dsons.ReadDsonValue(reader);
-                        }
-                        dsonObject[name] = value;
-                    } else {
-                        reader.SkipValue();
-                    }
-                }
-            }
-            reader.ReadEndObject();
-            return dsonObject;
         }
 
         private DsonHeader<string> ProjectHeader() {
@@ -247,14 +216,53 @@ public class Projection
             return dsonObject;
         }
 
-        internal DsonArray<string> ProjectArray(bool topContainer) {
+        internal DsonObject<string> ProjectObject() {
+            DsonObject<string> dsonObject = new DsonObject<string>();
+            DsonType dsonType;
+            string name;
+            DsonValue value;
+            reader.ReadStartObject();
+            while ((dsonType = reader.ReadDsonType()) != DsonType.EndOfObject) {
+                if (dsonType == DsonType.Header) {
+                    if (node.TestHeader()) {
+                        Dsons.ReadHeader(reader, dsonObject.Header);
+                    } else {
+                        reader.SkipValue();
+                    }
+                    if (node.RemainCount(dsonObject.Count) == 0) {
+                        reader.SkipToEndOfObject(); // 不再继续读；header不在计数中，因此放header后
+                        break;
+                    }
+                    continue;
+                }
+
+                name = reader.ReadName();
+                if (node.TestField(name)) {
+                    Node fieldNode = node.GetFieldNode(name);
+                    if (NeedMatcher(fieldNode)) {
+                        value = new Matcher(reader, fieldNode).Project();
+                    } else {
+                        value = Dsons.ReadDsonValue(reader);
+                    }
+                    dsonObject[name] = value;
+                    if (node.RemainCount(dsonObject.Count) == 0) {
+                        reader.SkipToEndOfObject();
+                        break;
+                    }
+                } else {
+                    reader.SkipValue();
+                }
+            }
+            reader.ReadEndObject();
+            return dsonObject;
+        }
+
+        internal DsonArray<string> ProjectArray() {
             DsonArray<string> dsonArray = new DsonArray<string>();
             DsonType dsonType;
             DsonValue value;
             int index = 0;
-            if (!topContainer) {
-                reader.ReadStartArray();
-            }
+            reader.ReadStartArray();
             while ((dsonType = reader.ReadDsonType()) != DsonType.EndOfObject) {
                 if (dsonType == DsonType.Header) {
                     if (node.TestHeader()) {
@@ -262,22 +270,65 @@ public class Projection
                     } else {
                         reader.SkipValue();
                     }
+                    if (node.RemainCount(dsonArray.Count) == 0) {
+                        reader.SkipToEndOfObject(); // 不再继续读；header不在计数中，因此放header后
+                        break;
+                    }
+                    continue;
+                }
+
+                if (node.TestElement(index++)) {
+                    Node elemNode = node.GetElemNode();
+                    if (NeedMatcher(elemNode)) {
+                        value = new Matcher(reader, elemNode).Project();
+                    } else {
+                        value = Dsons.ReadDsonValue(reader);
+                    }
+                    dsonArray.Add(value);
+                    if (node.RemainCount(dsonArray.Count) == 0) {
+                        reader.SkipToEndOfObject();
+                        break;
+                    }
                 } else {
-                    if (node.TestElement(index++)) {
-                        Node elemNode = node.GetElemNode();
-                        if (NeedMatcher(elemNode)) {
-                            value = new Matcher(reader, elemNode).Project();
-                        } else {
-                            value = Dsons.ReadDsonValue(reader);
-                        }
-                        dsonArray.Add(value);
+                    reader.SkipValue();
+                }
+            }
+            reader.ReadEndArray();
+            return dsonArray;
+        }
+
+        internal DsonArray<string> ProjectTopArray() {
+            DsonArray<string> dsonArray = new DsonArray<string>();
+            DsonType dsonType;
+            DsonValue value;
+            int index = 0;
+            while ((dsonType = reader.ReadDsonType()) != DsonType.EndOfObject) {
+                if (dsonType == DsonType.Header) {
+                    if (node.TestHeader()) {
+                        Dsons.ReadHeader(reader, dsonArray.Header);
                     } else {
                         reader.SkipValue();
                     }
+                    if (node.RemainCount(dsonArray.Count) == 0) {
+                        break; // 不再继续读；header不在计数中，因此放header后
+                    }
+                    continue;
                 }
-            }
-            if (!topContainer) {
-                reader.ReadEndArray();
+
+                if (node.TestElement(index++)) {
+                    Node elemNode = node.GetElemNode();
+                    if (NeedMatcher(elemNode)) {
+                        value = new Matcher(reader, elemNode).Project();
+                    } else {
+                        value = Dsons.ReadDsonValue(reader);
+                    }
+                    dsonArray.Add(value);
+                    if (node.RemainCount(dsonArray.Count) == 0) {
+                        break;
+                    }
+                } else {
+                    reader.SkipValue();
+                }
             }
             return dsonArray;
         }
@@ -314,6 +365,9 @@ public class Projection
         /** 测试数组的特点下标元素是否需要返回 */
         public abstract bool TestElement(int index);
 
+        /** 剩余需要投影的成员数量，-1表示未知 */
+        public abstract int RemainCount(int current);
+
         /** 获取字段投影的Node信息 */
         public abstract Node GetFieldNode(string key);
 
@@ -333,6 +387,8 @@ public class Projection
         readonly SelectMode selectMode;
         /** 字段的投影信息 */
         readonly Dictionary<string, Node> fieldNodes;
+        /** 投影的字段数 */
+        readonly int selectCount;
 
         /** 数组切片信息 */
         readonly SliceSpec sliceSpec;
@@ -359,6 +415,8 @@ public class Projection
                         count++;
                     }
                 }
+                this.selectCount = count;
+
                 projectInfo.TryGetValue(KeyAll, out DsonValue allValue);
                 if (IsTrue(allValue)) { // 指定$all的情况下直接进入反选模式
                     selectMode = SelectMode.Invert;
@@ -419,6 +477,16 @@ public class Projection
             return index < sliceSpec.skip + sliceSpec.count; // 有限投影
         }
 
+        public override int RemainCount(int current) {
+            if (arrayLike) {
+                if (sliceSpec.count == -1) {
+                    return -1;
+                }
+                return Math.Max(0, sliceSpec.count - current);
+            }
+            return selectMode == SelectMode.Normal ? Math.Max(0, selectCount - current) : -1;
+        }
+
         public override Node GetFieldNode(string key) {
             if (arrayLike) {
                 return DISCARD_NODE;
@@ -463,6 +531,10 @@ public class Projection
             return false;
         }
 
+        public override int RemainCount(int current) {
+            return 0;
+        }
+
         public override Node GetFieldNode(string key) {
             return DISCARD_NODE;
         }
@@ -491,6 +563,10 @@ public class Projection
             return false;
         }
 
+        public override int RemainCount(int current) {
+            return 0;
+        }
+
         public override Node GetFieldNode(string key) {
             return this;
         }
@@ -517,6 +593,10 @@ public class Projection
 
         public override bool TestElement(int index) {
             return true;
+        }
+
+        public override int RemainCount(int current) {
+            return -1;
         }
 
         public override Node GetFieldNode(string key) {
@@ -600,7 +680,7 @@ public class Projection
     }
 
     /** 数组切片范围 */
-    class SliceSpec
+    readonly struct SliceSpec
     {
         internal static readonly SliceSpec Empty = new SliceSpec(0, 0);
         internal static readonly SliceSpec Full = new SliceSpec(0, -1);

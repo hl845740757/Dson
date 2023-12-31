@@ -68,42 +68,42 @@ public class ProjectionTest
 
     [Test]
     public void Test() {
-        DsonObject<String> expected = new DsonObject<string>();
+        DsonObject<string> expected = new DsonObject<string>();
         {
-            DsonObject<String> dsonObject = Dsons.FromDson(DsonString).AsObject();
-            transfer(expected, dsonObject, "name");
-            transfer(expected, dsonObject, "age");
+            DsonObject<string> dsonObject = Dsons.FromDson(DsonString).AsObject();
+            Transfer(expected, dsonObject, "name");
+            Transfer(expected, dsonObject, "age");
             {
-                DsonObject<String> rawPos = dsonObject["pos"].AsObject();
-                DsonObject<String> newPos = new DsonObject<string>();
-                transfer(newPos, rawPos, "x");
-                transfer(newPos, rawPos, "y");
+                DsonObject<string> rawPos = dsonObject["pos"].AsObject();
+                DsonObject<string> newPos = new DsonObject<string>();
+                Transfer(newPos, rawPos, "x");
+                Transfer(newPos, rawPos, "y");
                 expected["pos"] = newPos;
             }
             {
-                DsonArray<String> rawAddress = dsonObject["address"].AsArray();
-                DsonArray<String> newAddress = rawAddress.Slice(1);
+                DsonArray<string> rawAddress = dsonObject["address"].AsArray();
+                DsonArray<string> newAddress = rawAddress.Slice(1);
                 expected["address"] = newAddress;
             }
 
-            DsonArray<String> rawPosArr = dsonObject["posArr"].AsArray();
-            DsonArray<String> newPosArr = new DsonArray<string>(3);
+            DsonArray<string> rawPosArr = dsonObject["posArr"].AsArray();
+            DsonArray<string> newPosArr = new DsonArray<string>(3);
             foreach (DsonValue ele in rawPosArr) {
-                DsonObject<String> rawPos = ele.AsObject();
-                DsonObject<String> newPos = new DsonObject<string>();
-                transfer(newPos, rawPos, "x");
-                transfer(newPos, rawPos, "z");
+                DsonObject<string> rawPos = ele.AsObject();
+                DsonObject<string> newPos = new DsonObject<string>();
+                Transfer(newPos, rawPos, "x");
+                Transfer(newPos, rawPos, "z");
                 newPosArr.Add(newPos);
             }
             expected["posArr"] = newPosArr;
         }
 
-        DsonObject<String> value = Dsons.Project(DsonString, ProjectInfo)!.AsObject();
+        DsonObject<string> value = Dsons.Project(DsonString, ProjectInfo)!.AsObject();
         Console.WriteLine(Dsons.ToDson(value, ObjectStyle.Indent));
         Assert.That(value, Is.EqualTo(expected));
     }
 
-    private static void transfer(DsonObject<String> expected, DsonObject<String> dsonObject, String key) {
+    private static void Transfer(DsonObject<string> expected, DsonObject<string> dsonObject, string key) {
         expected[key] = dsonObject[key];
     }
 }

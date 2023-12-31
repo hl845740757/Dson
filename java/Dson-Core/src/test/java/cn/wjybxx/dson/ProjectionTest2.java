@@ -31,13 +31,31 @@ public class ProjectionTest2 {
             -   ],
             ~   url: @sL https://www.github.com/hl845740757
             - }
+            -
+            - {@{clsName:MyClassInfo, guid :10002, flags: 0}
+            -   name : wjybxx,
+            -   age: 29,
+            -   pos :{@{Vector3} x: 1, y: 2, z: 3},
+            -   address: [
+            -     beijing,
+            -     chengdu,
+            -     shanghai
+            -   ],
+            -   posArr: [@{compClsName: Vector3}
+            -    {x: 1, y: 1, z: 1},
+            -    {x: 2, y: 2, z: 2},
+            -    {x: 3, y: 3, z: 3},
+            -   ],
+            ~   url: @sL https://www.github.com/hl845740757
+            - }
             """;
 
     private static final String projectInfo = """
             {
               "@" : 1,
-              $slice: 0,
+              $slice: [0, 1],
               $elem:  {
+                  "@": 1,
                   name: 1,
                   age: 1,
                   pos: {
