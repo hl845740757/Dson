@@ -81,6 +81,7 @@ public abstract class DsonValue
     public DsonExtDouble AsDsonExtDouble() => (DsonExtDouble)this;
 
     public DsonExtString AsDsonExtString() => (DsonExtString)this;
+
     public DsonReference AsDsonReference() => (DsonReference)this;
 
     public DsonTimestamp AsDsonTimestamp() => (DsonTimestamp)this;
@@ -90,7 +91,7 @@ public abstract class DsonValue
     public DsonNumber AsDsonNumber() => ((DsonNumber)this);
 
     public bool IsNumber => DsonType.IsNumber();
-    
+
     #endregion
 
     #region Dson特定类型

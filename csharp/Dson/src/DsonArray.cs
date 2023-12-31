@@ -16,7 +16,9 @@
 
 #endregion
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 #pragma warning disable CS1591
 namespace Wjybxx.Dson;
@@ -51,6 +53,33 @@ public class DsonArray<TK> : AbstractDsonArray
 
     public override DsonArray<TK> Append(DsonValue item) {
         return (DsonArray<TK>)base.Append(item);
+    }
+
+    public DsonArray<TK> Slice(int skip) {
+        if (skip < 0) {
+            throw new ArgumentException("skip cant be negative");
+        }
+        if (skip >= _values.Count) {
+            return new DsonArray<TK>(0);
+        }
+        List<DsonValue> slice = _values.Skip(skip).ToList();
+        return new DsonArray<TK>(slice, new DsonHeader<TK>());
+    }
+
+    public DsonArray<TK> Slice(int skip, int count) {
+        if (skip < 0) {
+            throw new ArgumentException("skip cant be negative");
+        }
+        if (skip >= _values.Count) {
+            return new DsonArray<TK>(0);
+        }
+        List<DsonValue> slice;
+        if (_values.Count <= skip + count) {
+            slice = _values.Skip(skip).ToList();
+        } else {
+            slice = _values.Skip(skip).Take(count).ToList();
+        }
+        return new DsonArray<TK>(slice, new DsonHeader<TK>());
     }
 
     public override string ToString() {

@@ -78,6 +78,25 @@ public class DsonArray<K> extends AbstractDsonArray implements RandomAccess {
         return this;
     }
 
+    public DsonArray<K> slice(int skip) {
+        if (skip < 0) throw new IllegalArgumentException("skip cant be negative");
+        if (skip >= values.size()) {
+            return new DsonArray<>(0);
+        }
+        List<DsonValue> dsonValues = values.subList(skip, values.size());
+        return new DsonArray<>(dsonValues, ValuesPolicy.COPY, new DsonHeader<>());
+    }
+
+    public DsonArray<K> slice(int skip, int count) {
+        if (skip < 0) throw new IllegalArgumentException("skip cant be negative");
+        if (skip >= values.size()) {
+            return new DsonArray<>(0);
+        }
+        int endIndex = Math.min(values.size(), skip + count);
+        List<DsonValue> dsonValues = values.subList(skip, endIndex);
+        return new DsonArray<>(dsonValues, ValuesPolicy.COPY, new DsonHeader<>());
+    }
+
     @Override
     public String toString() {
         return "DsonArray{" +

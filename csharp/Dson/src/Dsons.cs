@@ -22,6 +22,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Wjybxx.Dson.Collections;
 using Wjybxx.Dson.IO;
 using Wjybxx.Dson.Text;
 
@@ -609,6 +610,26 @@ public static class Dsons
         using DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.Default, dsonString);
         return ReadTopDsonValue(reader)!;
     }
+    
+    /// <summary>
+    /// 将原始Dson字符串按照给定投影信息进行投影
+    /// </summary>
+    /// <param name="dsonString">原始的dson字符串</param>
+    /// <param name="projectInfo">投影描述</param>
+    /// <returns>如果存在可映射对象则返回对应值</returns>
+    public static DsonValue? Project(String dsonString, String projectInfo) {
+        return new Projection(projectInfo).Project(dsonString);
+    }
+    
+    /// <summary>
+    /// 将原始Dson字符串按照给定投影信息进行投影
+    /// </summary>
+    /// <param name="dsonString">原始的dson字符串</param>
+    /// <param name="projectInfo">投影描述</param>
+    /// <returns>如果存在可映射对象则返回对应值</returns>
+    public static DsonValue? Project(String dsonString, DsonObject<String> projectInfo) {
+        return new Projection(projectInfo).Project(dsonString);
+    }
 
     /** 获取dsonValue的clsName -- dson的约定之一 */
     public static string? GetClassName(DsonValue dsonValue) {
@@ -625,7 +646,7 @@ public static class Dsons
         }
         return null;
     }
-    
+
     /** 获取dsonValue的localId -- dson的约定之一 */
     public static string? GetLocalId(DsonValue dsonValue) {
         DsonHeader<string> header;

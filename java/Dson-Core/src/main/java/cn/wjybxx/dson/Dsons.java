@@ -467,7 +467,7 @@ public final class Dsons {
     }
 
     /**
-     * 将原始对象投影为目标对象
+     * 将原始Dson字符串按照给定投影信息进行投影
      *
      * @param dsonString  原始的dson字符串
      * @param projectInfo 投影描述
@@ -476,6 +476,12 @@ public final class Dsons {
         return new Projection(projectInfo).project(dsonString);
     }
 
+    /**
+     * 将原始Dson字符串按照给定投影信息进行投影
+     *
+     * @param dsonString  原始的dson字符串
+     * @param projectInfo 投影描述
+     */
     public static DsonValue project(String dsonString, DsonObject<String> projectInfo) {
         return new Projection(projectInfo).project(dsonString);
     }

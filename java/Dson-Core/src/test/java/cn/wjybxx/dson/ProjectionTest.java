@@ -1,6 +1,7 @@
 package cn.wjybxx.dson;
 
 import cn.wjybxx.dson.text.ObjectStyle;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -42,10 +43,10 @@ public class ProjectionTest {
               },
               posArr: {
                 "@" : 1, //返回数组的header
-                $slice : 0,
+                $slice : 0, // 返回全部元素
                 $elem: {  //投影数组元素的x和y
                   x: 1,
-                  y: 1
+                  z: 1
                 }
               }
             }
@@ -53,7 +54,42 @@ public class ProjectionTest {
 
     @Test
     void test() {
+        DsonObject<String> expected = new DsonObject<>();
+        {
+            DsonObject<String> dsonObject = Dsons.fromDson(dsonString).asObject();
+            transfer(expected, dsonObject, "name");
+            transfer(expected, dsonObject, "age");
+            {
+                DsonObject<String> rawPos = dsonObject.get("pos").asObject();
+                DsonObject<String> newPos = new DsonObject<>();
+                transfer(newPos, rawPos, "x");
+                transfer(newPos, rawPos, "y");
+                expected.put("pos", newPos);
+            }
+            {
+                DsonArray<String> rawAddress = dsonObject.get("address").asArray();
+                DsonArray<String> newAddress = rawAddress.slice(1);
+                expected.put("address", newAddress);
+            }
+
+            DsonArray<String> rawPosArr = dsonObject.get("posArr").asArray();
+            DsonArray<String> newPosArr = new DsonArray<>(3);
+            for (DsonValue ele : rawPosArr) {
+                DsonObject<String> rawPos = ele.asObject();
+                DsonObject<String> newPos = new DsonObject<>();
+                transfer(newPos, rawPos, "x");
+                transfer(newPos, rawPos, "z");
+                newPosArr.add(newPos);
+            }
+            expected.put("posArr", newPosArr);
+        }
+
         DsonObject<String> value = Dsons.project(dsonString, projectInfo).asObject();
         System.out.println(Dsons.toDson(value, ObjectStyle.INDENT));
+        Assertions.assertEquals(expected, value);
+    }
+
+    private static void transfer(DsonObject<String> expected, DsonObject<String> dsonObject, String key) {
+        expected.put(key, dsonObject.get(key));
     }
 }

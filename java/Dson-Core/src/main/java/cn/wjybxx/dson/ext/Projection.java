@@ -37,6 +37,8 @@ import java.util.*;
  *   key2: {"@": 1}, // // 如果key2存在，返回的空Object或空Array将包含header。
  *  }
  * }</pre>
+ *
+ * <h2>规则</h2>
  * 1. "@" 表示投影对象的header，header总是全量投影；header默认不返回，只有显式指定的情况下返回；
  * 2. value为1表示选择，为0表示排除；全为0时表示反选模式，否则只返回value为1的字段 -- header不计入。
  * 3. $all 用于选择object的所有字段，强制为反选字段模式；主要解决声明header的影响，也方便进入排除模式。
@@ -57,18 +59,24 @@ import java.util.*;
 @Immutable
 public class Projection {
 
+    /** 用于选择header */
     public static final String key_header = "@";
     /** 用于强调投影为object */
     public static final String key_object = "$object";
+    /** 用于选择Object内的所有键 */
     public static final String key_all = "$all";
 
     /** 用于强调投影为数组 */
     public static final String key_array = "$array";
+    /** 用于对数组切片 */
     public static final String key_slice = "$slice";
+    /** 用于对数组元素进行投影 */
     public static final String key_elem = "$elem";
 
+    /** object投影的特殊键 */
     public static final Set<String> objectKeys = Set.of("$object", "$all");
-    public static final Set<String> arrayKeys = Set.of("$array", "$slice", "$elem"); // $array为预留
+    /** 数组投影的特殊键 */
+    public static final Set<String> arrayKeys = Set.of("$array", "$slice", "$elem");
     public static final Set<String> allSpecialKeys;
 
     static {
@@ -90,6 +98,7 @@ public class Projection {
         root = parseNode(projectInfo);
     }
 
+    /** 将给定Dson字符串进行投影 */
     public DsonValue project(String dsonString) {
         return project(new DsonTextReader(DsonTextReaderSettings.DEFAULT, dsonString));
     }
@@ -105,7 +114,7 @@ public class Projection {
                 return new DsonArray<>(0);
             }
             Matcher matcher = new Matcher(reader, root);
-            return matcher.matchArray();
+            return matcher.projectArray();
         } else {
             DsonType dsonType = reader.readDsonType();
             // 跳过header
@@ -146,16 +155,16 @@ public class Projection {
                 return new DsonObject<>(0);
             }
             if (currentDsonType == DsonType.ARRAY) {
-                return matchArray();
+                return projectArray();
             }
-            return matchObject();
+            return projectObject();
         }
 
         private static boolean needMatcher(Node fieldNode) {
             return fieldNode.isProjectNode() && !(fieldNode instanceof SelectNode);
         }
 
-        private DsonObject<String> matchObject() {
+        DsonObject<String> projectObject() {
             DsonObject<String> dsonObject = new DsonObject<>();
             DsonType dsonType;
             String name;
@@ -187,7 +196,7 @@ public class Projection {
             return dsonObject;
         }
 
-        private DsonArray<String> matchArray() {
+        DsonArray<String> projectArray() {
             DsonArray<String> dsonArray = new DsonArray<>();
             DsonType dsonType;
             DsonValue value;
@@ -425,10 +434,6 @@ public class Projection {
     /** 简单丢弃节点 -- value为0 */
     private static class DiscardNode extends Node {
 
-        public DiscardNode() {
-            super();
-        }
-
         @Override
         public boolean testType(DsonType dsonType) {
             return false;
@@ -464,10 +469,6 @@ public class Projection {
 
     /** 简单选择节点 -- value为1 */
     private static class SelectNode extends Node {
-
-        public SelectNode() {
-            super();
-        }
 
         @Override
         public boolean testType(DsonType dsonType) {
@@ -515,7 +516,7 @@ public class Projection {
             return new UnknownContextNode(childProjInfo);
         }
         if (childProjInfo.size() == 1
-                && childProjInfo.get(key_header) != null) { // {"@": 1}
+                && childProjInfo.containsKey(key_header)) { // {"@": 1}
             return new UnknownContextNode(childProjInfo);
         }
         for (String arrayKey : arrayKeys) {
