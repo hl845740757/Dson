@@ -16,6 +16,7 @@
 
 package cn.wjybxx.dson;
 
+import cn.wjybxx.dson.ext.Projection;
 import cn.wjybxx.dson.io.DsonIOException;
 import cn.wjybxx.dson.text.*;
 
@@ -463,6 +464,20 @@ public final class Dsons {
         try (DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.DEFAULT, dsonString)) {
             return readTopDsonValue(reader);
         }
+    }
+
+    /**
+     * 将原始对象投影为目标对象
+     *
+     * @param dsonString  原始的dson字符串
+     * @param projectInfo 投影描述
+     */
+    public static DsonValue project(String dsonString, String projectInfo) {
+        return new Projection(projectInfo).project(dsonString);
+    }
+
+    public static DsonValue project(String dsonString, DsonObject<String> projectInfo) {
+        return new Projection(projectInfo).project(dsonString);
     }
 
     /** 获取dsonValue的clsName -- dson的约定之一 */
