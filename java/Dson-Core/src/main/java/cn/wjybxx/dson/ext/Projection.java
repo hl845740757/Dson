@@ -16,11 +16,11 @@ import java.util.*;
  * 多路径表达式需要使用标准的Dson文本表达。
  * <pre>{@code
  *  {
- *    name : 1,
+ *    name: 1,
  *    age: 0, // 不返回age字段
- *    pos : {
- *      "@" : 1, // 返回pos的header
- *      $all : 1, // 返回pos的全部字段 -- 可表示这是一个object映射
+ *    pos: {
+ *      $header: 1, // 返回pos的header
+ *      $all: 1, // 返回pos的全部字段 -- 可表示这是一个object映射
  *      z: 0 // 排除z
  *   },
  *   arr1: {
@@ -35,12 +35,12 @@ import java.util.*;
  *   arr4: 1, // 返回arr4整个数组
  *
  *   key1: {}, // 如果key1存在，则返回对应空Object/空Array。
- *   key2: {"@": 1}, // // 如果key2存在，返回的空Object或空Array将包含header。
+ *   key2: {$header: 1}, // // 如果key2存在，返回的空Object或空Array将包含header。
  *  }
  * }</pre>
  *
  * <h2>规则</h2>
- * 1. "@" 表示投影对象的header，header总是全量投影；header默认不返回，只有显式指定的情况下返回；
+ * 1. $header 表示投影对象的header，header总是全量投影；header默认不返回，只有显式指定的情况下返回；
  * 2. value为1表示选择，为0表示排除；全为0时表示反选模式，否则只返回value为1的字段 -- header不计入。
  * 3. $all 用于选择object的所有字段，强制为反选字段模式；主要解决声明header的影响，也方便进入排除模式。
  * 4. 如果无法根据投影信息确定投影值的类型，将由真实的数据决定返回值类型 -- 可用于测试数据类型。
@@ -62,7 +62,7 @@ import java.util.*;
 public class Projection {
 
     /** 用于选择header */
-    public static final String key_header = "@";
+    public static final String key_header = "$header";
     /** 用于强调投影为object */
     public static final String key_object = "$object";
     /** 用于选择Object内的所有键 */
@@ -481,7 +481,7 @@ public class Projection {
         }
     }
 
-    /** 无法识别上下文类型的Node -- 比如：{}, {"@": 1} */
+    /** 无法识别上下文类型的Node -- 比如：{}, {$header: 1} */
     private static class UnknownContextNode extends Node {
 
         final boolean includeHeader;
@@ -623,7 +623,7 @@ public class Projection {
             return new UnknownContextNode(childProjInfo);
         }
         if (childProjInfo.size() == 1
-                && childProjInfo.containsKey(key_header)) { // {"@": 1}
+                && childProjInfo.containsKey(key_header)) { // {$header: 1}
             return new UnknownContextNode(childProjInfo);
         }
         for (String arrayKey : arrayKeys) {

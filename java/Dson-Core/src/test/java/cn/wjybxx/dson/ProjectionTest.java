@@ -34,7 +34,7 @@ public class ProjectionTest {
               name: 1,
               age: 1,
               pos: {
-                "@": 1,
+                $header: 1,
                 $all: 1,
                 z: 0
               },
@@ -42,7 +42,7 @@ public class ProjectionTest {
                 $slice : [1, 2] //跳过第一个元素，然后返回两个元素
               },
               posArr: {
-                "@" : 1, //返回数组的header
+                $header : 1, //返回数组的header
                 $slice : 0, // 返回全部元素
                 $elem: {  //投影数组元素的x和y
                   x: 1,
