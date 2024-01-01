@@ -66,28 +66,28 @@ public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName> where TName
 
     #region state
 
-    public DsonContextType ContextType => _context._contextType;
+    public DsonContextType ContextType => _context.contextType;
 
     public TName CurrentName {
         get {
             Context context = this._context;
-            if (context._state != DsonWriterState.Value) {
-                throw InvalidState(DsonInternals.NewList(DsonWriterState.Value), context._state);
+            if (context.state != DsonWriterState.Value) {
+                throw InvalidState(DsonInternals.NewList(DsonWriterState.Value), context.state);
             }
-            return context._curName;
+            return context.curName;
         }
     }
 
-    public bool IsAtName => _context._state == DsonWriterState.Name;
+    public bool IsAtName => _context.state == DsonWriterState.Name;
 
     public void WriteName(TName name) {
         if (name == null) throw new ArgumentNullException(nameof(name));
         Context context = this._context;
-        if (context._state != DsonWriterState.Name) {
-            throw InvalidState(DsonInternals.NewList(DsonWriterState.Name), context._state);
+        if (context.state != DsonWriterState.Name) {
+            throw InvalidState(DsonInternals.NewList(DsonWriterState.Name), context.state);
         }
-        context._curName = name;
-        context._state = DsonWriterState.Value;
+        context.curName = name;
+        context.state = DsonWriterState.Value;
         DoWriteName(name);
     }
 
@@ -97,22 +97,22 @@ public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName> where TName
 
     protected void AdvanceToValueState(TName name) {
         Context context = this._context;
-        if (context._state == DsonWriterState.Name) {
+        if (context.state == DsonWriterState.Name) {
             WriteName(name);
         }
-        if (context._state != DsonWriterState.Value) {
-            throw InvalidState(DsonInternals.NewList(DsonWriterState.Value), context._state);
+        if (context.state != DsonWriterState.Value) {
+            throw InvalidState(DsonInternals.NewList(DsonWriterState.Value), context.state);
         }
     }
 
     protected void EnsureValueState(Context context) {
-        if (context._state != DsonWriterState.Value) {
-            throw InvalidState(DsonInternals.NewList(DsonWriterState.Value), context._state);
+        if (context.state != DsonWriterState.Value) {
+            throw InvalidState(DsonInternals.NewList(DsonWriterState.Value), context.state);
         }
     }
 
     protected void SetNextState() {
-        switch (_context._contextType) {
+        switch (_context.contextType) {
             case DsonContextType.Object:
             case DsonContextType.Header: {
                 _context.SetState(DsonWriterState.Name);
@@ -128,7 +128,7 @@ public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName> where TName
     }
 
     private DsonIOException InvalidState(List<DsonWriterState> expected, DsonWriterState state) {
-        return DsonIOException.InvalidState(_context._contextType, expected, state);
+        return DsonIOException.InvalidState(_context.contextType, expected, state);
     }
 
     #endregion
@@ -281,7 +281,7 @@ public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName> where TName
     public void WriteStartHeader(ObjectStyle style) {
         // object下默认是name状态
         Context context = this._context;
-        if (context._contextType == DsonContextType.Object && context._state == DsonWriterState.Name) {
+        if (context.contextType == DsonContextType.Object && context.state == DsonWriterState.Name) {
             context.SetState(DsonWriterState.Value);
         }
         WriteStartContainer(DsonContextType.Header, DsonType.Header, style);
@@ -310,18 +310,18 @@ public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName> where TName
     }
 
     protected void AutoStartTopLevel(Context context) {
-        if (context._contextType == DsonContextType.TopLevel
-            && context._state == DsonWriterState.Initial) {
+        if (context.contextType == DsonContextType.TopLevel
+            && context.state == DsonWriterState.Initial) {
             context.SetState(DsonWriterState.Value);
         }
     }
 
     protected void CheckEndContext(Context context, DsonContextType contextType, DsonWriterState state) {
-        if (context._contextType != contextType) {
-            throw DsonIOException.ContextError(contextType, context._contextType);
+        if (context.contextType != contextType) {
+            throw DsonIOException.ContextError(contextType, context.contextType);
         }
-        if (context._state != state) {
-            throw InvalidState(DsonInternals.NewList(state), context._state);
+        if (context.state != state) {
+            throw InvalidState(DsonInternals.NewList(state), context.state);
         }
     }
 
@@ -355,7 +355,7 @@ public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName> where TName
     }
 
     public object Attachment() {
-        return _context._userData;
+        return _context.userData;
     }
 
     protected abstract void DoWriteValueBytes(DsonType type, byte[] data);
@@ -368,46 +368,46 @@ public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName> where TName
     protected internal class Context
     {
 #nullable disable
-        protected internal Context _parent;
-        protected internal DsonContextType _contextType;
-        protected internal DsonType _dsonType; // 用于在Object/Array模式下写入内置数据结构
-        protected internal DsonWriterState _state = DsonWriterState.Initial;
-        protected internal TName _curName;
-        protected internal object _userData;
+        protected internal Context parent;
+        protected internal DsonContextType contextType;
+        protected internal DsonType dsonType; // 用于在Object/Array模式下写入内置数据结构
+        protected internal DsonWriterState state = DsonWriterState.Initial;
+        protected internal TName curName;
+        protected internal object userData;
 #nullable enable
 
         public Context() {
         }
 
         public Context Init(Context? parent, DsonContextType contextType, DsonType dsonType) {
-            this._parent = parent;
-            this._contextType = contextType;
-            this._dsonType = dsonType;
+            this.parent = parent;
+            this.contextType = contextType;
+            this.dsonType = dsonType;
             return this;
         }
 
         public virtual void Reset() {
-            _parent = null;
-            _contextType = default;
-            _dsonType = DsonTypes.Invalid;
-            _state = default;
-            _curName = default;
-            _userData = null;
+            parent = null;
+            contextType = default;
+            dsonType = DsonTypes.Invalid;
+            state = default;
+            curName = default;
+            userData = null;
         }
 
         public object? Attach(object? userData) {
-            object? r = this._userData;
-            this._userData = userData;
+            object? r = this.userData;
+            this.userData = userData;
             return r;
         }
 
         /** 方便查看赋值的调用 */
         public void SetState(DsonWriterState state) {
-            this._state = state;
+            this.state = state;
         }
 
         /** 子类可隐藏 */
-        public Context Parent => _parent;
+        public Context Parent => parent;
     }
 
     #endregion

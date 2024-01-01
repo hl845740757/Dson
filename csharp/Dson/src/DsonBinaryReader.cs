@@ -168,8 +168,8 @@ public class DsonBinaryReader<TName> : AbstractDsonReader<TName> where TName : I
     protected override void DoReadStartContainer(DsonContextType contextType, DsonType dsonType) {
         Context newContext = NewContext(GetContext(), contextType, dsonType);
         int length = _input.ReadFixed32();
-        newContext._oldLimit = _input.PushLimit(length);
-        newContext._name = _currentName;
+        newContext.oldLimit = _input.PushLimit(length);
+        newContext.name = _currentName;
 
         this._recursionDepth++;
         SetContext(newContext);
@@ -180,12 +180,12 @@ public class DsonBinaryReader<TName> : AbstractDsonReader<TName> where TName : I
             throw DsonIOException.BytesRemain(_input.GetBytesUntilLimit());
         }
         Context context = GetContext();
-        _input.PopLimit(context._oldLimit);
+        _input.PopLimit(context.oldLimit);
 
         // 恢复上下文
         RecoverDsonType(context);
         this._recursionDepth--;
-        SetContext(context._parent!);
+        SetContext(context.parent!);
         PoolContext(context);
     }
 
@@ -239,14 +239,14 @@ public class DsonBinaryReader<TName> : AbstractDsonReader<TName> where TName : I
 
     protected new class Context : AbstractDsonReader<TName>.Context
     {
-        protected internal int _oldLimit = -1;
+        protected internal int oldLimit = -1;
 
         public Context() {
         }
 
         public override void Reset() {
             base.Reset();
-            _oldLimit = -1;
+            oldLimit = -1;
         }
     }
 

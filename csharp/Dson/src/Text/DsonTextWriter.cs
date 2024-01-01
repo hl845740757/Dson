@@ -76,12 +76,12 @@ public class DsonTextWriter : AbstractDsonWriter<string>
         }
         // header与外层对象无缩进，且是匿名属性 -- 如果打印多个header，将保持连续
         if (dsonType == DsonType.Header) {
-            Debug.Assert(context._count == 0);
-            context._headerCount++;
+            Debug.Assert(context.count == 0);
+            context.headerCount++;
             return;
         }
         // 处理value之间分隔符
-        if (context._count > 0) {
+        if (context.count > 0) {
             printer.PrintFastPath(",");
         }
         // 先处理长度超出，再处理缩进
@@ -89,11 +89,11 @@ public class DsonTextWriter : AbstractDsonWriter<string>
             printer.Println();
             PrintLineHead(LineHead.AppendLine);
         }
-        if (context._style == ObjectStyle.Indent) {
+        if (context.style == ObjectStyle.Indent) {
             if (context.HasElement() && printer.Column < printer.PrettyBodyColum) {
                 // 当前行是字符串结束行，字符串结束位置尚未到达缩进，不换行
                 printer.PrintSpace(printer.PrettyBodyColum - printer.Column);
-            } else if (context._count == 0 || printer.Column > printer.PrettyBodyColum) {
+            } else if (context.count == 0 || printer.Column > printer.PrettyBodyColum) {
                 // 当前行有内容了才换行缩进；首个元素需要缩进
                 printer.Println();
                 PrintLineHead(LineHead.AppendLine);
@@ -103,11 +103,11 @@ public class DsonTextWriter : AbstractDsonWriter<string>
             // 非缩进模式下，元素之间打印一个空格
             printer.Print(' ');
         }
-        if (context._contextType.IsLikeObject()) {
-            PrintString(printer, context._curName, StringStyle.AutoQuote);
+        if (context.contextType.IsLikeObject()) {
+            PrintString(printer, context.curName, StringStyle.AutoQuote);
             printer.PrintFastPath(": ");
         }
-        context._count++;
+        context.count++;
     }
 
     private void PrintString(DsonPrinter printer, string value, StringStyle style) {
@@ -509,11 +509,11 @@ public class DsonTextWriter : AbstractDsonWriter<string>
         WriteCurrentName(printer, dsonType);
 
         Context context = GetContext();
-        if (context._style == ObjectStyle.Flow) {
+        if (context.style == ObjectStyle.Flow) {
             style = ObjectStyle.Flow;
         }
         Context newContext = NewContext(context, contextType, dsonType);
-        newContext._style = style;
+        newContext.style = style;
 
         printer.PrintFastPath(contextType.GetStartSymbol()!);
         if (style == ObjectStyle.Indent) {
@@ -528,7 +528,7 @@ public class DsonTextWriter : AbstractDsonWriter<string>
         Context context = GetContext();
         DsonPrinter printer = this._printer;
 
-        if (context._style == ObjectStyle.Indent) {
+        if (context.style == ObjectStyle.Indent) {
             printer.Retract(); // 恢复缩进
             // 打印了内容的情况下才换行结束
             if (context.HasElement() && (printer.Column > printer.PrettyBodyColum)) {
@@ -537,7 +537,7 @@ public class DsonTextWriter : AbstractDsonWriter<string>
                 printer.PrintBodyIndent();
             }
         }
-        printer.PrintFastPath(context._contextType.GetEndSymbol()!);
+        printer.PrintFastPath(context.contextType.GetEndSymbol()!);
 
         this._recursionDepth--;
         SetContext(context.Parent);
@@ -555,7 +555,7 @@ public class DsonTextWriter : AbstractDsonWriter<string>
             base.WriteSimpleHeader(clsName);
             return;
         }
-        if (context._contextType == DsonContextType.Object && context._state == DsonWriterState.Name) {
+        if (context.contextType == DsonContextType.Object && context.state == DsonWriterState.Name) {
             context.SetState(DsonWriterState.Value);
         }
         AutoStartTopLevel(context);
@@ -596,25 +596,25 @@ public class DsonTextWriter : AbstractDsonWriter<string>
 
     protected new class Context : AbstractDsonWriter<string>.Context
     {
-        internal ObjectStyle _style = ObjectStyle.Indent;
-        internal int _headerCount = 0;
-        internal int _count = 0;
+        internal ObjectStyle style = ObjectStyle.Indent;
+        internal int headerCount = 0;
+        internal int count = 0;
 
         public Context() {
         }
 
         internal bool HasElement() {
-            return _headerCount > 0 || _count > 0;
+            return headerCount > 0 || count > 0;
         }
 
         public override void Reset() {
             base.Reset();
-            _style = ObjectStyle.Indent;
-            _headerCount = 0;
-            _count = 0;
+            style = ObjectStyle.Indent;
+            headerCount = 0;
+            count = 0;
         }
 
-        public new Context Parent => (Context)_parent;
+        public new Context Parent => (Context)parent;
     }
 
     #endregion

@@ -99,7 +99,7 @@ class BufferedCharStream : AbstractCharStream
 
     protected override void CheckUnreadOverFlow(int position) {
         int ridx = position - _bufferStartPos;
-        if (ridx < 0 || ridx >= _buffer.Widx) {
+        if (ridx < 0 || ridx >= _buffer.widx) {
             throw BufferOverFlow(position);
         }
     }
@@ -183,14 +183,14 @@ class BufferedCharStream : AbstractCharStream
 
     private void ReadToBuffer(CharBuffer nextBuffer) {
         if (!_readerEof) {
-            if (nextBuffer.Ridx >= nextBuffer.Capacity / 2) {
-                nextBuffer.Shift(nextBuffer.Ridx);
+            if (nextBuffer.ridx >= nextBuffer.Capacity / 2) {
+                nextBuffer.Shift(nextBuffer.ridx);
             }
             int len = nextBuffer.WritableChars;
             if (len <= 0) {
                 return;
             }
-            int n = _reader.Read(nextBuffer.Buffer, nextBuffer.Widx, len);
+            int n = _reader.Read(nextBuffer.buffer, nextBuffer.widx, len);
             if (n == -1) {
                 _readerEof = true;
             } else {

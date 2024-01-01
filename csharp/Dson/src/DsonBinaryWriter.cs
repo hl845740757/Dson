@@ -76,9 +76,9 @@ public class DsonBinaryWriter<TName> : AbstractDsonWriter<TName> where TName : I
             DsonContextType contextType = this.ContextType;
             if (contextType == DsonContextType.Object || contextType == DsonContextType.Header) {
                 if (_textWriter != null) { // 避免装箱
-                    output.WriteString(_textWriter._context._curName);
+                    output.WriteString(_textWriter._context.curName);
                 } else {
-                    output.WriteUint32(_binWriter!._context._curName.FullNumber);
+                    output.WriteUint32(_binWriter!._context.curName.FullNumber);
                 }
             }
         }
@@ -188,7 +188,7 @@ public class DsonBinaryWriter<TName> : AbstractDsonWriter<TName> where TName : I
         WriteFullTypeAndCurrentName(output, dsonType, 0);
 
         Context newContext = NewContext(GetContext(), contextType, dsonType);
-        newContext._preWritten = output.Position;
+        newContext.preWritten = output.Position;
         output.WriteFixed32(0);
 
         SetContext(newContext);
@@ -198,7 +198,7 @@ public class DsonBinaryWriter<TName> : AbstractDsonWriter<TName> where TName : I
     protected override void DoWriteEndContainer() {
         // 记录preWritten在写length之前，最后的size要减4
         Context context = GetContext();
-        int preWritten = context._preWritten;
+        int preWritten = context.preWritten;
         _output.SetFixedInt32(preWritten, _output.Position - preWritten - 4);
 
         this._recursionDepth--;
@@ -238,14 +238,14 @@ public class DsonBinaryWriter<TName> : AbstractDsonWriter<TName> where TName : I
 
     protected new class Context : AbstractDsonWriter<TName>.Context
     {
-        protected internal int _preWritten;
+        protected internal int preWritten;
 
         public Context() {
         }
 
         public override void Reset() {
             base.Reset();
-            _preWritten = 0;
+            preWritten = 0;
         }
     }
 

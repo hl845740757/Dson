@@ -40,7 +40,7 @@ public class DsonObjectWriter<TName> : AbstractDsonWriter<TName> where TName : I
         // 顶层输出是一个数组
         Context context = new Context();
         context.Init(null, DsonContextType.TopLevel, DsonTypes.Invalid);
-        context._container = outList ?? throw new ArgumentNullException(nameof(outList));
+        context.container = outList ?? throw new ArgumentNullException(nameof(outList));
         SetContext(context);
     }
 
@@ -50,10 +50,10 @@ public class DsonObjectWriter<TName> : AbstractDsonWriter<TName> where TName : I
     public DsonArray<TName> OutList {
         get {
             Context context = GetContext();
-            while (context!._contextType != DsonContextType.TopLevel) {
+            while (context!.contextType != DsonContextType.TopLevel) {
                 context = context.Parent;
             }
-            return context._container.AsArray<TName>();
+            return context.container.AsArray<TName>();
         }
     }
 
@@ -139,15 +139,15 @@ public class DsonObjectWriter<TName> : AbstractDsonWriter<TName> where TName : I
         Context newContext = NewContext(parent, contextType, dsonType);
         switch (contextType) {
             case DsonContextType.Header: {
-                newContext._container = parent.GetHeader();
+                newContext.container = parent.GetHeader();
                 break;
             }
             case DsonContextType.Array: {
-                newContext._container = new DsonArray<TName>();
+                newContext.container = new DsonArray<TName>();
                 break;
             }
             case DsonContextType.Object: {
-                newContext._container = new DsonObject<TName>();
+                newContext.container = new DsonObject<TName>();
                 break;
             }
             default: throw new InvalidOperationException();
@@ -159,8 +159,8 @@ public class DsonObjectWriter<TName> : AbstractDsonWriter<TName> where TName : I
 
     protected override void DoWriteEndContainer() {
         Context context = GetContext();
-        if (context._contextType != DsonContextType.Header) {
-            context.Parent!.Add(context._container);
+        if (context.contextType != DsonContextType.Header) {
+            context.Parent!.Add(context.container);
         }
 
         this._recursionDepth--;
@@ -199,31 +199,31 @@ public class DsonObjectWriter<TName> : AbstractDsonWriter<TName> where TName : I
     protected new class Context : AbstractDsonWriter<TName>.Context
     {
 #nullable disable
-        protected internal DsonValue _container;
+        protected internal DsonValue container;
 #nullable enable
 
         public Context() {
         }
 
         public DsonHeader<TName> GetHeader() {
-            if (_container.DsonType == DsonType.Object) {
-                return _container.AsObject<TName>().Header;
+            if (container.DsonType == DsonType.Object) {
+                return container.AsObject<TName>().Header;
             } else {
-                return _container.AsArray<TName>().Header;
+                return container.AsArray<TName>().Header;
             }
         }
 
         public void Add(DsonValue value) {
-            if (_container.DsonType == DsonType.Object) {
-                _container.AsObject<TName>().Append(_curName, value);
-            } else if (_container.DsonType == DsonType.Array) {
-                _container.AsArray<TName>().Add(value);
+            if (container.DsonType == DsonType.Object) {
+                container.AsObject<TName>().Append(curName, value);
+            } else if (container.DsonType == DsonType.Array) {
+                container.AsArray<TName>().Add(value);
             } else {
-                _container.AsHeader<TName>().Append(_curName, value);
+                container.AsHeader<TName>().Append(curName, value);
             }
         }
 
-        public new Context Parent => (Context)_parent;
+        public new Context Parent => (Context)parent;
     }
 
     #endregion

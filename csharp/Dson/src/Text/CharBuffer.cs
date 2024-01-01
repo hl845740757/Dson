@@ -25,63 +25,63 @@ namespace Wjybxx.Dson.Text;
 
 internal class CharBuffer
 {
-    internal char[] Buffer;
-    internal int Ridx;
-    internal int Widx;
+    internal char[] buffer;
+    internal int ridx;
+    internal int widx;
 
     internal CharBuffer(int length) {
-        this.Buffer = new char[length];
+        this.buffer = new char[length];
     }
 
     internal CharBuffer(char[] buffer) {
-        this.Buffer = buffer ?? throw new ArgumentNullException(nameof(buffer));
+        this.buffer = buffer ?? throw new ArgumentNullException(nameof(buffer));
     }
 
-    public int Capacity => Buffer.Length;
+    public int Capacity => buffer.Length;
 
-    public bool IsReadable => Ridx < Widx;
+    public bool IsReadable => ridx < widx;
 
-    public bool IsWritable => Widx < Buffer.Length;
+    public bool IsWritable => widx < buffer.Length;
 
-    public int WritableChars => Buffer.Length - Widx;
+    public int WritableChars => buffer.Length - widx;
 
-    public int ReadableChars => Math.Max(0, Widx - Ridx);
+    public int ReadableChars => Math.Max(0, widx - ridx);
 
     /** Length为可读字节数 */
-    public int Length => Math.Max(0, Widx - Ridx);
+    public int Length => Math.Max(0, widx - ridx);
 
     public char CharAt(int index) {
-        return Buffer[Ridx + index];
+        return buffer[ridx + index];
     }
 
     #region 读写
 
     public char Read() {
-        if (Ridx == Widx) throw new InternalBufferOverflowException();
-        return Buffer[Ridx++];
+        if (ridx == widx) throw new InternalBufferOverflowException();
+        return buffer[ridx++];
     }
 
     public void Unread() {
-        if (Ridx == 0) throw new InternalBufferOverflowException();
-        Ridx--;
+        if (ridx == 0) throw new InternalBufferOverflowException();
+        ridx--;
     }
 
     public void Write(char c) {
-        if (Widx == Buffer.Length) {
+        if (widx == buffer.Length) {
             throw new InternalBufferOverflowException();
         }
-        Buffer[Widx++] = c;
+        buffer[widx++] = c;
     }
 
     public void Write(char[] chars) {
         if (chars.Length == 0) {
             return;
         }
-        if (Widx + chars.Length > Buffer.Length) {
+        if (widx + chars.Length > buffer.Length) {
             throw new InternalBufferOverflowException();
         }
-        Array.Copy(chars, 0, Buffer, Widx, chars.Length);
-        Widx += chars.Length;
+        Array.Copy(chars, 0, buffer, widx, chars.Length);
+        widx += chars.Length;
     }
 
     public void Write(char[] chars, int offset, int len) {
@@ -89,11 +89,11 @@ internal class CharBuffer
             return;
         }
         BinaryUtils.CheckBuffer(chars.Length, offset, len);
-        if (Widx + len > Buffer.Length) {
+        if (widx + len > buffer.Length) {
             throw new InternalBufferOverflowException();
         }
-        Array.Copy(chars, offset, Buffer, Widx, len);
-        Widx += len;
+        Array.Copy(chars, offset, buffer, widx, len);
+        widx += len;
     }
 
     /**
@@ -107,7 +107,7 @@ internal class CharBuffer
         if (n == 0) {
             return 0;
         }
-        Write(charBuffer.Buffer, charBuffer.Ridx, n);
+        Write(charBuffer.buffer, charBuffer.ridx, n);
         charBuffer.AddRidx(n);
         return n;
     }
@@ -117,36 +117,36 @@ internal class CharBuffer
     #region 索引调整
 
     public void AddRidx(int count) {
-        SetRidx(Ridx + count);
+        SetRidx(ridx + count);
     }
 
     public void AddWidx(int count) {
-        SetWidx(Widx + count);
+        SetWidx(widx + count);
     }
 
     public void SetRidx(int ridx) {
-        if (ridx < 0 || ridx > Widx) {
+        if (ridx < 0 || ridx > widx) {
             throw new ArgumentException("ridx overflow");
         }
-        this.Ridx = ridx;
+        this.ridx = ridx;
     }
 
     public void SetWidx(int widx) {
-        if (widx < Ridx || widx > Buffer.Length) {
+        if (widx < ridx || widx > buffer.Length) {
             throw new ArgumentException("widx overflow");
         }
-        this.Widx = widx;
+        this.widx = widx;
     }
 
     public void SetIndexes(int ridx, int widx) {
         if (ridx < 0 || ridx > widx) {
             throw new ArgumentException("ridx overflow");
         }
-        if (widx > Buffer.Length) {
+        if (widx > buffer.Length) {
             throw new ArgumentException("widx overflow");
         }
-        this.Ridx = ridx;
-        this.Widx = widx;
+        this.ridx = ridx;
+        this.widx = widx;
     }
 
     #endregion
@@ -157,22 +157,22 @@ internal class CharBuffer
         if (shiftCount <= 0) {
             return;
         }
-        if (shiftCount >= Buffer.Length) {
-            Ridx = 0;
-            Widx = 0;
+        if (shiftCount >= buffer.Length) {
+            ridx = 0;
+            widx = 0;
         } else {
-            Array.Copy(Buffer, shiftCount, Buffer, 0, Buffer.Length - shiftCount);
-            Ridx = Math.Max(0, Ridx - shiftCount);
-            Widx = Math.Max(0, Widx - shiftCount);
+            Array.Copy(buffer, shiftCount, buffer, 0, buffer.Length - shiftCount);
+            ridx = Math.Max(0, ridx - shiftCount);
+            widx = Math.Max(0, widx - shiftCount);
         }
     }
 
     public void Grow(int capacity) {
-        char[] buffer = this.Buffer;
+        char[] buffer = this.buffer;
         if (capacity <= buffer.Length) {
             return;
         }
-        this.Buffer = CollectionUtil.CopyOf(this.Buffer, 0, capacity);
+        this.buffer = CollectionUtil.CopyOf(this.buffer, 0, capacity);
     }
 
     #endregion
@@ -180,15 +180,15 @@ internal class CharBuffer
     public override string ToString() {
         return "CharBuffer{" +
                "buffer='" + EncodeBuffer() + "'" +
-               ", ridx=" + Ridx +
-               ", widx=" + Widx +
+               ", ridx=" + ridx +
+               ", widx=" + widx +
                '}';
     }
 
     private string EncodeBuffer() {
-        if (Ridx >= Widx) {
+        if (ridx >= widx) {
             return "";
         }
-        return new string(Buffer, Ridx, Math.Max(0, Widx - Ridx));
+        return new string(buffer, ridx, Math.Max(0, widx - ridx));
     }
 }
