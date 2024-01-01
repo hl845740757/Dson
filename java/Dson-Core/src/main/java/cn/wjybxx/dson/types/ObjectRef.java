@@ -35,13 +35,13 @@ public final class ObjectRef {
     public static final int MASK_TYPE = 1 << 1;
     public static final int MASK_POLICY = 1 << 2;
 
-    /** 引用对象的本地id - 如果目标对象是容器中的一员，该值是其容器内编号 */
+    /** 引用对象的本地id -- 如果目标对象是容器中的一员，该值是其容器内编号 */
     private final String localId;
     /** 引用对象所属的命名空间 */
     private final String namespace;
-    /** 引用的对象的大类型 - 给业务使用的，用于快速引用分析 */
+    /** 引用的对象的大类型 -- 给业务使用的，用于快速引用分析 */
     private final int type;
-    /** 引用的解析策略 - 0：默认 */
+    /** 引用的解析策略 -- 自定义解析规则 */
     private final int policy;
 
     public ObjectRef(String localId) {

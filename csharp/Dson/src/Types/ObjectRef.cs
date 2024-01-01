@@ -34,9 +34,9 @@ public readonly struct ObjectRef : IEquatable<ObjectRef>
     public readonly string LocalId;
     /** 引用对象所属的命名空间 -- namespace是关键字，这里缩写 */
     public readonly string Ns;
-    /** 引用的对象的大类型 - 给业务使用的，用于快速引用分析 */
+    /** 引用的对象的大类型 -- 给业务使用的，用于快速引用分析 */
     public readonly int Type;
-    /** 引用的解析策略 - 0：默认 1：解析为引用 2：内联复制，3：不解析 */
+    /** 引用的解析策略 -- 自定义解析规则 */
     public readonly int Policy;
 
     public ObjectRef(string? localId, string? ns = null, int type = 0, int policy = 0) {
