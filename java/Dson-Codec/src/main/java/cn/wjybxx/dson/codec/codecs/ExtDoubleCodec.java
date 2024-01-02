@@ -29,7 +29,7 @@ import cn.wjybxx.dson.types.ExtDouble;
 import javax.annotation.Nonnull;
 
 /**
- * @author houlei
+ * @author wjybxx
  * date - 2023/12/28
  */
 public class ExtDoubleCodec implements PojoCodecImpl<ExtDouble> {

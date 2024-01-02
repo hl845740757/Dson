@@ -30,7 +30,7 @@ import cn.wjybxx.dson.types.ExtInt32;
 import javax.annotation.Nonnull;
 
 /**
- * @author houlei
+ * @author wjybxx
  * date - 2023/12/28
  */
 public class ExtInt32Codec implements PojoCodecImpl<ExtInt32> {

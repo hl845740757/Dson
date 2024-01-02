@@ -28,7 +28,7 @@ import cn.wjybxx.dson.types.Binary;
 import javax.annotation.Nonnull;
 
 /**
- * @author houlei
+ * @author wjybxx
  * date - 2023/12/28
  */
 public class BinaryCodec implements PojoCodecImpl<Binary> {
