@@ -204,7 +204,7 @@ final class BufferedCharStream extends AbstractCharStream {
                 return;
             }
             int n = reader.read(nextBuffer.buffer, nextBuffer.widx, len);
-            if (n == -1) {
+            if (n <= 0) { // Java会在Eof的情况下返回-1，0其实也结束了
                 readerEof = true;
             } else {
                 nextBuffer.addWidx(n);

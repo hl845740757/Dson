@@ -191,7 +191,7 @@ class BufferedCharStream : AbstractCharStream
                 return;
             }
             int n = _reader.Read(nextBuffer.buffer, nextBuffer.widx, len);
-            if (n == 0) { // C# 这里不会返回-1...
+            if (n <= 0) { // C# 在Eof的情况下不会返回-1...返回0时已读完
                 _readerEof = true;
             } else {
                 nextBuffer.AddWidx(n);

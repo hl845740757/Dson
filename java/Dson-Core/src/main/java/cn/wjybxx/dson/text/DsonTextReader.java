@@ -22,6 +22,7 @@ import cn.wjybxx.dson.internal.DsonInternals;
 import cn.wjybxx.dson.io.DsonIOException;
 import cn.wjybxx.dson.types.*;
 
+import java.io.Reader;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -62,6 +63,10 @@ public class DsonTextReader extends AbstractDsonReader {
 
     public DsonTextReader(DsonTextReaderSettings settings, CharSequence dsonString) {
         this(settings, new DsonScanner(dsonString));
+    }
+
+    public DsonTextReader(DsonTextReaderSettings settings, Reader reader) {
+        this(settings, new DsonScanner(DsonCharStream.newBufferedCharStream(reader)));
     }
 
     public DsonTextReader(DsonTextReaderSettings settings, DsonScanner scanner) {
