@@ -61,8 +61,8 @@ public class DsonObjectWriter<TName> : AbstractDsonWriter<TName> where TName : I
         return (Context)_context;
     }
 
-    protected override Context? GetPooledContext() {
-        return (Context)base.GetPooledContext();
+    protected override AbstractDsonWriter<TName>.Context NewContext() {
+        return new Context();
     }
 
     public override void Flush() {
@@ -165,7 +165,7 @@ public class DsonObjectWriter<TName> : AbstractDsonWriter<TName> where TName : I
 
         this._recursionDepth--;
         SetContext(context.Parent!);
-        PoolContext(context);
+        ReturnContext(context);
     }
 
     #endregion
@@ -181,19 +181,9 @@ public class DsonObjectWriter<TName> : AbstractDsonWriter<TName> where TName : I
     #region context
 
     private Context NewContext(Context parent, DsonContextType contextType, DsonType dsonType) {
-        Context? context = GetPooledContext();
-        if (context != null) {
-            SetPooledContext(null);
-        } else {
-            context = new Context();
-        }
+        Context context = (Context)RentContext();
         context.Init(parent, contextType, dsonType);
         return context;
-    }
-
-    private void PoolContext(Context context) {
-        context.Reset();
-        SetPooledContext(context);
     }
 
     protected new class Context : AbstractDsonWriter<TName>.Context

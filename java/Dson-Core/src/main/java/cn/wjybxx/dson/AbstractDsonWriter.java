@@ -16,6 +16,7 @@
 
 package cn.wjybxx.dson;
 
+import cn.wjybxx.dson.internal.DsonInternals;
 import cn.wjybxx.dson.io.DsonChunk;
 import cn.wjybxx.dson.io.DsonIOException;
 import cn.wjybxx.dson.text.INumberStyle;
@@ -23,6 +24,7 @@ import cn.wjybxx.dson.text.ObjectStyle;
 import cn.wjybxx.dson.text.StringStyle;
 import cn.wjybxx.dson.types.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -34,8 +36,7 @@ public abstract class AbstractDsonWriter implements DsonWriter {
 
     protected final DsonWriterSettings settings;
     private Context context;
-    private Context pooledContext; // 一个额外的缓存，用于写集合等减少上下文创建
-
+    private ArrayList<Context> contextPool = new ArrayList<>(DsonInternals.CONTEXT_POOL_SIZE);
     protected int recursionDepth;
 
     public AbstractDsonWriter(DsonWriterSettings settings) {
@@ -54,18 +55,28 @@ public abstract class AbstractDsonWriter implements DsonWriter {
         this.context = context;
     }
 
-    protected Context getPooledContext() {
-        return pooledContext;
+    protected abstract Context newContext();
+
+    protected Context rentContext() {
+        int size = contextPool.size();
+        if (size > 0) {
+            return contextPool.remove(size - 1);
+        }
+        return newContext();
     }
 
-    protected void setPooledContext(Context pooledContext) {
-        this.pooledContext = pooledContext;
+    protected void returnContext(Context context) {
+        context.reset();
+        if (contextPool.size() < DsonInternals.CONTEXT_POOL_SIZE) {
+            contextPool.add(context);
+        }
     }
 
     @Override
     public void close() {
         context = null;
-        pooledContext = null;
+        contextPool.clear();
+        contextPool = null;
     }
 
     // region state
@@ -387,7 +398,7 @@ public abstract class AbstractDsonWriter implements DsonWriter {
 
     // region context
 
-    protected static class Context {
+    protected static abstract class Context {
 
         public Context parent;
         public DsonContextType contextType;

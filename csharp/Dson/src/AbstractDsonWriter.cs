@@ -28,10 +28,11 @@ namespace Wjybxx.Dson;
 public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName> where TName : IEquatable<TName>
 {
     protected readonly DsonWriterSettings Settings;
+    private const int PoolSize = 4;
 
 #nullable disable
     internal Context _context;
-    private Context _pooledContext; // 一个额外的缓存，用于写集合等减少上下文创建
+    private Stack<Context> _contextPool = new(PoolSize);
     protected int _recursionDepth = 0; // 当前递归深度
 #nullable enable
 
@@ -49,19 +50,28 @@ public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName> where TName
         this._context = context;
     }
 
-    protected virtual Context? GetPooledContext() {
-        return _pooledContext;
+    protected abstract Context NewContext();
+
+    protected Context RentContext() {
+        if (_contextPool.TryPop(out Context? context)) {
+            return context;
+        }
+        return NewContext();
     }
 
-    protected void SetPooledContext(Context? pooledContext) {
-        this._pooledContext = pooledContext;
+    protected void ReturnContext(Context context) {
+        context.Reset();
+        if (_contextPool.Count < PoolSize) {
+            _contextPool.Push(context);
+        }
     }
 
     public abstract void Flush();
 
     public virtual void Dispose() {
         _context = null!;
-        _pooledContext = null;
+        _contextPool.Clear();
+        _contextPool = null!;
     }
 
     #region state
@@ -365,7 +375,7 @@ public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName> where TName
     #region contxt
 
 #nullable enable
-    protected internal class Context
+    protected internal abstract class Context
     {
 #nullable disable
         protected internal Context parent;

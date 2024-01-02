@@ -81,8 +81,8 @@ public class DsonTextReader : AbstractDsonReader<string>
         return (Context)_context;
     }
 
-    protected override Context? GetPooledContext() {
-        return (Context?)base.GetPooledContext();
+    protected override AbstractDsonReader<string>.Context NewContext() {
+        return new Context();
     }
 
     public override void Dispose() {
@@ -844,7 +844,7 @@ public class DsonTextReader : AbstractDsonReader<string>
         RecoverDsonType(context);
         this._recursionDepth--;
         SetContext(context.parent);
-        PoolContext(context);
+        ReturnContext(context);
     }
 
     #endregion
@@ -926,19 +926,9 @@ public class DsonTextReader : AbstractDsonReader<string>
     #region context
 
     private Context NewContext(Context parent, DsonContextType contextType, DsonType dsonType) {
-        Context? context = GetPooledContext();
-        if (context != null) {
-            SetPooledContext(null);
-        } else {
-            context = new Context();
-        }
+        Context context = (Context)RentContext();
         context.Init(parent, contextType, dsonType);
         return context;
-    }
-
-    private void PoolContext(Context context) {
-        context.Reset();
-        SetPooledContext(context);
     }
 
     protected new class Context : AbstractDsonReader<string>.Context

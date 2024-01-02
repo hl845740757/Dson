@@ -76,8 +76,8 @@ public class DsonObjectReader<TName> : AbstractDsonReader<TName> where TName : I
         return (Context)_context;
     }
 
-    protected override Context? GetPooledContext() {
-        return (Context)base.GetPooledContext();
+    protected override AbstractDsonReader<TName>.Context NewContext() {
+        return new Context();
     }
 
     #region state
@@ -263,7 +263,7 @@ public class DsonObjectReader<TName> : AbstractDsonReader<TName> where TName : I
         RecoverDsonType(context);
         this._recursionDepth--;
         SetContext(context.parent!);
-        PoolContext(context);
+        ReturnContext(context);
     }
 
     #endregion
@@ -298,21 +298,11 @@ public class DsonObjectReader<TName> : AbstractDsonReader<TName> where TName : I
     #region context
 
     private Context NewContext(Context parent, DsonContextType contextType, DsonType dsonType) {
-        Context? context = GetPooledContext();
-        if (context != null) {
-            SetPooledContext(null);
-        } else {
-            context = new Context();
-        }
+        Context context = (Context)RentContext();
         context.Init(parent, contextType, dsonType);
         return context;
     }
-
-    private void PoolContext(Context context) {
-        context.Reset();
-        SetPooledContext(context);
-    }
-
+    
     protected new class Context : AbstractDsonReader<TName>.Context
     {
         /** 如果不为null，则表示需要先读取header */

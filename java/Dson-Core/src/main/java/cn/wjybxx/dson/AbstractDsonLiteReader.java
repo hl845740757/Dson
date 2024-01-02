@@ -16,11 +16,13 @@
 
 package cn.wjybxx.dson;
 
+import cn.wjybxx.dson.internal.DsonInternals;
 import cn.wjybxx.dson.io.DsonIOException;
 import cn.wjybxx.dson.types.*;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -37,7 +39,7 @@ public abstract class AbstractDsonLiteReader implements DsonLiteReader {
 
     protected final DsonReaderSettings settings;
     private Context context;
-    private Context pooledContext; // 一个额外的缓存，用于写集合等减少上下文创建
+    private ArrayList<Context> contextPool = new ArrayList<>(DsonInternals.CONTEXT_POOL_SIZE);
 
     // 这些值放外面，不需要上下文隔离，但需要能恢复
     protected int recursionDepth;
@@ -58,18 +60,28 @@ public abstract class AbstractDsonLiteReader implements DsonLiteReader {
         this.context = context;
     }
 
-    protected Context getPooledContext() {
-        return pooledContext;
+    protected abstract Context newContext();
+
+    protected Context rentContext() {
+        int size = contextPool.size();
+        if (size > 0) {
+            return contextPool.remove(size - 1);
+        }
+        return newContext();
     }
 
-    protected void setPooledContext(Context pooledContext) {
-        this.pooledContext = pooledContext;
+    protected void returnContext(Context context) {
+        context.reset();
+        if (contextPool.size() < DsonInternals.CONTEXT_POOL_SIZE) {
+            contextPool.add(context);
+        }
     }
 
     @Override
     public void close() {
         context = null;
-        pooledContext = null;
+        contextPool.clear();
+        contextPool = null;
     }
 
     // region state
@@ -549,7 +561,7 @@ public abstract class AbstractDsonLiteReader implements DsonLiteReader {
 
     // region context
 
-    protected static class Context {
+    protected static abstract class Context {
 
         public Context parent;
         public DsonContextType contextType;

@@ -186,4 +186,5 @@ public class DsonInternals {
 
     // endregion
 
+    public static final int CONTEXT_POOL_SIZE = 4;
 }

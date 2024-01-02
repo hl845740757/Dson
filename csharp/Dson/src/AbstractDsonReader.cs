@@ -28,10 +28,11 @@ namespace Wjybxx.Dson;
 public abstract class AbstractDsonReader<TName> : IDsonReader<TName> where TName : IEquatable<TName>
 {
     protected readonly DsonReaderSettings Settings;
+    private const int PoolSize = 4;
 
 #nullable disable
     protected internal Context _context;
-    private Context _pooledContext; // 一个额外的缓存，用于写集合等减少上下文创建
+    private Stack<Context> _contextPool = new(PoolSize);
 
     protected int _recursionDepth; // 这些值放外面，不需要上下文隔离，但需要能恢复
     protected DsonType _currentDsonType = DsonTypes.Invalid;
@@ -54,17 +55,26 @@ public abstract class AbstractDsonReader<TName> : IDsonReader<TName> where TName
         this._context = context;
     }
 
-    protected virtual Context? GetPooledContext() {
-        return _pooledContext;
+    protected abstract Context NewContext();
+
+    protected Context RentContext() {
+        if (_contextPool.TryPop(out Context? context)) {
+            return context;
+        }
+        return NewContext();
     }
 
-    protected void SetPooledContext(Context? pooledContext) {
-        this._pooledContext = pooledContext;
+    protected void ReturnContext(Context context) {
+        context.Reset();
+        if (_contextPool.Count < PoolSize) {
+            _contextPool.Push(context);
+        }
     }
 
     public virtual void Dispose() {
         _context = null!;
-        _pooledContext = null;
+        _contextPool.Clear();
+        _contextPool = null!;
     }
 
     #region state
@@ -499,7 +509,7 @@ public abstract class AbstractDsonReader<TName> : IDsonReader<TName> where TName
 
     #region context
 
-    protected internal class Context
+    protected internal abstract class Context
     {
 #nullable disable
         protected internal Context parent;

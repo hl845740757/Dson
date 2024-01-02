@@ -610,7 +610,7 @@ public static class Dsons
         using DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.Default, dsonString);
         return ReadTopDsonValue(reader)!;
     }
-    
+
     /// <summary>
     /// 将原始Dson字符串按照给定投影信息进行投影
     /// </summary>
@@ -620,7 +620,7 @@ public static class Dsons
     public static DsonValue? Project(String dsonString, String projectInfo) {
         return new Projection(projectInfo).Project(dsonString);
     }
-    
+
     /// <summary>
     /// 将原始Dson字符串按照给定投影信息进行投影
     /// </summary>

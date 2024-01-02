@@ -50,8 +50,8 @@ public class DsonTextWriter : AbstractDsonWriter<string>
         return (Context)_context;
     }
 
-    protected override Context? GetPooledContext() {
-        return (Context?)base.GetPooledContext();
+    protected override AbstractDsonWriter<string>.Context NewContext() {
+        return new Context();
     }
 
     public override void Flush() {
@@ -70,8 +70,10 @@ public class DsonTextWriter : AbstractDsonWriter<string>
 
     private void WriteCurrentName(DsonPrinter printer, DsonType dsonType) {
         Context context = GetContext();
-        // 打印元素前先检查是否打印了行首和外部缩进
+        // 打印元素前先检查是否打印了行首
+        bool indented = false;
         if (printer.Column == 0) {
+            indented = true;
             PrintLineHead(LineHead.AppendLine);
         }
         // header与外层对象无缩进，且是匿名属性 -- 如果打印多个header，将保持连续
@@ -86,22 +88,25 @@ public class DsonTextWriter : AbstractDsonWriter<string>
         }
         // 先处理长度超出，再处理缩进
         if (printer.Column >= _settings.SoftLineLength) {
+            indented = true;
             printer.Println();
             PrintLineHead(LineHead.AppendLine);
         }
-        if (context.style == ObjectStyle.Indent) {
-            if (context.HasElement() && printer.Column < printer.PrettyBodyColum) {
-                // 当前行是字符串结束行，字符串结束位置尚未到达缩进，不换行
-                printer.PrintSpace(printer.PrettyBodyColum - printer.Column);
-            } else if (context.count == 0 || printer.Column > printer.PrettyBodyColum) {
-                // 当前行有内容了才换行缩进；首个元素需要缩进
-                printer.Println();
-                PrintLineHead(LineHead.AppendLine);
-                printer.PrintBodyIndent();
+        if (!indented) {
+            if (context.style == ObjectStyle.Indent) {
+                if (context.HasElement() && printer.Column < printer.PrettyBodyColum) {
+                    // 当前行是字符串结束行，字符串结束位置尚未到达缩进，不换行
+                    printer.PrintSpace(printer.PrettyBodyColum - printer.Column);
+                } else if (context.count == 0 || printer.Column > printer.PrettyBodyColum) {
+                    // 当前行有内容了才换行缩进；首个元素需要缩进
+                    printer.Println();
+                    PrintLineHead(LineHead.AppendLine);
+                    printer.PrintBodyIndent();
+                }
+            } else if (context.HasElement()) {
+                // 非缩进模式下，元素之间打印一个空格
+                printer.Print(' ');
             }
-        } else if (context.HasElement()) {
-            // 非缩进模式下，元素之间打印一个空格
-            printer.Print(' ');
         }
         if (context.contextType.IsLikeObject()) {
             PrintString(printer, context.curName, StringStyle.AutoQuote);
@@ -541,7 +546,7 @@ public class DsonTextWriter : AbstractDsonWriter<string>
 
         this._recursionDepth--;
         SetContext(context.Parent);
-        PoolContext(context);
+        ReturnContext(context);
     }
 
     #endregion
@@ -579,19 +584,9 @@ public class DsonTextWriter : AbstractDsonWriter<string>
     #region context
 
     private Context NewContext(Context parent, DsonContextType contextType, DsonType dsonType) {
-        Context? context = GetPooledContext();
-        if (context != null) {
-            SetPooledContext(null);
-        } else {
-            context = new Context();
-        }
+        Context context = (Context)RentContext();
         context.Init(parent, contextType, dsonType);
         return context;
-    }
-
-    private void PoolContext(Context context) {
-        context.Reset();
-        SetPooledContext(context);
     }
 
     protected new class Context : AbstractDsonWriter<string>.Context

@@ -46,8 +46,8 @@ public class DsonObjectLiteReader extends AbstractDsonLiteReader {
     }
 
     @Override
-    protected Context getPooledContext() {
-        return (Context) super.getPooledContext();
+    protected AbstractDsonLiteReader.Context newContext() {
+        return new Context();
     }
 
     /**
@@ -273,7 +273,7 @@ public class DsonObjectLiteReader extends AbstractDsonLiteReader {
         recoverDsonType(context);
         this.recursionDepth--;
         setContext(context.parent);
-        poolContext(context);
+        returnContext(context);
     }
 
     // endregion
@@ -311,19 +311,9 @@ public class DsonObjectLiteReader extends AbstractDsonLiteReader {
     // region context
 
     private Context newContext(Context parent, DsonContextType contextType, DsonType dsonType) {
-        Context context = getPooledContext();
-        if (context != null) {
-            setPooledContext(null);
-        } else {
-            context = new Context();
-        }
+        Context context = (Context) rentContext();
         context.init(parent, contextType, dsonType);
         return context;
-    }
-
-    private void poolContext(Context context) {
-        context.reset();
-        setPooledContext(context);
     }
 
     protected static class Context extends AbstractDsonLiteReader.Context {
