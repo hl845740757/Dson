@@ -144,22 +144,9 @@ public final class DsonPrinter implements AutoCloseable {
         }
     }
 
-    /**
-     * @param start the starting index of the subsequence to be appended.
-     * @param end   the end index of the subsequence to be appended.
-     */
-    public void printRange(CharSequence text, int start, int end) {
-        checkRange(start, end, text.length());
-        for (int idx = start; idx < end; idx++) {
-            print(text.charAt(idx));
-        }
-    }
-
-    private static void checkRange(int start, int end, int len) {
-        if (start < 0 || start > end || end > len) {
-            throw new IndexOutOfBoundsException(
-                    "start " + start + ", end " + end + ", length " + len);
-        }
+    public void printFastPath(char c) {
+        builder.append(c);
+        column++;
     }
 
     /** @param cBuffer 内容中无tab字符 */
@@ -241,20 +228,52 @@ public final class DsonPrinter implements AutoCloseable {
 
     /** 打印可能需要转义的字符 */
     public void printEscaped(char c, boolean unicodeChar) {
+        StringBuilder sb = builder;
         switch (c) {
-            case '\"' -> printFastPath("\\\"");
-            case '\\' -> printFastPath("\\\\");
-            case '\b' -> printFastPath("\\b");
-            case '\f' -> printFastPath("\\f");
-            case '\n' -> printFastPath("\\n");
-            case '\r' -> printFastPath("\\r");
-            case '\t' -> printFastPath("\\t");
+            case '\"' -> {
+                sb.append('\\');
+                sb.append('"');
+                column += 2;
+            }
+            case '\\' -> {
+                sb.append('\\');
+                sb.append('\\');
+                column += 2;
+            }
+            case '\b' -> {
+                sb.append('\\');
+                sb.append('b');
+                column += 2;
+            }
+            case '\f' -> {
+                sb.append('\\');
+                sb.append('f');
+                column += 2;
+            }
+            case '\n' -> {
+                sb.append('\\');
+                sb.append('n');
+                column += 2;
+            }
+            case '\r' -> {
+                sb.append('\\');
+                sb.append('r');
+                column += 2;
+            }
+            case '\t' -> {
+                sb.append('\\');
+                sb.append('t');
+                column += 2;
+            }
             default -> {
                 if (unicodeChar && (c < 32 || c > 126)) {
-                    printFastPath("\\u");
-                    printRangeFastPath(Integer.toHexString(0x10000 + (int) c), 1, 5);
+                    sb.append('\\');
+                    sb.append('u');
+                    sb.append(Integer.toHexString(0x10000 + (int) c), 1, 5);
+                    column += 6;
                 } else {
-                    print(c);
+                    sb.append(c);
+                    column += 1;
                 }
             }
         }

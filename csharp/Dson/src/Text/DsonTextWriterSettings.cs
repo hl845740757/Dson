@@ -115,8 +115,8 @@ public class DsonTextWriterSettings : DsonWriterSettings
          * 通常用于非UTF8文本的移植
          */
         public bool UnicodeChar = false;
-        /** 自动模式下无引号字符串的最大长度 -- 66为2进制long长度 */
-        public int MaxLengthOfUnquoteString = 66;
+        /** 自动模式下无引号字符串的最大长度 -- 过大会降低序列化速度 */
+        public int MaxLengthOfUnquoteString = 16;
         /** 外层额外缩进 */
         public int ExtraIndent;
 

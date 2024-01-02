@@ -20,6 +20,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Runtime.CompilerServices;
 using System.Text;
 using Wjybxx.Dson.IO;
 
@@ -99,11 +100,13 @@ public static class DsonTexts
     }
 
     /** 是否是缩进字符 */
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsIndentChar(int c) {
         return c == ' ' || c == '\t';
     }
 
     /** 是否是不安全的字符，不能省略引号的字符 */
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsUnsafeStringChar(int c) {
         if (c < 128) { // BitArray不能访问索引外的字符
             return UnsafeCharSet.Get(c) || char.IsWhiteSpace((char)c);
@@ -116,6 +119,7 @@ public static class DsonTexts
      * 注意：safeChar也可能组合出不安全的无引号字符串，比如：123, 0.5, null,true,false，
      * 因此不能因为每个字符安全，就认为整个字符串安全
      */
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsSafeStringChar(int c) {
         if (c < 128) {
             return !UnsafeCharSet.Get(c) && !char.IsWhiteSpace((char)c);

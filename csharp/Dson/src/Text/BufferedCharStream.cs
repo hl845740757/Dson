@@ -44,11 +44,11 @@ class BufferedCharStream : AbstractCharStream
     /** reader是否已到达文件尾部 -- 部分reader在到达文件尾部的时候不可继续读 */
     private bool _readerEof;
 
-    public BufferedCharStream(TextReader reader, int bufferSize = 64, bool autoClose = true) {
+    public BufferedCharStream(TextReader reader, int bufferSize = 512, bool autoClose = true) {
         bufferSize = Math.Max(MinBufferSize, bufferSize);
         this._reader = reader ?? throw new ArgumentNullException(nameof(reader));
         this._buffer = new CharBuffer(bufferSize);
-        this._nextBuffer = new CharBuffer(64);
+        this._nextBuffer = new CharBuffer(bufferSize / 2);
         this._autoClose = autoClose;
         try {
             DetectDsonMode();

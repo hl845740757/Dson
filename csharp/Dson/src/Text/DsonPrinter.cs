@@ -136,22 +136,9 @@ public class DsonPrinter : IDisposable
         }
     }
 
-    /**
-     * @param start the starting index of the subsequence to be appended.
-     * @param end   the end index of the subsequence to be appended.
-     */
-    public void PrintRange(string text, int start, int end) {
-        CheckRange(start, end, text.Length);
-        for (int idx = start; idx < end; idx++) {
-            Print(text[idx]);
-        }
-    }
-
-    private static void CheckRange(int start, int end, int len) {
-        if (start < 0 || start > end || end > len) {
-            throw new IndexOutOfRangeException(
-                "start " + start + ", end " + end + ", length " + len);
-        }
+    public void PrintFastPath(char c) {
+        _builder.Append(c);
+        _column++;
     }
 
     /** @param cBuffer 内容中无tab字符 */
@@ -167,9 +154,9 @@ public class DsonPrinter : IDisposable
     }
 
     /** @param cBuffer 内容中无tab字符 */
-    public void PrintFastPath(char[] cBuffer, int offset, int len) {
-        _builder.Append(cBuffer, offset, len);
-        _column += len;
+    public void PrintFastPath(char[] cBuffer, int offset, int count) {
+        _builder.Append(cBuffer, offset, count);
+        _column += count; // c#是count...
     }
 
     /** @param text 内容中无tab字符 */
@@ -179,9 +166,9 @@ public class DsonPrinter : IDisposable
     }
 
     /** @param text 内容中无tab字符 */
-    public void PrintRangeFastPath(string text, int start, int end) {
-        _builder.Append(text, start, end);
-        _column += (end - start);
+    public void PrintRangeFastPath(string text, int start, int count) {
+        _builder.Append(text, start, count);
+        _column += count; // c#是count...
     }
 
     #endregion
@@ -239,34 +226,52 @@ public class DsonPrinter : IDisposable
 
     /** 打印可能需要转义的字符 */
     public void PrintEscaped(char c, bool unicodeChar) {
+        StringBuilder sb = _builder;
         switch (c) {
             case '\"':
-                PrintFastPath("\\\"");
+                sb.Append('\\');
+                sb.Append('"');
+                _column += 2;
                 break;
             case '\\':
-                PrintFastPath("\\\\");
+                sb.Append('\\');
+                sb.Append('\\');
+                _column += 2;
                 break;
             case '\b':
-                PrintFastPath("\\b");
+                sb.Append('\\');
+                sb.Append('b');
+                _column += 2;
                 break;
             case '\f':
-                PrintFastPath("\\f");
+                sb.Append('\\');
+                sb.Append('f');
+                _column += 2;
                 break;
             case '\n':
-                PrintFastPath("\\n");
+                sb.Append('\\');
+                sb.Append('n');
+                _column += 2;
                 break;
             case '\r':
-                PrintFastPath("\\r");
+                sb.Append('\\');
+                sb.Append('r');
+                _column += 2;
                 break;
             case '\t':
-                PrintFastPath("\\t");
+                sb.Append('\\');
+                sb.Append('t');
+                _column += 2;
                 break;
             default: {
                 if (unicodeChar && (c < 32 || c > 126)) {
-                    PrintFastPath("\\u");
-                    PrintRangeFastPath((0x10000 + c).ToString("X"), 1, 5);
+                    sb.Append('\\');
+                    sb.Append('u');
+                    sb.Append((0x10000 + c).ToString("X"), 1, 4);
+                    _column += 6;
                 } else {
-                    Print(c);
+                    sb.Append(c);
+                    _column += 1;
                 }
                 break;
             }

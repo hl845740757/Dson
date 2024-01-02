@@ -33,6 +33,10 @@ class CharBuffer implements CharSequence {
     public int ridx;
     public int widx;
 
+    CharBuffer(int length) {
+        this.buffer = new char[length];
+    }
+
     CharBuffer(char[] buffer) {
         this.buffer = Objects.requireNonNull(buffer);
     }
