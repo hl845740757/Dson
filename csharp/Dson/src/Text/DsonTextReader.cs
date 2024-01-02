@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.IO;
 using System.Text;
 using Wjybxx.Dson.IO;
 using Wjybxx.Dson.Types;
@@ -55,6 +56,10 @@ public class DsonTextReader : AbstractDsonReader<string>
 
     public DsonTextReader(DsonTextReaderSettings settings, string dsonString)
         : this(settings, new DsonScanner(dsonString)) {
+    }
+
+    public DsonTextReader(DsonTextReaderSettings settings, TextReader reader)
+        : this(settings, new DsonScanner(IDsonCharStream.NewBufferedCharStream(reader))) {
     }
 
     public DsonTextReader(DsonTextReaderSettings settings, DsonScanner scanner)
