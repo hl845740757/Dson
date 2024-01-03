@@ -37,12 +37,14 @@ public class DsonScanner : IDisposable
     private readonly char[] _hexBuffer = new char[4];
 #nullable enable
 
-    public DsonScanner(string dson) {
+    public DsonScanner(string dson, StringBuilder? sb = null) {
         _charStream = new StringCharStream(dson);
+        _pooledStringBuilder = sb ?? new StringBuilder(64);
     }
 
-    public DsonScanner(IDsonCharStream charStream) {
+    public DsonScanner(IDsonCharStream charStream, StringBuilder? sb = null) {
         _charStream = charStream ?? throw new ArgumentNullException(nameof(charStream));
+        _pooledStringBuilder = sb ?? new StringBuilder(64);
     }
 
     public void Dispose() {

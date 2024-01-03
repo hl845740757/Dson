@@ -37,7 +37,7 @@ public class DsonPrinter : IDisposable
     private readonly TextWriter _writer;
 
     /** 行缓冲，减少同步写操作 */
-    private readonly StringBuilder _builder = new StringBuilder(1024);
+    private StringBuilder _builder;
     /** 缩进字符缓存，减少字符串构建 */
     private char[] _indentionArray = SharedIndentionArray;
 
@@ -59,6 +59,11 @@ public class DsonPrinter : IDisposable
         _writer = writer ?? throw new ArgumentNullException(nameof(writer));
         // 初始化
         this._headIndent = settings.ExtraIndent;
+        if (_settings.AccessBackingBuilder && writer is StringWriter stringWriter) {
+            _builder = stringWriter.GetStringBuilder();
+        } else {
+            _builder = settings.StringBuilderPool.Rent();
+        }
     }
 
     #region 属性
@@ -359,7 +364,12 @@ public class DsonPrinter : IDisposable
     }
 
     public void Dispose() {
+        if (_builder == null) {
+            return;
+        }
         Flush();
+        _settings.StringBuilderPool.ReturnOne(_builder);
+        _builder = null;
         if (_settings.AutoClose) {
             _writer.Dispose();
         }
