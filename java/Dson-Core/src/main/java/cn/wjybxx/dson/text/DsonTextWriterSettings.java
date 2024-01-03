@@ -99,7 +99,7 @@ public class DsonTextWriterSettings extends DsonWriterSettings {
          */
         private boolean unicodeChar = false;
         /** 自动模式下无引号字符串的最大长度 -- 过大会降低序列化速度 */
-        private int maxLengthOfUnquoteString = 16;
+        private int maxLengthOfUnquoteString = 20;
         /** 外层额外缩进 -- 行首前缩进 */
         private int extraIndent;
 

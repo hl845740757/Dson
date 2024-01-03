@@ -59,7 +59,7 @@ public class DsonArrayHeaderTest {
         Assertions.assertEquals(array, copiedArray);
     }
 
-    /** 测试自身headeer时是否冲突 */
+    /** 测试自身header时是否冲突 */
     @Test
     void testHeader() {
         DsonArray<String> array = new DsonArray<>();

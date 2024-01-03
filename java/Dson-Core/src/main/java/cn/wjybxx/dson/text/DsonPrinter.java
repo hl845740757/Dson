@@ -39,7 +39,7 @@ public final class DsonPrinter implements AutoCloseable {
     private final Writer writer;
 
     /** 行缓冲，减少同步写操作 */
-    private final StringBuilder builder = new StringBuilder(150);
+    private final StringBuilder builder = new StringBuilder(1024);
     /** 缩进字符缓存，减少字符串构建 */
     private char[] indentionArray = SHARED_INDENTION_ARRAY;
 
@@ -286,7 +286,9 @@ public final class DsonPrinter implements AutoCloseable {
     /** 换行 */
     public void println() {
         builder.append(settings.lineSeparator);
-        flush();
+        if (builder.length() >= 4096) {
+            flush(); // 如果每一行都flush，在数量大的情况下会产生大量的io操作，降低性能
+        }
         ln++;
         column = 0;
         headIndent = settings.extraIndent;

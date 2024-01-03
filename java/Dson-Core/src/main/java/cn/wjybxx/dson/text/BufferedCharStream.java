@@ -55,7 +55,7 @@ final class BufferedCharStream extends AbstractCharStream {
         this.reader = reader;
         this.autoClose = autoClose;
         this.buffer = new CharBuffer(bufferSize);
-        this.nextBuffer = new CharBuffer(bufferSize / 2);
+        this.nextBuffer = new CharBuffer(Math.max(64, bufferSize));
         try {
             detectDsonMode();
         } catch (IOException e) {

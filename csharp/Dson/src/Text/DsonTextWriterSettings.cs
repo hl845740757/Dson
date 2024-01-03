@@ -116,7 +116,7 @@ public class DsonTextWriterSettings : DsonWriterSettings
          */
         public bool UnicodeChar = false;
         /** 自动模式下无引号字符串的最大长度 -- 过大会降低序列化速度 */
-        public int MaxLengthOfUnquoteString = 16;
+        public int MaxLengthOfUnquoteString = 20;
         /** 外层额外缩进 */
         public int ExtraIndent;
 

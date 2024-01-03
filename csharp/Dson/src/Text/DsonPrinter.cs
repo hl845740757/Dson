@@ -37,7 +37,7 @@ public class DsonPrinter : IDisposable
     private readonly TextWriter _writer;
 
     /** 行缓冲，减少同步写操作 */
-    private readonly StringBuilder _builder = new StringBuilder(150);
+    private readonly StringBuilder _builder = new StringBuilder(1024);
     /** 缩进字符缓存，减少字符串构建 */
     private char[] _indentionArray = SharedIndentionArray;
 
@@ -285,7 +285,10 @@ public class DsonPrinter : IDisposable
     /** 换行 */
     public void Println() {
         _builder.Append(_settings.LineSeparator);
-        Flush();
+        if (_builder.Length >= 4096) {
+            Flush(); // 如果每一行都flush，在数量大的情况下会产生大量的io操作，降低性能
+        }
+        // Flush();
         _ln++;
         _column = 0;
         _headIndent = _settings.ExtraIndent;
