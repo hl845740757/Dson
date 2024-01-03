@@ -48,7 +48,7 @@ class BufferedCharStream : AbstractCharStream
         bufferSize = Math.Max(MinBufferSize, bufferSize);
         this._reader = reader ?? throw new ArgumentNullException(nameof(reader));
         this._buffer = new CharBuffer(bufferSize);
-        this._nextBuffer = new CharBuffer(Math.Max(64, bufferSize));
+        this._nextBuffer = new CharBuffer(Math.Max(64, bufferSize / 4));
         this._autoClose = autoClose;
         try {
             DetectDsonMode();
