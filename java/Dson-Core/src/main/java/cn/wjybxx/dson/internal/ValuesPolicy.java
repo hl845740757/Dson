@@ -16,6 +16,8 @@
 
 package cn.wjybxx.dson.internal;
 
+import cn.wjybxx.base.CollectionUtils;
+
 import java.util.*;
 
 /**
@@ -61,7 +63,7 @@ public enum ValuesPolicy {
     IMMUTABLE {
         @Override
         public <K, V> Map<K, V> applyMap(Map<K, V> src) {
-            return DsonInternals.toImmutableLinkedHashMap(src);
+            return CollectionUtils.toImmutableLinkedHashMap(src);
         }
 
         @Override
@@ -71,7 +73,7 @@ public enum ValuesPolicy {
 
         @Override
         public <E> Set<E> applySet(Set<E> src) {
-            return DsonInternals.toImmutableLinkedHashSet(src);
+            return CollectionUtils.toImmutableLinkedHashSet(src);
         }
     },
 

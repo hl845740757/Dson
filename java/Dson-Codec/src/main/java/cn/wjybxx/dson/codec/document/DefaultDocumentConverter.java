@@ -16,6 +16,7 @@
 
 package cn.wjybxx.dson.codec.document;
 
+import cn.wjybxx.base.io.StringBuilderWriter;
 import cn.wjybxx.dson.codec.ConvertOptions;
 import cn.wjybxx.dson.codec.TypeArgInfo;
 import cn.wjybxx.dson.codec.TypeMetaRegistries;
@@ -83,7 +84,7 @@ public class DefaultDocumentConverter implements DocumentConverter {
     @Override
     public byte[] write(Object value, @Nonnull TypeArgInfo<?> typeArgInfo) {
         Objects.requireNonNull(value);
-        final byte[] localBuffer = options.bufferPool.alloc();
+        final byte[] localBuffer = options.bufferPool.rent();
         try {
             final DsonChunk chunk = new DsonChunk(localBuffer);
             write(value, chunk, typeArgInfo);
@@ -92,14 +93,14 @@ public class DefaultDocumentConverter implements DocumentConverter {
             System.arraycopy(localBuffer, 0, result, 0, result.length);
             return result;
         } finally {
-            options.bufferPool.release(localBuffer);
+            options.bufferPool.returnOne(localBuffer);
         }
     }
 
     @Override
     public <U> U cloneObject(Object value, TypeArgInfo<U> typeArgInfo) {
         Objects.requireNonNull(value);
-        final byte[] localBuffer = options.bufferPool.alloc();
+        final byte[] localBuffer = options.bufferPool.rent();
         try {
             final DsonOutput outputStream = DsonOutputs.newInstance(localBuffer);
             encodeObject(outputStream, value, typeArgInfo);
@@ -107,7 +108,7 @@ public class DefaultDocumentConverter implements DocumentConverter {
             final DsonInput inputStream = DsonInputs.newInstance(localBuffer, 0, outputStream.getPosition());
             return decodeObject(inputStream, typeArgInfo);
         } finally {
-            options.bufferPool.release(localBuffer);
+            options.bufferPool.returnOne(localBuffer);
         }
     }
 
@@ -139,12 +140,12 @@ public class DefaultDocumentConverter implements DocumentConverter {
     @Nonnull
     @Override
     public String writeAsDson(Object value, DsonMode dsonMode, @Nonnull TypeArgInfo<?> typeArgInfo) {
-        StringBuilder stringBuilder = options.stringBuilderPool.alloc();
+        StringBuilder stringBuilder = options.stringBuilderPool.rent();
         try {
             writeAsDson(value, dsonMode, typeArgInfo, new StringBuilderWriter(stringBuilder));
             return stringBuilder.toString();
         } finally {
-            options.stringBuilderPool.release(stringBuilder);
+            options.stringBuilderPool.returnOne(stringBuilder);
         }
     }
 

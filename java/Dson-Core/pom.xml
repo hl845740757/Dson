@@ -15,4 +15,12 @@
     <description>Dson核心模块</description>
     <url>https://github.com/hl845740757/Dson</url>
 
+    <dependencies>
+        <dependency>
+            <groupId>cn.wjybxx.commons</groupId>
+            <artifactId>base</artifactId>
+            <version>${base.version}</version>
+        </dependency>
+    </dependencies>
+
 </project>

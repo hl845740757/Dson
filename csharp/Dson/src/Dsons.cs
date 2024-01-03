@@ -22,6 +22,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Wjybxx.Commons.IO;
 using Wjybxx.Dson.Collections;
 using Wjybxx.Dson.IO;
 using Wjybxx.Dson.Text;
@@ -574,11 +575,17 @@ public static class Dsons
     /** 该接口用于写顶层数组容器，所有元素将被展开 */
     public static string ToFlatDson(this DsonArray<string> topContainer, DsonTextWriterSettings? settings = null) {
         if (settings == null) settings = DsonTextWriterSettings.Default;
-        StringWriter stringWriter = new StringWriter(new StringBuilder(1024));
-        using (DsonTextWriter writer = new DsonTextWriter(settings, stringWriter)) {
-            WriteTopContainer(writer, topContainer);
+
+        StringBuilder sb = LocalStringBuilderPool.Instance.Rent();
+        try {
+            using (DsonTextWriter writer = new DsonTextWriter(settings, new StringWriter(sb))) {
+                WriteTopContainer(writer, topContainer);
+            }
+            return sb.ToString();
         }
-        return stringWriter.ToString();
+        finally {
+            LocalStringBuilderPool.Instance.ReturnOne(sb);
+        }
     }
 
     /** 该接口用于读取多顶层对象dson文本 */
@@ -598,11 +605,16 @@ public static class Dsons
         if (!dsonValue.DsonType.IsContainerOrHeader()) {
             throw new InvalidOperationException("invalid dsonType " + dsonValue.DsonType);
         }
-        StringWriter stringWriter = new StringWriter(new StringBuilder(1024));
-        using (DsonTextWriter writer = new DsonTextWriter(settings, stringWriter)) {
-            WriteTopDsonValue(writer, dsonValue, style);
+        StringBuilder sb = LocalStringBuilderPool.Instance.Rent();
+        try {
+            using (DsonTextWriter writer = new DsonTextWriter(settings, new StringWriter(sb))) {
+                WriteTopDsonValue(writer, dsonValue, style);
+            }
+            return sb.ToString();
         }
-        return stringWriter.ToString();
+        finally {
+            LocalStringBuilderPool.Instance.ReturnOne(sb);
+        }
     }
 
     /** 默认只读取第一个值 */

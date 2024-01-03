@@ -16,7 +16,9 @@
 
 #endregion
 
-using Wjybxx.Dson.IO;
+using System.Text;
+using Wjybxx.Commons.IO;
+using Wjybxx.Commons.Pool;
 
 #pragma warning disable CS1591
 namespace Wjybxx.Dson.Text;
@@ -29,10 +31,10 @@ public class DsonTextReaderSettings : DsonReaderSettings
     public static readonly DsonTextReaderSettings Default = NewBuilder().Build();
 
     /** StringBuilder池 - 用于Scanner扫描文本时 */
-    public readonly IStringBuilderPool StringBuilderPool;
+    public readonly IObjectPool<StringBuilder> StringBuilderPool;
 
     public DsonTextReaderSettings(Builder builder) : base(builder) {
-        StringBuilderPool = builder.StringBuilderPool ?? LocalBuilderPool.Default;
+        StringBuilderPool = builder.StringBuilderPool ?? LocalStringBuilderPool.Instance;
     }
 
     public new static Builder NewBuilder() {
@@ -42,7 +44,7 @@ public class DsonTextReaderSettings : DsonReaderSettings
     public new class Builder : DsonReaderSettings.Builder
     {
         /** StringBuilder池 */
-        public IStringBuilderPool? StringBuilderPool = LocalBuilderPool.Default;
+        public IObjectPool<StringBuilder>? StringBuilderPool = LocalStringBuilderPool.Instance;
 
         public Builder() {
         }

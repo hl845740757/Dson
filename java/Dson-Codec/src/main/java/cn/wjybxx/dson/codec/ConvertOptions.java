@@ -17,6 +17,9 @@
 package cn.wjybxx.dson.codec;
 
 import cn.wjybxx.base.OptionalBool;
+import cn.wjybxx.base.io.LocalByteArrayPool;
+import cn.wjybxx.base.io.LocalStringBuilderPool;
+import cn.wjybxx.base.pool.ObjectPool;
 import cn.wjybxx.dson.DsonReaderSettings;
 import cn.wjybxx.dson.DsonWriterSettings;
 import cn.wjybxx.dson.codec.binary.BinaryConverter;
@@ -73,9 +76,9 @@ public class ConvertOptions {
     /** 数字classId的转换器 */
     public final ClassIdConverter classIdConverter;
     /** 字节数组缓存池 */
-    public final BufferPool bufferPool;
+    public final ObjectPool<byte[]> bufferPool;
     /** 字符串缓存池 */
-    public final StringBuilderPool stringBuilderPool;
+    public final ObjectPool<StringBuilder> stringBuilderPool;
 
     /** 二进制解码设置 */
     public final DsonReaderSettings binReaderSettings;
@@ -128,8 +131,8 @@ public class ConvertOptions {
         private OptionalBool encodeMapAsObject = OptionalBool.FALSE;
 
         private ClassIdConverter classIdConverter = new DefaultClassIdConverter();
-        private BufferPool bufferPool = LocalPools.BUFFER_POOL;
-        private StringBuilderPool stringBuilderPool = LocalPools.STRING_BUILDER_POOL;
+        private ObjectPool<byte[]> bufferPool = LocalByteArrayPool.INSTANCE;
+        private ObjectPool<StringBuilder> stringBuilderPool = LocalStringBuilderPool.INSTANCE;
 
         private DsonReaderSettings binReaderSettings = DsonReaderSettings.DEFAULT;
         private DsonWriterSettings binWriterSettings = DsonWriterSettings.DEFAULT;
@@ -191,20 +194,20 @@ public class ConvertOptions {
             return this;
         }
 
-        public BufferPool getBufferPool() {
+        public ObjectPool<byte[]> getBufferPool() {
             return bufferPool;
         }
 
-        public Builder setBufferPool(BufferPool bufferPool) {
+        public Builder setBufferPool(ObjectPool<byte[]> bufferPool) {
             this.bufferPool = Objects.requireNonNull(bufferPool);
             return this;
         }
 
-        public StringBuilderPool getStringBuilderPool() {
+        public ObjectPool<StringBuilder> getStringBuilderPool() {
             return stringBuilderPool;
         }
 
-        public Builder setStringBuilderPool(StringBuilderPool stringBuilderPool) {
+        public Builder setStringBuilderPool(ObjectPool<StringBuilder> stringBuilderPool) {
             this.stringBuilderPool = stringBuilderPool;
             return this;
         }

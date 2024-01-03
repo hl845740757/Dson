@@ -20,6 +20,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using Wjybxx.Commons.IO;
+using Wjybxx.Commons.Pool;
+using Wjybxx.Dson.IO;
 
 #pragma warning disable CS1591
 namespace Wjybxx.Dson.Text;
@@ -33,18 +36,19 @@ public class DsonScanner : IDisposable
 
 #nullable disable
     private IDsonCharStream _charStream;
-    private StringBuilder _pooledStringBuilder = new StringBuilder(64);
+    private IObjectPool<StringBuilder> _builderPool;
+    private StringBuilder _pooledStringBuilder;
     private readonly char[] _hexBuffer = new char[4];
 #nullable enable
 
-    public DsonScanner(string dson, StringBuilder? sb = null) {
-        _charStream = new StringCharStream(dson);
-        _pooledStringBuilder = sb ?? new StringBuilder(64);
+    public DsonScanner(string dson, IObjectPool<StringBuilder>? builderPool = null)
+        : this(IDsonCharStream.NewCharStream(dson), builderPool) {
     }
 
-    public DsonScanner(IDsonCharStream charStream, StringBuilder? sb = null) {
+    public DsonScanner(IDsonCharStream charStream, IObjectPool<StringBuilder>? builderPool = null) {
         _charStream = charStream ?? throw new ArgumentNullException(nameof(charStream));
-        _pooledStringBuilder = sb ?? new StringBuilder(64);
+        _builderPool = builderPool ?? LocalStringBuilderPool.Instance;
+        _pooledStringBuilder = _builderPool.Rent();
     }
 
     public void Dispose() {
@@ -52,7 +56,11 @@ public class DsonScanner : IDisposable
             _charStream.Dispose();
             _charStream = null;
         }
-        _pooledStringBuilder = null;
+        if (_builderPool != null) {
+            _builderPool.ReturnOne(_pooledStringBuilder);
+            _builderPool = null;
+            _pooledStringBuilder = null;
+        }
     }
 
     /// <summary>

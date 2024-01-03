@@ -16,7 +16,7 @@
 
 package cn.wjybxx.dson.text;
 
-import cn.wjybxx.dson.internal.DsonInternals;
+import cn.wjybxx.base.ThreadUtils;
 import cn.wjybxx.dson.io.DsonIOException;
 
 import java.io.IOException;
@@ -189,7 +189,7 @@ final class BufferedCharStream extends AbstractCharStream {
                 }
             }
         } catch (IOException e) {
-            DsonInternals.recoveryInterrupt(e.getCause());
+            ThreadUtils.recoveryInterrupted(e.getCause());
             throw DsonIOException.wrap(e);
         }
     }

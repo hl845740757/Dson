@@ -16,6 +16,9 @@
 
 package cn.wjybxx.dson.text;
 
+import cn.wjybxx.base.ObjectUtils;
+import cn.wjybxx.base.io.LocalStringBuilderPool;
+import cn.wjybxx.base.pool.ObjectPool;
 import cn.wjybxx.dson.DsonReaderSettings;
 
 /**
@@ -26,8 +29,12 @@ public class DsonTextReaderSettings extends DsonReaderSettings {
 
     public static final DsonTextReaderSettings DEFAULT = newBuilder().build();
 
+    /** StringBuilder池 */
+    public final ObjectPool<StringBuilder> stringBuilderPool;
+
     protected DsonTextReaderSettings(Builder builder) {
         super(builder);
+        stringBuilderPool = ObjectUtils.nullToDef(builder.stringBuilderPool, LocalStringBuilderPool.INSTANCE);
     }
 
     public static Builder newBuilder() {
@@ -35,8 +42,19 @@ public class DsonTextReaderSettings extends DsonReaderSettings {
     }
 
     public static class Builder extends DsonReaderSettings.Builder {
+        /** StringBuilder池 */
+        private ObjectPool<StringBuilder> stringBuilderPool;
 
         protected Builder() {
+        }
+
+        public ObjectPool<StringBuilder> getStringBuilderPool() {
+            return stringBuilderPool;
+        }
+
+        public Builder setStringBuilderPool(ObjectPool<StringBuilder> stringBuilderPool) {
+            this.stringBuilderPool = stringBuilderPool;
+            return this;
         }
 
         @Override

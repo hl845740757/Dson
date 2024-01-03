@@ -16,13 +16,14 @@
 
 package cn.wjybxx.dson;
 
+import cn.wjybxx.base.io.LocalStringBuilderPool;
+import cn.wjybxx.base.io.StringBuilderWriter;
 import cn.wjybxx.dson.ext.Projection;
 import cn.wjybxx.dson.io.DsonIOException;
 import cn.wjybxx.dson.text.*;
 
 import javax.annotation.Nullable;
 import java.io.Reader;
-import java.io.StringWriter;
 
 /**
  * dson的辅助工具类，二进制流工具类{@link DsonLites}
@@ -423,11 +424,16 @@ public final class Dsons {
     /** 该接口用于写顶层数组容器，所有元素将被展开 */
     public static String toFlatDson(DsonArray<String> topContainer, DsonTextWriterSettings settings) {
         if (settings == null) settings = DsonTextWriterSettings.DEFAULT;
-        StringWriter stringWriter = new StringWriter(1024);
-        try (DsonTextWriter writer = new DsonTextWriter(settings, stringWriter)) {
-            writeTopContainer(writer, topContainer);
+
+        StringBuilder sb = LocalStringBuilderPool.INSTANCE.rent();
+        try {
+            try (DsonTextWriter writer = new DsonTextWriter(settings, new StringBuilderWriter(sb))) {
+                writeTopContainer(writer, topContainer);
+            }
+            return sb.toString();
+        } finally {
+            LocalStringBuilderPool.INSTANCE.returnOne(sb);
         }
-        return stringWriter.toString();
     }
 
     /** 该接口用于读取多顶层对象dson文本 */
@@ -456,11 +462,15 @@ public final class Dsons {
         if (!dsonValue.getDsonType().isContainerOrHeader()) {
             throw new IllegalArgumentException("invalid dsonType " + dsonValue.getDsonType());
         }
-        StringWriter stringWriter = new StringWriter(1024);
-        try (DsonTextWriter writer = new DsonTextWriter(settings, stringWriter)) {
-            writeTopDsonValue(writer, dsonValue, style);
+        StringBuilder sb = LocalStringBuilderPool.INSTANCE.rent();
+        try {
+            try (DsonTextWriter writer = new DsonTextWriter(settings, new StringBuilderWriter(sb))) {
+                writeTopDsonValue(writer, dsonValue, style);
+            }
+            return sb.toString();
+        } finally {
+            LocalStringBuilderPool.INSTANCE.returnOne(sb);
         }
-        return stringWriter.toString();
     }
 
     /** 默认只读取第一个对象 */

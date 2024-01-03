@@ -55,11 +55,11 @@ public class DsonTextReader : AbstractDsonReader<string>
 #nullable enable
 
     public DsonTextReader(DsonTextReaderSettings settings, string dsonString)
-        : this(settings, new DsonScanner(dsonString)) {
+        : this(settings, new DsonScanner(dsonString, settings.StringBuilderPool)) {
     }
 
     public DsonTextReader(DsonTextReaderSettings settings, TextReader reader)
-        : this(settings, new DsonScanner(IDsonCharStream.NewBufferedCharStream(reader))) {
+        : this(settings, new DsonScanner(IDsonCharStream.NewBufferedCharStream(reader), settings.StringBuilderPool)) {
     }
 
     public DsonTextReader(DsonTextReaderSettings settings, DsonScanner scanner)

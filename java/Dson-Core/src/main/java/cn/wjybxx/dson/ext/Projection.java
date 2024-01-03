@@ -1,7 +1,7 @@
 package cn.wjybxx.dson.ext;
 
+import cn.wjybxx.base.CollectionUtils;
 import cn.wjybxx.dson.*;
-import cn.wjybxx.dson.internal.DsonInternals;
 import cn.wjybxx.dson.io.DsonIOException;
 import cn.wjybxx.dson.text.DsonTextReader;
 import cn.wjybxx.dson.text.DsonTextReaderSettings;
@@ -85,7 +85,7 @@ public class Projection {
     public static final Set<String> allSpecialKeys;
 
     static {
-        HashSet<String> tempAllKeys = DsonInternals.newHashSet(8);
+        HashSet<String> tempAllKeys = CollectionUtils.newHashSet(8);
         tempAllKeys.add(key_header);
         tempAllKeys.addAll(objectKeys);
         tempAllKeys.addAll(arrayKeys);
@@ -374,7 +374,7 @@ public class Projection {
             this.includeHeader = isTrue(projectInfo.get(key_header));
             // object 字段映射
             {
-                fieldNodes = DsonInternals.newHashMap(projectInfo.size());
+                fieldNodes = CollectionUtils.newHashMap(projectInfo.size());
                 int count = 0;
                 for (Map.Entry<String, DsonValue> entry : projectInfo.entrySet()) {
                     String key = entry.getKey();

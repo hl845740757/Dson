@@ -16,9 +16,9 @@
 
 package cn.wjybxx.dson.text;
 
+import cn.wjybxx.base.ObjectUtils;
 import cn.wjybxx.dson.*;
 import cn.wjybxx.dson.internal.CommonsLang3;
-import cn.wjybxx.dson.internal.DsonInternals;
 import cn.wjybxx.dson.io.DsonChunk;
 import cn.wjybxx.dson.types.*;
 
@@ -441,7 +441,7 @@ public class DsonTextWriter extends AbstractDsonWriter {
         DsonPrinter printer = this.printer;
         int softLineLength = this.settings.softLineLength;
         writeCurrentName(printer, DsonType.REFERENCE);
-        if (DsonInternals.isBlank(objectRef.getNamespace())
+        if (ObjectUtils.isBlank(objectRef.getNamespace())
                 && objectRef.getType() == 0 && objectRef.getPolicy() == 0) {
             printer.printFastPath("@ref "); // 只有localId时简写
             printString(printer, objectRef.getLocalId(), StringStyle.AUTO_QUOTE);

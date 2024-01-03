@@ -16,9 +16,9 @@
 
 package cn.wjybxx.dson.text;
 
+import cn.wjybxx.base.CollectionUtils;
 import cn.wjybxx.dson.*;
 import cn.wjybxx.dson.internal.CommonsLang3;
-import cn.wjybxx.dson.internal.DsonInternals;
 import cn.wjybxx.dson.io.DsonIOException;
 import cn.wjybxx.dson.types.*;
 
@@ -62,11 +62,11 @@ public class DsonTextReader extends AbstractDsonReader {
     private final ArrayDeque<DsonToken> markedTokenQueue = new ArrayDeque<>(6);
 
     public DsonTextReader(DsonTextReaderSettings settings, CharSequence dsonString) {
-        this(settings, new DsonScanner(dsonString));
+        this(settings, new DsonScanner(dsonString, settings.stringBuilderPool));
     }
 
     public DsonTextReader(DsonTextReaderSettings settings, Reader reader) {
-        this(settings, new DsonScanner(DsonCharStream.newBufferedCharStream(reader)));
+        this(settings, new DsonScanner(DsonCharStream.newBufferedCharStream(reader), settings.stringBuilderPool));
     }
 
     public DsonTextReader(DsonTextReaderSettings settings, DsonScanner scanner) {
@@ -700,7 +700,7 @@ public class DsonTextReader extends AbstractDsonReader {
     }
 
     private static void verifyTokenType(Context context, DsonToken token, List<DsonTokenType> expected) {
-        if (!DsonInternals.containsRef(expected, token.getType())) {
+        if (!CollectionUtils.containsRef(expected, token.getType())) {
             throw DsonIOException.invalidTokenType(context.contextType, token, expected);
         }
     }

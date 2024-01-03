@@ -53,8 +53,8 @@
 
     <properties>
         <revision>1.4.rc1</revision>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>utf-8</project.reporting.outputEncoding>
@@ -66,7 +66,7 @@
         <commons-io.version>2.13.0</commons-io.version>
 
         <!-- 运行时依赖 -->
-        <base.version>1.0.rc1</base.version>
+        <base.version>1.0.0</base.version>
         <jsr305.version>3.0.2</jsr305.version>
         <commons-lang3.version>3.14.0</commons-lang3.version>
         <fastutil.version>8.5.12</fastutil.version>

@@ -16,6 +16,10 @@
 
 package cn.wjybxx.dson.text;
 
+import cn.wjybxx.base.ObjectUtils;
+import cn.wjybxx.base.io.LocalStringBuilderPool;
+import cn.wjybxx.base.io.StringBuilderWriter;
+import cn.wjybxx.base.pool.ObjectPool;
 import cn.wjybxx.dson.DsonWriterSettings;
 
 import javax.annotation.concurrent.Immutable;
@@ -36,6 +40,9 @@ public class DsonTextWriterSettings extends DsonWriterSettings {
     public final DsonMode dsonMode;
     public final int softLineLength;
 
+    public final ObjectPool<StringBuilder> stringBuilderPool;
+    public final boolean accessBackingBuilder;
+
     public final boolean enableText;
     public final float textStringLength;
     public final boolean textAlignLeft;
@@ -50,6 +57,9 @@ public class DsonTextWriterSettings extends DsonWriterSettings {
         this.lineSeparator = Objects.requireNonNull(builder.lineSeparator);
         this.dsonMode = builder.dsonMode;
         this.softLineLength = Math.max(MIN_LINE_LENGTH, builder.softLineLength);
+
+        this.stringBuilderPool = ObjectUtils.nullToDef(builder.stringBuilderPool, LocalStringBuilderPool.INSTANCE);
+        this.accessBackingBuilder = builder.accessBackingBuilder;
 
         // 标准模式下才可启用纯文本
         this.enableText = dsonMode == DsonMode.STANDARD && builder.enableText;
@@ -79,6 +89,11 @@ public class DsonTextWriterSettings extends DsonWriterSettings {
          * 另外，这个行长度是是码元计数，不是字符计数。
          */
         private int softLineLength = 120;
+
+        /** StringBuilder池 */
+        private ObjectPool<StringBuilder> stringBuilderPool;
+        /** 目标Writer是{@link StringBuilderWriter}时是否直接访问底层的Builder代替额外的分配，这可以节省大量的开销 */
+        private boolean accessBackingBuilder = true;
 
         /**
          * 是否启用纯文本模式
@@ -120,6 +135,15 @@ public class DsonTextWriterSettings extends DsonWriterSettings {
             return this;
         }
 
+        public DsonMode getDsonMode() {
+            return dsonMode;
+        }
+
+        public Builder setDsonMode(DsonMode dsonMode) {
+            this.dsonMode = dsonMode;
+            return this;
+        }
+
         public int getSoftLineLength() {
             return softLineLength;
         }
@@ -129,12 +153,21 @@ public class DsonTextWriterSettings extends DsonWriterSettings {
             return this;
         }
 
-        public DsonMode getDsonMode() {
-            return dsonMode;
+        public ObjectPool<StringBuilder> getStringBuilderPool() {
+            return stringBuilderPool;
         }
 
-        public Builder setDsonMode(DsonMode dsonMode) {
-            this.dsonMode = dsonMode;
+        public Builder setStringBuilderPool(ObjectPool<StringBuilder> stringBuilderPool) {
+            this.stringBuilderPool = stringBuilderPool;
+            return this;
+        }
+
+        public boolean isAccessBackingBuilder() {
+            return accessBackingBuilder;
+        }
+
+        public Builder setAccessBackingBuilder(boolean accessBackingBuilder) {
+            this.accessBackingBuilder = accessBackingBuilder;
             return this;
         }
 

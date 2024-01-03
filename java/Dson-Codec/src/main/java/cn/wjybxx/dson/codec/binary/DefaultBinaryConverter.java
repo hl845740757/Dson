@@ -81,7 +81,7 @@ public class DefaultBinaryConverter implements BinaryConverter {
     @Override
     public byte[] write(Object value, @Nonnull TypeArgInfo<?> typeArgInfo) {
         Objects.requireNonNull(value);
-        final byte[] localBuffer = options.bufferPool.alloc();
+        final byte[] localBuffer = options.bufferPool.rent();
         try {
             final DsonChunk chunk = new DsonChunk(localBuffer);
             write(value, chunk, typeArgInfo);
@@ -90,14 +90,14 @@ public class DefaultBinaryConverter implements BinaryConverter {
             System.arraycopy(localBuffer, 0, result, 0, result.length);
             return result;
         } finally {
-            options.bufferPool.release(localBuffer);
+            options.bufferPool.returnOne(localBuffer);
         }
     }
 
     @Override
     public <U> U cloneObject(Object value, TypeArgInfo<U> typeArgInfo) {
         Objects.requireNonNull(value);
-        final byte[] localBuffer = options.bufferPool.alloc();
+        final byte[] localBuffer = options.bufferPool.rent();
         try {
             final DsonOutput outputStream = DsonOutputs.newInstance(localBuffer);
             encodeObject(outputStream, value, typeArgInfo);
@@ -105,7 +105,7 @@ public class DefaultBinaryConverter implements BinaryConverter {
             final DsonInput inputStream = DsonInputs.newInstance(localBuffer, 0, outputStream.getPosition());
             return decodeObject(inputStream, typeArgInfo);
         } finally {
-            options.bufferPool.release(localBuffer);
+            options.bufferPool.returnOne(localBuffer);
         }
     }
 

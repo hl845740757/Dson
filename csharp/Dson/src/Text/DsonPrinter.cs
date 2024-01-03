@@ -38,6 +38,8 @@ public class DsonPrinter : IDisposable
 
     /** 行缓冲，减少同步写操作 */
     private StringBuilder _builder;
+    /** 是否是Writer内部的builder */
+    private bool _backingBuilder;
     /** 缩进字符缓存，减少字符串构建 */
     private char[] _indentionArray = SharedIndentionArray;
 
@@ -59,7 +61,8 @@ public class DsonPrinter : IDisposable
         _writer = writer ?? throw new ArgumentNullException(nameof(writer));
         // 初始化
         this._headIndent = settings.ExtraIndent;
-        if (_settings.AccessBackingBuilder && writer is StringWriter stringWriter) {
+        if (settings.AccessBackingBuilder && writer is StringWriter stringWriter) {
+            _backingBuilder = true;
             _builder = stringWriter.GetStringBuilder();
         } else {
             _builder = settings.StringBuilderPool.Rent();
@@ -355,6 +358,9 @@ public class DsonPrinter : IDisposable
     #region io
 
     public void Flush() {
+        if (_backingBuilder) {
+            return;
+        }
         StringBuilder builder = this._builder;
         if (builder.Length > 0) {
             _writer.Write(this._builder);
@@ -368,7 +374,9 @@ public class DsonPrinter : IDisposable
             return;
         }
         Flush();
-        _settings.StringBuilderPool.ReturnOne(_builder);
+        if (!_backingBuilder) {
+            _settings.StringBuilderPool.ReturnOne(_builder);
+        }
         _builder = null;
         if (_settings.AutoClose) {
             _writer.Dispose();

@@ -18,7 +18,9 @@
 
 using System;
 using System.IO;
-using Wjybxx.Dson.IO;
+using System.Text;
+using Wjybxx.Commons.IO;
+using Wjybxx.Commons.Pool;
 
 #pragma warning disable CS1591
 namespace Wjybxx.Dson.Text;
@@ -40,9 +42,9 @@ public class DsonTextWriterSettings : DsonWriterSettings
     public readonly DsonMode DsonMode;
     /** 行长度-软限制 */
     public readonly int SoftLineLength;
-    
+
     /** StringBuilder池 */
-    public readonly IStringBuilderPool StringBuilderPool;
+    public readonly IObjectPool<StringBuilder> StringBuilderPool;
     /** 目标Writer是<see cref="StringWriter"/>时是否直接使用底层的builder */
     public readonly bool AccessBackingBuilder;
 
@@ -66,7 +68,7 @@ public class DsonTextWriterSettings : DsonWriterSettings
         this.LineSeparator = builder.LineSeparator;
         this.DsonMode = builder.DsonMode;
         this.SoftLineLength = Math.Max(MinLineLength, builder.SoftLineLength);
-        this.StringBuilderPool = builder.StringBuilderPool ?? LocalBuilderPool.Default;
+        this.StringBuilderPool = builder.StringBuilderPool ?? LocalStringBuilderPool.Instance;
         this.AccessBackingBuilder = builder.AccessBackingBuilder;
 
         // 标准模式下才可启用纯文本
@@ -107,11 +109,8 @@ public class DsonTextWriterSettings : DsonWriterSettings
         public int SoftLineLength = 120;
 
         /** StringBuilder池 */
-        public IStringBuilderPool? StringBuilderPool = LocalBuilderPool.Default;
-        /**
-         * 如果目标Writer是<see cref="StringWriter"/>，是否直接访问底层的Builder代替额外的分配，
-         * 这可以节省大量的开销。
-         */
+        public IObjectPool<StringBuilder>? StringBuilderPool = LocalStringBuilderPool.Instance;
+        /** 如果目标Writer是<see cref="StringWriter"/>，是否直接访问底层的Builder代替额外的分配，这可以节省大量的开销。 */
         public bool AccessBackingBuilder = true;
 
         /**

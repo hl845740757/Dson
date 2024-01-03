@@ -15,6 +15,7 @@
  */
 package cn.wjybxx.dson.internal;
 
+import cn.wjybxx.base.ObjectUtils;
 import cn.wjybxx.dson.io.DsonIOException;
 
 /**
@@ -27,7 +28,7 @@ public class CommonsLang3 {
 
     // region number
     public static boolean isParsable(String str) {
-        if (DsonInternals.isEmpty(str)) {
+        if (ObjectUtils.isEmpty(str)) {
             return false;
         }
         if (str.charAt(str.length() - 1) == '.') {

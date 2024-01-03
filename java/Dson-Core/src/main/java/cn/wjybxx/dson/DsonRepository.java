@@ -1,6 +1,6 @@
 package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.internal.DsonInternals;
+import cn.wjybxx.base.CollectionUtils;
 import cn.wjybxx.dson.types.ObjectRef;
 
 import java.util.HashMap;
@@ -60,7 +60,7 @@ public class DsonRepository {
         if (localId != null) {
             DsonValue exist = indexMap.put(localId, value);
             if (exist != null) {
-                DsonInternals.removeRef(container, exist);
+                CollectionUtils.removeRef(container, exist);
             }
         }
         return this;
@@ -76,7 +76,7 @@ public class DsonRepository {
     }
 
     public boolean remove(DsonValue dsonValue) {
-        int idx = DsonInternals.indexOfRef(container, dsonValue);
+        int idx = CollectionUtils.indexOfRef(container, dsonValue);
         if (idx >= 0) {
             removeAt(idx);
             return true;
@@ -89,7 +89,7 @@ public class DsonRepository {
         Objects.requireNonNull(localId);
         DsonValue exist = indexMap.remove(localId);
         if (exist != null) {
-            DsonInternals.removeRef(container, exist);
+            CollectionUtils.removeRef(container, exist);
         }
         return exist;
     }

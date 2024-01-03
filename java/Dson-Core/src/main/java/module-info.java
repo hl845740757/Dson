@@ -4,6 +4,7 @@
  */
 module wjybxx.dson.core {
     requires jsr305;
+    requires wjybxx.base;
 
     exports cn.wjybxx.dson;
     exports cn.wjybxx.dson.text;

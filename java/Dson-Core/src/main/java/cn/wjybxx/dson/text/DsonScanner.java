@@ -16,7 +16,10 @@
 
 package cn.wjybxx.dson.text;
 
-import cn.wjybxx.dson.internal.DsonInternals;
+import cn.wjybxx.base.CollectionUtils;
+import cn.wjybxx.base.ObjectUtils;
+import cn.wjybxx.base.io.LocalStringBuilderPool;
+import cn.wjybxx.base.pool.ObjectPool;
 
 import java.util.List;
 import java.util.Objects;
@@ -30,15 +33,26 @@ public class DsonScanner implements AutoCloseable {
     private static final List<DsonTokenType> STRING_TOKEN_TYPES = List.of(DsonTokenType.STRING, DsonTokenType.UNQUOTE_STRING);
 
     private DsonCharStream charStream;
-    private StringBuilder pooledStringBuilder = new StringBuilder(64);
+    private ObjectPool<StringBuilder> builderPool;
+    private StringBuilder pooledStringBuilder;
     private final char[] hexBuffer = new char[4];
 
     public DsonScanner(CharSequence dson) {
-        this.charStream = new StringCharStream(dson);
+        this(new StringCharStream(dson), null);
     }
 
     public DsonScanner(DsonCharStream charStream) {
+        this(charStream, null);
+    }
+
+    public DsonScanner(CharSequence dson, ObjectPool<StringBuilder> builderPool) {
+        this(DsonCharStream.newCharStream(dson), builderPool);
+    }
+
+    public DsonScanner(DsonCharStream charStream, ObjectPool<StringBuilder> builderPool) {
         this.charStream = Objects.requireNonNull(charStream);
+        this.builderPool = ObjectUtils.nullToDef(builderPool, LocalStringBuilderPool.INSTANCE);
+        this.pooledStringBuilder = this.builderPool.rent();
     }
 
     @Override
@@ -47,7 +61,9 @@ public class DsonScanner implements AutoCloseable {
             charStream.close();
             charStream = null;
         }
-        if (pooledStringBuilder != null) {
+        if (builderPool != null) {
+            builderPool.returnOne(pooledStringBuilder);
+            builderPool = null;
             pooledStringBuilder = null;
         }
     }
@@ -118,7 +134,7 @@ public class DsonScanner implements AutoCloseable {
     }
 
     private static void checkToken(List<DsonTokenType> expected, DsonTokenType tokenType, int position) {
-        if (!DsonInternals.containsRef(expected, tokenType)) {
+        if (!CollectionUtils.containsRef(expected, tokenType)) {
             throw invalidTokenType(expected, tokenType, position);
         }
     }
@@ -234,7 +250,7 @@ public class DsonScanner implements AutoCloseable {
             throw spaceRequired(getPosition());
         }
         String className = sb.toString();
-        if (DsonInternals.isBlank(className)) {
+        if (ObjectUtils.isBlank(className)) {
             throw invalidClassName(className, getPosition());
         }
         return onReadClassName(className, skipValue);

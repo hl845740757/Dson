@@ -16,6 +16,7 @@
 
 package cn.wjybxx.dson.text;
 
+import cn.wjybxx.base.io.StringBuilderWriter;
 import cn.wjybxx.dson.io.BinaryUtils;
 import cn.wjybxx.dson.io.DsonIOException;
 
@@ -39,7 +40,9 @@ public final class DsonPrinter implements AutoCloseable {
     private final Writer writer;
 
     /** 行缓冲，减少同步写操作 */
-    private final StringBuilder builder = new StringBuilder(1024);
+    private StringBuilder builder;
+    /** 是否是Writer内部的builder */
+    private boolean backingBuilder;
     /** 缩进字符缓存，减少字符串构建 */
     private char[] indentionArray = SHARED_INDENTION_ARRAY;
 
@@ -60,6 +63,12 @@ public final class DsonPrinter implements AutoCloseable {
         this.writer = writer;
         // 初始化
         this.headIndent = settings.extraIndent;
+        if (settings.accessBackingBuilder && writer instanceof StringBuilderWriter sbWriter) {
+            backingBuilder = true;
+            builder = sbWriter.getBuilder();
+        } else {
+            builder = settings.stringBuilderPool.rent();
+        }
     }
 
     // region 属性
@@ -349,6 +358,9 @@ public final class DsonPrinter implements AutoCloseable {
     // region io
 
     public void flush() {
+        if (backingBuilder) {
+            return;
+        }
         try {
             StringBuilder builder = this.builder;
             if (builder.length() > 0) {
@@ -367,8 +379,15 @@ public final class DsonPrinter implements AutoCloseable {
 
     @Override
     public void close() {
+        if (builder == null) {
+            return;
+        }
         try {
             flush();
+            if (!backingBuilder) {
+                settings.stringBuilderPool.returnOne(builder);
+            }
+            builder = null;
             if (settings.autoClose) {
                 writer.close();
             }

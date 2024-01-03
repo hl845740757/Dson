@@ -302,7 +302,7 @@ public class DsonObjectReader<TName> : AbstractDsonReader<TName> where TName : I
         context.Init(parent, contextType, dsonType);
         return context;
     }
-    
+
     protected new class Context : AbstractDsonReader<TName>.Context
     {
         /** 如果不为null，则表示需要先读取header */

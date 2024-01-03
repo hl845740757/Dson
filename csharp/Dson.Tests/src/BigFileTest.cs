@@ -27,6 +27,19 @@ using Wjybxx.Dson.Text;
 
 namespace Wjybxx.Dson.Tests;
 
+/// <summary>
+/// 以540K的文件测试如下：
+/// <code>
+/// StopWatch[System.Json=39ms][Read=30ms,Write=8ms]
+/// StopWatch[Wjybxx.Dson=46ms][Read=36ms,Write=9ms]  // 禁用无引号字符串
+/// StopWatch[Wjybxx.Dson=47ms][Read=35ms,Write=11ms] // 启用 MaxLengthOfUnquoteString 为 16
+/// StopWatch[Bson=67ms][Read=48ms,Write=19ms]
+/// </code>
+/// 我们优化后的Dson读写速度和系统库Json解析速度相近了，Bson的源码里几乎是没有优化的，因此是最慢的。
+/// 优化的内容包括：
+/// 1. 换行时不再固定Flush，而是等待Builder内容达到4K再Flush。
+/// 2. 增加StringBuilder池，且增加初始空间
+/// </summary>
 public class BigFileTest
 {
     private FileStream NewInputStream() {
@@ -36,14 +49,7 @@ public class BigFileTest
     private FileStream NewOutputStream() {
         return new FileStream("D:\\Test2.json", FileMode.Create);
     }
-
-    /// <summary>
-    /// 发现Dson的速度比系统库的Json慢不少...
-    /// Dson的Reader稍优于Bson的Reader -- 毕竟我们算法实现基本一致。
-    /// 
-    /// Dson的Writer是3个里最慢的，Reader比Bson块一丢丢
-    /// 不过，我们的测试输入全部是字符串值...猜测是字符串处理有问题
-    /// </summary>
+    
     [Test]
     public void TestReadWrite() {
         if (!File.Exists("D:\\Test.json")) {
