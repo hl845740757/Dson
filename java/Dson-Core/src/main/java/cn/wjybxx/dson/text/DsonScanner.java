@@ -16,7 +16,6 @@
 
 package cn.wjybxx.dson.text;
 
-import cn.wjybxx.base.CollectionUtils;
 import cn.wjybxx.base.ObjectUtils;
 import cn.wjybxx.base.io.LocalStringBuilderPool;
 import cn.wjybxx.base.pool.ObjectPool;
@@ -85,25 +84,10 @@ public class DsonScanner implements AutoCloseable {
                 return new DsonToken(DsonTokenType.EOF, "eof", getPosition());
             }
             switch (c) {
-                case '{': {
-                    // peek下一个字符，判断是否有修饰自身的header
-                    int nextChar = charStream.read();
-                    charStream.unread();
-                    if (nextChar == '@') {
-                        return new DsonToken(DsonTokenType.BEGIN_OBJECT, "{@", getPosition());
-                    } else {
-                        return new DsonToken(DsonTokenType.BEGIN_OBJECT, "{", getPosition());
-                    }
-                }
-                case '[': {
-                    int nextChar = charStream.read();
-                    charStream.unread();
-                    if (nextChar == '@') {
-                        return new DsonToken(DsonTokenType.BEGIN_ARRAY, "[@", getPosition());
-                    } else {
-                        return new DsonToken(DsonTokenType.BEGIN_ARRAY, "[", getPosition());
-                    }
-                }
+                case '{':
+                    return new DsonToken(DsonTokenType.BEGIN_OBJECT, "{", getPosition());
+                case '[':
+                    return new DsonToken(DsonTokenType.BEGIN_ARRAY, "[", getPosition());
                 case '}':
                     return new DsonToken(DsonTokenType.END_OBJECT, "}", getPosition());
                 case ']':
@@ -127,15 +111,9 @@ public class DsonScanner implements AutoCloseable {
 
     // region common
 
-    private static void checkEof(int c) {
-        if (c == -1) {
-            throw new DsonParseException("End of file in Dson string.");
-        }
-    }
-
-    private static void checkToken(List<DsonTokenType> expected, DsonTokenType tokenType, int position) {
-        if (!CollectionUtils.containsRef(expected, tokenType)) {
-            throw invalidTokenType(expected, tokenType, position);
+    private static void ensureStringToken(DsonTokenType tokenType, int position) {
+        if (tokenType != DsonTokenType.UNQUOTE_STRING && tokenType != DsonTokenType.STRING) {
+            throw invalidTokenType(STRING_TOKEN_TYPES, tokenType, position);
         }
     }
 
@@ -261,7 +239,7 @@ public class DsonScanner implements AutoCloseable {
         switch (className) {
             case DsonTexts.LABEL_INT32 -> {
                 DsonToken nextToken = nextToken(skipValue);
-                checkToken(STRING_TOKEN_TYPES, nextToken.getType(), position);
+                ensureStringToken(nextToken.getType(), position);
                 if (skipValue) {
                     return new DsonToken(DsonTokenType.INT32, null, getPosition());
                 }
@@ -269,7 +247,7 @@ public class DsonScanner implements AutoCloseable {
             }
             case DsonTexts.LABEL_INT64 -> {
                 DsonToken nextToken = nextToken(skipValue);
-                checkToken(STRING_TOKEN_TYPES, nextToken.getType(), position);
+                ensureStringToken(nextToken.getType(), position);
                 if (skipValue) {
                     return new DsonToken(DsonTokenType.INT64, null, getPosition());
                 }
@@ -277,7 +255,7 @@ public class DsonScanner implements AutoCloseable {
             }
             case DsonTexts.LABEL_FLOAT -> {
                 DsonToken nextToken = nextToken(skipValue);
-                checkToken(STRING_TOKEN_TYPES, nextToken.getType(), position);
+                ensureStringToken(nextToken.getType(), position);
                 if (skipValue) {
                     return new DsonToken(DsonTokenType.FLOAT, null, getPosition());
                 }
@@ -285,7 +263,7 @@ public class DsonScanner implements AutoCloseable {
             }
             case DsonTexts.LABEL_DOUBLE -> {
                 DsonToken nextToken = nextToken(skipValue);
-                checkToken(STRING_TOKEN_TYPES, nextToken.getType(), position);
+                ensureStringToken(nextToken.getType(), position);
                 if (skipValue) {
                     return new DsonToken(DsonTokenType.DOUBLE, null, getPosition());
                 }
@@ -293,7 +271,7 @@ public class DsonScanner implements AutoCloseable {
             }
             case DsonTexts.LABEL_BOOL -> {
                 DsonToken nextToken = nextToken(skipValue);
-                checkToken(STRING_TOKEN_TYPES, nextToken.getType(), position);
+                ensureStringToken(nextToken.getType(), position);
                 if (skipValue) {
                     return new DsonToken(DsonTokenType.BOOL, null, getPosition());
                 }
@@ -301,7 +279,7 @@ public class DsonScanner implements AutoCloseable {
             }
             case DsonTexts.LABEL_NULL -> {
                 DsonToken nextToken = nextToken(skipValue);
-                checkToken(STRING_TOKEN_TYPES, nextToken.getType(), position);
+                ensureStringToken(nextToken.getType(), position);
                 if (skipValue) {
                     return new DsonToken(DsonTokenType.NULL, null, getPosition());
                 }
@@ -310,7 +288,7 @@ public class DsonScanner implements AutoCloseable {
             }
             case DsonTexts.LABEL_STRING -> {
                 DsonToken nextToken = nextToken(skipValue);
-                checkToken(STRING_TOKEN_TYPES, nextToken.getType(), position);
+                ensureStringToken(nextToken.getType(), position);
                 return new DsonToken(DsonTokenType.STRING, nextToken.castAsString(), getPosition());
             }
             case DsonTexts.LABEL_TEXT -> {

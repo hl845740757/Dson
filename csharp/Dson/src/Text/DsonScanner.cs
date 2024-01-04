@@ -79,25 +79,8 @@ public class DsonScanner : IDisposable
                 return new DsonToken(DsonTokenType.Eof, "eof", Position);
             }
             switch (c) {
-                case '{': {
-                    // peek下一个字符，判断是否有修饰自身的header
-                    int nextChar = _charStream.Read();
-                    _charStream.Unread();
-                    if (nextChar == '@') {
-                        return new DsonToken(DsonTokenType.BeginObject, "{@", Position);
-                    } else {
-                        return new DsonToken(DsonTokenType.BeginObject, "{", Position);
-                    }
-                }
-                case '[': {
-                    int nextChar = _charStream.Read();
-                    _charStream.Unread();
-                    if (nextChar == '@') {
-                        return new DsonToken(DsonTokenType.BeginArray, "[@", Position);
-                    } else {
-                        return new DsonToken(DsonTokenType.BeginArray, "[", Position);
-                    }
-                }
+                case '{': return new DsonToken(DsonTokenType.BeginObject, "{", Position);
+                case '[': return new DsonToken(DsonTokenType.BeginArray, "[", Position);
                 case '}': return new DsonToken(DsonTokenType.EndObject, "}", Position);
                 case ']': return new DsonToken(DsonTokenType.EndArray, "]", Position);
                 case ':': return new DsonToken(DsonTokenType.Colon, ":", Position);
@@ -108,23 +91,16 @@ public class DsonScanner : IDisposable
                     SkipComment();
                     continue;
                 }
-                    ;
                 default: return new DsonToken(DsonTokenType.UnquoteString, ScanUnquotedString((char)c, skipValue), Position);
             }
         }
     }
 
     #region common
-
-    private static void CheckEof(int c) {
-        if (c == -1) {
-            throw new DsonParseException("End of file in Dson string.");
-        }
-    }
-
-    private static void CheckToken(List<DsonTokenType> expected, DsonTokenType tokenType, int position) {
-        if (!expected.Contains(tokenType)) {
-            throw InvalidTokenType(expected, tokenType, position);
+    
+    private static void EnsureStringToken(DsonTokenType tokenType, int position) {
+        if (tokenType != DsonTokenType.UnquoteString && tokenType != DsonTokenType.String) {
+            throw InvalidTokenType(StringTokenTypes, tokenType, position);
         }
     }
 
@@ -247,7 +223,7 @@ public class DsonScanner : IDisposable
         switch (className) {
             case DsonTexts.LabelInt32: {
                 DsonToken nextToken = NextToken(skipValue);
-                CheckToken(StringTokenTypes, nextToken.Type, position);
+                EnsureStringToken(nextToken.Type, position);
                 if (skipValue) {
                     return new DsonToken(DsonTokenType.Int32, null, Position);
                 }
@@ -255,7 +231,7 @@ public class DsonScanner : IDisposable
             }
             case DsonTexts.LabelInt64: {
                 DsonToken nextToken = NextToken(skipValue);
-                CheckToken(StringTokenTypes, nextToken.Type, position);
+                EnsureStringToken(nextToken.Type, position);
                 if (skipValue) {
                     return new DsonToken(DsonTokenType.Int64, null, Position);
                 }
@@ -263,7 +239,7 @@ public class DsonScanner : IDisposable
             }
             case DsonTexts.LabelFloat: {
                 DsonToken nextToken = NextToken(skipValue);
-                CheckToken(StringTokenTypes, nextToken.Type, position);
+                EnsureStringToken(nextToken.Type, position);
                 if (skipValue) {
                     return new DsonToken(DsonTokenType.Float, null, Position);
                 }
@@ -271,7 +247,7 @@ public class DsonScanner : IDisposable
             }
             case DsonTexts.LabelDouble: {
                 DsonToken nextToken = NextToken(skipValue);
-                CheckToken(StringTokenTypes, nextToken.Type, position);
+                EnsureStringToken(nextToken.Type, position);
                 if (skipValue) {
                     return new DsonToken(DsonTokenType.Double, null, Position);
                 }
@@ -279,7 +255,7 @@ public class DsonScanner : IDisposable
             }
             case DsonTexts.LabelBool: {
                 DsonToken nextToken = NextToken(skipValue);
-                CheckToken(StringTokenTypes, nextToken.Type, position);
+                EnsureStringToken(nextToken.Type, position);
                 if (skipValue) {
                     return new DsonToken(DsonTokenType.Bool, null, Position);
                 }
@@ -287,7 +263,7 @@ public class DsonScanner : IDisposable
             }
             case DsonTexts.LabelNull: {
                 DsonToken nextToken = NextToken(skipValue);
-                CheckToken(StringTokenTypes, nextToken.Type, position);
+                EnsureStringToken(nextToken.Type, position);
                 if (skipValue) {
                     return new DsonToken(DsonTokenType.Null, null, Position);
                 }
@@ -296,7 +272,7 @@ public class DsonScanner : IDisposable
             }
             case DsonTexts.LabelString: {
                 DsonToken nextToken = NextToken(skipValue);
-                CheckToken(StringTokenTypes, nextToken.Type, position);
+                EnsureStringToken(nextToken.Type, position);
                 return new DsonToken(DsonTokenType.String, nextToken.CastAsString(), Position);
             }
             case DsonTexts.LabelText: {
