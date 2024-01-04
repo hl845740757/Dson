@@ -26,16 +26,16 @@ import java.util.*;
  * @author wjybxx
  * date - 2023/6/13
  */
-public class DsonObjectLiteReader extends AbstractDsonLiteReader {
+public class DsonLiteObjectReader extends AbstractDsonLiteReader {
 
     private FieldNumber nextName = null;
     private DsonValue nextValue;
 
-    public DsonObjectLiteReader(DsonReaderSettings settings, DsonArray<FieldNumber> dsonArray) {
+    public DsonLiteObjectReader(DsonReaderSettings settings, DsonArray<FieldNumber> dsonArray) {
         super(settings);
         Context context = new Context();
         context.init(null, DsonContextType.TOP_LEVEL, null);
-        context.header = dsonArray.getHeader().size() > 0 ? dsonArray.getHeader() : null;
+        context.header = !dsonArray.getHeader().isEmpty() ? dsonArray.getHeader() : null;
         context.arrayIterator = new MarkableIterator<>(dsonArray.iterator());
         setContext(context);
     }

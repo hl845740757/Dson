@@ -73,7 +73,6 @@ namespace Wjybxx.Dson.Collections;
 /// 数据库通常会支持反向索引，这是因为数据库数据不是手工直接修改的，因此数据库可以在数据上存储一些元数据，实现快速截取。
 /// 
 /// </summary>
-[SuppressMessage("ReSharper", "ArrangeTypeMemberModifiers")]
 public class Projection
 {
     /** 用于选择header */
@@ -667,7 +666,6 @@ public class Projection
                 throw new DsonIOException("invalid slice range: " + rangeValue);
             }
         }
-        ;
     }
 
     /** object类型的投影模式 */

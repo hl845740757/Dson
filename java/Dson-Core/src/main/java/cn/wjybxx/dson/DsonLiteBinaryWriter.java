@@ -26,11 +26,11 @@ import java.util.Objects;
  * @author wjybxx
  * date - 2023/4/21
  */
-public class DsonBinaryLiteWriter extends AbstractDsonLiteWriter {
+public class DsonLiteBinaryWriter extends AbstractDsonLiteWriter {
 
     private DsonOutput output;
 
-    public DsonBinaryLiteWriter(DsonWriterSettings settings, DsonOutput output) {
+    public DsonLiteBinaryWriter(DsonWriterSettings settings, DsonOutput output) {
         super(settings);
         this.output = Objects.requireNonNull(output);
         setContext(new Context().init(null, DsonContextType.TOP_LEVEL, null));

@@ -18,7 +18,6 @@ package cn.wjybxx.dson.text;
 
 import cn.wjybxx.base.CollectionUtils;
 import cn.wjybxx.dson.*;
-import cn.wjybxx.dson.internal.CommonsLang3;
 import cn.wjybxx.dson.io.DsonIOException;
 import cn.wjybxx.dson.types.*;
 
@@ -28,6 +27,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.util.ArrayDeque;
+import java.util.HexFormat;
 import java.util.List;
 import java.util.Objects;
 
@@ -456,7 +456,7 @@ public class DsonTextReader extends AbstractDsonReader {
         return switch (clsName) {
             case DsonTexts.LABEL_BINARY -> {
                 Tuple2 tuple2 = scanTuple2(context);
-                byte[] data = CommonsLang3.decodeHex(tuple2.value.toCharArray());
+                byte[] data = HexFormat.of().parseHex(tuple2.value);
                 pushNextValue(new Binary(tuple2.type, data));
                 yield DsonType.BINARY;
             }

@@ -16,8 +16,8 @@
 
 package cn.wjybxx.dson.codec.binary;
 
-import cn.wjybxx.dson.DsonBinaryLiteReader;
-import cn.wjybxx.dson.DsonBinaryLiteWriter;
+import cn.wjybxx.dson.DsonLiteBinaryReader;
+import cn.wjybxx.dson.DsonLiteBinaryWriter;
 import cn.wjybxx.dson.codec.ConvertOptions;
 import cn.wjybxx.dson.codec.TypeArgInfo;
 import cn.wjybxx.dson.codec.TypeMetaRegistries;
@@ -111,7 +111,7 @@ public class DefaultBinaryConverter implements BinaryConverter {
 
     private void encodeObject(DsonOutput outputStream, @Nullable Object value, TypeArgInfo<?> typeArgInfo) {
         try (BinaryObjectWriter wrapper = new DefaultBinaryObjectWriter(this,
-                new DsonBinaryLiteWriter(options.binWriterSettings, outputStream))) {
+                new DsonLiteBinaryWriter(options.binWriterSettings, outputStream))) {
             wrapper.writeObject(value, typeArgInfo);
             wrapper.flush();
         }
@@ -119,7 +119,7 @@ public class DefaultBinaryConverter implements BinaryConverter {
 
     private <U> U decodeObject(DsonInput inputStream, TypeArgInfo<U> typeArgInfo) {
         try (BinaryObjectReader wrapper = new DefaultBinaryObjectReader(this,
-                new DsonBinaryLiteReader(options.binReaderSettings, inputStream))) {
+                new DsonLiteBinaryReader(options.binReaderSettings, inputStream))) {
             return wrapper.readObject(typeArgInfo);
         }
     }

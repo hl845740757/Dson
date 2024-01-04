@@ -2,6 +2,7 @@ package cn.wjybxx.dson;
 
 import cn.wjybxx.dson.internal.ValuesPolicy;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
@@ -88,6 +89,10 @@ public abstract class AbstractDsonArray extends DsonValue implements List<DsonVa
         return values.addAll(index, c);
     }
 
+    public DsonValue removeAt(int index) {
+        return values.remove(index);
+    }
+
     // endregion
 
     // region 代理实现
@@ -105,11 +110,6 @@ public abstract class AbstractDsonArray extends DsonValue implements List<DsonVa
     @Override
     public boolean contains(Object o) {
         return values.contains(o);
-    }
-
-    @Override
-    public <T> T[] toArray(T[] a) {
-        return values.toArray(a);
     }
 
     @Override
@@ -167,21 +167,25 @@ public abstract class AbstractDsonArray extends DsonValue implements List<DsonVa
         return values.lastIndexOf(o);
     }
 
+    @Nonnull
     @Override
     public Iterator<DsonValue> iterator() {
         return values.iterator();
     }
 
+    @Nonnull
     @Override
     public ListIterator<DsonValue> listIterator() {
         return values.listIterator(); // TODO 缺少Set和Add校验
     }
 
+    @Nonnull
     @Override
     public ListIterator<DsonValue> listIterator(int index) {
         return values.listIterator(index);
     }
 
+    @Nonnull
     @Override
     public List<DsonValue> subList(int fromIndex, int toIndex) {
         return values.subList(fromIndex, toIndex);
@@ -192,9 +196,16 @@ public abstract class AbstractDsonArray extends DsonValue implements List<DsonVa
         return values.spliterator();
     }
 
+    @Nonnull
     @Override
     public Object[] toArray() {
         return values.toArray();
+    }
+
+    @Nonnull
+    @Override
+    public <T> T[] toArray(@Nonnull T[] a) {
+        return values.toArray(a);
     }
 
     @Override

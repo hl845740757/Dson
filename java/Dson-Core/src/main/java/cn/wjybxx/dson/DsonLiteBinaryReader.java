@@ -26,11 +26,11 @@ import java.util.Objects;
  * @author wjybxx
  * date - 2023/4/22
  */
-public class DsonBinaryLiteReader extends AbstractDsonLiteReader {
+public class DsonLiteBinaryReader extends AbstractDsonLiteReader {
 
     private DsonInput input;
 
-    public DsonBinaryLiteReader(DsonReaderSettings settings, DsonInput input) {
+    public DsonLiteBinaryReader(DsonReaderSettings settings, DsonInput input) {
         super(settings);
         this.input = Objects.requireNonNull(input);
         setContext(new Context().init(null, DsonContextType.TOP_LEVEL, null));

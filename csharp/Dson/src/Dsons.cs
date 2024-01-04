@@ -86,12 +86,14 @@ public static class Dsons
     /// </summary>
     /// <param name="fieldName"></param>
     /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string InternField(string fieldName) {
         // 长度异常的数据不池化
         return fieldName.Length <= 32 ? string.Intern(fieldName) : fieldName;
     }
 
     /** 检查具备类型标签的数据的子类型是否合法 */
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void CheckSubType(int type) {
         if (type < 0) {
             throw new ArgumentException("type cant be negative");
@@ -99,6 +101,7 @@ public static class Dsons
     }
 
     /** 检查二进制数据的长度是否合法 */
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void CheckBinaryLength(int length) {
         if (length < 0 || length > MaxBinaryLength) {
             throw new ArgumentException($"the length of data must between[0, {MaxBinaryLength}], but found: {length}");
@@ -106,6 +109,7 @@ public static class Dsons
     }
 
     /** 检查hasValue标记和值是否匹配 */
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void CheckHasValue(int value, bool hasVal) {
         if (!hasVal && value != 0) {
             throw new ArgumentException();
@@ -113,6 +117,7 @@ public static class Dsons
     }
 
     /** 检查hasValue标记和值是否匹配 */
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void CheckHasValue(long value, bool hasVal) {
         if (!hasVal && value != 0) {
             throw new ArgumentException();
@@ -120,6 +125,7 @@ public static class Dsons
     }
 
     /** 检查hasValue标记和值是否匹配 */
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void CheckHasValue(double value, bool hasVal) {
         if (!hasVal && value != 0) {
             throw new ArgumentException();
@@ -182,11 +188,21 @@ public static class Dsons
         return (lnumber << IdepBits) | idep;
     }
 
+    /// <summary>
+    /// 通过字段完整编号计算本地编号
+    /// </summary>
+    /// <param name="fullNumber"></param>
+    /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int LnumberOfFullNumber(int fullNumber) {
         return DsonInternals.LogicalShiftRight(fullNumber, IdepBits);
     }
 
+    /// <summary>
+    /// 通过字段完整编号计算继承深度
+    /// </summary>
+    /// <param name="fullNumber"></param>
+    /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static byte IdepOfFullNumber(int fullNumber) {
         return (byte)(fullNumber & IdepMask);
@@ -196,16 +212,18 @@ public static class Dsons
     public static int MakeFullNumberZeroIdep(int lnumber) {
         return lnumber << IdepBits;
     }
-
-    // classId
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static long MakeClassGuid(int ns, int classId) {
         return ((long)ns << 32) | (classId & 0xFFFF_FFFFL);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int NamespaceOfClassGuid(long guid) {
         return (int)DsonInternals.LogicalShiftRight(guid, 32);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int LclassIdOfClassGuid(long guid) {
         return (int)guid;
     }

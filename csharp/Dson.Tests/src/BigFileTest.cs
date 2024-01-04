@@ -39,6 +39,8 @@ namespace Wjybxx.Dson.Tests;
 /// 优化的内容包括：
 /// 1. 换行时不再固定Flush，而是等待Builder内容达到4K再Flush。
 /// 2. 增加StringBuilder池，且增加初始空间
+///
+/// ps：后面测试了一下小文件(25k)，dson全面第一，耗时只有系统库的1/3。
 /// </summary>
 public class BigFileTest
 {

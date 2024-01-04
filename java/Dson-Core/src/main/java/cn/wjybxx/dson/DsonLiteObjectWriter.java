@@ -9,9 +9,9 @@ import java.util.Objects;
  * @author wjybxx
  * date - 2023/6/13
  */
-public class DsonObjectLiteWriter extends AbstractDsonLiteWriter {
+public class DsonLiteObjectWriter extends AbstractDsonLiteWriter {
 
-    public DsonObjectLiteWriter(DsonWriterSettings settings, DsonArray<FieldNumber> outList) {
+    public DsonLiteObjectWriter(DsonWriterSettings settings, DsonArray<FieldNumber> outList) {
         super(settings);
         // 顶层输出是一个数组
         Context context = new Context();
