@@ -84,7 +84,7 @@ public class DsonTextWriter : AbstractDsonWriter<string>
         }
         // 处理value之间分隔符
         if (context.count > 0) {
-            printer.PrintFastPath(",");
+            printer.Print(',');
         }
         // 先处理长度超出，再处理缩进
         if (printer.Column >= _settings.SoftLineLength) {
@@ -96,7 +96,7 @@ public class DsonTextWriter : AbstractDsonWriter<string>
             if (context.style == ObjectStyle.Indent) {
                 if (context.HasElement() && printer.Column < printer.PrettyBodyColum) {
                     // 当前行是字符串结束行，字符串结束位置尚未到达缩进，不换行
-                    printer.PrintSpace(printer.PrettyBodyColum - printer.Column);
+                    printer.PrintSpaces(printer.PrettyBodyColum - printer.Column);
                 } else if (context.count == 0 || printer.Column > printer.PrettyBodyColum) {
                     // 当前行有内容了才换行缩进；首个元素需要缩进
                     printer.Println();
@@ -105,12 +105,12 @@ public class DsonTextWriter : AbstractDsonWriter<string>
                 }
             } else if (context.HasElement()) {
                 // 非缩进模式下，元素之间打印一个空格
-                printer.Print(' ');
+                printer.PrintFastPath(' ');
             }
         }
         if (context.contextType.IsLikeObject()) {
             PrintString(printer, context.curName, StringStyle.AutoQuote);
-            printer.PrintFastPath(": ");
+            printer.Print(": ");
         }
         context.count++;
     }
@@ -178,8 +178,13 @@ public class DsonTextWriter : AbstractDsonWriter<string>
         }
         printer.Print('"');
         for (int i = 0, length = text.Length; i < length; i++) {
-            printer.PrintEscaped(text[i], unicodeChar);
-            if (printer.Column >= softLineLength && (i + 1 < length)) {
+            char c = text[i];
+            if (char.IsSurrogate(c)) {
+                printer.PrintHpmCodePoint(c, text[++i]);
+            } else {
+                printer.PrintEscaped(c, unicodeChar);
+            }
+            if (printer.Column > softLineLength && (i + 1 < length)) {
                 printer.Println();
                 printer.HeadIndent = headIndent;
                 printer.BodyIndent = 0;
@@ -223,7 +228,11 @@ public class DsonTextWriter : AbstractDsonWriter<string>
                 i++;
                 continue;
             }
-            printer.Print(c);
+            if (char.IsSurrogate(c)) {
+                printer.PrintHpmCodePoint(c, text[++i]);
+            } else {
+                printer.Print(c);
+            }
             if (printer.Column > softLineLength && (i + 1 < length)) {
                 printer.Println();
                 printer.HeadIndent = headIndent;

@@ -16,13 +16,14 @@
 
 package cn.wjybxx.dson;
 
+import java.util.Map;
 import java.util.Objects;
 
 /**
  * @author wjybxx
  * date - 2023/5/27
  */
-public final class DsonElement<K> {
+public final class DsonElement<K> implements Map.Entry<K, DsonValue> {
 
     private final K name;
     private final DsonValue value;
@@ -36,8 +37,18 @@ public final class DsonElement<K> {
         return name;
     }
 
+    @Override
+    public K getKey() {
+        return name;
+    }
+
     public DsonValue getValue() {
         return value;
+    }
+
+    @Override
+    public DsonValue setValue(DsonValue value) {
+        throw new UnsupportedOperationException("setValue");
     }
 
     //

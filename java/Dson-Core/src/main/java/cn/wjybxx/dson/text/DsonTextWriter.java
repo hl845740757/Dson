@@ -97,7 +97,7 @@ public class DsonTextWriter extends AbstractDsonWriter {
         }
         // 处理value之间分隔符
         if (context.count > 0) {
-            printer.printFastPath(",");
+            printer.print(',');
         }
         // 先处理长度超出，再处理缩进
         if (printer.getColumn() >= settings.softLineLength) {
@@ -109,7 +109,7 @@ public class DsonTextWriter extends AbstractDsonWriter {
             if (context.style == ObjectStyle.INDENT) {
                 if (context.hasElement() && printer.getColumn() < printer.getPrettyBodyColum()) {
                     // 当前行是字符串结束行，字符串结束位置尚未到达缩进，不换行
-                    printer.printSpace(printer.getPrettyBodyColum() - printer.getColumn());
+                    printer.printSpaces(printer.getPrettyBodyColum() - printer.getColumn());
                 } else if (context.count == 0 || printer.getColumn() > printer.getPrettyBodyColum()) {
                     // 当前行有内容了才换行缩进；首个元素需要缩进
                     printer.println();
@@ -186,8 +186,13 @@ public class DsonTextWriter extends AbstractDsonWriter {
         }
         printer.print('"');
         for (int i = 0, length = text.length(); i < length; i++) {
-            printer.printEscaped(text.charAt(i), unicodeChar);
-            if (printer.getColumn() >= softLineLength && (i + 1 < length)) {
+            char c = text.charAt(i);
+            if (Character.isSurrogate(c)) {
+                printer.printHpmCodePoint(c, text.charAt(++i));
+            } else {
+                printer.printEscaped(c, unicodeChar);
+            }
+            if (printer.getColumn() > softLineLength && (i + 1 < length)) {
                 printer.println();
                 printer.setHeadIndent(headIndent);
                 printer.setBodyIndent(0);
@@ -231,7 +236,11 @@ public class DsonTextWriter extends AbstractDsonWriter {
                 i++;
                 continue;
             }
-            printer.print(c);
+            if (Character.isSurrogate(c)) {
+                printer.printHpmCodePoint(c, text.charAt(++i));
+            } else {
+                printer.print(c);
+            }
             if (printer.getColumn() > softLineLength && (i + 1 < length)) {
                 printer.println();
                 printer.setHeadIndent(headIndent);

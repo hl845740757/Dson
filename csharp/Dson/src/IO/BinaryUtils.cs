@@ -60,7 +60,7 @@ public static class BinaryUtils
 
     /** c#的byte默认是无符号的；这一点我觉得C#是对的... */
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int ToUint(byte value) {
+    internal static int ToUint(byte value) {
         return value;
     }
 

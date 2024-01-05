@@ -32,7 +32,7 @@ public class DsonReaderSettings {
     public final boolean enableFieldIntern;
 
     public DsonReaderSettings(Builder builder) {
-        this.recursionLimit = builder.recursionLimit;
+        this.recursionLimit = Math.max(1, builder.recursionLimit);
         this.autoClose = builder.autoClose;
         this.enableFieldIntern = builder.enableFieldIntern;
     }

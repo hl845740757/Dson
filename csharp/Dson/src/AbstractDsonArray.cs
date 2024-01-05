@@ -43,6 +43,7 @@ public abstract class AbstractDsonArray : DsonValue, IList<DsonValue>, IEquatabl
         return _values.GetEnumerator();
     }
 
+    /** 勿修改Values内容 */
     public IList<DsonValue> Values => _values;
 
     #region 元素检查
@@ -76,17 +77,14 @@ public abstract class AbstractDsonArray : DsonValue, IList<DsonValue>, IEquatabl
         return this;
     }
 
-    public void AddAll(List<DsonValue> dsonValues) {
-        foreach (var item in dsonValues) {
-            CheckElement(item);
-            _values.Add(item);
-        }
-    }
-
     #endregion
 
     #region 简单代理
 
+    public bool IsReadOnly => _values.IsReadOnly;
+    public int Count => _values.Count;
+    public bool IsEmpty => _values.Count == 0;
+    
     public void Clear() {
         _values.Clear();
     }
@@ -102,9 +100,6 @@ public abstract class AbstractDsonArray : DsonValue, IList<DsonValue>, IEquatabl
     public bool Remove(DsonValue item) {
         return _values.Remove(item);
     }
-
-    public int Count => _values.Count;
-    public bool IsReadOnly => _values.IsReadOnly;
 
     public int IndexOf(DsonValue item) {
         return _values.IndexOf(item);

@@ -16,6 +16,8 @@
 
 #endregion
 
+using System;
+
 #pragma warning disable CS1591
 namespace Wjybxx.Dson;
 
@@ -32,7 +34,7 @@ public class DsonReaderSettings
     public readonly bool EnableFieldIntern;
 
     public DsonReaderSettings(Builder builder) {
-        RecursionLimit = builder.RecursionLimit;
+        RecursionLimit = Math.Max(1, builder.RecursionLimit);
         AutoClose = builder.AutoClose;
         EnableFieldIntern = builder.EnableFieldIntern;
     }

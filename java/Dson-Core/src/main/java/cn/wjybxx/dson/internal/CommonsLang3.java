@@ -74,44 +74,6 @@ public class CommonsLang3 {
             outBuffer[j++] = toDigits[0x0F & data[i]]; // 低4位
         }
     }
-
-    public static byte[] decodeHex(char[] data) {
-        final int dateLen = data.length;
-        if ((dateLen & 0x01) != 0) {
-            throw new DsonIOException("Odd number of characters.");
-        }
-        byte[] result = new byte[dateLen >> 1];
-        // two characters form the hex value.
-        for (int i = 0, j = 0; j < dateLen; i++) {
-            int f = toDigit(data[j], j) << 4;
-            j++;
-            f = f | toDigit(data[j], j);
-            j++;
-            result[i] = (byte) (f & 0xFF);
-        }
-        return result;
-    }
-
-    private static int toDigit(final char c, final int index) {
-        return switch (c) {
-            case '0' -> 0;
-            case '1' -> 1;
-            case '2' -> 2;
-            case '3' -> 3;
-            case '4' -> 4;
-            case '5' -> 5;
-            case '6' -> 6;
-            case '7' -> 7;
-            case '8' -> 8;
-            case '9' -> 9;
-            case 'a', 'A' -> 10;
-            case 'b', 'B' -> 11;
-            case 'c', 'C' -> 12;
-            case 'd', 'D' -> 13;
-            case 'e', 'E' -> 14;
-            case 'f', 'F' -> 15;
-            default -> throw new DsonIOException("Illegal hexadecimal character " + c + " at index " + index);
-        };
-    }
+    
     // endregion
 }

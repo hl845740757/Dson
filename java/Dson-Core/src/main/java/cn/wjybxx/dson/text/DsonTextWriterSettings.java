@@ -33,7 +33,7 @@ import java.util.Objects;
 public class DsonTextWriterSettings extends DsonWriterSettings {
 
     public static final DsonTextWriterSettings DEFAULT = DsonTextWriterSettings.newBuilder().build();
-    public static final DsonTextWriterSettings RELAXED_DEFAULT = DsonTextWriterSettings.newBuilder().setDsonMode(DsonMode.RELAXED).build();
+    public static final DsonTextWriterSettings RELAXED_DEFAULT = DsonTextWriterSettings.newBuilder(DsonMode.RELAXED).build();
     private static final int MIN_LINE_LENGTH = 10;
 
     public final String lineSeparator;
@@ -74,6 +74,11 @@ public class DsonTextWriterSettings extends DsonWriterSettings {
 
     public static Builder newBuilder() {
         return new Builder();
+    }
+
+    public static Builder newBuilder(DsonMode dsonMode) {
+        return new Builder()
+                .setDsonMode(dsonMode);
     }
 
     public static class Builder extends DsonWriterSettings.Builder {

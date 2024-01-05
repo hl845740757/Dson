@@ -125,6 +125,13 @@ public class DsonPrinter : IDisposable
         }
     }
 
+    /** 打印高平面码点 */
+    public void PrintHpmCodePoint(char high, char low) {
+        _builder.Append(high);
+        _builder.Append(low);
+        _column += 1;
+    }
+
     public void Print(char[] cBuffer) {
         foreach (char c in cBuffer) {
             Print(c);
@@ -305,12 +312,12 @@ public class DsonPrinter : IDisposable
 
     /** 打印内容缩进 */
     public void PrintBodyIndent() {
-        PrintSpace(_bodyIndent);
+        PrintSpaces(_bodyIndent);
     }
 
     /** 打印行首缩进 */
     public void PrintHeadIndent() {
-        PrintSpace(_headIndent);
+        PrintSpaces(_headIndent);
     }
 
     /** 打印一个空格 */
@@ -319,8 +326,8 @@ public class DsonPrinter : IDisposable
         _column += 1;
     }
 
-    /** 打印多个空格 */
-    public void PrintSpace(int count) {
+    /** 打印多个空格 -- char可以静默转int，改名安全些 */
+    public void PrintSpaces(int count) {
         if (count < 0) throw new ArgumentException(nameof(count));
         if (count == 0) return;
         if (count <= _indentionArray.Length) {

@@ -91,8 +91,9 @@ public abstract class AbstractDsonObject<TK> : DsonValue, IGenericDictionary<TK,
 
     #region 简单代理
 
-    public int Count => _valueMap.Count;
     public bool IsReadOnly => _valueMap.IsReadOnly;
+    public int Count => _valueMap.Count;
+    public bool IsEmpty => _valueMap.IsEmpty;
 
     public bool Contains(KeyValuePair<TK, DsonValue> item) => _valueMap.Contains(item);
 

@@ -122,7 +122,8 @@ public final class DsonPrinter implements AutoCloseable {
     // region 普通打印
 
     /**
-     * @apiNote tab增加的列不是固定的...所以其它打印字符串的方法都必须调用该方法，一定程度上降低了性能，不能批量拷贝
+     * tab增加的列不是固定的...
+     * 所以其它打印字符串的方法都必须调用该方法，一定程度上降低了性能，不能批量拷贝
      */
     public void print(char c) {
         builder.append(c);
@@ -132,6 +133,13 @@ public final class DsonPrinter implements AutoCloseable {
         } else {
             column += 1;
         }
+    }
+
+    /** 打印高平面码点 */
+    public void printHpmCodePoint(char high, char low) {
+        builder.append(high);
+        builder.append(low);
+        column += 1;
     }
 
     public void print(char[] cBuffer) {
@@ -306,12 +314,12 @@ public final class DsonPrinter implements AutoCloseable {
 
     /** 打印内容缩进 */
     public void printBodyIndent() {
-        printSpace(bodyIndent);
+        printSpaces(bodyIndent);
     }
 
     /** 打印行首缩进 */
     public void printHeadIndent() {
-        printSpace(headIndent);
+        printSpaces(headIndent);
     }
 
     /** 打印一个空格 */
@@ -320,8 +328,8 @@ public final class DsonPrinter implements AutoCloseable {
         column += 1;
     }
 
-    /** 打印指定数量的空格 */
-    public void printSpace(int count) {
+    /** 打印指定数量的空格 -- char可以静默转int，改名安全些 */
+    public void printSpaces(int count) {
         if (count < 0) throw new IllegalArgumentException();
         if (count == 0) return;
         if (count <= indentionArray.length) {
@@ -395,5 +403,6 @@ public final class DsonPrinter implements AutoCloseable {
             throw DsonIOException.wrap(e);
         }
     }
+
     // endregion
 }
