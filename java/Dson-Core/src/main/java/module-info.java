@@ -4,7 +4,7 @@
  */
 module wjybxx.dson.core {
     requires jsr305;
-    requires transitive wjybxx.base;
+    requires transitive wjybxx.commons.base;
 
     exports cn.wjybxx.dson;
     exports cn.wjybxx.dson.ext;

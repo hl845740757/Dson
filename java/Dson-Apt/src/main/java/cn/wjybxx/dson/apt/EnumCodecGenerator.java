@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cn.wjybxx.dson.codec;
+package cn.wjybxx.dson.apt;
 
 import cn.wjybxx.apt.AbstractGenerator;
 import com.squareup.javapoet.ClassName;

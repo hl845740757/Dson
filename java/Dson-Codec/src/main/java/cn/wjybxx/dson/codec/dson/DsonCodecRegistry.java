@@ -34,7 +34,7 @@ public interface DsonCodecRegistry {
     @Nullable
     <T> DsonCodecImpl<T> get(Class<T> clazz);
 
-    default <T> DsonCodecImpl<T> checkedGet(Class<T> clazz) {
+    default <T> DsonCodecImpl<T> getOrThrow(Class<T> clazz) {
         DsonCodecImpl<T> codec = get(clazz);
         if (codec == null) {
             throw new DsonCodecException("codec is absent, clazz" + clazz);

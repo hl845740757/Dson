@@ -17,6 +17,7 @@
 #endregion
 
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using MongoDB.Bson;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
@@ -27,53 +28,48 @@ using Wjybxx.Dson.Text;
 namespace Wjybxx.Dson.Tests;
 
 /// <summary>
-/// 测试读写文件的性能（Release|AnyCPU）
-/// 以540K的文件进行测试，结果如下：
+/// 测试解析和生成Json字符串的性能（Release|AnyCPU）
+/// 我们仍然使用那个540K的文件，读取到内存中保存为String，然后进行解析和生成。
+/// 取稳定值结果如下：
 /// <code>
-/// StopWatch[System.Json=39ms][Read=30ms,Write=8ms]
-/// StopWatch[Wjybxx.Dson=46ms][Read=36ms,Write=9ms]  // 禁用无引号字符串
-/// StopWatch[Wjybxx.Dson=47ms][Read=35ms,Write=11ms] // 启用 MaxLengthOfUnquoteString 为 16
-/// StopWatch[Bson=67ms][Read=48ms,Write=19ms]
+/// StopWatch[System.Json=18ms][Read=10ms,Write=7ms]
+/// StopWatch[Newtonsoft.Json=64ms][Read=47ms,Write=17ms]
+/// StopWatch[Wjybxx.Dson=19ms][Read=16ms,Write=3ms]
+/// StopWatch[Bson=36ms][Read=25ms,Write=10ms]
 /// </code>
 /// ps：
 /// 1. 本机设备信息：I7-9750H 2.6GHz  16G内存
-/// 2. 后面测试了一下小文件(25k)，dson全面第一，耗时只有系统库的1/3。
-/// 3. newtonsoft不能直接读写文件。。。因此不在此测试中。
+/// 2. 如果是只是简单使用Json，强烈建议使用系统库 -- 不论是读写文件，还是字符串性能都极好。
+/// 3. Dson现在还没有支持解码器，所以还不算最终数据。
 /// </summary>
-public class BigFileTest
+public class BigStringTest
 {
-    private FileStream NewInputStream() {
-        return new FileStream("D:\\Test.json", FileMode.Open);
-    }
-
-    private FileStream NewOutputStream() {
-        return new FileStream("D:\\Test2.json", FileMode.Create);
-    }
-
     [Test]
-    public void TestReadWriteFile() {
+    public void TestReadWriteString() {
         if (!File.Exists("D:\\Test.json")) {
             return;
         }
-        TestSystemJson();
+        string json = File.ReadAllText("D:\\Test.json");
+
+        TestSystemJson(json);
         Thread.Sleep(1000);
 
-        TestDson();
+        TestNewtonsoftJson(json);
         Thread.Sleep(1000);
 
-        TestBson();
+        TestDson(json);
+        Thread.Sleep(1000);
+
+        TestBson(json);
     }
 
-    private void TestSystemJson() {
+    private void TestSystemJson(string json) {
         StopWatch stopWatch = StopWatch.CreateStarted("System.Json");
 
-        // 系统库使用JsonObject或Object做泛型没有差异
-        using FileStream inputStream = NewInputStream();
-        object jsonObject = JsonSerializer.Deserialize<object>(inputStream);
+        object jsonObject = JsonSerializer.Deserialize<object>(json);
         stopWatch.LogStep("Read");
 
-        using FileStream outFileStream = NewOutputStream();
-        JsonSerializer.Serialize(outFileStream, jsonObject,
+        JsonSerializer.Serialize(jsonObject,
             new JsonSerializerOptions
             {
                 WriteIndented = true,
@@ -82,35 +78,43 @@ public class BigFileTest
         Console.WriteLine(stopWatch.GetLog());
     }
 
-    private void TestDson() {
+    private void TestNewtonsoftJson(string json) {
+        StopWatch stopWatch = StopWatch.CreateStarted("Newtonsoft.Json");
+
+        object jsonObject = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
+        stopWatch.LogStep("Read");
+
+        Newtonsoft.Json.JsonConvert.SerializeObject(jsonObject);
+        stopWatch.LogStep("Write");
+        Console.WriteLine(stopWatch.GetLog());
+    }
+
+    private void TestDson(string json) {
         StopWatch stopWatch = StopWatch.CreateStarted("Wjybxx.Dson");
 
-        using DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.Default, new StreamReader(NewInputStream()));
-        DsonValue dsonValue = Dsons.ReadTopDsonValue(reader)!;
+        DsonValue dsonValue = Dsons.FromDson(json);
         stopWatch.LogStep("Read");
 
         DsonTextWriterSettings settings = new DsonTextWriterSettings.Builder
         {
             DsonMode = DsonMode.Relaxed,
             EnableText = false,
-            MaxLengthOfUnquoteString = 0,
+            MaxLengthOfUnquoteString = 16,
         }.Build();
 
-        using DsonTextWriter writer = new DsonTextWriter(settings, new StreamWriter(NewOutputStream()));
+        using DsonTextWriter writer = new DsonTextWriter(settings, new StringWriter());
         Dsons.WriteTopDsonValue(writer, dsonValue);
         stopWatch.LogStep("Write");
         Console.WriteLine(stopWatch.GetLog());
     }
 
-    private void TestBson() {
+    private void TestBson(string json) {
         StopWatch stopWatch = StopWatch.CreateStarted("Bson");
 
-        // Bson使用object做泛型会导致读性能骤降，降低1个Level 46ms => 160ms....
-        using FileStream inputStream = NewInputStream();
-        BsonDocument bsonDocument = BsonSerializer.Deserialize<BsonDocument>(new JsonReader(new StreamReader(inputStream)));
+        BsonDocument bsonDocument = BsonSerializer.Deserialize<BsonDocument>(new JsonReader(json));
         stopWatch.LogStep("Read");
 
-        using JsonWriter jsonWriter = new JsonWriter(new StreamWriter(NewOutputStream()), new JsonWriterSettings()
+        using JsonWriter jsonWriter = new JsonWriter(new StringWriter(), new JsonWriterSettings()
         {
             Indent = true
         });

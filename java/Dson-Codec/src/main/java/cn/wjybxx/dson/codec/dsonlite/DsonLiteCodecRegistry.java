@@ -39,7 +39,7 @@ public interface DsonLiteCodecRegistry {
     @Nullable
     <T> DsonLiteCodecImpl<T> get(Class<T> clazz);
 
-    default <T> DsonLiteCodecImpl<T> checkedGet(Class<T> clazz) {
+    default <T> DsonLiteCodecImpl<T> getOrThrow(Class<T> clazz) {
         DsonLiteCodecImpl<T> codec = get(clazz);
         if (codec == null) {
             throw new DsonCodecException("codec is absent, clazz" + clazz);

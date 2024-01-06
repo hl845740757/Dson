@@ -18,8 +18,10 @@ package cn.wjybxx.dson.codec.codecs;
 
 import cn.wjybxx.dson.codec.DuplexCodec;
 import cn.wjybxx.dson.codec.TypeArgInfo;
+import cn.wjybxx.dson.codec.dson.DsonCodecScanIgnore;
 import cn.wjybxx.dson.codec.dson.DsonObjectReader;
 import cn.wjybxx.dson.codec.dson.DsonObjectWriter;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteCodecScanIgnore;
 import cn.wjybxx.dson.codec.dsonlite.DsonLiteObjectReader;
 import cn.wjybxx.dson.codec.dsonlite.DsonLiteObjectWriter;
 import cn.wjybxx.dson.text.ObjectStyle;
@@ -31,6 +33,8 @@ import javax.annotation.Nonnull;
  * @author wjybxx
  * date - 2023/12/28
  */
+@DsonLiteCodecScanIgnore
+@DsonCodecScanIgnore
 public class BinaryCodec implements DuplexCodec<Binary> {
 
     @Override
