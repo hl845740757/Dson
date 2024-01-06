@@ -75,15 +75,13 @@ public class Projection {
     public static final String key_array = "$array";
     /** 用于对数组切片 */
     public static final String key_slice = "$slice";
-    /** 投影数组的首个元素 */
-    public static final String key_first = "$0";
     /** 用于对数组元素进行投影 */
     public static final String key_elem = "$elem";
 
     /** object投影的特殊键 */
     public static final Set<String> objectKeys = Set.of(key_object, key_all);
     /** 数组投影的特殊键 */
-    public static final Set<String> arrayKeys = Set.of(key_array, key_slice, key_first, key_elem);
+    public static final Set<String> arrayKeys = Set.of(key_array, key_slice, key_elem);
     /** 所有的特殊键 */
     public static final Set<String> allSpecialKeys;
 
@@ -404,17 +402,12 @@ public class Projection {
             }
             // array 映射
             {
-                final DsonValue firstValue = projectInfo.get(key_first);
-                if (firstValue != null) {
-                    sliceSpec = SliceSpec.FIRST;
+                final DsonValue sliceValue = projectInfo.get(key_slice);
+                if (sliceValue == null) {
+                    // 未声明slice的情况下，返回空数组
+                    sliceSpec = SliceSpec.EMPTY;
                 } else {
-                    final DsonValue sliceValue = projectInfo.get(key_slice);
-                    if (sliceValue == null) {
-                        // 未声明slice的情况下，返回空数组
-                        sliceSpec = SliceSpec.EMPTY;
-                    } else {
-                        sliceSpec = parseSliceSpec(sliceValue);
-                    }
+                    sliceSpec = parseSliceSpec(sliceValue);
                 }
                 DsonValue elemValue = projectInfo.get(key_elem);
                 if (elemValue == null) {

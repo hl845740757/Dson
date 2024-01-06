@@ -702,8 +702,8 @@ public static class Dsons
         return new DsonScanner(IDsonCharStream.NewCharStream(dsonString));
     }
 
-    public static DsonScanner NewStreamScanner(TextReader reader, int bufferSize = 512, bool autoClose = true) {
-        return new DsonScanner(IDsonCharStream.NewBufferedCharStream(reader, bufferSize, autoClose));
+    public static DsonScanner NewStreamScanner(TextReader reader, bool autoClose = true) {
+        return new DsonScanner(IDsonCharStream.NewBufferedCharStream(reader, autoClose));
     }
 
     #endregion

@@ -17,6 +17,8 @@
 package cn.wjybxx.dson.text;
 
 import cn.wjybxx.base.ThreadUtils;
+import cn.wjybxx.base.io.ArrayPool;
+import cn.wjybxx.base.io.LocalCharArrayPool;
 import cn.wjybxx.dson.io.DsonIOException;
 
 import java.io.IOException;
@@ -30,8 +32,10 @@ import java.util.Objects;
 final class BufferedCharStream extends AbstractCharStream {
 
     private static final int MIN_BUFFER_SIZE = 32;
-    /** 行首前面超过1000个空白字符是有问题的 */
+    /** 行首前面超过空白字符太多是有问题的 */
     private static final int MAX_BUFFER_SIZE = 4096;
+    /** 方便以后调整 */
+    private static final ArrayPool<char[]> CHAR_ARRAY_POOL = LocalCharArrayPool.INSTANCE;
 
     private Reader reader;
     private final boolean autoClose;
@@ -46,19 +50,19 @@ final class BufferedCharStream extends AbstractCharStream {
     private boolean readerEof;
 
     BufferedCharStream(Reader reader) {
-        this(reader, 512, true);
+        this(reader, true);
     }
 
-    BufferedCharStream(Reader reader, int bufferSize, boolean autoClose) {
+    BufferedCharStream(Reader reader, boolean autoClose) {
         Objects.requireNonNull(reader);
-        bufferSize = Math.max(MIN_BUFFER_SIZE, bufferSize);
         this.reader = reader;
         this.autoClose = autoClose;
-        this.buffer = new CharBuffer(bufferSize);
-        this.nextBuffer = new CharBuffer(Math.max(64, bufferSize / 4));
+        this.buffer = new CharBuffer(CHAR_ARRAY_POOL.rent(1024));
+        this.nextBuffer = new CharBuffer(CHAR_ARRAY_POOL.rent(1024));
         try {
             detectDsonMode();
         } catch (IOException e) {
+            returnBuffers();
             throw new DsonIOException("invalid dson input", e);
         }
     }
@@ -82,15 +86,25 @@ final class BufferedCharStream extends AbstractCharStream {
         setPosition(discardBytes);
     }
 
+    private void returnBuffers() {
+        if (buffer != null) {
+            CHAR_ARRAY_POOL.returnOne(buffer.array);
+            buffer = null;
+        }
+        if (nextBuffer != null) {
+            CHAR_ARRAY_POOL.returnOne(nextBuffer.array);
+            nextBuffer = null;
+        }
+    }
+
     @Override
     public void close() {
+        returnBuffers();
         try {
             if (reader != null && autoClose) {
                 reader.close();
                 reader = null;
             }
-            buffer = null;
-            nextBuffer = null;
         } catch (IOException e) {
             throw DsonIOException.wrap(e);
         }
@@ -142,7 +156,9 @@ final class BufferedCharStream extends AbstractCharStream {
 
     private void growUp(CharBuffer charBuffer) {
         int capacity = Math.min(MAX_BUFFER_SIZE, charBuffer.capacity() * 2);
-        charBuffer.grow(capacity);
+        char[] newBuffer = CHAR_ARRAY_POOL.rent(capacity);
+        char[] oldBuffer = charBuffer.grow(newBuffer);
+        CHAR_ARRAY_POOL.returnOne(oldBuffer);
     }
 
     /** 该方法一直读到指定行读取完毕，或缓冲区满(不一定扩容) */
@@ -203,7 +219,7 @@ final class BufferedCharStream extends AbstractCharStream {
             if (len <= 0) {
                 return;
             }
-            int n = reader.read(nextBuffer.buffer, nextBuffer.widx, len);
+            int n = reader.read(nextBuffer.array, nextBuffer.widx, len);
             if (n <= 0) { // Java会在Eof的情况下返回-1，0其实也结束了
                 readerEof = true;
             } else {

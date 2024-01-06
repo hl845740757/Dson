@@ -110,8 +110,8 @@ public interface DsonCharStream extends AutoCloseable {
         return new BufferedCharStream(reader);
     }
 
-    static DsonCharStream newBufferedCharStream(Reader reader, int bufferSize, boolean autoClose) {
-        return new BufferedCharStream(reader, bufferSize, autoClose);
+    static DsonCharStream newBufferedCharStream(Reader reader, boolean autoClose) {
+        return new BufferedCharStream(reader, autoClose);
     }
 
     // endregion

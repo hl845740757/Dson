@@ -29,20 +29,20 @@ import java.util.Objects;
  */
 class CharBuffer implements CharSequence {
 
-    public char[] buffer;
+    public char[] array;
     public int ridx;
     public int widx;
 
     CharBuffer(int length) {
-        this.buffer = new char[length];
+        this.array = new char[length];
     }
 
-    CharBuffer(char[] buffer) {
-        this.buffer = Objects.requireNonNull(buffer);
+    CharBuffer(char[] array) {
+        this.array = Objects.requireNonNull(array);
     }
 
     public int capacity() {
-        return buffer.length;
+        return array.length;
     }
 
     public boolean isReadable() {
@@ -50,11 +50,11 @@ class CharBuffer implements CharSequence {
     }
 
     public boolean isWritable() {
-        return widx < buffer.length;
+        return widx < array.length;
     }
 
     public int writableChars() {
-        return buffer.length - widx;
+        return array.length - widx;
     }
 
     public int readableChars() {
@@ -71,13 +71,13 @@ class CharBuffer implements CharSequence {
 
     @Override
     public char charAt(int index) {
-        return buffer[ridx + index];
+        return array[ridx + index];
     }
 
     @Nonnull
     @Override
     public CharSequence subSequence(int start, int end) {
-        return new String(buffer, ridx + start, end - start);
+        return new String(array, ridx + start, end - start);
     }
 
     // endregion
@@ -86,7 +86,7 @@ class CharBuffer implements CharSequence {
 
     public char read() {
         if (ridx == widx) throw new BufferOverflowException();
-        return buffer[ridx++];
+        return array[ridx++];
     }
 
     public void unread() {
@@ -95,20 +95,20 @@ class CharBuffer implements CharSequence {
     }
 
     public void write(char c) {
-        if (widx == buffer.length) {
+        if (widx == array.length) {
             throw new BufferOverflowException();
         }
-        buffer[widx++] = c;
+        array[widx++] = c;
     }
 
     public void write(char[] chars) {
         if (chars.length == 0) {
             return;
         }
-        if (widx + chars.length > buffer.length) {
+        if (widx + chars.length > array.length) {
             throw new BufferOverflowException();
         }
-        System.arraycopy(chars, 0, buffer, widx, chars.length);
+        System.arraycopy(chars, 0, array, widx, chars.length);
         widx += chars.length;
     }
 
@@ -117,10 +117,10 @@ class CharBuffer implements CharSequence {
             return;
         }
         ByteBufferUtils.checkBuffer(chars.length, offset, len);
-        if (widx + len > buffer.length) {
+        if (widx + len > array.length) {
             throw new BufferOverflowException();
         }
-        System.arraycopy(chars, offset, buffer, widx, len);
+        System.arraycopy(chars, offset, array, widx, len);
         widx += len;
     }
 
@@ -135,7 +135,7 @@ class CharBuffer implements CharSequence {
         if (n == 0) {
             return 0;
         }
-        write(charBuffer.buffer, charBuffer.ridx, n);
+        write(charBuffer.array, charBuffer.ridx, n);
         charBuffer.addRidx(n);
         return n;
     }
@@ -159,7 +159,7 @@ class CharBuffer implements CharSequence {
     }
 
     public void setWidx(int widx) {
-        if (widx < ridx || widx > buffer.length) {
+        if (widx < ridx || widx > array.length) {
             throw new IllegalArgumentException("widx overflow");
         }
         this.widx = widx;
@@ -169,7 +169,7 @@ class CharBuffer implements CharSequence {
         if (ridx < 0 || ridx > widx) {
             throw new IllegalArgumentException("ridx overflow");
         }
-        if (widx > buffer.length) {
+        if (widx > array.length) {
             throw new IllegalArgumentException("widx overflow");
         }
         this.ridx = ridx;
@@ -183,24 +183,31 @@ class CharBuffer implements CharSequence {
         if (shiftCount <= 0) {
             return;
         }
-        if (shiftCount >= buffer.length) {
+        if (shiftCount >= array.length) {
 //                Arrays.fill(buffer, (char) 0);
             ridx = 0;
             widx = 0;
         } else {
-            System.arraycopy(buffer, shiftCount, buffer, 0, buffer.length - shiftCount);
+            System.arraycopy(array, shiftCount, array, 0, array.length - shiftCount);
             ridx = Math.max(0, ridx - shiftCount);
             widx = Math.max(0, widx - shiftCount);
 //            Arrays.fill(buffer, widx, buffer.length, (char) 0);
         }
     }
 
+    public char[] grow(char[] newArray) {
+        char[] oldArray = this.array;
+        System.arraycopy(oldArray, 0, newArray, 0, oldArray.length);
+        this.array = newArray;
+        return oldArray;
+    }
+
     public void grow(int capacity) {
-        char[] buffer = this.buffer;
+        char[] buffer = this.array;
         if (capacity <= buffer.length) {
             return;
         }
-        this.buffer = Arrays.copyOf(this.buffer, capacity);
+        this.array = Arrays.copyOf(this.array, capacity);
     }
     // endregion
 
@@ -219,6 +226,6 @@ class CharBuffer implements CharSequence {
         if (ridx >= widx) {
             return "";
         }
-        return new String(buffer, ridx, Math.max(0, widx - ridx));
+        return new String(array, ridx, Math.max(0, widx - ridx));
     }
 }

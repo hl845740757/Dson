@@ -43,7 +43,7 @@ public class DsonTextReaderSettings extends DsonReaderSettings {
 
     public static class Builder extends DsonReaderSettings.Builder {
         /** StringBuilder池 */
-        private ObjectPool<StringBuilder> stringBuilderPool;
+        private ObjectPool<StringBuilder> stringBuilderPool = LocalStringBuilderPool.INSTANCE;
 
         protected Builder() {
         }

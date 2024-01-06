@@ -117,11 +117,10 @@ public interface IDsonCharStream : IDisposable
     /// 创建一个基于TextReader的带缓存的Dson字符串流
     /// </summary>
     /// <param name="reader">Stream流</param>
-    /// <param name="bufferSize">缓冲区大小</param>
     /// <param name="autoClose">是否自动关闭Stream</param>
     /// <returns></returns>
-    public static IDsonCharStream NewBufferedCharStream(TextReader reader, int bufferSize = 512, bool autoClose = true) {
-        return new BufferedCharStream(reader, bufferSize, autoClose);
+    public static IDsonCharStream NewBufferedCharStream(TextReader reader, bool autoClose = true) {
+        return new BufferedCharStream(reader, autoClose);
     }
 
     #endregion

@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.Buffers;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -27,33 +28,35 @@ namespace Wjybxx.Dson.Text;
 class BufferedCharStream : AbstractCharStream
 {
     private const int MinBufferSize = 32;
-    /** 行首前面超过1000个空白字符是有问题的 */
+    /** 行首前面超过空白字符太多是有问题的 */
     private const int MaxBufferSize = 4096;
+    /** 方便以后调整 */
+    private static readonly ArrayPool<char> CharArrayPool = ArrayPool<char>.Shared;
 
 #nullable disable
     private TextReader _reader;
     private readonly bool _autoClose;
-#nullable enable
 
     private CharBuffer _buffer;
     /** reader批量读取数据到该buffer，然后再读取到当前buffer -- 缓冲的缓冲，减少io操作 */
     private CharBuffer _nextBuffer;
+#nullable enable
 
     /** buffer全局开始位置 */
     private int _bufferStartPos;
     /** reader是否已到达文件尾部 -- 部分reader在到达文件尾部的时候不可继续读 */
     private bool _readerEof;
 
-    public BufferedCharStream(TextReader reader, int bufferSize = 512, bool autoClose = true) {
-        bufferSize = Math.Max(MinBufferSize, bufferSize);
+    public BufferedCharStream(TextReader reader, bool autoClose = true) {
         this._reader = reader ?? throw new ArgumentNullException(nameof(reader));
-        this._buffer = new CharBuffer(bufferSize);
-        this._nextBuffer = new CharBuffer(Math.Max(64, bufferSize / 4));
+        this._buffer = new CharBuffer(CharArrayPool.Rent(1024));
+        this._nextBuffer = new CharBuffer(CharArrayPool.Rent(1024));
         this._autoClose = autoClose;
         try {
             DetectDsonMode();
         }
         catch (Exception e) {
+            ReturnBuffers();
             throw new DsonIOException("invalid dson input", e);
         }
     }
@@ -79,13 +82,23 @@ class BufferedCharStream : AbstractCharStream
         SetPosition(discardBytes);
     }
 
+    private void ReturnBuffers() {
+        if (_buffer != null) {
+            CharArrayPool.Return(_buffer.array);
+            _buffer = null;
+        }
+        if (_nextBuffer != null) {
+            CharArrayPool.Return(_nextBuffer.array);
+            _nextBuffer = null;
+        }
+    }
+
     public override void Dispose() {
+        ReturnBuffers();
         if (_reader != null && _autoClose) {
             _reader.Dispose();
             _reader = null;
         }
-        _buffer = null!;
-        _nextBuffer = null!;
     }
 
     protected override bool IsClosed() {
@@ -130,7 +143,9 @@ class BufferedCharStream : AbstractCharStream
 
     private void GrowUp(CharBuffer charBuffer) {
         int capacity = Math.Min(MaxBufferSize, charBuffer.Capacity * 2);
-        charBuffer.Grow(capacity);
+        char[] newBuffer = CharArrayPool.Rent(capacity);
+        char[] oldBuffer = charBuffer.Grow(newBuffer);
+        CharArrayPool.Return(oldBuffer);
     }
 
     /** 该方法一直读到指定行读取完毕，或缓冲区满(不一定扩容) */
@@ -190,7 +205,7 @@ class BufferedCharStream : AbstractCharStream
             if (len <= 0) {
                 return;
             }
-            int n = _reader.Read(nextBuffer.buffer, nextBuffer.widx, len);
+            int n = _reader.Read(nextBuffer.array, nextBuffer.widx, len);
             if (n <= 0) { // C# 在Eof的情况下不会返回-1...返回0时已读完
                 _readerEof = true;
             } else {

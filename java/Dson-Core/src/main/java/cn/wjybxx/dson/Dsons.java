@@ -540,8 +540,8 @@ public final class Dsons {
         return new DsonScanner(DsonCharStream.newBufferedCharStream(reader));
     }
 
-    public static DsonScanner newStreamScanner(Reader reader, int bufferSize, boolean autoClose) {
-        return new DsonScanner(DsonCharStream.newBufferedCharStream(reader, bufferSize, autoClose));
+    public static DsonScanner newStreamScanner(Reader reader, boolean autoClose) {
+        return new DsonScanner(DsonCharStream.newBufferedCharStream(reader, autoClose));
     }
 
     // endregion

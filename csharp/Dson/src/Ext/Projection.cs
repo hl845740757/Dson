@@ -86,15 +86,13 @@ public class Projection
     public const string KeyArray = "$array";
     /** 用于对数组切片 */
     public const string KeySlice = "$slice";
-    /** 投影数组的首个元素 */
-    public const string KeyFirst = "$0";
     /** 用于对数组元素进行投影 */
     public const string KeyElem = "$elem";
 
     /** object投影的特殊键 */
     public static readonly ISet<string> ObjectKeys = new[] { KeyObject, KeyAll }.ToImmutableHashSet();
     /** 数组投影的特殊键 */
-    public static readonly ISet<string> ArrayKeys = new[] { KeyArray, KeySlice, KeyFirst, KeyElem }.ToImmutableHashSet();
+    public static readonly ISet<string> ArrayKeys = new[] { KeyArray, KeySlice, KeyElem }.ToImmutableHashSet();
     /** 所有的特殊键 */
     public static readonly ISet<string> AllSpecialKeys;
 
@@ -429,16 +427,12 @@ public class Projection
             }
             // array 映射
             {
-                if (projectInfo.TryGetValue(KeyFirst, out DsonValue firstValue)) {
-                        sliceSpec = SliceSpec.First;
+                projectInfo.TryGetValue(KeySlice, out DsonValue sliceValue);
+                if (sliceValue == null) {
+                    // 未声明slice的情况下，返回空数组
+                    sliceSpec = SliceSpec.Empty;
                 } else {
-                    projectInfo.TryGetValue(KeySlice, out DsonValue sliceValue);
-                    if (sliceValue == null) {
-                        // 未声明slice的情况下，返回空数组
-                        sliceSpec = SliceSpec.Empty;
-                    } else {
-                        sliceSpec = ParseSliceSpec(sliceValue);
-                    }
+                    sliceSpec = ParseSliceSpec(sliceValue);
                 }
                 projectInfo.TryGetValue(KeyElem, out DsonValue elemValue);
                 if (elemValue == null) {
