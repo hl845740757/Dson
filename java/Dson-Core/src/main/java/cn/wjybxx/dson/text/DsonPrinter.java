@@ -16,8 +16,8 @@
 
 package cn.wjybxx.dson.text;
 
+import cn.wjybxx.base.io.ByteBufferUtils;
 import cn.wjybxx.base.io.StringBuilderWriter;
-import cn.wjybxx.dson.io.BinaryUtils;
 import cn.wjybxx.dson.io.DsonIOException;
 
 import java.io.Writer;
@@ -149,7 +149,7 @@ public final class DsonPrinter implements AutoCloseable {
     }
 
     public void print(char[] cBuffer, int offset, int len) {
-        BinaryUtils.checkBuffer(cBuffer.length, offset, len);
+        ByteBufferUtils.checkBuffer(cBuffer.length, offset, len);
         for (int idx = offset, end = offset + len; idx < end; idx++) {
             print(cBuffer[idx]);
         }

@@ -70,6 +70,9 @@ A：最初提供ExtString时没有考虑这个问题，禁止了value为null；�
 但这样会导致信息丢失，ExtString的type丢失了，因此底层需要支持value为null。  
 PS：普通的String不存在这个问题，因为不存在额外的信息。
 
+Q: 为什么要支持 ei、eL的value为null?  
+A: 缘由和支持es的value为null相同，有时我们期望表达尚未赋值的情况，而int本身是没有Null的，因此需要通过标记支持。
+
 <br>
 
 Q：为什么日期时间（DateTime）不直接支持 ISO8601格式的字符串？  

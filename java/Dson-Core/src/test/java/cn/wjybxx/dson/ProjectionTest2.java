@@ -1,7 +1,5 @@
 package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.text.ObjectStyle;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -81,6 +79,6 @@ public class ProjectionTest2 {
     @Test
     void test() {
         DsonArray<String> value = Dsons.project(dsonString, projectInfo).asArray();
-        System.out.println(Dsons.toFlatDson(value));
+        System.out.println(Dsons.toCollectionDson(value));
     }
 }

@@ -19,7 +19,6 @@ package cn.wjybxx.dson.codec;
 import cn.wjybxx.apt.AptUtils;
 import cn.wjybxx.apt.BeanUtils;
 import cn.wjybxx.apt.MyAbstractProcessor;
-import cn.wjybxx.base.ObjectUtils;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.*;
 
@@ -40,26 +39,26 @@ import java.util.*;
 public class CodecProcessor extends MyAbstractProcessor {
 
     // region 常量
-    public static final String CNAME_FIELD_IMPL = "cn.wjybxx.dson.codec.FieldImpl";
-    public static final String CNAME_CLASS_IMPL = "cn.wjybxx.dson.codec.ClassImpl";
-    public static final String CNAME_TYPEARG = "cn.wjybxx.dson.codec.TypeArgInfo";
+    public static final String CNAME_TypeArg = "cn.wjybxx.dson.codec.TypeArgInfo";
     public static final String CNAME_WireType = "cn.wjybxx.dson.WireType";
     public static final String CNAME_NumberStyle = "cn.wjybxx.dson.text.NumberStyle";
     public static final String CNAME_StringStyle = "cn.wjybxx.dson.text.StringStyle";
     public static final String CNAME_ObjectStyle = "cn.wjybxx.dson.text.ObjectStyle";
 
-    // Document
-    public static final String CNAME_DOC_SERIALIZABLE = "cn.wjybxx.dson.codec.document.DocumentSerializable";
-    public static final String CNAME_DOC_IGNORE = "cn.wjybxx.dson.codec.document.DocumentIgnore";
-    private static final String CNAME_DOC_READER = "cn.wjybxx.dson.codec.document.DocumentObjectReader";
-    private static final String CNAME_DOC_WRITER = "cn.wjybxx.dson.codec.document.DocumentObjectWriter";
-    private static final String CNAME_DOC_SCAN_IGNORE = "cn.wjybxx.dson.codec.document.DocumentPojoCodecScanIgnore";
-    // Binary
-    public static final String CNAME_BIN_SERIALIZABLE = "cn.wjybxx.dson.codec.binary.BinarySerializable";
-    public static final String CNAME_BIN_IGNORE = "cn.wjybxx.dson.codec.binary.BinaryIgnore";
-    private static final String CNAME_BIN_READER = "cn.wjybxx.dson.codec.binary.BinaryObjectReader";
-    private static final String CNAME_BIN_WRITER = "cn.wjybxx.dson.codec.binary.BinaryObjectWriter";
-    private static final String CNAME_BIN_SCAN_IGNORE = "cn.wjybxx.dson.codec.binary.BinaryPojoCodecScanIgnore";
+    public static final String CNAME_FIELD_IMPL = "cn.wjybxx.dson.codec.FieldImpl";
+    public static final String CNAME_CLASS_IMPL = "cn.wjybxx.dson.codec.ClassImpl";
+    // Dson
+    private static final String CNAME_DSON_SERIALIZABLE = "cn.wjybxx.dson.codec.dson.DsonSerializable";
+    private static final String CNAME_DSON_IGNORE = "cn.wjybxx.dson.codec.dson.DsonIgnore";
+    private static final String CNAME_DSON_READER = "cn.wjybxx.dson.codec.dson.DsonObjectReader";
+    private static final String CNAME_DSON_WRITER = "cn.wjybxx.dson.codec.dson.DsonObjectWriter";
+    private static final String CNAME_DSON_SCAN_IGNORE = "cn.wjybxx.dson.codec.dson.DsonCodecScanIgnore";
+    // DsonLite
+    private static final String CNAME_LITE_SERIALIZABLE = "cn.wjybxx.dson.codec.dsonlite.DsonLiteSerializable";
+    private static final String CNAME_LITE_IGNORE = "cn.wjybxx.dson.codec.dsonlite.DsonLiteIgnore";
+    private static final String CNAME_LITE_READER = "cn.wjybxx.dson.codec.dsonlite.DsonLiteObjectReader";
+    private static final String CNAME_LITE_WRITER = "cn.wjybxx.dson.codec.dsonlite.DsonLiteObjectWriter";
+    private static final String CNAME_LITE_SCAN_IGNORE = "cn.wjybxx.dson.codec.dsonlite.DsonLiteCodecScanIgnore";
     // Linker
     private static final String CNAME_CODEC_LINKER_GROUP = "cn.wjybxx.dson.codec.CodecLinkerGroup";
     private static final String CNAME_CODEC_LINKER = "cn.wjybxx.dson.codec.CodecLinker";
@@ -67,12 +66,12 @@ public class CodecProcessor extends MyAbstractProcessor {
     private static final String MNAME_SUBPACKAGE = "subPackage";
     private static final String MNAME_CLASSIMPL = "classImpl";
 
-    // PojoCodecImpl
-    public static final String CNAME_POJO_CODEC = "cn.wjybxx.dson.codec.PojoCodecImpl";
+    // DuplexCodec
+    public static final String CNAME_CODEC = "cn.wjybxx.dson.codec.DuplexCodec";
     public static final String MNAME_READ_OBJECT = "readObject";
     public static final String MNAME_WRITE_OBJECT = "writeObject";
-    // AbstractPojoCodecImpl
-    private static final String CNAME_ABSTRACT_CODEC = "cn.wjybxx.dson.codec.AbstractPojoCodecImpl";
+    // AbstractDuplexCodec
+    private static final String CNAME_ABSTRACT_CODEC = "cn.wjybxx.dson.codec.AbstractDuplexCodec";
     public static final String MNAME_GET_ENCODER_CLASS = "getEncoderClass";
     public static final String MNAME_NEW_INSTANCE = "newInstance";
     public static final String MNAME_READ_FIELDS = "readFields";
@@ -94,18 +93,18 @@ public class CodecProcessor extends MyAbstractProcessor {
     public ClassName typeNameStringStyle;
     public ClassName typeNameObjectStyle;
 
-    // document
-    public TypeElement anno_docSerializable;
-    public TypeMirror anno_docIgnore;
-    public TypeMirror docReaderTypeMirror;
-    public TypeMirror docWriterTypeMirror;
-    public AnnotationSpec docScanIgnoreAnnoSpec;
-    // binary
-    public TypeElement anno_binSerializable;
-    public TypeMirror anno_binIgnore;
-    public TypeMirror binReaderTypeMirror;
-    public TypeMirror binWriterTypeMirror;
-    public AnnotationSpec binScanIgnoreAnnoSpec;
+    // Dson
+    public TypeElement anno_dsonSerializable;
+    public TypeMirror anno_dsonIgnore;
+    public TypeMirror dsonReaderTypeMirror;
+    public TypeMirror dsonWriterTypeMirror;
+    public AnnotationSpec dsonScanIgnoreAnnoSpec;
+    // DsonLite
+    public TypeElement anno_liteSerializable;
+    public TypeMirror anno_liteIgnore;
+    public TypeMirror liteReaderTypeMirror;
+    public TypeMirror liteWriterTypeMirror;
+    public AnnotationSpec liteScanIgnoreAnnoSpec;
     // linker
     public TypeElement anno_codecLinkerGroup;
     public TypeElement anno_codecLinker;
@@ -113,14 +112,14 @@ public class CodecProcessor extends MyAbstractProcessor {
     // abstractCodec
     public TypeElement abstractCodecTypeElement;
     public ExecutableElement getEncoderClassMethod;
-    public ExecutableElement doc_newInstanceMethod;
-    public ExecutableElement doc_readFieldsMethod;
-    public ExecutableElement doc_afterDecodeMethod;
-    public ExecutableElement doc_writeObjectMethod;
-    public ExecutableElement bin_newInstanceMethod;
-    public ExecutableElement bin_readFieldsMethod;
-    public ExecutableElement bin_afterDecodeMethod;
-    public ExecutableElement bin_writeObjectMethod;
+    public ExecutableElement dson_newInstanceMethod;
+    public ExecutableElement dson_readFieldsMethod;
+    public ExecutableElement dson_afterDecodeMethod;
+    public ExecutableElement dson_writeObjectMethod;
+    public ExecutableElement lite_newInstanceMethod;
+    public ExecutableElement lite_readFieldsMethod;
+    public ExecutableElement lite_afterDecodeMethod;
+    public ExecutableElement lite_writeObjectMethod;
     // enumLiteCodec
     public TypeElement enumCodecTypeElement;
 
@@ -145,7 +144,7 @@ public class CodecProcessor extends MyAbstractProcessor {
 
     @Override
     public Set<String> getSupportedAnnotationTypes() {
-        return Set.of(CNAME_BIN_SERIALIZABLE, CNAME_DOC_SERIALIZABLE,
+        return Set.of(CNAME_LITE_SERIALIZABLE, CNAME_DSON_SERIALIZABLE,
                 CNAME_CODEC_LINKER_GROUP);
     }
 
@@ -155,47 +154,47 @@ public class CodecProcessor extends MyAbstractProcessor {
         // common
         anno_fieldImplTypeMirror = elementUtils.getTypeElement(CNAME_FIELD_IMPL).asType();
         anno_classImplTypeMirror = elementUtils.getTypeElement(CNAME_CLASS_IMPL).asType();
-        typeNameTypeArgInfo = ClassName.get(elementUtils.getTypeElement(CNAME_TYPEARG));
+        typeNameTypeArgInfo = ClassName.get(elementUtils.getTypeElement(CNAME_TypeArg));
         typeNameWireType = AptUtils.classNameOfCanonicalName(CNAME_WireType);
         typeNameNumberStyle = AptUtils.classNameOfCanonicalName(CNAME_NumberStyle);
         typeNameStringStyle = AptUtils.classNameOfCanonicalName(CNAME_StringStyle);
         typeNameObjectStyle = AptUtils.classNameOfCanonicalName(CNAME_ObjectStyle);
 
-        // document
-        anno_docSerializable = elementUtils.getTypeElement(CNAME_DOC_SERIALIZABLE);
-        anno_docIgnore = elementUtils.getTypeElement(CNAME_DOC_IGNORE).asType();
-        docReaderTypeMirror = elementUtils.getTypeElement(CNAME_DOC_READER).asType();
-        docWriterTypeMirror = elementUtils.getTypeElement(CNAME_DOC_WRITER).asType();
-        docScanIgnoreAnnoSpec = AnnotationSpec.builder(ClassName.get(elementUtils.getTypeElement(CNAME_DOC_SCAN_IGNORE)))
+        // dson
+        anno_dsonSerializable = elementUtils.getTypeElement(CNAME_DSON_SERIALIZABLE);
+        anno_dsonIgnore = elementUtils.getTypeElement(CNAME_DSON_IGNORE).asType();
+        dsonReaderTypeMirror = elementUtils.getTypeElement(CNAME_DSON_READER).asType();
+        dsonWriterTypeMirror = elementUtils.getTypeElement(CNAME_DSON_WRITER).asType();
+        dsonScanIgnoreAnnoSpec = AnnotationSpec.builder(ClassName.get(elementUtils.getTypeElement(CNAME_DSON_SCAN_IGNORE)))
                 .build();
-        // binary
-        anno_binSerializable = elementUtils.getTypeElement(CNAME_BIN_SERIALIZABLE);
-        anno_binIgnore = elementUtils.getTypeElement(CNAME_BIN_IGNORE).asType();
-        binReaderTypeMirror = elementUtils.getTypeElement(CNAME_BIN_READER).asType();
-        binWriterTypeMirror = elementUtils.getTypeElement(CNAME_BIN_WRITER).asType();
-        binScanIgnoreAnnoSpec = AnnotationSpec.builder(ClassName.get(elementUtils.getTypeElement(CNAME_BIN_SCAN_IGNORE)))
+        // dsonLite
+        anno_liteSerializable = elementUtils.getTypeElement(CNAME_LITE_SERIALIZABLE);
+        anno_liteIgnore = elementUtils.getTypeElement(CNAME_LITE_IGNORE).asType();
+        liteReaderTypeMirror = elementUtils.getTypeElement(CNAME_LITE_READER).asType();
+        liteWriterTypeMirror = elementUtils.getTypeElement(CNAME_LITE_WRITER).asType();
+        liteScanIgnoreAnnoSpec = AnnotationSpec.builder(ClassName.get(elementUtils.getTypeElement(CNAME_LITE_SCAN_IGNORE)))
                 .build();
         // linker
         anno_codecLinkerGroup = elementUtils.getTypeElement(CNAME_CODEC_LINKER_GROUP);
         anno_codecLinker = elementUtils.getTypeElement(CNAME_CODEC_LINKER);
 
         // PojoCodec
-        TypeElement pojoCodecTypeElement = elementUtils.getTypeElement(CNAME_POJO_CODEC);
+        TypeElement pojoCodecTypeElement = elementUtils.getTypeElement(CNAME_CODEC);
         getEncoderClassMethod = AptUtils.findMethodByName(pojoCodecTypeElement, MNAME_GET_ENCODER_CLASS);
         // abstractCodec
         abstractCodecTypeElement = elementUtils.getTypeElement(CNAME_ABSTRACT_CODEC);
         {
             List<ExecutableElement> allMethodsWithInherit = BeanUtils.getAllMethodsWithInherit(abstractCodecTypeElement);
-            // doc
-            doc_newInstanceMethod = findCodecMethod(allMethodsWithInherit, MNAME_NEW_INSTANCE, docReaderTypeMirror);
-            doc_readFieldsMethod = findCodecMethod(allMethodsWithInherit, MNAME_READ_FIELDS, docReaderTypeMirror);
-            doc_afterDecodeMethod = findCodecMethod(allMethodsWithInherit, MNAME_AFTER_DECODE, docReaderTypeMirror);
-            doc_writeObjectMethod = findCodecMethod(allMethodsWithInherit, MNAME_WRITE_OBJECT, docWriterTypeMirror);
-            // bin
-            bin_newInstanceMethod = findCodecMethod(allMethodsWithInherit, MNAME_NEW_INSTANCE, binReaderTypeMirror);
-            bin_readFieldsMethod = findCodecMethod(allMethodsWithInherit, MNAME_READ_FIELDS, binReaderTypeMirror);
-            bin_afterDecodeMethod = findCodecMethod(allMethodsWithInherit, MNAME_AFTER_DECODE, binReaderTypeMirror);
-            bin_writeObjectMethod = findCodecMethod(allMethodsWithInherit, MNAME_WRITE_OBJECT, binWriterTypeMirror);
+            // dson
+            dson_newInstanceMethod = findCodecMethod(allMethodsWithInherit, MNAME_NEW_INSTANCE, dsonReaderTypeMirror);
+            dson_readFieldsMethod = findCodecMethod(allMethodsWithInherit, MNAME_READ_FIELDS, dsonReaderTypeMirror);
+            dson_afterDecodeMethod = findCodecMethod(allMethodsWithInherit, MNAME_AFTER_DECODE, dsonReaderTypeMirror);
+            dson_writeObjectMethod = findCodecMethod(allMethodsWithInherit, MNAME_WRITE_OBJECT, dsonWriterTypeMirror);
+            // lite
+            lite_newInstanceMethod = findCodecMethod(allMethodsWithInherit, MNAME_NEW_INSTANCE, liteReaderTypeMirror);
+            lite_readFieldsMethod = findCodecMethod(allMethodsWithInherit, MNAME_READ_FIELDS, liteReaderTypeMirror);
+            lite_afterDecodeMethod = findCodecMethod(allMethodsWithInherit, MNAME_AFTER_DECODE, liteReaderTypeMirror);
+            lite_writeObjectMethod = findCodecMethod(allMethodsWithInherit, MNAME_WRITE_OBJECT, liteWriterTypeMirror);
         }
         // enumLiteCodec
         enumCodecTypeElement = elementUtils.getTypeElement(CNAME_ENUM_CODEC);
@@ -229,14 +228,14 @@ public class CodecProcessor extends MyAbstractProcessor {
     @Override
     protected boolean doProcess(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         final Set<TypeElement> allTypeElements = AptUtils.selectSourceFileAny(roundEnv, elementUtils,
-                anno_binSerializable, anno_docSerializable, anno_codecLinkerGroup);
+                anno_liteSerializable, anno_dsonSerializable, anno_codecLinkerGroup);
         for (TypeElement typeElement : allTypeElements) {
             try {
                 // 各种缓存，避免频繁解析类型信息
                 Context context = new Context(typeElement);
-                context.binSerialAnnoMirror = AptUtils.findAnnotation(typeUtils, typeElement, anno_binSerializable.asType())
+                context.liteSerialAnnoMirror = AptUtils.findAnnotation(typeUtils, typeElement, anno_liteSerializable.asType())
                         .orElse(null);
-                context.docSerialAnnoMirror = AptUtils.findAnnotation(typeUtils, typeElement, anno_docSerializable.asType())
+                context.dsonSerialAnnoMirror = AptUtils.findAnnotation(typeUtils, typeElement, anno_dsonSerializable.asType())
                         .orElse(null);
                 context.linkerGroupAnnoMirror = AptUtils.findAnnotation(typeUtils, typeElement, anno_codecLinkerGroup.asType())
                         .orElse(null);
@@ -284,61 +283,61 @@ public class CodecProcessor extends MyAbstractProcessor {
             TypeElement typeElement = (TypeElement) declaredType.asElement();
             Context context = new Context(typeElement);
             context.linkerAddAnnotations = getAdditionalAnnotations(linkerAnnoMirror);
-            context.binSerialAnnoMirror = context.docSerialAnnoMirror = linkerAnnoMirror;
-            context.binAddAnnotations = context.docAddAnnotations = context.linkerAddAnnotations;
-            context.outPackage = ObjectUtils.isBlank(subPackage) ? outPackage : outPackage + "." + subPackage;
+            context.liteSerialAnnoMirror = context.dsonSerialAnnoMirror = linkerAnnoMirror;
+            context.liteAddAnnotations = context.dsonAddAnnotations = context.linkerAddAnnotations;
+            context.outPackage = AptUtils.isBlank(subPackage) ? outPackage : outPackage + "." + subPackage;
 
             context.aptClassImpl = aptClassImpl;
             context.allFieldsAndMethodWithInherit = BeanUtils.getAllFieldsAndMethodsWithInherit(typeElement);
             cacheAptFieldImpl(context);
-            // binary
+            // dsonLite
             {
-                context.serialTypeElement = anno_binSerializable;
-                context.ignoreTypeMirror = anno_binIgnore;
-                context.readerTypeMirror = binReaderTypeMirror;
-                context.writerTypeMirror = binWriterTypeMirror;
+                context.serialTypeElement = anno_liteSerializable;
+                context.ignoreTypeMirror = anno_liteIgnore;
+                context.readerTypeMirror = liteReaderTypeMirror;
+                context.writerTypeMirror = liteWriterTypeMirror;
 
                 context.serialFields = new ArrayList<>();
                 checkTypeElement(context);
-                context.binSerialFields.addAll(context.serialFields);
+                context.liteSerialFields.addAll(context.serialFields);
             }
-            // document
+            // dson
             {
-                context.serialTypeElement = anno_docSerializable;
-                context.ignoreTypeMirror = anno_docIgnore;
-                context.readerTypeMirror = docReaderTypeMirror;
-                context.writerTypeMirror = docWriterTypeMirror;
+                context.serialTypeElement = anno_dsonSerializable;
+                context.ignoreTypeMirror = anno_dsonIgnore;
+                context.readerTypeMirror = dsonReaderTypeMirror;
+                context.writerTypeMirror = dsonWriterTypeMirror;
 
                 context.serialFields = new ArrayList<>();
                 checkTypeElement(context);
-                context.docSerialFields.addAll(context.serialFields);
+                context.dsonSerialFields.addAll(context.serialFields);
             }
             generateCodec(context);
         }
     }
 
     private void processDirectType(Context context) {
-        if (context.binSerialAnnoMirror != null) {
-            context.binAddAnnotations = getAdditionalAnnotations(context.binSerialAnnoMirror);
-            context.serialTypeElement = anno_binSerializable;
-            context.ignoreTypeMirror = anno_binIgnore;
-            context.readerTypeMirror = binReaderTypeMirror;
-            context.writerTypeMirror = binWriterTypeMirror;
+        if (context.liteSerialAnnoMirror != null) {
+            context.liteAddAnnotations = getAdditionalAnnotations(context.liteSerialAnnoMirror);
+            context.serialTypeElement = anno_liteSerializable;
+            context.ignoreTypeMirror = anno_liteIgnore;
+            context.readerTypeMirror = liteReaderTypeMirror;
+            context.writerTypeMirror = liteWriterTypeMirror;
 
             context.serialFields = new ArrayList<>();
             checkTypeElement(context);
-            context.binSerialFields.addAll(context.serialFields);
+            context.liteSerialFields.addAll(context.serialFields);
         }
-        if (context.docSerialAnnoMirror != null) {
-            context.docAddAnnotations = getAdditionalAnnotations(context.docSerialAnnoMirror);
-            context.serialTypeElement = anno_docSerializable;
-            context.ignoreTypeMirror = anno_docIgnore;
-            context.readerTypeMirror = docReaderTypeMirror;
-            context.writerTypeMirror = docWriterTypeMirror;
+        if (context.dsonSerialAnnoMirror != null) {
+            context.dsonAddAnnotations = getAdditionalAnnotations(context.dsonSerialAnnoMirror);
+            context.serialTypeElement = anno_dsonSerializable;
+            context.ignoreTypeMirror = anno_dsonIgnore;
+            context.readerTypeMirror = dsonReaderTypeMirror;
+            context.writerTypeMirror = dsonWriterTypeMirror;
 
             context.serialFields = new ArrayList<>();
             checkTypeElement(context);
-            context.docSerialFields.addAll(context.serialFields);
+            context.dsonSerialFields.addAll(context.serialFields);
         }
         generateCodec(context);
     }
@@ -357,31 +356,31 @@ public class CodecProcessor extends MyAbstractProcessor {
             SchemaGenerator schemaGenerator = new SchemaGenerator(this, context);
             schemaGenerator.execute();
             // 不论注解是否存在，所有方法都要实现
-            // Binary
+            // dsonLite
             {
-                context.serialAnnoMirror = context.binSerialAnnoMirror;
-                context.scanIgnoreAnnoSpec = binScanIgnoreAnnoSpec;
-                context.additionalAnnotations = context.binAddAnnotations;
+                context.serialAnnoMirror = context.liteSerialAnnoMirror;
+                context.scanIgnoreAnnoSpec = liteScanIgnoreAnnoSpec;
+                context.additionalAnnotations = context.liteAddAnnotations;
 
-                context.serialTypeElement = anno_binSerializable;
-                context.ignoreTypeMirror = anno_binIgnore;
-                context.readerTypeMirror = binReaderTypeMirror;
-                context.writerTypeMirror = binWriterTypeMirror;
-                context.serialFields = context.binSerialFields;
+                context.serialTypeElement = anno_liteSerializable;
+                context.ignoreTypeMirror = anno_liteIgnore;
+                context.readerTypeMirror = liteReaderTypeMirror;
+                context.writerTypeMirror = liteWriterTypeMirror;
+                context.serialFields = context.liteSerialFields;
                 context.serialNameAccess = "numbers_";
                 new PojoCodecGenerator(this, context).execute();
             }
-            // Document
+            // dson
             {
-                context.serialAnnoMirror = context.docSerialAnnoMirror;
-                context.scanIgnoreAnnoSpec = docScanIgnoreAnnoSpec;
-                context.additionalAnnotations = context.docAddAnnotations;
+                context.serialAnnoMirror = context.dsonSerialAnnoMirror;
+                context.scanIgnoreAnnoSpec = dsonScanIgnoreAnnoSpec;
+                context.additionalAnnotations = context.dsonAddAnnotations;
 
-                context.serialTypeElement = anno_docSerializable;
-                context.ignoreTypeMirror = anno_docIgnore;
-                context.readerTypeMirror = docReaderTypeMirror;
-                context.writerTypeMirror = docWriterTypeMirror;
-                context.serialFields = context.docSerialFields;
+                context.serialTypeElement = anno_dsonSerializable;
+                context.ignoreTypeMirror = anno_dsonIgnore;
+                context.readerTypeMirror = dsonReaderTypeMirror;
+                context.writerTypeMirror = dsonWriterTypeMirror;
+                context.serialFields = context.dsonSerialFields;
                 context.serialNameAccess = "names_";
                 new PojoCodecGenerator(this, context).execute();
             }
@@ -765,34 +764,34 @@ public class CodecProcessor extends MyAbstractProcessor {
     }
 
     public MethodSpec.Builder newNewInstanceMethodBuilder(DeclaredType superDeclaredType, TypeMirror readerTypeMirror) {
-        if (readerTypeMirror == binReaderTypeMirror) {
-            return MethodSpec.overriding(bin_newInstanceMethod, superDeclaredType, typeUtils);
+        if (readerTypeMirror == liteReaderTypeMirror) {
+            return MethodSpec.overriding(lite_newInstanceMethod, superDeclaredType, typeUtils);
         } else {
-            return MethodSpec.overriding(doc_newInstanceMethod, superDeclaredType, typeUtils);
+            return MethodSpec.overriding(dson_newInstanceMethod, superDeclaredType, typeUtils);
         }
     }
 
     public MethodSpec.Builder newReadFieldsMethodBuilder(DeclaredType superDeclaredType, TypeMirror readerTypeMirror) {
-        if (readerTypeMirror == binReaderTypeMirror) {
-            return MethodSpec.overriding(bin_readFieldsMethod, superDeclaredType, typeUtils);
+        if (readerTypeMirror == liteReaderTypeMirror) {
+            return MethodSpec.overriding(lite_readFieldsMethod, superDeclaredType, typeUtils);
         } else {
-            return MethodSpec.overriding(doc_readFieldsMethod, superDeclaredType, typeUtils);
+            return MethodSpec.overriding(dson_readFieldsMethod, superDeclaredType, typeUtils);
         }
     }
 
     public MethodSpec.Builder newAfterDecodeMethodBuilder(DeclaredType superDeclaredType, TypeMirror readerTypeMirror) {
-        if (readerTypeMirror == binReaderTypeMirror) {
-            return MethodSpec.overriding(bin_afterDecodeMethod, superDeclaredType, typeUtils);
+        if (readerTypeMirror == liteReaderTypeMirror) {
+            return MethodSpec.overriding(lite_afterDecodeMethod, superDeclaredType, typeUtils);
         } else {
-            return MethodSpec.overriding(doc_afterDecodeMethod, superDeclaredType, typeUtils);
+            return MethodSpec.overriding(dson_afterDecodeMethod, superDeclaredType, typeUtils);
         }
     }
 
     public MethodSpec.Builder newWriteObjectMethodBuilder(DeclaredType superDeclaredType, TypeMirror writerTypeMirror) {
-        if (writerTypeMirror == binWriterTypeMirror) {
-            return MethodSpec.overriding(bin_writeObjectMethod, superDeclaredType, typeUtils);
+        if (writerTypeMirror == liteWriterTypeMirror) {
+            return MethodSpec.overriding(lite_writeObjectMethod, superDeclaredType, typeUtils);
         } else {
-            return MethodSpec.overriding(doc_writeObjectMethod, superDeclaredType, typeUtils);
+            return MethodSpec.overriding(dson_writeObjectMethod, superDeclaredType, typeUtils);
         }
     }
 

@@ -57,6 +57,10 @@ public final class ClassId {
         return new ClassId(0, lclassId);
     }
 
+    public boolean isDefaultNameSpace() {
+        return namespace == 0;
+    }
+
     public int getNamespace() {
         return namespace;
     }
@@ -70,10 +74,6 @@ public final class ClassId {
             return true;
         }
         return namespace == 0 && lclassId == 0;
-    }
-
-    public boolean isDefaultNameSpace() {
-        return namespace == 0;
     }
 
     @Override

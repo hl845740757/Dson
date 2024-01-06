@@ -38,12 +38,12 @@ import java.util.Map;
 class Context {
 
     final TypeElement typeElement;
-    // binary
-    AnnotationMirror binSerialAnnoMirror;
-    List<AnnotationSpec> binAddAnnotations;
-    // document
-    AnnotationMirror docSerialAnnoMirror;
-    List<AnnotationSpec> docAddAnnotations;
+    // lite
+    AnnotationMirror liteSerialAnnoMirror;
+    List<AnnotationSpec> liteAddAnnotations;
+    // dson
+    AnnotationMirror dsonSerialAnnoMirror;
+    List<AnnotationSpec> dsonAddAnnotations;
     // linker
     AnnotationMirror linkerGroupAnnoMirror;
     List<AnnotationSpec> linkerAddAnnotations;
@@ -53,8 +53,8 @@ class Context {
     List<VariableElement> allFields;
     final Map<VariableElement, AptFieldImpl> fieldImplMap = new HashMap<>(); // 字段的注解缓存
 
-    final List<VariableElement> binSerialFields = new ArrayList<>();
-    final List<VariableElement> docSerialFields = new ArrayList<>();
+    final List<VariableElement> liteSerialFields = new ArrayList<>();
+    final List<VariableElement> dsonSerialFields = new ArrayList<>();
 
     TypeElement serialTypeElement; // 当前处理的注解
     TypeMirror ignoreTypeMirror;

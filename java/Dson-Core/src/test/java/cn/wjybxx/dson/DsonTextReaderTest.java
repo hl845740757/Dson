@@ -78,8 +78,8 @@ public class DsonTextReaderTest {
      */
     @Test
     void test_equivalenceOfAllReaders() {
-        DsonArray<String> topContainer1 = Dsons.fromFlatDson(dsonString);
-        String dsonString1 = Dsons.toFlatDson(topContainer1);
+        DsonArray<String> collection1 = Dsons.fromCollectionDson(dsonString);
+        String dsonString1 = Dsons.toCollectionDson(collection1);
 //        System.out.println(dsonString1);
 
         // Binary
@@ -87,26 +87,26 @@ public class DsonTextReaderTest {
             byte[] buffer = new byte[8192];
             DsonOutput output = DsonOutputs.newInstance(buffer);
             try (DsonWriter writer = new DsonBinaryWriter(DsonTextWriterSettings.DEFAULT, output)) {
-                Dsons.writeTopContainer(writer, topContainer1);
+                Dsons.writeCollection(writer, collection1);
             }
             DsonInput input = DsonInputs.newInstance(buffer, 0, output.getPosition());
             try (DsonReader reader = new DsonBinaryReader(DsonTextReaderSettings.DEFAULT, input)) {
-                DsonArray<String> topContainer2 = Dsons.readTopContainer(reader);
+                DsonArray<String> collection2 = Dsons.readCollection(reader);
 
-                String dsonString2 = Dsons.toFlatDson(topContainer2);
+                String dsonString2 = Dsons.toCollectionDson(collection2);
                 Assertions.assertEquals(dsonString1, dsonString2, "BinaryReader/BinaryWriter");
             }
         }
         // Object
         {
             DsonArray<String> outList = new DsonArray<>();
-            try (DsonWriter writer = new DsonObjectWriter(DsonTextWriterSettings.DEFAULT, outList)) {
-                Dsons.writeTopContainer(writer, topContainer1);
+            try (DsonWriter writer = new DsonCollectionWriter(DsonTextWriterSettings.DEFAULT, outList)) {
+                Dsons.writeCollection(writer, collection1);
             }
-            try (DsonReader reader = new DsonObjectReader(DsonTextReaderSettings.DEFAULT, outList)) {
-                DsonArray<String> topContainer3 = Dsons.readTopContainer(reader);
+            try (DsonReader reader = new DsonCollectionReader(DsonTextReaderSettings.DEFAULT, outList)) {
+                DsonArray<String> collection3 = Dsons.readCollection(reader);
 
-                String dsonString3 = Dsons.toFlatDson(topContainer3);
+                String dsonString3 = Dsons.toCollectionDson(collection3);
                 Assertions.assertEquals(dsonString1, dsonString3, "ObjectReader/ObjectWriter");
             }
         }

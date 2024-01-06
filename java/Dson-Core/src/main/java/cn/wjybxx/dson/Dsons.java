@@ -122,35 +122,35 @@ public final class Dsons {
     // region read/write
 
     /**
-     * 读取顶层容器
+     * 读取顶层集合
      * 会将独立的header合并到容器中，会将分散的元素读取存入数组
      */
-    public static DsonArray<String> readTopContainer(DsonReader reader) {
-        final DsonArray<String> topContainer = new DsonArray<>(4);
+    public static DsonArray<String> readCollection(DsonReader reader) {
+        final DsonArray<String> collection = new DsonArray<>(4);
         DsonType dsonType;
         while ((dsonType = reader.readDsonType()) != DsonType.END_OF_OBJECT) {
             if (dsonType == DsonType.HEADER) {
-                readHeader(reader, topContainer.getHeader());
+                readHeader(reader, collection.getHeader());
             } else if (dsonType == DsonType.OBJECT) {
-                topContainer.add(readObject(reader));
+                collection.add(readObject(reader));
             } else if (dsonType == DsonType.ARRAY) {
-                topContainer.add(readArray(reader));
+                collection.add(readArray(reader));
             } else {
                 throw DsonIOException.invalidTopDsonType(dsonType);
             }
         }
-        return topContainer;
+        return collection;
     }
 
     /**
-     * 写入顶层容器
+     * 写入顶层集合
      * 顶层容器的header和元素将被展开，而不是嵌套在数组中
      */
-    public static void writeTopContainer(DsonWriter writer, DsonArray<String> topContainer) {
-        if (!topContainer.getHeader().isEmpty()) {
-            writeHeader(writer, topContainer.getHeader());
+    public static void writeCollection(DsonWriter writer, DsonArray<String> collection) {
+        if (!collection.getHeader().isEmpty()) {
+            writeHeader(writer, collection.getHeader());
         }
-        for (DsonValue dsonValue : topContainer) {
+        for (DsonValue dsonValue : collection) {
             if (dsonValue.getDsonType() == DsonType.OBJECT) {
                 writeObject(writer, dsonValue.asObject(), ObjectStyle.INDENT);
             } else if (dsonValue.getDsonType() == DsonType.ARRAY) {
@@ -417,18 +417,18 @@ public final class Dsons {
 
     // region 快捷方法
 
-    public static String toFlatDson(DsonArray<String> topContainer) {
-        return toFlatDson(topContainer, null);
+    public static String toCollectionDson(DsonArray<String> collection) {
+        return toCollectionDson(collection, null);
     }
 
     /** 该接口用于写顶层数组容器，所有元素将被展开 */
-    public static String toFlatDson(DsonArray<String> topContainer, DsonTextWriterSettings settings) {
+    public static String toCollectionDson(DsonArray<String> collection, DsonTextWriterSettings settings) {
         if (settings == null) settings = DsonTextWriterSettings.DEFAULT;
 
         StringBuilder sb = LocalStringBuilderPool.INSTANCE.rent();
         try {
             try (DsonTextWriter writer = new DsonTextWriter(settings, new StringBuilderWriter(sb))) {
-                writeTopContainer(writer, topContainer);
+                writeCollection(writer, collection);
             }
             return sb.toString();
         } finally {
@@ -437,9 +437,9 @@ public final class Dsons {
     }
 
     /** 该接口用于读取多顶层对象dson文本 */
-    public static DsonArray<String> fromFlatDson(String dsonString) {
+    public static DsonArray<String> fromCollectionDson(String dsonString) {
         try (DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.DEFAULT, dsonString)) {
-            return readTopContainer(reader);
+            return readCollection(reader);
         }
     }
 

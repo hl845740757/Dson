@@ -19,6 +19,7 @@
 using System;
 using System.IO;
 using System.Text;
+using Wjybxx.Commons.IO;
 using Wjybxx.Dson.IO;
 
 #pragma warning disable CS1591
@@ -139,7 +140,7 @@ public class DsonPrinter : IDisposable
     }
 
     public void Print(char[] cBuffer, int offset, int len) {
-        BinaryUtils.CheckBuffer(cBuffer.Length, offset, len);
+        ByteBufferUtil.CheckBuffer(cBuffer.Length, offset, len);
         for (int idx = offset, end = offset + len; idx < end; idx++) {
             Print(cBuffer[idx]);
         }

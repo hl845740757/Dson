@@ -21,6 +21,7 @@ Dson最初是为序列化而创建的，但我们在这里只讨论文本格式�
 4. 易于维护(修改)
 5. 易于解析和输出
 6. 易于扩展
+7. 高性能
 
 PS：Dson的文本格式从设计到最终实现大概2个月时间，尝试了多个版本的语法和行首，现版本我认为还是达到了目标，在缺乏编辑器的情况下，手写和阅读的体验都还不错。
 
@@ -111,25 +112,25 @@ PS：挑选行首字符也蛮困难的，既要对阅读影响小，还要让人
 
 Dson支持的值类型和内置结构体包括：
 
-| 标签  | 类型        | 枚举 | 含义                    | 内置结构体                                                                                | 格式或示例                                                                                                      |
-|-----|-----------|----|-----------------------|--------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|
-| i   | int32     | 1  | 32位整型                 |                                                                                      | @i 123 <br> @i  0xFF                                                                                       |
-| L   | int64     | 2  | 64位长整型，大写L            |                                                                                      | @L 123 <br> @L 0xFF                                                                                        |
-| f   | float     | 3  | 32位浮点数                |                                                                                      | @f 1.0                                                                                                     |
-| d   | double    | 4  | 64位浮点数                |                                                                                      | @d 1.5  <br> 1.5                                                                                           |
-| b   | bool      | 5  | bool值                 |                                                                                      | @b true <br> true <br/> @b 1                                                                               |
-| s   | string    | 6  | 字符串                   |                                                                                      | "10"   <br>  abc                                                                                           |
-| N   | null      | 7  | null，大写N              |                                                                                      | @N null <br> null                                                                                          |
-| bin | binary    | 8  | 二进制，带类型标签             | {<br> int32 type;<br> byte[] data; <br>}                                             | 格式固定二元数组 \[@bin type, data] <br> \[@bin 1, FFFE]                                                           |
-| ei  | extInt32  | 9  | 带类型标签的int32           | {<br> int32 type;<br> int32 value;<br> bool hasVal; <br>}                            | 格式固定二元数组 \[@ei type, value] <br> \[@ei 1, 10086] <br> \[@ei 1, null]                                       |
-| eL  | extInt64  | 10 | 带类型标签的int64           | {<br> int32 type;<br> int64 value;<br> bool hasVal; <br>}                            | 格式固定二元数组 \[@eL type, value] <br> \[@eL 1, 10086] <br> \[@eL 1, null]                                       |
-| ed  | extDouble | 11 | 带类型标签的double          | {<br> int32 type;<br> double value;<br> bool hasVal; <br>}                           | 格式固定二元数组 \[@ed type, value] <br> \[@ed 1, 0.5] <br>\[@ed 1, null]                                          |
-| es  | extString | 12 | *<b>带类型标签的string</b>* | {<br> int32 type;<br> string value; <br>}                                            | 格式固定二元数组 \[@es type, value] <br> - \[@es 10, <br/>- @ss ^\[\\u4e00-\\u9fa5_a-zA-Z0-9]+$ <br/> ~ ]          |
-| ref | reference | 13 | 引用                    | {<br> string namespace;<br> string localId;<br> int32 type; <br> int32 policy; <br>} | 格式为单值 '@ref localId' 格式或 object格式 <br/> @ref abcdefg <br> {@ref ns: wjybxx, localId: abcdefg, type: 0}     |
-| dt  | datetime  | 14 | 日期时间                  | { <br>  int64 seconds; <br> int32 nanos;<br> int32 offset;<br> int32 enables; <br> } | 无需引号<br/> @dt 2023-06-17T18:37:00 <br/>{@dt date: 2023-06-17, time: 18:37:00, offset: +08:00, millis: 100} |
-|     | header    | 29 | 对象头                   |                                                                                      | 对象形式： @{clsName: Vector3 } <br/> 简写形式： @{Vector3}                                                          |
-|     | array     | 30 | 数组                    |                                                                                      | \[ 1, 2, 3, 4, 5 ]                                                                                         |
-|     | object    | 31 | 对象/结构体                |                                                                                      | { name: wjybxx, age: 28 }                                                                                  |
+| 标签  | 类型        | 枚举 | 含义           | 内置结构体                                                                                | 格式或示例                                                                                                      |
+|-----|-----------|----|--------------|--------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|
+| i   | int32     | 1  | 32位整型        |                                                                                      | @i 123 <br> @i  0xFF                                                                                       |
+| L   | int64     | 2  | 64位长整型，大写L   |                                                                                      | @L 123 <br> @L 0xFF                                                                                        |
+| f   | float     | 3  | 32位浮点数       |                                                                                      | @f 1.0                                                                                                     |
+| d   | double    | 4  | 64位浮点数       |                                                                                      | @d 1.5  <br> 1.5                                                                                           |
+| b   | bool      | 5  | bool值        |                                                                                      | @b true <br> true <br/> @b 1                                                                               |
+| s   | string    | 6  | 字符串          |                                                                                      | "10"   <br>  abc                                                                                           |
+| N   | null      | 7  | null，大写N     |                                                                                      | @N null <br> null                                                                                          |
+| bin | binary    | 8  | 二进制，带类型标签    | {<br> int32 type;<br> byte[] data; <br>}                                             | 格式固定二元数组 \[@bin type, data] <br> \[@bin 1, FFFE]                                                           |
+| ei  | extInt32  | 9  | 带类型标签的int32  | {<br> int32 type;<br> int32 value;<br> bool hasVal; <br>}                            | 格式固定二元数组 \[@ei type, value] <br> \[@ei 1, 10086] <br> \[@ei 1, null]                                       |
+| eL  | extInt64  | 10 | 带类型标签的int64  | {<br> int32 type;<br> int64 value;<br> bool hasVal; <br>}                            | 格式固定二元数组 \[@eL type, value] <br> \[@eL 1, 10086] <br> \[@eL 1, null]                                       |
+| ed  | extDouble | 11 | 带类型标签的double | {<br> int32 type;<br> double value;<br> bool hasVal; <br>}                           | 格式固定二元数组 \[@ed type, value] <br> \[@ed 1, 0.5] <br>\[@ed 1, null]                                          |
+| es  | extString | 12 | 带类型标签的string | {<br> int32 type;<br> string value; <br>}                                            | 格式固定二元数组 \[@es type, value] <br> - \[@es 10, <br/>- @ss ^\[\\u4e00-\\u9fa5_a-zA-Z0-9]+$ <br/> ~ ]          |
+| ref | reference | 13 | 引用           | {<br> string namespace;<br> string localId;<br> int32 type; <br> int32 policy; <br>} | 格式为单值 '@ref localId' 格式或 object格式 <br/> @ref abcdefg <br> {@ref ns: wjybxx, localId: abcdefg, type: 0}     |
+| dt  | datetime  | 14 | 日期时间         | { <br>  int64 seconds; <br> int32 nanos;<br> int32 offset;<br> int32 enables; <br> } | 无需引号<br/> @dt 2023-06-17T18:37:00 <br/>{@dt date: 2023-06-17, time: 18:37:00, offset: +08:00, millis: 100} |
+|     | header    | 29 | 对象头          |                                                                                      | 对象形式： @{clsName: Vector3 } <br/> 简写形式： @{Vector3}                                                          |
+|     | array     | 30 | 数组           |                                                                                      | \[ 1, 2, 3, 4, 5 ]                                                                                         |
+|     | object    | 31 | 对象/结构体       |                                                                                      | { name: wjybxx, age: 28 }                                                                                  |
 
 ## 特殊标签
 
@@ -137,7 +138,7 @@ Dson支持的值类型和内置结构体包括：
 
 | 标签 | 类型                         | 含义                                                                                             | 格式或示例                                                                                                       |
 |----|----------------------------|------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------|
-| ss | string string <br/> (text) | 多行纯文本 <br/>1. 遇见'~'行首时结束 <br>2. 不会对字符进行转义，所见即所得 <br/>3. 既可修饰value，**也可修饰key** <br/>4. 相当于特殊的引号 | - {<br> - url:  @ss https://github.com/hl845740757 <br> ~ , reg: @ss ^\[\u4e00-\u9fa5_a-zA-Z0-9]+$ <br> ~ } |
+| ss | string string <br/> (text) | 多行纯文本 <br/>1. 遇见'~'行首时结束 <br>2. 不会对字符进行转义，所见即所得 <br/>3. 既可修饰value，也可修饰key <br/>4. **相当于特殊的引号** | - {<br> - url:  @ss https://github.com/hl845740757 <br> ~ , reg: @ss ^\[\u4e00-\u9fa5_a-zA-Z0-9]+$ <br> ~ } |
 | sL | string line                | 单行纯文本 <br/>1. 单行有效，行尾结束 <br>2. 不会对字符进行转义，所见即所得<br/>3. **适用宽松模式**<br/>4.主要用于简化书写                | { <br/>url:  @sL https://github.com/hl845740757<br/>}                                                       |
 
 在我自己的笔记中，示例其实比上面两张表复杂，但我实在不想写转义字符和标签，所以示例偷懒了...
@@ -378,6 +379,33 @@ header中值得存储的信息：对象自身类型，字典的Key/Value类型�
 
 PS：内置结构体的值类型都是确定的，因此可以不声明类型直接使用特殊方式输入。
 
+## 高级概念
+
+### 集合
+
+在Dson标准中，允许一个文件中包含多段Dson文本，每段文本表达一个Object或Array；
+在这种情况下，我们将整个文件看做一个小型数据库，一个单表或单集合的数据库；
+由于每段文本的结构可能不一致，这里我们选择NoSql概念下的集合。
+
+因此，在Dson库中读写整个文件的接口都包含`Collection`，而读写文件中单个值的接口则不包含。
+
+## 多语言
+
+作者本人是一个游戏开发者，熟悉JAVA、C#、LUA，后期会提供C#的Dson实现；其它语言可能只能依靠喜欢上Dson的小伙伴们提供。
+
+1. [Java库使用指南](https://github.com/hl845740757/Dson/blob/dev/java/Dson-Java.md)。
+   ```
+      # java maven坐标(最新可查看Mvn中央仓库)
+      <groupId>cn.wjybxx.dson</groupId>
+      <artifactId>dson-core</artifactId>
+      <version>1.4.0</version>
+   ```  
+2. [C#库使用指南](https://github.com/hl845740757/Dson/blob/dev/csharp/Dson-Csharp.md)。
+
+```
+	nuget Wjybxx.Dson 1.4.0
+```
+
 ## 与其他配置文件格式的比较
 
 ### JSON和Bson
@@ -457,27 +485,12 @@ Dson主要解决的问题有三个：
 序列化的精确性问题则通过对象头来解决；对象头是额外的数据区，不会污染正常的数据区；
 我们通过在对象头中存储对象的类型信息，可以实现序列化的精确性，也可以实现一些其它的扩展功能。
 
-## 多语言
-
-作者本人是一个游戏开发者，熟悉JAVA、C#、LUA，后期会提供C#的Dson实现；其它语言可能只能依靠喜欢上Dson的小伙伴们提供。
-
-1. [Java库使用指南](https://github.com/hl845740757/Dson/blob/dev/java/Dson-Java.md)。
-   ```
-      # java maven坐标(最新可查看Mvn中央仓库)
-      <groupId>cn.wjybxx.dson</groupId>
-      <artifactId>dson-core</artifactId>
-      <version>1.4.0</version>
-   ```  
-2. [C#库使用指南](https://github.com/hl845740757/Dson/blob/dev/csharp/Dson-Csharp.md)。
-
-```
-	nuget Wjybxx.Dson 1.4.0
-```
-
 ## Dson编辑器（缺失）
 
 行首虽然很好地解决了内容拆分的问题，但对新手使用者有一定的干扰，如果有编辑器（和插件）支持的话，行首带来的影响就可以消除。
 不过，作者我不是很擅长做这个，暂时无法提供。
+
+ps：V1.4版本开始，宽松模式的Dson已支持完整的Dson功能，在脱离编辑器的情况下更容易编写。
 
 ## 特别鸣谢
 

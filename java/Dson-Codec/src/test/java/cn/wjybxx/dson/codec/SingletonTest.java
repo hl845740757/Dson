@@ -16,16 +16,16 @@
 
 package cn.wjybxx.dson.codec;
 
-import cn.wjybxx.dson.codec.binary.BinarySerializable;
-import cn.wjybxx.dson.codec.document.DocumentSerializable;
+import cn.wjybxx.dson.codec.dson.DsonSerializable;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteSerializable;
 
 /**
  * @author wjybxx
  * date - 2023/12/5
  */
 @ClassImpl(singleton = "getInstance")
-@BinarySerializable
-@DocumentSerializable
+@DsonLiteSerializable
+@DsonSerializable
 public class SingletonTest {
 
     private final String name;

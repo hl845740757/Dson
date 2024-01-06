@@ -33,8 +33,8 @@ public class MarkableItrTest
             .Append("time", new DsonInt64(DatetimeUtil.ToEpochMillis(DateTime.UtcNow) + Random.Shared.NextInt64(1, 1000)));
 
         DsonTextReader textReader = new DsonTextReader(DsonTextReaderSettings.Default, BasicTests.DsonString);
-        DsonArray<string> topContainer = Dsons.ReadTopContainer(textReader);
-        obj1.Append("wrapped1", topContainer);
+        DsonArray<string> collection = Dsons.ReadCollection(textReader);
+        obj1.Append("wrapped1", collection);
         obj1.Append("wrapped2", Dsons.FromDson(FormatTest.DsonString));
 
         // 测试基础数字

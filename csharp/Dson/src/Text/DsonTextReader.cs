@@ -22,6 +22,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using Wjybxx.Dson.Internal;
 using Wjybxx.Dson.IO;
 using Wjybxx.Dson.Types;
 

@@ -50,8 +50,8 @@ public class DsonCodecTest {
                 .append("time", new DsonInt64(System.currentTimeMillis() + RandomUtils.nextLong(1, 1000)));
 
         DsonTextReader textReader = new DsonTextReader(DsonTextReaderSettings.DEFAULT, DsonTextReaderTest.dsonString);
-        DsonArray<String> topContainer = Dsons.readTopContainer(textReader);
-        obj1.append("wrapped1", topContainer);
+        DsonArray<String> collection = Dsons.readCollection(textReader);
+        obj1.append("wrapped1", collection);
         obj1.append("wrapped2", Dsons.fromDson(DsonTextReaderTest2.dsonString));
         obj1.append("wrapped3", Dsons.fromDson(DsonNumberTest.numberString));
         obj1.append("wrapped4", Dsons.fromDson(DsonEscapeTest.dsonString));
@@ -100,13 +100,13 @@ public class DsonCodecTest {
     @Test
     void testObjet() {
         DsonArray<String> dsonArray = new DsonArray<>();
-        try (DsonWriter writer = new DsonObjectWriter(DsonWriterSettings.DEFAULT, dsonArray)) {
+        try (DsonWriter writer = new DsonCollectionWriter(DsonWriterSettings.DEFAULT, dsonArray)) {
             for (DsonObject<String> dsonObject : srcList) {
                 Dsons.writeObject(writer, dsonObject, ObjectStyle.INDENT);
             }
         }
         List<DsonObject<String>> copiedList = new ArrayList<>(loop);
-        try (DsonReader reader = new DsonObjectReader(DsonReaderSettings.DEFAULT, dsonArray)) {
+        try (DsonReader reader = new DsonCollectionReader(DsonReaderSettings.DEFAULT, dsonArray)) {
             DsonValue dsonValue;
             while ((dsonValue = Dsons.readTopDsonValue(reader)) != null) {
                 copiedList.add(dsonValue.asObject());

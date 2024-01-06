@@ -16,6 +16,8 @@
 
 package cn.wjybxx.dson.io;
 
+import cn.wjybxx.base.io.ByteBufferUtils;
+import cn.wjybxx.dson.internal.CodedUtils;
 import cn.wjybxx.dson.internal.Utf8Util;
 
 /**
@@ -44,7 +46,7 @@ public class DsonOutputs {
         private int bufferPosLimit;
 
         ArrayOutput(byte[] buffer, int offset, int length) {
-            BinaryUtils.checkBuffer(buffer, offset, length);
+            ByteBufferUtils.checkBuffer(buffer, offset, length);
             this.buffer = buffer;
             this.rawOffset = offset;
             this.rawLimit = offset + length;
@@ -82,7 +84,7 @@ public class DsonOutputs {
         @Override
         public void writeInt32(int value) {
             try {
-                int newPos = BinaryUtils.writeInt32(buffer, bufferPos, value);
+                int newPos = CodedUtils.writeInt32(buffer, bufferPos, value);
                 bufferPos = CheckNewBufferPos(newPos);
             } catch (Exception e) {
                 throw DsonIOException.wrap(e, "buffer overflow");
@@ -92,7 +94,7 @@ public class DsonOutputs {
         @Override
         public void writeUint32(int value) {
             try {
-                int newPos = BinaryUtils.writeUint32(buffer, bufferPos, value);
+                int newPos = CodedUtils.writeUint32(buffer, bufferPos, value);
                 bufferPos = CheckNewBufferPos(newPos);
             } catch (Exception e) {
                 throw DsonIOException.wrap(e, "buffer overflow");
@@ -102,7 +104,7 @@ public class DsonOutputs {
         @Override
         public void writeSint32(int value) {
             try {
-                int newPos = BinaryUtils.writeSint32(buffer, bufferPos, value);
+                int newPos = CodedUtils.writeSint32(buffer, bufferPos, value);
                 bufferPos = CheckNewBufferPos(newPos);
             } catch (Exception e) {
                 throw DsonIOException.wrap(e, "buffer overflow");
@@ -112,7 +114,7 @@ public class DsonOutputs {
         @Override
         public void writeFixed32(int value) {
             try {
-                int newPos = BinaryUtils.writeFixed32(buffer, bufferPos, value);
+                int newPos = CodedUtils.writeFixed32(buffer, bufferPos, value);
                 bufferPos = CheckNewBufferPos(newPos);
             } catch (Exception e) {
                 throw DsonIOException.wrap(e, "buffer overflow");
@@ -122,7 +124,7 @@ public class DsonOutputs {
         @Override
         public void writeInt64(long value) {
             try {
-                int newPos = BinaryUtils.writeInt64(buffer, bufferPos, value);
+                int newPos = CodedUtils.writeInt64(buffer, bufferPos, value);
                 bufferPos = CheckNewBufferPos(newPos);
             } catch (Exception e) {
                 throw DsonIOException.wrap(e, "buffer overflow");
@@ -132,7 +134,7 @@ public class DsonOutputs {
         @Override
         public void writeUint64(long value) {
             try {
-                int newPos = BinaryUtils.writeUint64(buffer, bufferPos, value);
+                int newPos = CodedUtils.writeUint64(buffer, bufferPos, value);
                 bufferPos = CheckNewBufferPos(newPos);
             } catch (Exception e) {
                 throw DsonIOException.wrap(e, "buffer overflow");
@@ -142,7 +144,7 @@ public class DsonOutputs {
         @Override
         public void writeSint64(long value) {
             try {
-                int newPos = BinaryUtils.writeSint64(buffer, bufferPos, value);
+                int newPos = CodedUtils.writeSint64(buffer, bufferPos, value);
                 bufferPos = CheckNewBufferPos(newPos);
             } catch (Exception e) {
                 throw DsonIOException.wrap(e, "buffer overflow");
@@ -152,7 +154,7 @@ public class DsonOutputs {
         @Override
         public void writeFixed64(long value) {
             try {
-                int newPos = BinaryUtils.writeFixed64(buffer, bufferPos, value);
+                int newPos = CodedUtils.writeFixed64(buffer, bufferPos, value);
                 bufferPos = CheckNewBufferPos(newPos);
             } catch (Exception e) {
                 throw DsonIOException.wrap(e, "buffer overflow");
@@ -162,7 +164,7 @@ public class DsonOutputs {
         @Override
         public void writeFloat(float value) {
             try {
-                int newPos = BinaryUtils.writeFloat(buffer, bufferPos, value);
+                int newPos = CodedUtils.writeFloat(buffer, bufferPos, value);
                 bufferPos = CheckNewBufferPos(newPos);
             } catch (Exception e) {
                 throw DsonIOException.wrap(e, "buffer overflow");
@@ -172,7 +174,7 @@ public class DsonOutputs {
         @Override
         public void writeDouble(double value) {
             try {
-                int newPos = BinaryUtils.writeDouble(buffer, bufferPos, value);
+                int newPos = CodedUtils.writeDouble(buffer, bufferPos, value);
                 bufferPos = CheckNewBufferPos(newPos);
             } catch (Exception e) {
                 throw DsonIOException.wrap(e, "buffer overflow");
@@ -182,7 +184,7 @@ public class DsonOutputs {
         @Override
         public void writeBool(boolean value) {
             try {
-                int newPos = BinaryUtils.writeUint32(buffer, bufferPos, value ? 1 : 0);
+                int newPos = CodedUtils.writeUint32(buffer, bufferPos, value ? 1 : 0);
                 bufferPos = CheckNewBufferPos(newPos);
             } catch (Exception e) {
                 throw DsonIOException.wrap(e, "buffer overflow");
@@ -193,18 +195,18 @@ public class DsonOutputs {
         public void writeString(String value) {
             try {
                 long maxByteCount = (value.length() * 3L);
-                int maxByteCountVarIntSize = BinaryUtils.computeRawVarInt64Size(maxByteCount);
-                int minByteCountVarIntSize = BinaryUtils.computeRawVarInt32Size(value.length());
+                int maxByteCountVarIntSize = CodedUtils.computeRawVarInt64Size(maxByteCount);
+                int minByteCountVarIntSize = CodedUtils.computeRawVarInt32Size(value.length());
                 if (maxByteCountVarIntSize == minByteCountVarIntSize) {
                     // len占用的字节数是可提前确定的，因此无需额外的字节数计算，可直接编码
                     int newPos = bufferPos + minByteCountVarIntSize;
                     int byteCount = Utf8Util.utf8Encode(value, buffer, newPos, bufferPosLimit - newPos);
-                    BinaryUtils.writeUint32(buffer, bufferPos, byteCount);
+                    CodedUtils.writeUint32(buffer, bufferPos, byteCount);
                     bufferPos = CheckNewBufferPos(newPos + byteCount);
                 } else {
                     // 注意，这里写的编码后的字节长度；而不是字符串长度 -- 提前计算UTF8的长度是很有用的方法
                     int byteCount = Utf8Util.utf8Length(value);
-                    int newPos = BinaryUtils.writeUint32(buffer, bufferPos, byteCount);
+                    int newPos = CodedUtils.writeUint32(buffer, bufferPos, byteCount);
                     if (byteCount > 0) {
                         CheckNewBufferPos(newPos + byteCount);
                         Utf8Util.utf8Encode(value, buffer, newPos, bufferPosLimit - newPos);
@@ -218,7 +220,7 @@ public class DsonOutputs {
 
         @Override
         public void writeRawBytes(byte[] data, int offset, int length) {
-            BinaryUtils.checkBuffer(data, offset, length);
+            ByteBufferUtils.checkBuffer(data, offset, length);
             CheckNewBufferPos(bufferPos + length);
 
             System.arraycopy(data, offset, buffer, bufferPos, length);
@@ -240,22 +242,22 @@ public class DsonOutputs {
 
         @Override
         public void setPosition(int value) {
-            BinaryUtils.checkBuffer(rawLimit - rawOffset, value);
+            ByteBufferUtils.checkBuffer(rawLimit - rawOffset, value);
             bufferPos = rawOffset + value;
         }
 
         @Override
         public void setByte(int pos, byte value) {
-            BinaryUtils.checkBuffer(rawLimit - rawOffset, pos, 1);
+            ByteBufferUtils.checkBuffer(rawLimit - rawOffset, pos, 1);
             int bufferPos = rawOffset + pos;
             buffer[bufferPos] = value;
         }
 
         @Override
         public void setFixedInt32(int pos, int value) {
-            BinaryUtils.checkBuffer(rawLimit - rawOffset, pos, 4);
+            ByteBufferUtils.checkBuffer(rawLimit - rawOffset, pos, 4);
             int bufferPos = rawOffset + pos;
-            BinaryUtils.setIntLE(buffer, bufferPos, value);
+            ByteBufferUtils.setInt32LE(buffer, bufferPos, value);
         }
         // endregion
 

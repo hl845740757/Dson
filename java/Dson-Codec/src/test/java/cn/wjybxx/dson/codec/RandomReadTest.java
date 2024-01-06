@@ -19,8 +19,8 @@ package cn.wjybxx.dson.codec;
 import cn.wjybxx.base.OptionalBool;
 import cn.wjybxx.dson.DsonLites;
 import cn.wjybxx.dson.WireType;
-import cn.wjybxx.dson.codec.binary.*;
-import cn.wjybxx.dson.codec.document.*;
+import cn.wjybxx.dson.codec.dson.*;
+import cn.wjybxx.dson.codec.dsonlite.*;
 import cn.wjybxx.dson.text.NumberStyle;
 import cn.wjybxx.dson.text.ObjectStyle;
 import org.junit.jupiter.api.Assertions;
@@ -39,12 +39,12 @@ public class RandomReadTest {
 
     @Test
     void docTest() {
-        ConvertOptions options = ConvertOptions.newBuilder()
-                .setEncodeMapAsObject(OptionalBool.TRUE)
+        ConverterOptions options = ConverterOptions.newBuilder()
+                .setWriteMapAsDocument(OptionalBool.TRUE)
                 .setAppendDef(OptionalBool.FALSE)
                 .build();
 
-        DocumentConverter converter = DefaultDocumentConverter.newInstance(
+        DsonConverter converter = DefaultDsonConverter.newInstance(
                 List.of(new BeanDocCodec()),
                 TypeMetaRegistries.fromMetas(TypeMeta.of(Bean.class, ObjectStyle.INDENT, "Bean")),
                 options);
@@ -65,12 +65,12 @@ public class RandomReadTest {
 
     @Test
     void binTest() {
-        ConvertOptions options = ConvertOptions.newBuilder()
-                .setEncodeMapAsObject(OptionalBool.TRUE)
+        ConverterOptions options = ConverterOptions.newBuilder()
+                .setWriteMapAsDocument(OptionalBool.TRUE)
                 .setAppendDef(OptionalBool.FALSE)
                 .build();
 
-        BinaryConverter converter = DefaultBinaryConverter.newInstance(
+        DsonLiteConverter converter = DefaultDsonLiteConverter.newInstance(
                 List.of(new BeanBinCodec()),
                 TypeMetaRegistries.fromMetas(TypeMeta.of(Bean.class, new ClassId(1, 1))),
                 options);
@@ -137,7 +137,7 @@ public class RandomReadTest {
     }
 
 
-    private static class BeanDocCodec extends AbstractDocumentPojoCodecImpl<Bean> {
+    private static class BeanDocCodec extends AbstractDsonCodec<Bean> {
 
         @Override
         @Nonnull
@@ -146,13 +146,13 @@ public class RandomReadTest {
         }
 
         @Override
-        protected RandomReadTest.Bean newInstance(DocumentObjectReader reader,
+        protected RandomReadTest.Bean newInstance(DsonObjectReader reader,
                                                   TypeArgInfo<?> typeArgInfo) {
             return new RandomReadTest.Bean();
         }
 
         @Override
-        public void readFields(DocumentObjectReader reader, RandomReadTest.Bean instance,
+        public void readFields(DsonObjectReader reader, RandomReadTest.Bean instance,
                                TypeArgInfo<?> typeArgInfo) {
             instance.iv1 = reader.readInt("iv1");
             instance.iv2 = reader.readInt("iv2");
@@ -167,7 +167,7 @@ public class RandomReadTest {
         }
 
         @Override
-        public void writeObject(DocumentObjectWriter writer, Bean instance,
+        public void writeObject(DsonObjectWriter writer, Bean instance,
                                 TypeArgInfo<?> typeArgInfo, ObjectStyle style) {
             writer.writeInt("iv1", instance.iv1, WireType.VARINT, NumberStyle.SIMPLE);
             writer.writeInt("iv2", instance.iv2, WireType.VARINT, NumberStyle.SIMPLE);
@@ -183,7 +183,7 @@ public class RandomReadTest {
 
     }
 
-    private static class BeanBinCodec extends AbstractBinaryPojoCodecImpl<Bean> {
+    private static class BeanBinCodec extends AbstractDsonLiteCodec<Bean> {
 
         @Override
         @Nonnull
@@ -192,13 +192,13 @@ public class RandomReadTest {
         }
 
         @Override
-        protected RandomReadTest.Bean newInstance(BinaryObjectReader reader,
+        protected RandomReadTest.Bean newInstance(DsonLiteObjectReader reader,
                                                   TypeArgInfo<?> typeArgInfo) {
             return new RandomReadTest.Bean();
         }
 
         @Override
-        public void readFields(BinaryObjectReader reader, Bean instance,
+        public void readFields(DsonLiteObjectReader reader, Bean instance,
                                TypeArgInfo<?> typeArgInfo) {
             instance.iv1 = reader.readInt(DsonLites.makeFullNumber(0, 0));
             instance.iv2 = reader.readInt(DsonLites.makeFullNumber(0, 1));
@@ -213,7 +213,7 @@ public class RandomReadTest {
         }
 
         @Override
-        public void writeObject(BinaryObjectWriter writer, Bean instance, TypeArgInfo<?> typeArgInfo) {
+        public void writeObject(DsonLiteObjectWriter writer, Bean instance, TypeArgInfo<?> typeArgInfo) {
             writer.writeInt(DsonLites.makeFullNumber(0, 0), instance.iv1, WireType.VARINT, NumberStyle.SIMPLE);
             writer.writeInt(DsonLites.makeFullNumber(0, 1), instance.iv2, WireType.VARINT, NumberStyle.SIMPLE);
             writer.writeLong(DsonLites.makeFullNumber(0, 2), instance.lv1, WireType.VARINT, NumberStyle.SIMPLE);

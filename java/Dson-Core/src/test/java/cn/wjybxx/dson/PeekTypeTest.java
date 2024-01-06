@@ -45,7 +45,7 @@ public class PeekTypeTest {
         }
 
         String dsonString = Dsons.toDson(dsonObject, ObjectStyle.INDENT);
-        return List.of(new DsonObjectReader(DsonReaderSettings.DEFAULT, new DsonArray<String>(1).append(dsonObject)),
+        return List.of(new DsonCollectionReader(DsonReaderSettings.DEFAULT, new DsonArray<String>(1).append(dsonObject)),
                 new DsonTextReader(DsonTextReaderSettings.DEFAULT, dsonString),
                 new DsonBinaryReader(DsonReaderSettings.DEFAULT, DsonInputs.newInstance(buffer, 0, dsonOutput.getPosition())));
     }

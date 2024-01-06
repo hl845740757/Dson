@@ -52,9 +52,8 @@ public class TypeMetaRegistries {
                 .toList();
 
         final IdentityHashMap<Class<?>, TypeMeta> type2MetaMap = new IdentityHashMap<>(typeMetaList.size());
-        final HashMap<ClassId, TypeMeta> id2MetaMap = new HashMap<>((int) (typeMetaList.size() * 1.5f));
-        final HashMap<String, TypeMeta> name2MetaMap = new HashMap<>((int) (typeMetaList.size() * 1.5f));
-
+        final HashMap<ClassId, TypeMeta> id2MetaMap = HashMap.newHashMap(typeMetaList.size());
+        final HashMap<String, TypeMeta> name2MetaMap = HashMap.newHashMap(typeMetaList.size());
         for (TypeMeta typeMeta : typeMetaList) {
             Class<?> type = typeMeta.clazz;
             if (type2MetaMap.containsKey(type)) {
@@ -83,12 +82,12 @@ public class TypeMetaRegistries {
         private final List<TypeMeta> typeMetas;
         private final Map<Class<?>, TypeMeta> type2MetaMap;
         private final Map<ClassId, TypeMeta> id2MetaMap;
-        private final HashMap<String, TypeMeta> name2MetaMap;
+        private final Map<String, TypeMeta> name2MetaMap;
 
         TypeMetaRegistryImpl(List<TypeMeta> typeMetas,
                              Map<Class<?>, TypeMeta> type2MetaMap,
                              Map<ClassId, TypeMeta> id2MetaMap,
-                             HashMap<String, TypeMeta> name2MetaMap) {
+                             Map<String, TypeMeta> name2MetaMap) {
             this.typeMetas = typeMetas;
             this.type2MetaMap = type2MetaMap;
             this.id2MetaMap = id2MetaMap;

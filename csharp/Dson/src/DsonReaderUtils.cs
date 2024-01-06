@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using Wjybxx.Dson.Internal;
 using Wjybxx.Dson.IO;
 using Wjybxx.Dson.Types;
 
@@ -225,14 +226,14 @@ public static class DsonReaderUtils
     #region binary
 
     public static void WriteBinary(IDsonOutput output, Binary binary) {
-        int sizeOfBinaryType = BinaryUtils.ComputeRawVarInt32Size((uint)binary.Type);
+        int sizeOfBinaryType = CodedUtil.ComputeRawVarInt32Size((uint)binary.Type);
         output.WriteFixed32(sizeOfBinaryType + binary.Data.Length);
         output.WriteUint32(binary.Type);
         output.WriteRawBytes(binary.Data);
     }
 
     public static void WriteBinary(IDsonOutput output, int type, DsonChunk chunk) {
-        int sizeOfBinaryType = BinaryUtils.ComputeRawVarInt32Size((uint)type);
+        int sizeOfBinaryType = CodedUtil.ComputeRawVarInt32Size((uint)type);
         output.WriteFixed32(sizeOfBinaryType + chunk.Length);
         output.WriteUint32(type);
         output.WriteRawBytes(chunk.Buffer, chunk.Offset, chunk.Length);

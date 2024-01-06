@@ -78,11 +78,11 @@ public class BasicTests
     /// </summary>
     [Test]
     public static void test_equivalenceOfAllReaders() {
-        DsonArray<string> topContainer1;
+        DsonArray<string> collection1;
         using (IDsonReader<string> reader = new DsonTextReader(DsonTextReaderSettings.Default, DsonString)) {
-            topContainer1 = Dsons.ReadTopContainer(reader);
+            collection1 = Dsons.ReadCollection(reader);
         }
-        string dsonString1 = topContainer1.ToFlatDson();
+        string dsonString1 = collection1.ToCollectionDson();
         Console.WriteLine(dsonString1);
 
         // BinaryWriter
@@ -90,13 +90,13 @@ public class BasicTests
             byte[] buffer = new byte[8192];
             IDsonOutput output = DsonOutputs.NewInstance(buffer);
             using (IDsonWriter<string> writer = new DsonBinaryWriter<string>(DsonTextWriterSettings.Default, output)) {
-                Dsons.WriteTopContainer(writer, topContainer1);
+                Dsons.WriteCollection(writer, collection1);
             }
             IDsonInput input = DsonInputs.NewInstance(buffer, 0, output.Position);
             using (IDsonReader<string> reader = new DsonBinaryReader<string>(DsonTextReaderSettings.Default, input)) {
-                DsonArray<string> topContainer2 = Dsons.ReadTopContainer(reader);
+                DsonArray<string> collection2 = Dsons.ReadCollection(reader);
 
-                string dsonString2 = topContainer2.ToFlatDson();
+                string dsonString2 = collection2.ToCollectionDson();
                 Debug.Assert(dsonString1 == dsonString2, "BinaryReader/BinaryWriter");
             }
         }
@@ -104,13 +104,13 @@ public class BasicTests
         // ObjectWriter
         {
             DsonArray<string> outList = new DsonArray<string>();
-            using (IDsonWriter<string> writer = new DsonObjectWriter<string>(DsonTextWriterSettings.Default, outList)) {
-                Dsons.WriteTopContainer(writer, topContainer1);
+            using (IDsonWriter<string> writer = new DsonCollectionWriter<string>(DsonTextWriterSettings.Default, outList)) {
+                Dsons.WriteCollection(writer, collection1);
             }
-            using (IDsonReader<string> reader = new DsonObjectReader<string>(DsonTextReaderSettings.Default, outList)) {
-                DsonArray<string> topContainer3 = Dsons.ReadTopContainer(reader);
+            using (IDsonReader<string> reader = new DsonCollectionReader<string>(DsonTextReaderSettings.Default, outList)) {
+                DsonArray<string> collection3 = Dsons.ReadCollection(reader);
 
-                string dsonString3 = topContainer3.ToFlatDson();
+                string dsonString3 = collection3.ToCollectionDson();
                 Debug.Assert(dsonString1 == dsonString3, "ObjectReader/ObjectWriter");
             }
         }

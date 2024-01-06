@@ -38,9 +38,5 @@
     <ItemGroup>
         <ProjectReference Include="..\Dson\Dson.csproj" />
     </ItemGroup>
-    
-    <ItemGroup>
-      <Folder Include="src" />
-    </ItemGroup>
 
 </Project>

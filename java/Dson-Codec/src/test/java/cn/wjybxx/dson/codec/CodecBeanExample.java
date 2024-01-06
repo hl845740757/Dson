@@ -21,12 +21,12 @@ import cn.wjybxx.base.EnumLiteMap;
 import cn.wjybxx.base.EnumUtils;
 import cn.wjybxx.dson.DsonType;
 import cn.wjybxx.dson.WireType;
-import cn.wjybxx.dson.codec.binary.BinaryObjectReader;
-import cn.wjybxx.dson.codec.binary.BinaryObjectWriter;
-import cn.wjybxx.dson.codec.binary.BinarySerializable;
-import cn.wjybxx.dson.codec.document.DocumentObjectReader;
-import cn.wjybxx.dson.codec.document.DocumentObjectWriter;
-import cn.wjybxx.dson.codec.document.DocumentSerializable;
+import cn.wjybxx.dson.codec.dson.DsonObjectReader;
+import cn.wjybxx.dson.codec.dson.DsonObjectWriter;
+import cn.wjybxx.dson.codec.dson.DsonSerializable;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteObjectReader;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteObjectWriter;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteSerializable;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 
@@ -42,8 +42,8 @@ import java.util.*;
  * @author wjybxx
  * date 2023/4/7
  */
-@DocumentSerializable
-@BinarySerializable
+@DsonSerializable
+@DsonLiteSerializable
 public class CodecBeanExample {
 
     @FieldImpl(wireType = WireType.UINT, name = "_age")
@@ -86,19 +86,19 @@ public class CodecBeanExample {
     }
 
     //
-    public void writeCustom(BinaryObjectWriter writer, int name) {
+    public void writeCustom(DsonLiteObjectWriter writer, int name) {
         writer.writeObject(name, custom, TypeArgInfo.OBJECT);
     }
 
-    public void readCustom(BinaryObjectReader reader, int name) {
+    public void readCustom(DsonLiteObjectReader reader, int name) {
         this.custom = reader.readObject(name, TypeArgInfo.OBJECT);
     }
 
-    public void writeCustom(DocumentObjectWriter writer, String name) {
+    public void writeCustom(DsonObjectWriter writer, String name) {
 
     }
 
-    public void readCustom(DocumentObjectReader reader, String name) {
+    public void readCustom(DsonObjectReader reader, String name) {
 
     }
 
@@ -129,8 +129,8 @@ public class CodecBeanExample {
     // ENDREGION
 
     //
-    @BinarySerializable
-    @DocumentSerializable
+    @DsonLiteSerializable
+    @DsonSerializable
     public enum Sex implements EnumLite {
 
         MALE(1),

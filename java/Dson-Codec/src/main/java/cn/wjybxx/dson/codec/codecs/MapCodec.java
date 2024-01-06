@@ -17,18 +17,18 @@
 package cn.wjybxx.dson.codec.codecs;
 
 import cn.wjybxx.dson.DsonType;
-import cn.wjybxx.dson.codec.ConverterUtils;
-import cn.wjybxx.dson.codec.PojoCodecImpl;
+import cn.wjybxx.dson.codec.DuplexCodec;
 import cn.wjybxx.dson.codec.TypeArgInfo;
-import cn.wjybxx.dson.codec.binary.BinaryObjectReader;
-import cn.wjybxx.dson.codec.binary.BinaryObjectWriter;
-import cn.wjybxx.dson.codec.binary.BinaryPojoCodecScanIgnore;
-import cn.wjybxx.dson.codec.document.DocumentObjectReader;
-import cn.wjybxx.dson.codec.document.DocumentObjectWriter;
-import cn.wjybxx.dson.codec.document.DocumentPojoCodecScanIgnore;
+import cn.wjybxx.dson.codec.dson.DsonCodecScanIgnore;
+import cn.wjybxx.dson.codec.dson.DsonObjectReader;
+import cn.wjybxx.dson.codec.dson.DsonObjectWriter;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteCodecScanIgnore;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteObjectReader;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteObjectWriter;
 import cn.wjybxx.dson.text.ObjectStyle;
 
 import javax.annotation.Nonnull;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -39,9 +39,9 @@ import java.util.function.Supplier;
  * date 2023/4/4
  */
 @SuppressWarnings("rawtypes")
-@BinaryPojoCodecScanIgnore
-@DocumentPojoCodecScanIgnore
-public class MapCodec<T extends Map> implements PojoCodecImpl<T> {
+@DsonLiteCodecScanIgnore
+@DsonCodecScanIgnore
+public class MapCodec<T extends Map> implements DuplexCodec<T> {
 
     final Class<T> clazz;
     final Supplier<? extends T> factory;
@@ -51,19 +51,30 @@ public class MapCodec<T extends Map> implements PojoCodecImpl<T> {
         this.factory = factory;
     }
 
+    @Override
+    public boolean autoStartEnd() {
+        return false;
+    }
+
     @Nonnull
     @Override
     public Class<T> getEncoderClass() {
         return clazz;
     }
 
-    @Override
-    public boolean autoStartEnd() {
-        return false;
+    @SuppressWarnings("unchecked")
+    private Map<Object, Object> newMap(TypeArgInfo<?> typeArgInfo) {
+        if (typeArgInfo.factory != null) {
+            return (Map<Object, Object>) typeArgInfo.factory.get();
+        }
+        if (factory != null) {
+            return (Map<Object, Object>) factory.get();
+        }
+        return new LinkedHashMap<>();
     }
 
     @Override
-    public void writeObject(BinaryObjectWriter writer, T instance, TypeArgInfo<?> typeArgInfo) {
+    public void writeObject(DsonLiteObjectWriter writer, T instance, TypeArgInfo<?> typeArgInfo) {
         TypeArgInfo<?> ketArgInfo = TypeArgInfo.of(typeArgInfo.typeArg1);
         TypeArgInfo<?> valueArgInfo = TypeArgInfo.of(typeArgInfo.typeArg2);
 
@@ -77,8 +88,8 @@ public class MapCodec<T extends Map> implements PojoCodecImpl<T> {
     }
 
     @Override
-    public T readObject(BinaryObjectReader reader, TypeArgInfo<?> typeArgInfo) {
-        Map<Object, Object> result = ConverterUtils.newMap(typeArgInfo, factory);
+    public T readObject(DsonLiteObjectReader reader, TypeArgInfo<?> typeArgInfo) {
+        Map<Object, Object> result = newMap(typeArgInfo);
         TypeArgInfo<?> ketArgInfo = TypeArgInfo.of(typeArgInfo.typeArg1);
         TypeArgInfo<?> valueArgInfo = TypeArgInfo.of(typeArgInfo.typeArg2);
 
@@ -93,11 +104,11 @@ public class MapCodec<T extends Map> implements PojoCodecImpl<T> {
     }
 
     @Override
-    public void writeObject(DocumentObjectWriter writer, T instance, TypeArgInfo<?> typeArgInfo, ObjectStyle style) {
+    public void writeObject(DsonObjectWriter writer, T instance, TypeArgInfo<?> typeArgInfo, ObjectStyle style) {
         TypeArgInfo<?> valueArgInfo = TypeArgInfo.of(typeArgInfo.typeArg2);
         @SuppressWarnings("unchecked") Set<Map.Entry<?, ?>> entrySet = instance.entrySet();
 
-        if (writer.options().encodeMapAsObject) {
+        if (writer.options().writeMapAsDocument) {
             writer.writeStartObject(instance, typeArgInfo, style);
             for (Map.Entry<?, ?> entry : entrySet) {
                 String keyString = writer.encodeKey(entry.getKey());
@@ -123,11 +134,11 @@ public class MapCodec<T extends Map> implements PojoCodecImpl<T> {
     }
 
     @Override
-    public T readObject(DocumentObjectReader reader, TypeArgInfo<?> typeArgInfo) {
-        Map<Object, Object> result = ConverterUtils.newMap(typeArgInfo, factory);
+    public T readObject(DsonObjectReader reader, TypeArgInfo<?> typeArgInfo) {
+        Map<Object, Object> result = newMap(typeArgInfo);
         TypeArgInfo<?> valueArgInfo = TypeArgInfo.of(typeArgInfo.typeArg2);
 
-        if (reader.options().encodeMapAsObject) {
+        if (reader.options().writeMapAsDocument) {
             reader.readStartObject(typeArgInfo);
             while (reader.readDsonType() != DsonType.END_OF_OBJECT) {
                 String keyString = reader.readName();

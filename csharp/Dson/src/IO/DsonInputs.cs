@@ -19,6 +19,8 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Wjybxx.Commons.IO;
+using Wjybxx.Dson.Internal;
 
 namespace Wjybxx.Dson.IO;
 
@@ -57,7 +59,7 @@ public class DsonInputs
         private int _bufferPosLimit;
 
         internal ArrayDsonInput(byte[] buffer, int offset, int length) {
-            BinaryUtils.CheckBuffer(buffer, offset, length);
+            ByteBufferUtil.CheckBuffer(buffer, offset, length);
             this._buffer = buffer;
             this._rawOffset = offset;
             this._rawLimit = offset + length;
@@ -89,7 +91,7 @@ public class DsonInputs
 
         public int ReadInt32() {
             try {
-                int r = BinaryUtils.ReadInt32(_buffer, _bufferPos, out int newPos);
+                int r = CodedUtil.ReadInt32(_buffer, _bufferPos, out int newPos);
                 _bufferPos = CheckNewBufferPos(newPos);
                 return r;
             }
@@ -100,7 +102,7 @@ public class DsonInputs
 
         public int ReadUint32() {
             try {
-                int r = BinaryUtils.ReadUint32(_buffer, _bufferPos, out int newPos);
+                int r = CodedUtil.ReadUint32(_buffer, _bufferPos, out int newPos);
                 _bufferPos = CheckNewBufferPos(newPos);
                 return r;
             }
@@ -111,7 +113,7 @@ public class DsonInputs
 
         public int ReadSint32() {
             try {
-                int r = BinaryUtils.ReadSint32(_buffer, _bufferPos, out int newPos);
+                int r = CodedUtil.ReadSint32(_buffer, _bufferPos, out int newPos);
                 _bufferPos = CheckNewBufferPos(newPos);
                 return r;
             }
@@ -122,7 +124,7 @@ public class DsonInputs
 
         public int ReadFixed32() {
             try {
-                int r = BinaryUtils.ReadFixed32(_buffer, _bufferPos, out int newPos);
+                int r = CodedUtil.ReadFixed32(_buffer, _bufferPos, out int newPos);
                 _bufferPos = CheckNewBufferPos(newPos);
                 return r;
             }
@@ -133,7 +135,7 @@ public class DsonInputs
 
         public long ReadInt64() {
             try {
-                long r = BinaryUtils.ReadInt64(_buffer, _bufferPos, out int newPos);
+                long r = CodedUtil.ReadInt64(_buffer, _bufferPos, out int newPos);
                 _bufferPos = CheckNewBufferPos(newPos);
                 return r;
             }
@@ -144,7 +146,7 @@ public class DsonInputs
 
         public long ReadUint64() {
             try {
-                long r = BinaryUtils.ReadUint64(_buffer, _bufferPos, out int newPos);
+                long r = CodedUtil.ReadUint64(_buffer, _bufferPos, out int newPos);
                 _bufferPos = CheckNewBufferPos(newPos);
                 return r;
             }
@@ -155,7 +157,7 @@ public class DsonInputs
 
         public long ReadSint64() {
             try {
-                long r = BinaryUtils.ReadSint64(_buffer, _bufferPos, out int newPos);
+                long r = CodedUtil.ReadSint64(_buffer, _bufferPos, out int newPos);
                 _bufferPos = CheckNewBufferPos(newPos);
                 return r;
             }
@@ -166,7 +168,7 @@ public class DsonInputs
 
         public long ReadFixed64() {
             try {
-                long r = BinaryUtils.ReadFixed64(_buffer, _bufferPos, out int newPos);
+                long r = CodedUtil.ReadFixed64(_buffer, _bufferPos, out int newPos);
                 _bufferPos = CheckNewBufferPos(newPos);
                 return r;
             }
@@ -177,7 +179,7 @@ public class DsonInputs
 
         public float ReadFloat() {
             try {
-                float r = BinaryUtils.ReadFloat(_buffer, _bufferPos, out int newPos);
+                float r = CodedUtil.ReadFloat(_buffer, _bufferPos, out int newPos);
                 _bufferPos = CheckNewBufferPos(newPos);
                 return r;
             }
@@ -188,7 +190,7 @@ public class DsonInputs
 
         public double ReadDouble() {
             try {
-                double r = BinaryUtils.ReadDouble(_buffer, _bufferPos, out int newPos);
+                double r = CodedUtil.ReadDouble(_buffer, _bufferPos, out int newPos);
                 _bufferPos = CheckNewBufferPos(newPos);
                 return r;
             }
@@ -204,7 +206,7 @@ public class DsonInputs
 
         public string ReadString() {
             try {
-                int len = BinaryUtils.ReadUint32(_buffer, _bufferPos, out int newPos); // 字符串长度
+                int len = CodedUtil.ReadUint32(_buffer, _bufferPos, out int newPos); // 字符串长度
                 CheckNewBufferPos(newPos + len); // 先检查，避免构建无效字符串
 
                 string r = Encoding.UTF8.GetString(_buffer, newPos, len);
@@ -237,21 +239,21 @@ public class DsonInputs
         public int Position {
             get => _bufferPos - _rawOffset;
             set {
-                BinaryUtils.CheckBuffer(_rawLimit - _rawOffset, value);
+                ByteBufferUtil.CheckBuffer(_rawLimit - _rawOffset, value);
                 _bufferPos = _rawOffset + value;
             }
         }
 
         public byte GetByte(int pos) {
-            BinaryUtils.CheckBuffer(_rawLimit - _rawOffset, pos, 1);
+            ByteBufferUtil.CheckBuffer(_rawLimit - _rawOffset, pos, 1);
             int bufferPos = _rawOffset + pos;
             return _buffer[bufferPos];
         }
 
         public int GetFixed32(int pos) {
-            BinaryUtils.CheckBuffer(_rawLimit - _rawOffset, pos, 4);
+            ByteBufferUtil.CheckBuffer(_rawLimit - _rawOffset, pos, 4);
             int bufferPos = _rawOffset + pos;
-            return BinaryUtils.GetIntLE(_buffer, bufferPos);
+            return ByteBufferUtil.GetIntLE(_buffer, bufferPos);
         }
 
         public int PushLimit(int byteLimit) {
@@ -260,14 +262,14 @@ public class DsonInputs
             int newPosLimit = _bufferPos + byteLimit;
 
             // 不可超过原始限制
-            BinaryUtils.CheckBuffer(_rawLimit, _rawOffset, newPosLimit - _rawOffset);
+            ByteBufferUtil.CheckBuffer(_rawLimit, _rawOffset, newPosLimit - _rawOffset);
             _bufferPosLimit = newPosLimit;
             return oldPosLimit;
         }
 
         public void PopLimit(int oldLimit) {
             // 不可超过原始限制
-            BinaryUtils.CheckBuffer(_rawLimit, _rawOffset, oldLimit - _rawOffset);
+            ByteBufferUtil.CheckBuffer(_rawLimit, _rawOffset, oldLimit - _rawOffset);
             _bufferPosLimit = oldLimit;
         }
 

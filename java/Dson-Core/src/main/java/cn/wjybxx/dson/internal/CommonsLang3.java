@@ -16,7 +16,6 @@
 package cn.wjybxx.dson.internal;
 
 import cn.wjybxx.base.ObjectUtils;
-import cn.wjybxx.dson.io.DsonIOException;
 
 /**
  * 这里的算法修改自commons-lang3，commons-lang3现在文件太多，不想引入。
@@ -74,6 +73,6 @@ public class CommonsLang3 {
             outBuffer[j++] = toDigits[0x0F & data[i]]; // 低4位
         }
     }
-    
+
     // endregion
 }

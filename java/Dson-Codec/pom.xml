@@ -15,7 +15,6 @@
     <url>https://github.com/hl845740757/Dson</url>
 
     <dependencies>
-        <!-- dson-core是jdk17,commons是jdk21... -->
         <dependency>
             <groupId>cn.wjybxx.commons</groupId>
             <artifactId>base</artifactId>
@@ -31,11 +30,6 @@
             <groupId>it.unimi.dsi</groupId>
             <artifactId>fastutil-core</artifactId>
             <version>${fastutil.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>${commons-lang3.version}</version>
         </dependency>
     </dependencies>
 </project>

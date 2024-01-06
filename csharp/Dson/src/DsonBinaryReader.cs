@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using Wjybxx.Dson.Internal;
 using Wjybxx.Dson.IO;
 using Wjybxx.Dson.Types;
 
@@ -69,7 +70,7 @@ public class DsonBinaryReader<TName> : AbstractDsonReader<TName> where TName : I
         Context context = GetContext();
         CheckReadDsonTypeState(context);
 
-        int fullType = _input.IsAtEnd() ? 0 : BinaryUtils.ToUint(_input.ReadRawByte());
+        int fullType = _input.IsAtEnd() ? 0 : _input.ReadRawByte();
         int wreTypeBits = Dsons.WireTypeOfFullType(fullType);
         DsonType dsonType = DsonTypes.ForNumber(Dsons.DsonTypeOfFullType(fullType));
         WireType wireType = dsonType.HasWireType() ? WireTypes.ForNumber(wreTypeBits) : WireType.VarInt;
@@ -86,7 +87,7 @@ public class DsonBinaryReader<TName> : AbstractDsonReader<TName> where TName : I
         Context context = GetContext();
         CheckReadDsonTypeState(context);
 
-        int fullType = _input.IsAtEnd() ? 0 : BinaryUtils.ToUint(_input.GetByte(_input.Position));
+        int fullType = _input.IsAtEnd() ? 0 : _input.GetByte(_input.Position);
         return DsonTypes.ForNumber(Dsons.DsonTypeOfFullType(fullType));
     }
 

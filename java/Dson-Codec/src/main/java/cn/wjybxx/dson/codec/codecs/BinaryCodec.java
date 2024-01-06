@@ -16,12 +16,12 @@
 
 package cn.wjybxx.dson.codec.codecs;
 
-import cn.wjybxx.dson.codec.PojoCodecImpl;
+import cn.wjybxx.dson.codec.DuplexCodec;
 import cn.wjybxx.dson.codec.TypeArgInfo;
-import cn.wjybxx.dson.codec.binary.BinaryObjectReader;
-import cn.wjybxx.dson.codec.binary.BinaryObjectWriter;
-import cn.wjybxx.dson.codec.document.DocumentObjectReader;
-import cn.wjybxx.dson.codec.document.DocumentObjectWriter;
+import cn.wjybxx.dson.codec.dson.DsonObjectReader;
+import cn.wjybxx.dson.codec.dson.DsonObjectWriter;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteObjectReader;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteObjectWriter;
 import cn.wjybxx.dson.text.ObjectStyle;
 import cn.wjybxx.dson.types.Binary;
 
@@ -31,7 +31,7 @@ import javax.annotation.Nonnull;
  * @author wjybxx
  * date - 2023/12/28
  */
-public class BinaryCodec implements PojoCodecImpl<Binary> {
+public class BinaryCodec implements DuplexCodec<Binary> {
 
     @Override
     public boolean isWriteAsArray() {
@@ -50,24 +50,24 @@ public class BinaryCodec implements PojoCodecImpl<Binary> {
     }
 
     @Override
-    public void writeObject(BinaryObjectWriter writer, Binary instance, TypeArgInfo<?> typeArgInfo) {
+    public void writeObject(DsonLiteObjectWriter writer, Binary instance, TypeArgInfo<?> typeArgInfo) {
         // 外部writeName
         writer.writeBinary(writer.getCurrentName(), instance);
     }
 
     @Override
-    public Binary readObject(BinaryObjectReader reader, TypeArgInfo<?> typeArgInfo) {
+    public Binary readObject(DsonLiteObjectReader reader, TypeArgInfo<?> typeArgInfo) {
         // 外部已readName
         return reader.readBinary(reader.getCurrentName());
     }
 
     @Override
-    public void writeObject(DocumentObjectWriter writer, Binary instance, TypeArgInfo<?> typeArgInfo, ObjectStyle style) {
+    public void writeObject(DsonObjectWriter writer, Binary instance, TypeArgInfo<?> typeArgInfo, ObjectStyle style) {
         writer.writeBinary(writer.getCurrentName(), instance);
     }
 
     @Override
-    public Binary readObject(DocumentObjectReader reader, TypeArgInfo<?> typeArgInfo) {
+    public Binary readObject(DsonObjectReader reader, TypeArgInfo<?> typeArgInfo) {
         return reader.readBinary(reader.getCurrentName());
     }
 }

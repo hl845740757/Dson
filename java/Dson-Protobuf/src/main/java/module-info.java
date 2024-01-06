@@ -4,6 +4,7 @@
  */
 module Dson.ProtoBuf {
     requires wjybxx.dson.core;
+    requires wjybxx.base;
     requires protobuf.java;
 
     exports cn.wjybxx.dson.pb;

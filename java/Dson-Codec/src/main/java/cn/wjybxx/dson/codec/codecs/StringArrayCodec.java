@@ -17,17 +17,16 @@
 package cn.wjybxx.dson.codec.codecs;
 
 import cn.wjybxx.dson.DsonType;
-import cn.wjybxx.dson.codec.PojoCodecImpl;
+import cn.wjybxx.dson.codec.DuplexCodec;
 import cn.wjybxx.dson.codec.TypeArgInfo;
-import cn.wjybxx.dson.codec.binary.BinaryObjectReader;
-import cn.wjybxx.dson.codec.binary.BinaryObjectWriter;
-import cn.wjybxx.dson.codec.binary.BinaryPojoCodecScanIgnore;
-import cn.wjybxx.dson.codec.document.DocumentObjectReader;
-import cn.wjybxx.dson.codec.document.DocumentObjectWriter;
-import cn.wjybxx.dson.codec.document.DocumentPojoCodecScanIgnore;
+import cn.wjybxx.dson.codec.dson.DsonCodecScanIgnore;
+import cn.wjybxx.dson.codec.dson.DsonObjectReader;
+import cn.wjybxx.dson.codec.dson.DsonObjectWriter;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteCodecScanIgnore;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteObjectReader;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteObjectWriter;
 import cn.wjybxx.dson.text.ObjectStyle;
 import cn.wjybxx.dson.text.StringStyle;
-import org.apache.commons.lang3.ArrayUtils;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -36,9 +35,9 @@ import java.util.ArrayList;
  * @author wjybxx
  * date 2023/4/4
  */
-@BinaryPojoCodecScanIgnore
-@DocumentPojoCodecScanIgnore
-public class StringArrayCodec implements PojoCodecImpl<String[]> {
+@DsonLiteCodecScanIgnore
+@DsonCodecScanIgnore
+public class StringArrayCodec implements DuplexCodec<String[]> {
 
     @Nonnull
     @Override
@@ -47,34 +46,34 @@ public class StringArrayCodec implements PojoCodecImpl<String[]> {
     }
 
     @Override
-    public void writeObject(BinaryObjectWriter writer, String[] instance, TypeArgInfo<?> typeArgInfo) {
+    public void writeObject(DsonLiteObjectWriter writer, String[] instance, TypeArgInfo<?> typeArgInfo) {
         for (String e : instance) {
             writer.writeString(0, e);
         }
     }
 
     @Override
-    public String[] readObject(BinaryObjectReader reader, TypeArgInfo<?> typeArgInfo) {
+    public String[] readObject(DsonLiteObjectReader reader, TypeArgInfo<?> typeArgInfo) {
         ArrayList<String> result = new ArrayList<>();
         while (reader.readDsonType() != DsonType.END_OF_OBJECT) {
             result.add(reader.readString(0));
         }
-        return result.toArray(ArrayUtils.EMPTY_STRING_ARRAY);
+        return result.toArray(new String[result.size()]);
     }
 
     @Override
-    public void writeObject(DocumentObjectWriter writer, String[] instance, TypeArgInfo<?> typeArgInfo, ObjectStyle style) {
+    public void writeObject(DsonObjectWriter writer, String[] instance, TypeArgInfo<?> typeArgInfo, ObjectStyle style) {
         for (String e : instance) {
             writer.writeString(null, e, StringStyle.AUTO);
         }
     }
 
     @Override
-    public String[] readObject(DocumentObjectReader reader, TypeArgInfo<?> typeArgInfo) {
+    public String[] readObject(DsonObjectReader reader, TypeArgInfo<?> typeArgInfo) {
         ArrayList<String> result = new ArrayList<>();
         while (reader.readDsonType() != DsonType.END_OF_OBJECT) {
             result.add(reader.readString(null));
         }
-        return result.toArray(ArrayUtils.EMPTY_STRING_ARRAY);
+        return result.toArray(new String[result.size()]);
     }
 }

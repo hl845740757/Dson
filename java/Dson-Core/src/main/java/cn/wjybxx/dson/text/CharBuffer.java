@@ -16,7 +16,7 @@
 
 package cn.wjybxx.dson.text;
 
-import cn.wjybxx.dson.io.BinaryUtils;
+import cn.wjybxx.base.io.ByteBufferUtils;
 
 import javax.annotation.Nonnull;
 import java.nio.BufferOverflowException;
@@ -116,7 +116,7 @@ class CharBuffer implements CharSequence {
         if (len == 0) {
             return;
         }
-        BinaryUtils.checkBuffer(chars.length, offset, len);
+        ByteBufferUtils.checkBuffer(chars.length, offset, len);
         if (widx + len > buffer.length) {
             throw new BufferOverflowException();
         }

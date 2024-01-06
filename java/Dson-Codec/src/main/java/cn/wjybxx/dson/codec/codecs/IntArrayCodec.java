@@ -17,14 +17,14 @@
 package cn.wjybxx.dson.codec.codecs;
 
 import cn.wjybxx.dson.DsonType;
-import cn.wjybxx.dson.codec.PojoCodecImpl;
+import cn.wjybxx.dson.codec.DuplexCodec;
 import cn.wjybxx.dson.codec.TypeArgInfo;
-import cn.wjybxx.dson.codec.binary.BinaryObjectReader;
-import cn.wjybxx.dson.codec.binary.BinaryObjectWriter;
-import cn.wjybxx.dson.codec.binary.BinaryPojoCodecScanIgnore;
-import cn.wjybxx.dson.codec.document.DocumentObjectReader;
-import cn.wjybxx.dson.codec.document.DocumentObjectWriter;
-import cn.wjybxx.dson.codec.document.DocumentPojoCodecScanIgnore;
+import cn.wjybxx.dson.codec.dson.DsonCodecScanIgnore;
+import cn.wjybxx.dson.codec.dson.DsonObjectReader;
+import cn.wjybxx.dson.codec.dson.DsonObjectWriter;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteCodecScanIgnore;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteObjectReader;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteObjectWriter;
 import cn.wjybxx.dson.text.ObjectStyle;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 
@@ -34,9 +34,9 @@ import javax.annotation.Nonnull;
  * @author wjybxx
  * date 2023/4/4
  */
-@BinaryPojoCodecScanIgnore
-@DocumentPojoCodecScanIgnore
-public class IntArrayCodec implements PojoCodecImpl<int[]> {
+@DsonLiteCodecScanIgnore
+@DsonCodecScanIgnore
+public class IntArrayCodec implements DuplexCodec<int[]> {
 
     @Nonnull
     @Override
@@ -45,14 +45,14 @@ public class IntArrayCodec implements PojoCodecImpl<int[]> {
     }
 
     @Override
-    public void writeObject(BinaryObjectWriter writer, int[] instance, TypeArgInfo<?> typeArgInfo) {
+    public void writeObject(DsonLiteObjectWriter writer, int[] instance, TypeArgInfo<?> typeArgInfo) {
         for (int e : instance) {
             writer.writeInt(0, e);
         }
     }
 
     @Override
-    public int[] readObject(BinaryObjectReader reader, TypeArgInfo<?> typeArgInfo) {
+    public int[] readObject(DsonLiteObjectReader reader, TypeArgInfo<?> typeArgInfo) {
         IntArrayList result = new IntArrayList();
         while (reader.readDsonType() != DsonType.END_OF_OBJECT) {
             result.add(reader.readInt(0));
@@ -61,14 +61,14 @@ public class IntArrayCodec implements PojoCodecImpl<int[]> {
     }
 
     @Override
-    public void writeObject(DocumentObjectWriter writer, int[] instance, TypeArgInfo<?> typeArgInfo, ObjectStyle style) {
+    public void writeObject(DsonObjectWriter writer, int[] instance, TypeArgInfo<?> typeArgInfo, ObjectStyle style) {
         for (int e : instance) {
             writer.writeInt(null, e);
         }
     }
 
     @Override
-    public int[] readObject(DocumentObjectReader reader, TypeArgInfo<?> typeArgInfo) {
+    public int[] readObject(DsonObjectReader reader, TypeArgInfo<?> typeArgInfo) {
         IntArrayList result = new IntArrayList();
         while (reader.readDsonType() != DsonType.END_OF_OBJECT) {
             result.add(reader.readInt(null));

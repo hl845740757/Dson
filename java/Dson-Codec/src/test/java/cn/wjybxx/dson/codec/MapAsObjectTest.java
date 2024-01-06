@@ -17,8 +17,8 @@
 package cn.wjybxx.dson.codec;
 
 import cn.wjybxx.base.OptionalBool;
-import cn.wjybxx.dson.codec.document.DefaultDocumentConverter;
-import cn.wjybxx.dson.codec.document.DocumentConverter;
+import cn.wjybxx.dson.codec.dson.DefaultDsonConverter;
+import cn.wjybxx.dson.codec.dson.DsonConverter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -36,8 +36,8 @@ public class MapAsObjectTest {
 
     @Test
     void test() {
-        ConvertOptions options = ConvertOptions.newBuilder().setEncodeMapAsObject(OptionalBool.TRUE).build();
-        DocumentConverter converter = DefaultDocumentConverter.newInstance(
+        ConverterOptions options = ConverterOptions.newBuilder().setWriteMapAsDocument(OptionalBool.TRUE).build();
+        DsonConverter converter = DefaultDsonConverter.newInstance(
                 List.of(),
                 TypeMetaRegistries.fromMetas(),
                 options);

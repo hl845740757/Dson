@@ -22,6 +22,7 @@ using System.Diagnostics;
 using System.Text;
 using Wjybxx.Commons.IO;
 using Wjybxx.Commons.Pool;
+using Wjybxx.Dson.Internal;
 using Wjybxx.Dson.IO;
 
 #pragma warning disable CS1591
@@ -97,7 +98,7 @@ public class DsonScanner : IDisposable
     }
 
     #region common
-    
+
     private static void EnsureStringToken(DsonTokenType tokenType, int position) {
         if (tokenType != DsonTokenType.UnquoteString && tokenType != DsonTokenType.String) {
             throw InvalidTokenType(StringTokenTypes, tokenType, position);

@@ -17,14 +17,14 @@
 package cn.wjybxx.dson.codec.codecs;
 
 import cn.wjybxx.dson.DsonType;
-import cn.wjybxx.dson.codec.PojoCodecImpl;
+import cn.wjybxx.dson.codec.DuplexCodec;
 import cn.wjybxx.dson.codec.TypeArgInfo;
-import cn.wjybxx.dson.codec.binary.BinaryObjectReader;
-import cn.wjybxx.dson.codec.binary.BinaryObjectWriter;
-import cn.wjybxx.dson.codec.binary.BinaryPojoCodecScanIgnore;
-import cn.wjybxx.dson.codec.document.DocumentObjectReader;
-import cn.wjybxx.dson.codec.document.DocumentObjectWriter;
-import cn.wjybxx.dson.codec.document.DocumentPojoCodecScanIgnore;
+import cn.wjybxx.dson.codec.dson.DsonCodecScanIgnore;
+import cn.wjybxx.dson.codec.dson.DsonObjectReader;
+import cn.wjybxx.dson.codec.dson.DsonObjectWriter;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteCodecScanIgnore;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteObjectReader;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteObjectWriter;
 import cn.wjybxx.dson.text.ObjectStyle;
 import it.unimi.dsi.fastutil.shorts.ShortArrayList;
 
@@ -34,9 +34,9 @@ import javax.annotation.Nonnull;
  * @author wjybxx
  * date 2023/4/4
  */
-@BinaryPojoCodecScanIgnore
-@DocumentPojoCodecScanIgnore
-public class ShortArrayCodec implements PojoCodecImpl<short[]> {
+@DsonLiteCodecScanIgnore
+@DsonCodecScanIgnore
+public class ShortArrayCodec implements DuplexCodec<short[]> {
 
     @Nonnull
     @Override
@@ -45,14 +45,14 @@ public class ShortArrayCodec implements PojoCodecImpl<short[]> {
     }
 
     @Override
-    public void writeObject(BinaryObjectWriter writer, short[] instance, TypeArgInfo<?> typeArgInfo) {
+    public void writeObject(DsonLiteObjectWriter writer, short[] instance, TypeArgInfo<?> typeArgInfo) {
         for (short e : instance) {
             writer.writeShort(0, e);
         }
     }
 
     @Override
-    public short[] readObject(BinaryObjectReader reader, TypeArgInfo<?> typeArgInfo) {
+    public short[] readObject(DsonLiteObjectReader reader, TypeArgInfo<?> typeArgInfo) {
         ShortArrayList result = new ShortArrayList();
         while (reader.readDsonType() != DsonType.END_OF_OBJECT) {
             result.add(reader.readShort(0));
@@ -61,14 +61,14 @@ public class ShortArrayCodec implements PojoCodecImpl<short[]> {
     }
 
     @Override
-    public void writeObject(DocumentObjectWriter writer, short[] instance, TypeArgInfo<?> typeArgInfo, ObjectStyle style) {
+    public void writeObject(DsonObjectWriter writer, short[] instance, TypeArgInfo<?> typeArgInfo, ObjectStyle style) {
         for (short e : instance) {
             writer.writeShort(null, e);
         }
     }
 
     @Override
-    public short[] readObject(DocumentObjectReader reader, TypeArgInfo<?> typeArgInfo) {
+    public short[] readObject(DsonObjectReader reader, TypeArgInfo<?> typeArgInfo) {
         ShortArrayList result = new ShortArrayList();
         while (reader.readDsonType() != DsonType.END_OF_OBJECT) {
             result.add(reader.readShort(null));

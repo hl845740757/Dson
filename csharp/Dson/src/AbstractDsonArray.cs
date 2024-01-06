@@ -84,7 +84,7 @@ public abstract class AbstractDsonArray : DsonValue, IList<DsonValue>, IEquatabl
     public bool IsReadOnly => _values.IsReadOnly;
     public int Count => _values.Count;
     public bool IsEmpty => _values.Count == 0;
-    
+
     public void Clear() {
         _values.Clear();
     }

@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Wjybxx.Dson.Internal;
 using Wjybxx.Dson.IO;
 
 #pragma warning disable CS1591

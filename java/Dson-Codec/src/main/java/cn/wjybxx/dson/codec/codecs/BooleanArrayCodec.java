@@ -18,14 +18,14 @@ package cn.wjybxx.dson.codec.codecs;
 
 import cn.wjybxx.dson.DsonType;
 import cn.wjybxx.dson.codec.ConverterUtils;
-import cn.wjybxx.dson.codec.PojoCodecImpl;
+import cn.wjybxx.dson.codec.DuplexCodec;
 import cn.wjybxx.dson.codec.TypeArgInfo;
-import cn.wjybxx.dson.codec.binary.BinaryObjectReader;
-import cn.wjybxx.dson.codec.binary.BinaryObjectWriter;
-import cn.wjybxx.dson.codec.binary.BinaryPojoCodecScanIgnore;
-import cn.wjybxx.dson.codec.document.DocumentObjectReader;
-import cn.wjybxx.dson.codec.document.DocumentObjectWriter;
-import cn.wjybxx.dson.codec.document.DocumentPojoCodecScanIgnore;
+import cn.wjybxx.dson.codec.dson.DsonCodecScanIgnore;
+import cn.wjybxx.dson.codec.dson.DsonObjectReader;
+import cn.wjybxx.dson.codec.dson.DsonObjectWriter;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteCodecScanIgnore;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteObjectReader;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteObjectWriter;
 import cn.wjybxx.dson.text.ObjectStyle;
 
 import javax.annotation.Nonnull;
@@ -35,9 +35,9 @@ import java.util.ArrayList;
  * @author wjybxx
  * date 2023/4/4
  */
-@BinaryPojoCodecScanIgnore
-@DocumentPojoCodecScanIgnore
-public class BooleanArrayCodec implements PojoCodecImpl<boolean[]> {
+@DsonLiteCodecScanIgnore
+@DsonCodecScanIgnore
+public class BooleanArrayCodec implements DuplexCodec<boolean[]> {
 
     @Nonnull
     @Override
@@ -46,14 +46,14 @@ public class BooleanArrayCodec implements PojoCodecImpl<boolean[]> {
     }
 
     @Override
-    public void writeObject(BinaryObjectWriter writer, boolean[] instance, TypeArgInfo<?> typeArgInfo) {
+    public void writeObject(DsonLiteObjectWriter writer, boolean[] instance, TypeArgInfo<?> typeArgInfo) {
         for (boolean e : instance) {
             writer.writeBoolean(0, e);
         }
     }
 
     @Override
-    public boolean[] readObject(BinaryObjectReader reader, TypeArgInfo<?> typeArgInfo) {
+    public boolean[] readObject(DsonLiteObjectReader reader, TypeArgInfo<?> typeArgInfo) {
         ArrayList<Boolean> result = new ArrayList<>();
         while (reader.readDsonType() != DsonType.END_OF_OBJECT) {
             result.add(reader.readBoolean(0));
@@ -62,14 +62,14 @@ public class BooleanArrayCodec implements PojoCodecImpl<boolean[]> {
     }
 
     @Override
-    public void writeObject(DocumentObjectWriter writer, boolean[] instance, TypeArgInfo<?> typeArgInfo, ObjectStyle style) {
+    public void writeObject(DsonObjectWriter writer, boolean[] instance, TypeArgInfo<?> typeArgInfo, ObjectStyle style) {
         for (boolean e : instance) {
             writer.writeBoolean(null, e);
         }
     }
 
     @Override
-    public boolean[] readObject(DocumentObjectReader reader, TypeArgInfo<?> typeArgInfo) {
+    public boolean[] readObject(DsonObjectReader reader, TypeArgInfo<?> typeArgInfo) {
         ArrayList<Boolean> result = new ArrayList<>();
         while (reader.readDsonType() != DsonType.END_OF_OBJECT) {
             result.add(reader.readBoolean(null));

@@ -19,7 +19,9 @@ package cn.wjybxx.dson.codec;
 import cn.wjybxx.dson.codec.codecs.CollectionCodec;
 import cn.wjybxx.dson.codec.codecs.MapCodec;
 import cn.wjybxx.dson.text.*;
+import cn.wjybxx.dson.types.*;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.invoke.CallSite;
 import java.lang.invoke.LambdaMetafactory;
@@ -28,6 +30,7 @@ import java.lang.invoke.MethodType;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 /**
@@ -42,6 +45,9 @@ public class ConverterUtils {
     private static final Map<Class<?>, Class<?>> wrapperToPrimitiveTypeMap = new IdentityHashMap<>(9);
     private static final Map<Class<?>, Class<?>> primitiveTypeToWrapperMap = new IdentityHashMap<>(9);
     private static final Map<Class<?>, Object> primitiveTypeDefaultValueMap = new IdentityHashMap<>(9);
+
+    /** 类型id注册表 */
+    public static final TypeMetaRegistry TYPE_META_REGISTRY;
 
     static {
         wrapperToPrimitiveTypeMap.put(Boolean.class, boolean.class);
@@ -67,27 +73,59 @@ public class ConverterUtils {
         primitiveTypeDefaultValueMap.put(Long.class, 0L);
         primitiveTypeDefaultValueMap.put(Short.class, (short) 0);
         primitiveTypeDefaultValueMap.put(Void.class, null);
+
+        // 内置codec类型
+        TYPE_META_REGISTRY = TypeMetaRegistries.fromMetas(
+                typeMetaOf(int[].class, (1), null),
+                typeMetaOf(long[].class, (2), null),
+                typeMetaOf(float[].class, (3), null),
+                typeMetaOf(double[].class, (4), null),
+                typeMetaOf(boolean[].class, (5), null),
+                typeMetaOf(String[].class, (6), null),
+                typeMetaOf(short[].class, (7), null),
+                typeMetaOf(char[].class, (8), null),
+
+                typeMetaOf(Object[].class, (11), null),
+                typeMetaOf(Collection.class, (12), null),
+                typeMetaOf(Map.class, (13), null),
+
+                // 常用具体类型集合
+                typeMetaOf(LinkedList.class, (21), null),
+                typeMetaOf(ArrayDeque.class, (22), null),
+                typeMetaOf(IdentityHashMap.class, (23), null),
+                typeMetaOf(ConcurrentHashMap.class, (24), null),
+
+                // dson内建结构
+                typeMetaOf(Binary.class, (31), "bi"),
+                typeMetaOf(ExtInt32.class, (32), "ei"),
+                typeMetaOf(ExtInt64.class, (33), "eL"),
+                typeMetaOf(ExtDouble.class, (34), "ed"),
+                typeMetaOf(ExtString.class, (35), "es")
+        );
+    }
+
+    private static TypeMeta typeMetaOf(Class<?> clazz, int classId, String clsName) {
+        if (clsName == null) {
+            clsName = clazz.getSimpleName();
+        }
+        return TypeMeta.of(clazz, ObjectStyle.INDENT, clsName, ClassId.ofDefaultNameSpace(classId));
+    }
+
+    public static TypeMetaRegistry getDefaultTypeMetaRegistry() {
+        return TYPE_META_REGISTRY;
+    }
+
+    public static Object getDefaultValue(Class<?> type) {
+        return type.isPrimitive() ? primitiveTypeDefaultValueMap.get(type) : null;
     }
 
     public static Class<?> boxIfPrimitiveType(Class<?> type) {
-        if (type.isPrimitive()) {
-            return primitiveTypeToWrapperMap.get(type);
-        } else {
-            return type;
-        }
+        return type.isPrimitive() ? primitiveTypeToWrapperMap.get(type) : type;
     }
 
     public static Class<?> unboxIfWrapperType(Class<?> type) {
         final Class<?> result = wrapperToPrimitiveTypeMap.get(type);
         return result == null ? type : result;
-    }
-
-    public static Object getDefaultValue(Class<?> type) {
-        if (type.isPrimitive()) {
-            return primitiveTypeDefaultValueMap.get(type);
-        } else {
-            return null;
-        }
     }
 
     public static boolean isBoxType(Class<?> type) {
@@ -97,22 +135,6 @@ public class ConverterUtils {
     public static boolean isPrimitiveType(Class<?> type) {
         return type.isPrimitive();
     }
-
-    /**
-     * 无参构造函数转lambda实例 -- 比反射构建实例要快。
-     */
-    public static <T> Supplier<T> noArgConstructorToSupplier(MethodHandles.Lookup lookup, Constructor<T> constructor) throws Throwable {
-        Class<T> returnType = constructor.getDeclaringClass();
-        CallSite callSite = LambdaMetafactory.metafactory(lookup,
-                "get", SUPPLIER_INVOKE_TYPE, SUPPLIER_GET_METHOD_TYPE,
-                lookup.unreflectConstructor(constructor),
-                MethodType.methodType(returnType));
-
-        @SuppressWarnings("unchecked") Supplier<T> supplier = (Supplier<T>) callSite.getTarget().invoke();
-        return supplier;
-    }
-
-    // region
 
     /**
      * 测试右手边的类型是否可以赋值给左边的类型。
@@ -182,13 +204,10 @@ public class ConverterUtils {
         }
         return tempArray;
     }
-    // endregion
 
-    // region
+    // region converter
 
-    /**
-     * 枚举实例可能是枚举类的子类，如果枚举实例声明了代码块{}，在编解码时需要转换为声明类
-     */
+    /** 枚举实例可能是枚举类的子类，如果枚举实例声明了代码块{}，在编解码时需要转换为声明类 */
     public static Class<?> getEncodeClass(Object value) {
         if (value instanceof Enum<?> e) {
             return e.getDeclaringClass();
@@ -197,19 +216,19 @@ public class ConverterUtils {
         }
     }
 
-    /**
-     * 注意：默认情况下map是一个数组对象，而不是普通的对象
-     */
+    /** 注意：默认情况下map是一个数组对象，而不是普通的对象 */
     public static <T> boolean isEncodeAsArray(Class<T> encoderClass) {
         return encoderClass.isArray()
                 || Collection.class.isAssignableFrom(encoderClass)
                 || Map.class.isAssignableFrom(encoderClass);
     }
 
+    @Nonnull
     public static INumberStyle castNumberStyle(IStyle style) {
         return style instanceof INumberStyle numberStyle ? numberStyle : NumberStyle.SIMPLE;
     }
 
+    @Nonnull
     public static StringStyle castStringStyle(IStyle style) {
         return style instanceof StringStyle stringStyle ? stringStyle : StringStyle.AUTO;
     }
@@ -219,40 +238,28 @@ public class ConverterUtils {
         return style instanceof ObjectStyle objectStyle ? objectStyle : null;
     }
 
-    @SuppressWarnings("unchecked")
-    public static Collection<Object> newCollection(TypeArgInfo<?> typeArgInfo, Supplier<?> factory) {
-        if (typeArgInfo.factory != null) {
-            return (Collection<Object>) typeArgInfo.factory.get();
-        }
-        if (factory != null) {
-            return (Collection<Object>) factory.get();
-        }
-        if (Set.class.isAssignableFrom(typeArgInfo.declaredType)) {
-            return new LinkedHashSet<>();
-        }
-        return new ArrayList<>();
-    }
-
-    @SuppressWarnings("unchecked")
-    public static Map<Object, Object> newMap(TypeArgInfo<?> typeArgInfo, Supplier<?> factory) {
-        if (typeArgInfo.factory != null) {
-            return (Map<Object, Object>) typeArgInfo.factory.get();
-        }
-        if (factory != null) {
-            return (Map<Object, Object>) factory.get();
-        }
-        return new LinkedHashMap<>();
-    }
-
+    /** 查找数组成员类型的泛型参数 */
     public static TypeArgInfo<?> findComponentTypeArg(Class<?> declaredType) {
         Class<?> componentType = declaredType.getComponentType();
         if (componentType == null) {
             throw new IllegalArgumentException("declaredType is not arrayType, info " + declaredType);
         }
-        if (componentType != Object.class) {
-            return TypeArgInfo.of(componentType);
-        }
-        return TypeArgInfo.OBJECT;
+        return TypeArgInfo.of(componentType);
+    }
+    // endregion
+
+    // region 对外api
+
+    /** 无参构造函数转lambda实例 -- 可避免解码过程中的反射 */
+    public static <T> Supplier<T> noArgConstructorToSupplier(MethodHandles.Lookup lookup, Constructor<T> constructor) throws Throwable {
+        Class<T> returnType = constructor.getDeclaringClass();
+        CallSite callSite = LambdaMetafactory.metafactory(lookup,
+                "get", SUPPLIER_INVOKE_TYPE, SUPPLIER_GET_METHOD_TYPE,
+                lookup.unreflectConstructor(constructor),
+                MethodType.methodType(returnType));
+
+        @SuppressWarnings("unchecked") Supplier<T> supplier = (Supplier<T>) callSite.getTarget().invoke();
+        return supplier;
     }
 
     /** @param lookup 外部缓存实例，避免每次创建的开销 */

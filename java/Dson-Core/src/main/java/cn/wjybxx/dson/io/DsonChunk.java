@@ -16,6 +16,8 @@
 
 package cn.wjybxx.dson.io;
 
+import cn.wjybxx.base.io.ByteBufferUtils;
+
 /**
  * 二进制块
  * 默认编码length对应的部分
@@ -42,7 +44,7 @@ public final class DsonChunk {
      * @param length 有效区域的长度
      */
     public DsonChunk(byte[] buffer, int offset, int length) {
-        BinaryUtils.checkBuffer(buffer, offset, length);
+        ByteBufferUtils.checkBuffer(buffer, offset, length);
         this.buffer = buffer;
         this.offset = offset;
         this.length = length;
@@ -56,7 +58,7 @@ public final class DsonChunk {
      * @param length 有效部分的长度
      */
     public void setOffsetLength(int offset, int length) {
-        BinaryUtils.checkBuffer(buffer, offset, length);
+        ByteBufferUtils.checkBuffer(buffer, offset, length);
         this.offset = offset;
         this.length = length;
     }

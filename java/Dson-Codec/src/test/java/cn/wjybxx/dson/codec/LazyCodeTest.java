@@ -18,10 +18,10 @@ package cn.wjybxx.dson.codec;
 
 import cn.wjybxx.dson.DsonLites;
 import cn.wjybxx.dson.DsonType;
-import cn.wjybxx.dson.codec.binary.BinaryObjectReader;
-import cn.wjybxx.dson.codec.binary.BinaryObjectWriter;
-import cn.wjybxx.dson.codec.binary.BinaryPojoCodecImpl;
-import cn.wjybxx.dson.codec.binary.DefaultBinaryConverter;
+import cn.wjybxx.dson.codec.dsonlite.DefaultDsonLiteConverter;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteCodec;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteObjectReader;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteObjectWriter;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -52,30 +52,30 @@ public class LazyCodeTest {
         // 源端
         final byte[] bytesSource;
         {
-            DefaultBinaryConverter converter = DefaultBinaryConverter.newInstance(
+            DefaultDsonLiteConverter converter = DefaultDsonLiteConverter.newInstance(
                     List.of(new MyStructCodec(Role.SOURCE)),
                     typeMetaRegistry,
-                    ConvertOptions.DEFAULT);
+                    ConverterOptions.DEFAULT);
             bytesSource = converter.write(myStruct);
         }
 
         final byte[] routerBytes;
         // 模拟转发 -- 读进来再写
         {
-            DefaultBinaryConverter converter = DefaultBinaryConverter.newInstance(
+            DefaultDsonLiteConverter converter = DefaultDsonLiteConverter.newInstance(
                     List.of(new MyStructCodec(Role.ROUTER)),
                     typeMetaRegistry,
-                    ConvertOptions.DEFAULT);
+                    ConverterOptions.DEFAULT);
             routerBytes = converter.write(converter.read(bytesSource));
         }
 
         // 终端
         MyStruct destStruct;
         {
-            DefaultBinaryConverter converter = DefaultBinaryConverter.newInstance(
+            DefaultDsonLiteConverter converter = DefaultDsonLiteConverter.newInstance(
                     List.of(new MyStructCodec(Role.DESTINATION)),
                     typeMetaRegistry,
-                    ConvertOptions.DEFAULT);
+                    ConverterOptions.DEFAULT);
             destStruct = (MyStruct) converter.read(routerBytes);
         }
         Assertions.assertEquals(myStruct, destStruct);
@@ -87,7 +87,7 @@ public class LazyCodeTest {
         DESTINATION
     }
 
-    private static class MyStructCodec implements BinaryPojoCodecImpl<MyStruct> {
+    private static class MyStructCodec implements DsonLiteCodec<MyStruct> {
 
         private final Role role;
 
@@ -102,7 +102,7 @@ public class LazyCodeTest {
         }
 
         @Override
-        public void writeObject(BinaryObjectWriter writer, MyStruct instance, TypeArgInfo<?> typeArgInfo) {
+        public void writeObject(DsonLiteObjectWriter writer, MyStruct instance, TypeArgInfo<?> typeArgInfo) {
             writer.writeString(DsonLites.makeFullNumber(0, 0), instance.strVal);
             if (role == Role.ROUTER) {
                 writer.writeValueBytes(DsonLites.makeFullNumber(0, 1), DsonType.OBJECT, (byte[]) instance.nestStruct);
@@ -121,7 +121,7 @@ public class LazyCodeTest {
         }
 
         @Override
-        public MyStruct readObject(BinaryObjectReader reader, TypeArgInfo<?> typeArgInfo) {
+        public MyStruct readObject(DsonLiteObjectReader reader, TypeArgInfo<?> typeArgInfo) {
             String strVal = reader.readString(DsonLites.makeFullNumber(0, 0));
             Object nestStruct;
             if (role == Role.ROUTER) {

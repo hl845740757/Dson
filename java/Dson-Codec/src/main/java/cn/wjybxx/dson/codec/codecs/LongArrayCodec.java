@@ -17,14 +17,14 @@
 package cn.wjybxx.dson.codec.codecs;
 
 import cn.wjybxx.dson.DsonType;
-import cn.wjybxx.dson.codec.PojoCodecImpl;
+import cn.wjybxx.dson.codec.DuplexCodec;
 import cn.wjybxx.dson.codec.TypeArgInfo;
-import cn.wjybxx.dson.codec.binary.BinaryObjectReader;
-import cn.wjybxx.dson.codec.binary.BinaryObjectWriter;
-import cn.wjybxx.dson.codec.binary.BinaryPojoCodecScanIgnore;
-import cn.wjybxx.dson.codec.document.DocumentObjectReader;
-import cn.wjybxx.dson.codec.document.DocumentObjectWriter;
-import cn.wjybxx.dson.codec.document.DocumentPojoCodecScanIgnore;
+import cn.wjybxx.dson.codec.dson.DsonCodecScanIgnore;
+import cn.wjybxx.dson.codec.dson.DsonObjectReader;
+import cn.wjybxx.dson.codec.dson.DsonObjectWriter;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteCodecScanIgnore;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteObjectReader;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteObjectWriter;
 import cn.wjybxx.dson.text.ObjectStyle;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 
@@ -34,9 +34,9 @@ import javax.annotation.Nonnull;
  * @author wjybxx
  * date 2023/4/4
  */
-@BinaryPojoCodecScanIgnore
-@DocumentPojoCodecScanIgnore
-public class LongArrayCodec implements PojoCodecImpl<long[]> {
+@DsonLiteCodecScanIgnore
+@DsonCodecScanIgnore
+public class LongArrayCodec implements DuplexCodec<long[]> {
 
     @Nonnull
     @Override
@@ -45,14 +45,14 @@ public class LongArrayCodec implements PojoCodecImpl<long[]> {
     }
 
     @Override
-    public void writeObject(BinaryObjectWriter writer, long[] instance, TypeArgInfo<?> typeArgInfo) {
+    public void writeObject(DsonLiteObjectWriter writer, long[] instance, TypeArgInfo<?> typeArgInfo) {
         for (long e : instance) {
             writer.writeLong(0, e);
         }
     }
 
     @Override
-    public long[] readObject(BinaryObjectReader reader, TypeArgInfo<?> typeArgInfo) {
+    public long[] readObject(DsonLiteObjectReader reader, TypeArgInfo<?> typeArgInfo) {
         LongArrayList result = new LongArrayList();
         while (reader.readDsonType() != DsonType.END_OF_OBJECT) {
             result.add(reader.readLong(0));
@@ -61,14 +61,14 @@ public class LongArrayCodec implements PojoCodecImpl<long[]> {
     }
 
     @Override
-    public void writeObject(DocumentObjectWriter writer, long[] instance, TypeArgInfo<?> typeArgInfo, ObjectStyle style) {
+    public void writeObject(DsonObjectWriter writer, long[] instance, TypeArgInfo<?> typeArgInfo, ObjectStyle style) {
         for (long e : instance) {
             writer.writeLong(null, e);
         }
     }
 
     @Override
-    public long[] readObject(DocumentObjectReader reader, TypeArgInfo<?> typeArgInfo) {
+    public long[] readObject(DsonObjectReader reader, TypeArgInfo<?> typeArgInfo) {
         LongArrayList result = new LongArrayList();
         while (reader.readDsonType() != DsonType.END_OF_OBJECT) {
             result.add(reader.readLong(null));

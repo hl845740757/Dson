@@ -19,6 +19,7 @@
 using System;
 using System.IO;
 using Wjybxx.Commons.Collections;
+using Wjybxx.Commons.IO;
 using Wjybxx.Dson.IO;
 
 namespace Wjybxx.Dson.Text;
@@ -88,7 +89,7 @@ internal class CharBuffer
         if (len == 0) {
             return;
         }
-        BinaryUtils.CheckBuffer(chars.Length, offset, len);
+        ByteBufferUtil.CheckBuffer(chars.Length, offset, len);
         if (widx + len > buffer.Length) {
             throw new InternalBufferOverflowException();
         }

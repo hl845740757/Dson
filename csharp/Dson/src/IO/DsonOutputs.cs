@@ -20,6 +20,8 @@ using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Wjybxx.Commons.IO;
+using Wjybxx.Dson.Internal;
 
 #pragma warning disable CS1591
 namespace Wjybxx.Dson.IO;
@@ -54,7 +56,7 @@ public class DsonOutputs
         private int _bufferPosLimit;
 
         internal ArrayDsonOutput(byte[] buffer, int offset, int length) {
-            BinaryUtils.CheckBuffer(buffer, offset, length);
+            ByteBufferUtil.CheckBuffer(buffer, offset, length);
             this._buffer = buffer;
             this._rawOffset = offset;
             this._rawLimit = offset + length;
@@ -86,7 +88,7 @@ public class DsonOutputs
 
         public void WriteInt32(int value) {
             try {
-                int newPos = BinaryUtils.WriteInt32(_buffer, _bufferPos, value);
+                int newPos = CodedUtil.WriteInt32(_buffer, _bufferPos, value);
                 _bufferPos = CheckNewBufferPos(newPos);
             }
             catch (Exception e) {
@@ -96,7 +98,7 @@ public class DsonOutputs
 
         public void WriteUint32(int value) {
             try {
-                int newPos = BinaryUtils.WriteUint32(_buffer, _bufferPos, value);
+                int newPos = CodedUtil.WriteUint32(_buffer, _bufferPos, value);
                 _bufferPos = CheckNewBufferPos(newPos);
             }
             catch (Exception e) {
@@ -106,7 +108,7 @@ public class DsonOutputs
 
         public void WriteSint32(int value) {
             try {
-                int newPos = BinaryUtils.WriteSint32(_buffer, _bufferPos, value);
+                int newPos = CodedUtil.WriteSint32(_buffer, _bufferPos, value);
                 _bufferPos = CheckNewBufferPos(newPos);
             }
             catch (Exception e) {
@@ -116,7 +118,7 @@ public class DsonOutputs
 
         public void WriteFixed32(int value) {
             try {
-                int newPos = BinaryUtils.WriteFixed32(_buffer, _bufferPos, value);
+                int newPos = CodedUtil.WriteFixed32(_buffer, _bufferPos, value);
                 _bufferPos = CheckNewBufferPos(newPos);
             }
             catch (Exception e) {
@@ -126,7 +128,7 @@ public class DsonOutputs
 
         public void WriteInt64(long value) {
             try {
-                int newPos = BinaryUtils.WriteInt64(_buffer, _bufferPos, value);
+                int newPos = CodedUtil.WriteInt64(_buffer, _bufferPos, value);
                 _bufferPos = CheckNewBufferPos(newPos);
             }
             catch (Exception e) {
@@ -136,7 +138,7 @@ public class DsonOutputs
 
         public void WriteUint64(long value) {
             try {
-                int newPos = BinaryUtils.WriteUint64(_buffer, _bufferPos, value);
+                int newPos = CodedUtil.WriteUint64(_buffer, _bufferPos, value);
                 _bufferPos = CheckNewBufferPos(newPos);
             }
             catch (Exception e) {
@@ -146,7 +148,7 @@ public class DsonOutputs
 
         public void WriteSint64(long value) {
             try {
-                int newPos = BinaryUtils.WriteSint64(_buffer, _bufferPos, value);
+                int newPos = CodedUtil.WriteSint64(_buffer, _bufferPos, value);
                 _bufferPos = CheckNewBufferPos(newPos);
             }
             catch (Exception e) {
@@ -156,7 +158,7 @@ public class DsonOutputs
 
         public void WriteFixed64(long value) {
             try {
-                int newPos = BinaryUtils.WriteFixed64(_buffer, _bufferPos, value);
+                int newPos = CodedUtil.WriteFixed64(_buffer, _bufferPos, value);
                 _bufferPos = CheckNewBufferPos(newPos);
             }
             catch (Exception e) {
@@ -166,7 +168,7 @@ public class DsonOutputs
 
         public void WriteFloat(float value) {
             try {
-                int newPos = BinaryUtils.WriteFloat(_buffer, _bufferPos, value);
+                int newPos = CodedUtil.WriteFloat(_buffer, _bufferPos, value);
                 _bufferPos = CheckNewBufferPos(newPos);
             }
             catch (Exception e) {
@@ -176,7 +178,7 @@ public class DsonOutputs
 
         public void WriteDouble(double value) {
             try {
-                int newPos = BinaryUtils.WriteDouble(_buffer, _bufferPos, value);
+                int newPos = CodedUtil.WriteDouble(_buffer, _bufferPos, value);
                 _bufferPos = CheckNewBufferPos(newPos);
             }
             catch (Exception e) {
@@ -186,7 +188,7 @@ public class DsonOutputs
 
         public void WriteBool(bool value) {
             try {
-                int newPos = BinaryUtils.WriteUint32(_buffer, _bufferPos, value ? 1 : 0);
+                int newPos = CodedUtil.WriteUint32(_buffer, _bufferPos, value ? 1 : 0);
                 _bufferPos = CheckNewBufferPos(newPos);
             }
             catch (Exception e) {
@@ -197,17 +199,17 @@ public class DsonOutputs
         public void WriteString(string value) {
             try {
                 ulong maxByteCount = (ulong)(value.Length * 3L);
-                int maxByteCountVarIntSize = BinaryUtils.ComputeRawVarInt64Size(maxByteCount);
-                int minByteCountVarIntSize = BinaryUtils.ComputeRawVarInt32Size((uint)value.Length);
+                int maxByteCountVarIntSize = CodedUtil.ComputeRawVarInt64Size(maxByteCount);
+                int minByteCountVarIntSize = CodedUtil.ComputeRawVarInt32Size((uint)value.Length);
                 if (maxByteCountVarIntSize == minByteCountVarIntSize) {
                     // len占用的字节数是可提前确定的，因此无需额外的字节数计算，可直接编码
                     int byteCount = Encoding.UTF8.GetBytes(value, 0, value.Length, _buffer, _bufferPos + minByteCountVarIntSize);
-                    int newPos = BinaryUtils.WriteUint32(_buffer, _bufferPos, byteCount);
+                    int newPos = CodedUtil.WriteUint32(_buffer, _bufferPos, byteCount);
                     _bufferPos = CheckNewBufferPos(newPos + byteCount);
                 } else {
                     // 注意，这里写的编码后的字节长度；而不是字符串长度 -- 提前计算UTF8的长度是很有用的方法
                     int byteCount = Encoding.UTF8.GetByteCount(value);
-                    int newPos = BinaryUtils.WriteUint32(_buffer, _bufferPos, byteCount);
+                    int newPos = CodedUtil.WriteUint32(_buffer, _bufferPos, byteCount);
                     if (byteCount > 0) {
                         CheckNewBufferPos(newPos + byteCount);
                         //  如果需要限制buffer访问区域，可使用Span；但这里预计算过，因此是安全的
@@ -223,7 +225,7 @@ public class DsonOutputs
         }
 
         public void WriteRawBytes(byte[] data, int offset, int length) {
-            BinaryUtils.CheckBuffer(data, offset, length);
+            ByteBufferUtil.CheckBuffer(data, offset, length);
             CheckNewBufferPos(_bufferPos + length);
 
             Array.Copy(data, offset, _buffer, _bufferPos, length);
@@ -239,21 +241,21 @@ public class DsonOutputs
         public int Position {
             get => _bufferPos - _rawOffset;
             set {
-                BinaryUtils.CheckBuffer(_rawLimit - _rawOffset, value);
+                ByteBufferUtil.CheckBuffer(_rawLimit - _rawOffset, value);
                 _bufferPos = _rawOffset + value;
             }
         }
 
         public void SetByte(int pos, byte value) {
-            BinaryUtils.CheckBuffer(_rawLimit - _rawOffset, pos, 1);
+            ByteBufferUtil.CheckBuffer(_rawLimit - _rawOffset, pos, 1);
             int bufferPos = _rawOffset + pos;
             _buffer[bufferPos] = value;
         }
 
         public void SetFixedInt32(int pos, int value) {
-            BinaryUtils.CheckBuffer(_rawLimit - _rawOffset, pos, 4);
+            ByteBufferUtil.CheckBuffer(_rawLimit - _rawOffset, pos, 4);
             int bufferPos = _rawOffset + pos;
-            BinaryUtils.SetIntLE(_buffer, bufferPos, value);
+            ByteBufferUtil.SetIntLE(_buffer, bufferPos, value);
         }
 
         #endregion

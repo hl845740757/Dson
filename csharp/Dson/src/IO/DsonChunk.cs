@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using Wjybxx.Commons.IO;
 
 #pragma warning disable CS1591
 namespace Wjybxx.Dson.IO;
@@ -39,7 +40,7 @@ public class DsonChunk
     }
 
     public DsonChunk(byte[] buffer, int offset, int length) {
-        BinaryUtils.CheckBuffer(buffer, offset, length);
+        ByteBufferUtil.CheckBuffer(buffer, offset, length);
         this._buffer = buffer;
         this._offset = offset;
         this._length = length;
@@ -55,7 +56,7 @@ public class DsonChunk
     /// <param name="offset">有效部分的起始偏移量</param>
     /// <param name="length">有效部分的长度</param>
     public void SetOffsetLength(int offset, int length) {
-        BinaryUtils.CheckBuffer(_buffer, offset, length);
+        ByteBufferUtil.CheckBuffer(_buffer, offset, length);
         this._offset = offset;
         this._length = length;
     }

@@ -76,8 +76,8 @@ public class ArrayCodedTest {
 
     @Test
     void arrayOutputTest() {
-        DsonArray<String> topContainer1 = Dsons.fromFlatDson(dsonString);
-        String dsonString1 = Dsons.toFlatDson(topContainer1);
+        DsonArray<String> collection1 = Dsons.fromCollectionDson(dsonString);
+        String dsonString1 = Dsons.toCollectionDson(collection1);
 //        System.out.println(dsonString1);
 
         byte[] buffer1 = new byte[2048];
@@ -89,12 +89,12 @@ public class ArrayCodedTest {
             // 自实现
             output1= DsonOutputs.newInstance(buffer1);
             try (DsonWriter writer = new DsonBinaryWriter(DsonTextWriterSettings.DEFAULT, output1)) {
-                Dsons.writeTopContainer(writer, topContainer1);
+                Dsons.writeCollection(writer, collection1);
             }
             // pb实现
             output2= DsonProtobufOutputs.newInstance(buffer2);
             try (DsonWriter writer = new DsonBinaryWriter(DsonTextWriterSettings.DEFAULT, output2)) {
-                Dsons.writeTopContainer(writer, topContainer1);
+                Dsons.writeCollection(writer, collection1);
             }
             Assertions.assertEquals(output1.getPosition(), output2.getPosition());
             Assertions.assertArrayEquals(buffer1, buffer2);
@@ -104,17 +104,17 @@ public class ArrayCodedTest {
             // 自实现
             DsonInput input1 = DsonInputs.newInstance(buffer1, 0, output1.getPosition());
             try (DsonReader reader = new DsonBinaryReader(DsonTextReaderSettings.DEFAULT, input1)) {
-                DsonArray<String> topContainer2 = Dsons.readTopContainer(reader);
+                DsonArray<String> collection2 = Dsons.readCollection(reader);
 
-                String dsonString2 = Dsons.toFlatDson(topContainer2);
+                String dsonString2 = Dsons.toCollectionDson(collection2);
                 Assertions.assertEquals(dsonString1, dsonString2, "my-BinaryReader/BinaryWriter");
             }
             // pb实现
             DsonInput input2 = DsonProtobufInputs.newInstance(buffer2, 0, output1.getPosition());
             try (DsonReader reader = new DsonBinaryReader(DsonTextReaderSettings.DEFAULT, input2)) {
-                DsonArray<String> topContainer2 = Dsons.readTopContainer(reader);
+                DsonArray<String> collection3 = Dsons.readCollection(reader);
 
-                String dsonString2 = Dsons.toFlatDson(topContainer2);
+                String dsonString2 = Dsons.toCollectionDson(collection3);
                 Assertions.assertEquals(dsonString1, dsonString2, "pb-BinaryReader/BinaryWriter");
             }
         }

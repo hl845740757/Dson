@@ -16,7 +16,7 @@
 
 package cn.wjybxx.dson.pb;
 
-import cn.wjybxx.dson.io.BinaryUtils;
+import cn.wjybxx.base.io.ByteBufferUtils;
 import cn.wjybxx.dson.io.DsonIOException;
 import com.google.protobuf.CodedOutputStream;
 import com.google.protobuf.MessageLite;
@@ -275,7 +275,7 @@ public class DsonProtobufOutputs {
         public void setByte(int writerIndex, byte value) {
             Objects.checkIndex(writerIndex, limit - offset);
             int newOffset = offset + writerIndex;
-            BinaryUtils.checkBuffer(buffer, newOffset, 1);
+            ByteBufferUtils.checkBuffer(buffer, newOffset, 1);
             buffer[newOffset] = value;
         }
 
@@ -283,8 +283,8 @@ public class DsonProtobufOutputs {
         public void setFixedInt32(final int writerIndex, int value) {
             Objects.checkIndex(writerIndex, limit - offset);
             int newOffset = offset + writerIndex;
-            BinaryUtils.checkBuffer(buffer, newOffset, 4);
-            BinaryUtils.setIntLE(buffer, newOffset, value); // 保持和writeFixed32一致
+            ByteBufferUtils.checkBuffer(buffer, newOffset, 4);
+            ByteBufferUtils.setInt32LE(buffer, newOffset, value); // 保持和writeFixed32一致
         }
 
         @Override
@@ -328,7 +328,7 @@ public class DsonProtobufOutputs {
                 codedOutputStream.flush();
 
                 int newOffset = offset + writerIndex;
-                BinaryUtils.position(byteBuffer, newOffset);
+                ByteBufferUtils.position(byteBuffer, newOffset);
                 codedOutputStream = CodedOutputStream.newInstance(byteBuffer);
                 codedOutputStreamOffset = newOffset;
             } catch (IOException e) {

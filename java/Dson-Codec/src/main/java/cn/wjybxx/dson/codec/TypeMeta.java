@@ -83,6 +83,10 @@ public class TypeMeta {
         return new TypeMeta(clazz, style, List.of(classNames), List.of());
     }
 
+    public static TypeMeta of(Class<?> clazz, ObjectStyle style, String className, ClassId classId) {
+        return new TypeMeta(clazz, style, List.of(className), List.of(classId));
+    }
+
     @Override
     public String toString() {
         return "TypeMeta{" +

@@ -17,12 +17,12 @@
 package cn.wjybxx.dson.codec.codecs;
 
 import cn.wjybxx.dson.WireType;
-import cn.wjybxx.dson.codec.PojoCodecImpl;
+import cn.wjybxx.dson.codec.DuplexCodec;
 import cn.wjybxx.dson.codec.TypeArgInfo;
-import cn.wjybxx.dson.codec.binary.BinaryObjectReader;
-import cn.wjybxx.dson.codec.binary.BinaryObjectWriter;
-import cn.wjybxx.dson.codec.document.DocumentObjectReader;
-import cn.wjybxx.dson.codec.document.DocumentObjectWriter;
+import cn.wjybxx.dson.codec.dson.DsonObjectReader;
+import cn.wjybxx.dson.codec.dson.DsonObjectWriter;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteObjectReader;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteObjectWriter;
 import cn.wjybxx.dson.text.NumberStyle;
 import cn.wjybxx.dson.text.ObjectStyle;
 import cn.wjybxx.dson.types.ExtInt64;
@@ -33,7 +33,7 @@ import javax.annotation.Nonnull;
  * @author wjybxx
  * date - 2023/12/28
  */
-public class ExtInt64Codec implements PojoCodecImpl<ExtInt64> {
+public class ExtInt64Codec implements DuplexCodec<ExtInt64> {
 
     @Override
     public boolean isWriteAsArray() {
@@ -52,24 +52,24 @@ public class ExtInt64Codec implements PojoCodecImpl<ExtInt64> {
     }
 
     @Override
-    public void writeObject(BinaryObjectWriter writer, ExtInt64 instance, TypeArgInfo<?> typeArgInfo) {
+    public void writeObject(DsonLiteObjectWriter writer, ExtInt64 instance, TypeArgInfo<?> typeArgInfo) {
         // 外部writeName
         writer.writeExtInt64(writer.getCurrentName(), instance, WireType.VARINT);
     }
 
     @Override
-    public ExtInt64 readObject(BinaryObjectReader reader, TypeArgInfo<?> typeArgInfo) {
+    public ExtInt64 readObject(DsonLiteObjectReader reader, TypeArgInfo<?> typeArgInfo) {
         // 外部已readName
         return reader.readExtInt64(reader.getCurrentName());
     }
 
     @Override
-    public void writeObject(DocumentObjectWriter writer, ExtInt64 instance, TypeArgInfo<?> typeArgInfo, ObjectStyle style) {
+    public void writeObject(DsonObjectWriter writer, ExtInt64 instance, TypeArgInfo<?> typeArgInfo, ObjectStyle style) {
         writer.writeExtInt64(writer.getCurrentName(), instance, WireType.VARINT, NumberStyle.SIMPLE);
     }
 
     @Override
-    public ExtInt64 readObject(DocumentObjectReader reader, TypeArgInfo<?> typeArgInfo) {
+    public ExtInt64 readObject(DsonObjectReader reader, TypeArgInfo<?> typeArgInfo) {
         return reader.readExtInt64(reader.getCurrentName());
     }
 }

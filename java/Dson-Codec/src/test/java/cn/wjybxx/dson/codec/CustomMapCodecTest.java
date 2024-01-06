@@ -17,10 +17,10 @@
 package cn.wjybxx.dson.codec;
 
 import cn.wjybxx.dson.DsonType;
-import cn.wjybxx.dson.codec.binary.BinaryObjectReader;
-import cn.wjybxx.dson.codec.binary.BinaryObjectWriter;
-import cn.wjybxx.dson.codec.binary.BinaryPojoCodecScanIgnore;
-import cn.wjybxx.dson.codec.binary.BinarySerializable;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteCodecScanIgnore;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteObjectReader;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteObjectWriter;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteSerializable;
 
 import java.util.IdentityHashMap;
 
@@ -31,20 +31,20 @@ import java.util.IdentityHashMap;
  * date 2023/4/14
  */
 @ClassImpl(skipFields = "size")
-@BinarySerializable(annotations = BinaryPojoCodecScanIgnore.class)
+@DsonLiteSerializable(annotations = DsonLiteCodecScanIgnore.class)
 public class CustomMapCodecTest<K, V> extends IdentityHashMap<K, V> {
 
     public CustomMapCodecTest() {
     }
 
-    public void writeObject(BinaryObjectWriter writer) {
+    public void writeObject(DsonLiteObjectWriter writer) {
         for (Entry<K, V> entry : this.entrySet()) {
             writer.writeObject(0, entry.getKey());
             writer.writeObject(0, entry.getValue());
         }
     }
 
-    public void readObject(BinaryObjectReader reader) {
+    public void readObject(DsonLiteObjectReader reader) {
         while (reader.readDsonType() != DsonType.END_OF_OBJECT) {
             K k = reader.readObject(0);
             V v = reader.readObject(0);

@@ -17,14 +17,14 @@
 package cn.wjybxx.dson.codec.codecs;
 
 import cn.wjybxx.dson.DsonType;
-import cn.wjybxx.dson.codec.PojoCodecImpl;
+import cn.wjybxx.dson.codec.DuplexCodec;
 import cn.wjybxx.dson.codec.TypeArgInfo;
-import cn.wjybxx.dson.codec.binary.BinaryObjectReader;
-import cn.wjybxx.dson.codec.binary.BinaryObjectWriter;
-import cn.wjybxx.dson.codec.binary.BinaryPojoCodecScanIgnore;
-import cn.wjybxx.dson.codec.document.DocumentObjectReader;
-import cn.wjybxx.dson.codec.document.DocumentObjectWriter;
-import cn.wjybxx.dson.codec.document.DocumentPojoCodecScanIgnore;
+import cn.wjybxx.dson.codec.dson.DsonCodecScanIgnore;
+import cn.wjybxx.dson.codec.dson.DsonObjectReader;
+import cn.wjybxx.dson.codec.dson.DsonObjectWriter;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteCodecScanIgnore;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteObjectReader;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteObjectWriter;
 import cn.wjybxx.dson.text.NumberStyle;
 import cn.wjybxx.dson.text.ObjectStyle;
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
@@ -35,9 +35,9 @@ import javax.annotation.Nonnull;
  * @author wjybxx
  * date 2023/4/4
  */
-@BinaryPojoCodecScanIgnore
-@DocumentPojoCodecScanIgnore
-public class DoubleArrayCodec implements PojoCodecImpl<double[]> {
+@DsonLiteCodecScanIgnore
+@DsonCodecScanIgnore
+public class DoubleArrayCodec implements DuplexCodec<double[]> {
 
     @Nonnull
     @Override
@@ -46,14 +46,14 @@ public class DoubleArrayCodec implements PojoCodecImpl<double[]> {
     }
 
     @Override
-    public void writeObject(BinaryObjectWriter writer, double[] instance, TypeArgInfo<?> typeArgInfo) {
+    public void writeObject(DsonLiteObjectWriter writer, double[] instance, TypeArgInfo<?> typeArgInfo) {
         for (double e : instance) {
             writer.writeDouble(0, e);
         }
     }
 
     @Override
-    public double[] readObject(BinaryObjectReader reader, TypeArgInfo<?> typeArgInfo) {
+    public double[] readObject(DsonLiteObjectReader reader, TypeArgInfo<?> typeArgInfo) {
         DoubleArrayList result = new DoubleArrayList();
         while (reader.readDsonType() != DsonType.END_OF_OBJECT) {
             result.add(reader.readDouble(0));
@@ -62,14 +62,14 @@ public class DoubleArrayCodec implements PojoCodecImpl<double[]> {
     }
 
     @Override
-    public void writeObject(DocumentObjectWriter writer, double[] instance, TypeArgInfo<?> typeArgInfo, ObjectStyle style) {
+    public void writeObject(DsonObjectWriter writer, double[] instance, TypeArgInfo<?> typeArgInfo, ObjectStyle style) {
         for (double e : instance) {
             writer.writeDouble(null, e, NumberStyle.SIMPLE);
         }
     }
 
     @Override
-    public double[] readObject(DocumentObjectReader reader, TypeArgInfo<?> typeArgInfo) {
+    public double[] readObject(DsonObjectReader reader, TypeArgInfo<?> typeArgInfo) {
         DoubleArrayList result = new DoubleArrayList();
         while (reader.readDsonType() != DsonType.END_OF_OBJECT) {
             result.add(reader.readDouble(null));

@@ -64,8 +64,8 @@ class SchemaGenerator extends AbstractGenerator<CodecProcessor> {
     private List<FieldSpec> genTypeFields() {
         // 需要去重
         LinkedHashSet<VariableElement> allSerialFields = new LinkedHashSet<>();
-        allSerialFields.addAll(context.binSerialFields);
-        allSerialFields.addAll(context.docSerialFields);
+        allSerialFields.addAll(context.liteSerialFields);
+        allSerialFields.addAll(context.dsonSerialFields);
         return allSerialFields.stream()
                 .map(this::genTypeField)
                 .collect(Collectors.toList());
@@ -279,7 +279,7 @@ class SchemaGenerator extends AbstractGenerator<CodecProcessor> {
     // region names
 
     private List<FieldSpec> genNames() {
-        final List<VariableElement> serialFields = context.docSerialFields;
+        final List<VariableElement> serialFields = context.dsonSerialFields;
         final Set<String> dsonNameSet = new HashSet<>((int) (serialFields.size() * 1.35f));
         final List<FieldSpec> fieldSpecList = new ArrayList<>(serialFields.size());
 
@@ -311,7 +311,7 @@ class SchemaGenerator extends AbstractGenerator<CodecProcessor> {
     // region numbers
 
     private List<FieldSpec> genNumbers() {
-        final List<VariableElement> serialFields = context.binSerialFields;
+        final List<VariableElement> serialFields = context.liteSerialFields;
         final Set<Integer> fullNumberSet = new HashSet<>((int) (serialFields.size() * 1.35f));
         final List<FieldSpec> fieldSpecList = new ArrayList<>(serialFields.size());
 

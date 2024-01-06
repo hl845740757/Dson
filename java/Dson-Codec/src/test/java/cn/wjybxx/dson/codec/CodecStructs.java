@@ -17,12 +17,12 @@
 package cn.wjybxx.dson.codec;
 
 import cn.wjybxx.dson.DsonLites;
-import cn.wjybxx.dson.codec.binary.BinaryObjectReader;
-import cn.wjybxx.dson.codec.binary.BinaryObjectWriter;
-import cn.wjybxx.dson.codec.binary.BinaryPojoCodecImpl;
-import cn.wjybxx.dson.codec.document.DocumentObjectReader;
-import cn.wjybxx.dson.codec.document.DocumentObjectWriter;
-import cn.wjybxx.dson.codec.document.DocumentPojoCodecImpl;
+import cn.wjybxx.dson.codec.dson.DsonCodec;
+import cn.wjybxx.dson.codec.dson.DsonObjectReader;
+import cn.wjybxx.dson.codec.dson.DsonObjectWriter;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteCodec;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteObjectReader;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteObjectWriter;
 import cn.wjybxx.dson.text.NumberStyle;
 import cn.wjybxx.dson.text.ObjectStyle;
 import cn.wjybxx.dson.text.StringStyle;
@@ -151,7 +151,7 @@ class CodecStructs {
 
     }
 
-    static class MyStructCodec implements BinaryPojoCodecImpl<MyStruct>, DocumentPojoCodecImpl<MyStruct> {
+    static class MyStructCodec implements DsonLiteCodec<MyStruct>, DsonCodec<MyStruct> {
 
         @Override
         public boolean isWriteAsArray() {
@@ -170,7 +170,7 @@ class CodecStructs {
         }
 
         @Override
-        public void writeObject(BinaryObjectWriter writer, MyStruct instance, TypeArgInfo<?> typeArgInfo) {
+        public void writeObject(DsonLiteObjectWriter writer, MyStruct instance, TypeArgInfo<?> typeArgInfo) {
             NestStruct nestStruct = instance.nestStruct;
             writer.writeStartObject(DsonLites.makeFullNumber(0, 0), nestStruct, TypeArgInfo.of(NestStruct.class));
             {
@@ -194,7 +194,7 @@ class CodecStructs {
 
         @SuppressWarnings("unchecked")
         @Override
-        public MyStruct readObject(BinaryObjectReader reader, TypeArgInfo<?> typeArgInfo) {
+        public MyStruct readObject(DsonLiteObjectReader reader, TypeArgInfo<?> typeArgInfo) {
             reader.readStartObject(DsonLites.makeFullNumber(0, 0), TypeArgInfo.of(NestStruct.class));
             NestStruct nestStruct = new NestStruct(
                     reader.readInt(DsonLites.makeFullNumber(0, 0)),
@@ -217,7 +217,7 @@ class CodecStructs {
         }
 
         @Override
-        public void writeObject(DocumentObjectWriter writer, MyStruct instance, TypeArgInfo<?> typeArgInfo, ObjectStyle style) {
+        public void writeObject(DsonObjectWriter writer, MyStruct instance, TypeArgInfo<?> typeArgInfo, ObjectStyle style) {
             NestStruct nestStruct = instance.nestStruct;
             writer.writeStartObject("nestStruct", nestStruct, TypeArgInfo.of(NestStruct.class));
             {
@@ -241,7 +241,7 @@ class CodecStructs {
 
         @SuppressWarnings("unchecked")
         @Override
-        public MyStruct readObject(DocumentObjectReader reader, TypeArgInfo<?> typeArgInfo) {
+        public MyStruct readObject(DsonObjectReader reader, TypeArgInfo<?> typeArgInfo) {
             reader.readStartObject("nestStruct", TypeArgInfo.of(NestStruct.class));
             NestStruct nestStruct = new NestStruct(
                     reader.readInt("intVal"),

@@ -16,7 +16,7 @@
 
 package cn.wjybxx.dson.pb;
 
-import cn.wjybxx.dson.io.BinaryUtils;
+import cn.wjybxx.base.io.ByteBufferUtils;
 import cn.wjybxx.dson.io.DsonIOException;
 import com.google.protobuf.CodedInputStream;
 import com.google.protobuf.ExtensionRegistryLite;
@@ -277,15 +277,15 @@ public class DsonProtobufInputs {
         @Override
         public byte getByte(int readerIndex) {
             int bufferPos = rawOffset + readerIndex;
-            BinaryUtils.checkBuffer(buffer, bufferPos, 1);
+            ByteBufferUtils.checkBuffer(buffer, bufferPos, 1);
             return buffer[bufferPos];
         }
 
         @Override
         public int getFixed32(int readerIndex) {
             int bufferPos = rawOffset + readerIndex;
-            BinaryUtils.checkBuffer(buffer, bufferPos, 4);
-            return BinaryUtils.getIntLE(buffer, bufferPos);
+            ByteBufferUtils.checkBuffer(buffer, bufferPos, 4);
+            return ByteBufferUtils.getInt32LE(buffer, bufferPos);
         }
     }
 
@@ -320,7 +320,7 @@ public class DsonProtobufInputs {
             }
 
             int bufferPos = offset + readerIndex;
-            BinaryUtils.position(byteBuffer, bufferPos);
+            ByteBufferUtils.position(byteBuffer, bufferPos);
             codedInputStream = CodedInputStream.newInstance(byteBuffer);
             codedInputStreamOffset = bufferPos;
         }

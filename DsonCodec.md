@@ -142,11 +142,11 @@ Dson的理念是：**能托管的逻辑就让生成的代码负责，用户只�
     public Object custom;
 
     //
-    public void writeCustom(BinaryObjectWriter writer) {
+    public void writeCustom(DsonLiteObjectWriter writer) {
         writer.writeObject(custom, TypeArgInfo.OBJECT);
     }
 
-    public void readCustom(BinaryObjectReader reader) {
+    public void readCustom(DsonLiteObjectReader reader) {
         this.custom = reader.readObject(TypeArgInfo.OBJECT);
     }
 ```
@@ -191,7 +191,7 @@ Dson提供了 *writeObject、readObject、afterDecode、constructor* 4种默认�
 比如：一个类中的long字段是日期时间或时间戳，就无法在序列化结果中得到体现，因此也就无法直接转换为其它数据格式。
 当然，你可以手写序列化代码，将这个long序列化为一个特定的数据结构，从而让序列化数据可以转换为其它数据格式。
 
-Dson除了基本的值类型外，还提供了ExtInt32（带标签的Int32）、ExtInt64（带标签的Int64）、ExtString（带标签的String）--
+Dson除了基本的值类型外，还提供了ExtInt32（带标签的Int32）、ExtInt64（带标签的Int64）、ExtDouble（带标签的Double）、ExtString（带标签的String）--
 且Binary也是带标签的。
 以上面的long值为例，用户可以通过注解将其标记为ExtInt64类型，并声明其子类型为datetime，生成的序列化代码就会将其序列化为ExtInt64,
 

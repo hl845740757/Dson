@@ -16,8 +16,12 @@
 
 package cn.wjybxx.dson;
 
+import cn.wjybxx.dson.internal.CodedUtils;
 import cn.wjybxx.dson.internal.DsonInternals;
-import cn.wjybxx.dson.io.*;
+import cn.wjybxx.dson.io.DsonChunk;
+import cn.wjybxx.dson.io.DsonIOException;
+import cn.wjybxx.dson.io.DsonInput;
+import cn.wjybxx.dson.io.DsonOutput;
 import cn.wjybxx.dson.types.*;
 
 import java.util.List;
@@ -136,14 +140,14 @@ public class DsonReaderUtils {
     // region binary
 
     public static void writeBinary(DsonOutput output, Binary binary) {
-        int sizeOfBinaryType = BinaryUtils.computeRawVarInt32Size(binary.getType());
+        int sizeOfBinaryType = CodedUtils.computeRawVarInt32Size(binary.getType());
         output.writeFixed32(sizeOfBinaryType + binary.getData().length);
         output.writeUint32(binary.getType());
         output.writeRawBytes(binary.getData());
     }
 
     public static void writeBinary(DsonOutput output, int type, DsonChunk chunk) {
-        int sizeOfBinaryType = BinaryUtils.computeRawVarInt32Size(type);
+        int sizeOfBinaryType = CodedUtils.computeRawVarInt32Size(type);
         output.writeFixed32(sizeOfBinaryType + chunk.getLength());
         output.writeUint32(type);
         output.writeRawBytes(chunk.getBuffer(), chunk.getOffset(), chunk.getLength());

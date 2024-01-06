@@ -81,35 +81,35 @@ public class DsonLites {
     // region read/write
 
     /**
-     * 读取顶层容器
+     * 读取顶层集合
      * 会将独立的header合并到容器中，会将分散的元素读取存入数组
      */
-    public static DsonArray<FieldNumber> readTopContainer(DsonLiteReader reader) {
-        final DsonArray<FieldNumber> topContainer = new DsonArray<>(4);
+    public static DsonArray<FieldNumber> readCollection(DsonLiteReader reader) {
+        final DsonArray<FieldNumber> collection = new DsonArray<>(4);
         DsonType dsonType;
         while ((dsonType = reader.readDsonType()) != DsonType.END_OF_OBJECT) {
             if (dsonType == DsonType.HEADER) {
-                readHeader(reader, topContainer.getHeader());
+                readHeader(reader, collection.getHeader());
             } else if (dsonType == DsonType.OBJECT) {
-                topContainer.add(readObject(reader));
+                collection.add(readObject(reader));
             } else if (dsonType == DsonType.ARRAY) {
-                topContainer.add(readArray(reader));
+                collection.add(readArray(reader));
             } else {
                 throw DsonIOException.invalidTopDsonType(dsonType);
             }
         }
-        return topContainer;
+        return collection;
     }
 
     /**
-     * 写入顶层容器
+     * 写入顶层集合
      * 顶层容器的header和元素将被展开，而不是嵌套在数组中
      */
-    public static void writeTopContainer(DsonLiteWriter writer, DsonArray<FieldNumber> topContainer) {
-        if (!topContainer.getHeader().isEmpty()) {
-            writeHeader(writer, topContainer.getHeader());
+    public static void writeCollection(DsonLiteWriter writer, DsonArray<FieldNumber> collection) {
+        if (!collection.getHeader().isEmpty()) {
+            writeHeader(writer, collection.getHeader());
         }
-        for (DsonValue dsonValue : topContainer) {
+        for (DsonValue dsonValue : collection) {
             if (dsonValue.getDsonType() == DsonType.OBJECT) {
                 writeObject(writer, dsonValue.asObjectLite());
             } else if (dsonValue.getDsonType() == DsonType.ARRAY) {

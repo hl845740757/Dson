@@ -30,14 +30,14 @@ namespace Wjybxx.Dson;
 public class DsonRepository
 {
     private readonly Dictionary<string, DsonValue> _indexMap = new();
-    private readonly DsonArray<string> _container;
+    private readonly DsonArray<string> _collection;
 
     public DsonRepository() {
-        _container = new();
+        _collection = new();
     }
 
     public DsonRepository(DsonArray<string> container) {
-        _container = container ?? throw new ArgumentNullException(nameof(container));
+        _collection = container ?? throw new ArgumentNullException(nameof(container));
         foreach (var dsonValue in container) {
             string localId = Dsons.GetLocalId(dsonValue);
             if (localId != null) {
@@ -46,17 +46,17 @@ public class DsonRepository
         }
     }
 
-    /** 获取索引信息 */
+    /** 获取索引信息 -- 勿修改返回的对象 */
     public Dictionary<string, DsonValue> IndexMap => _indexMap;
 
-    /** 获取顶层容器 */
-    public DsonArray<string> Container => _container;
+    /** 获取顶层集合 -- 勿修改返回的对象 */
+    public DsonArray<string> Collection => _collection;
 
     /** 获取顶层元素数量 */
-    public int Count => _container.Count;
+    public int Count => _collection.Count;
 
     /** 获取指定下标的元素 */
-    public DsonValue this[int index] => _container[index];
+    public DsonValue this[int index] => _collection[index];
 
     /// <summary>
     /// 添加元素到仓库
@@ -68,12 +68,12 @@ public class DsonRepository
         if (!value.DsonType.IsContainerOrHeader()) {
             throw new ArgumentException();
         }
-        _container.Add(value);
+        _collection.Add(value);
 
         string localId = Dsons.GetLocalId(value);
         if (localId != null) {
             if (_indexMap.Remove(localId, out DsonValue exist)) {
-                CollectionUtil.RemoveRef(_container, exist);
+                CollectionUtil.RemoveRef(_collection, exist);
             }
             _indexMap[localId] = value;
         }
@@ -86,8 +86,8 @@ public class DsonRepository
     /// <param name="idx">元素下标</param>
     /// <returns>删除的元素</returns>
     public DsonValue RemoveAt(int idx) {
-        DsonValue dsonValue = _container[idx];
-        _container.RemoveAt(idx); // 居然没返回值...
+        DsonValue dsonValue = _collection[idx];
+        _collection.RemoveAt(idx); // 居然没返回值...
 
         string localId = Dsons.GetLocalId(dsonValue);
         if (localId != null) {
@@ -103,7 +103,7 @@ public class DsonRepository
     /// <param name="dsonValue">要删除的元素</param>
     /// <returns>删除成功则返回true，否则返回false</returns>
     public bool Remove(DsonValue dsonValue) {
-        int idx = CollectionUtil.IndexOfRef(_container, dsonValue);
+        int idx = CollectionUtil.IndexOfRef(_collection, dsonValue);
         if (idx >= 0) {
             RemoveAt(idx);
             return true;
@@ -121,7 +121,7 @@ public class DsonRepository
     public DsonValue? RemoveById(string localId) {
         if (localId == null) throw new ArgumentNullException(nameof(localId));
         if (_indexMap.Remove(localId, out DsonValue exist)) {
-            CollectionUtil.RemoveRef(_container, exist);
+            CollectionUtil.RemoveRef(_collection, exist);
         }
         return exist;
     }
@@ -143,7 +143,7 @@ public class DsonRepository
     /// </summary>
     /// <returns></returns>
     public DsonRepository ResolveReference() {
-        foreach (DsonValue dsonValue in _container) {
+        foreach (DsonValue dsonValue in _collection) {
             ResolveReference(dsonValue);
         }
         return this;
@@ -186,8 +186,7 @@ public class DsonRepository
     /// <returns></returns>
     public static DsonRepository FromDson(IDsonReader<string> reader, bool resolveRef = false) {
         using (reader) {
-            DsonArray<string> topContainer = Dsons.ReadTopContainer(reader);
-            DsonRepository repository = new DsonRepository(topContainer);
+            DsonRepository repository = new DsonRepository(Dsons.ReadCollection(reader));
             if (resolveRef) {
                 repository.ResolveReference();
             }

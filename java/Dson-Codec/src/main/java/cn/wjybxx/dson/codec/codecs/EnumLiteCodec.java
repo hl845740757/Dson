@@ -17,15 +17,15 @@
 package cn.wjybxx.dson.codec.codecs;
 
 import cn.wjybxx.base.EnumLite;
-import cn.wjybxx.dson.codec.PojoCodecImpl;
+import cn.wjybxx.dson.codec.DuplexCodec;
 import cn.wjybxx.dson.codec.TypeArgInfo;
-import cn.wjybxx.dson.codec.binary.BinaryObjectReader;
-import cn.wjybxx.dson.codec.binary.BinaryObjectWriter;
-import cn.wjybxx.dson.codec.binary.BinaryPojoCodecImpl;
-import cn.wjybxx.dson.codec.binary.BinaryPojoCodecScanIgnore;
-import cn.wjybxx.dson.codec.document.DocumentObjectReader;
-import cn.wjybxx.dson.codec.document.DocumentObjectWriter;
-import cn.wjybxx.dson.codec.document.DocumentPojoCodecScanIgnore;
+import cn.wjybxx.dson.codec.dson.DsonCodecScanIgnore;
+import cn.wjybxx.dson.codec.dson.DsonObjectReader;
+import cn.wjybxx.dson.codec.dson.DsonObjectWriter;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteCodec;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteCodecScanIgnore;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteObjectReader;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteObjectWriter;
 import cn.wjybxx.dson.text.ObjectStyle;
 
 import javax.annotation.Nonnull;
@@ -33,15 +33,15 @@ import java.util.Objects;
 import java.util.function.IntFunction;
 
 /**
- * 在之前的版本中，生成的代码直接继承{@link BinaryPojoCodecImpl}，这让枚举的编解码调整较为麻烦，
+ * 在之前的版本中，生成的代码直接继承{@link DsonLiteCodec}，这让枚举的编解码调整较为麻烦，
  * 因为要调整APT，而让枚举的Codec继承该Codec的话，生成的代码就更为稳定，我们调整编解码方式也更方便。
  *
  * @author wjybxx
  * date - 2023/4/24
  */
-@BinaryPojoCodecScanIgnore
-@DocumentPojoCodecScanIgnore
-public class EnumLiteCodec<T extends EnumLite> implements PojoCodecImpl<T> {
+@DsonLiteCodecScanIgnore
+@DsonCodecScanIgnore
+public class EnumLiteCodec<T extends EnumLite> implements DuplexCodec<T> {
 
     private final Class<T> encoderClass;
     private final IntFunction<T> mapper;
@@ -65,22 +65,22 @@ public class EnumLiteCodec<T extends EnumLite> implements PojoCodecImpl<T> {
     }
 
     @Override
-    public void writeObject(BinaryObjectWriter writer, T instance, TypeArgInfo<?> typeArgInfo) {
+    public void writeObject(DsonLiteObjectWriter writer, T instance, TypeArgInfo<?> typeArgInfo) {
         writer.writeInt(0, instance.getNumber());
     }
 
     @Override
-    public T readObject(BinaryObjectReader reader, TypeArgInfo<?> typeArgInfo) {
+    public T readObject(DsonLiteObjectReader reader, TypeArgInfo<?> typeArgInfo) {
         return mapper.apply(reader.readInt(0));
     }
 
     @Override
-    public T readObject(DocumentObjectReader reader, TypeArgInfo<?> typeArgInfo) {
+    public T readObject(DsonObjectReader reader, TypeArgInfo<?> typeArgInfo) {
         return mapper.apply(reader.readInt("number"));
     }
 
     @Override
-    public void writeObject(DocumentObjectWriter writer, T instance, TypeArgInfo<?> typeArgInfo, ObjectStyle style) {
+    public void writeObject(DsonObjectWriter writer, T instance, TypeArgInfo<?> typeArgInfo, ObjectStyle style) {
         writer.writeInt("number", instance.getNumber());
     }
 }

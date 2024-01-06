@@ -17,6 +17,7 @@
 #endregion
 
 using Wjybxx.Commons.Collections;
+using Wjybxx.Dson.Internal;
 
 #pragma warning disable CS1591
 namespace Wjybxx.Dson;

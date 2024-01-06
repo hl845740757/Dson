@@ -24,6 +24,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using Wjybxx.Commons.IO;
 using Wjybxx.Dson.Collections;
+using Wjybxx.Dson.Internal;
 using Wjybxx.Dson.IO;
 using Wjybxx.Dson.Text;
 
@@ -212,7 +213,7 @@ public static class Dsons
     public static int MakeFullNumberZeroIdep(int lnumber) {
         return lnumber << IdepBits;
     }
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static long MakeClassGuid(int ns, int classId) {
         return ((long)ns << 32) | (classId & 0xFFFF_FFFFL);
@@ -252,36 +253,36 @@ public static class Dsons
     #region Read/Write
 
     /**
-     * 读取顶层容器
+     * 读取顶层集合
      * 会将独立的header合并到容器中，会将分散的元素读取存入数组
      */
-    public static DsonArray<TName> ReadTopContainer<TName>(IDsonReader<TName> reader) where TName : IEquatable<TName> {
-        DsonArray<TName> topContainer = new DsonArray<TName>(4);
+    public static DsonArray<TName> ReadCollection<TName>(IDsonReader<TName> reader) where TName : IEquatable<TName> {
+        DsonArray<TName> collection = new DsonArray<TName>(4);
         DsonType dsonType;
         while ((dsonType = reader.ReadDsonType()) != DsonType.EndOfObject) {
             if (dsonType == DsonType.Header) {
-                ReadHeader(reader, topContainer.Header);
+                ReadHeader(reader, collection.Header);
             } else if (dsonType == DsonType.Object) {
-                topContainer.Add(ReadObject(reader));
+                collection.Add(ReadObject(reader));
             } else if (dsonType == DsonType.Array) {
-                topContainer.Add(ReadArray(reader));
+                collection.Add(ReadArray(reader));
             } else {
                 throw DsonIOException.InvalidTopDsonType(dsonType);
             }
         }
-        return topContainer;
+        return collection;
     }
 
     /**
-     * 写入顶层容器
+     * 写入顶层集合
      * 顶层容器的header和元素将被展开，而不是嵌套在数组中
      */
-    public static void WriteTopContainer<TName>(IDsonWriter<TName> writer,
-                                                DsonArray<TName> topContainer) where TName : IEquatable<TName> {
-        if (topContainer.Header.Count > 0) {
-            WriteHeader(writer, topContainer.Header);
+    public static void WriteCollection<TName>(IDsonWriter<TName> writer,
+                                              DsonArray<TName> collection) where TName : IEquatable<TName> {
+        if (collection.Header.Count > 0) {
+            WriteHeader(writer, collection.Header);
         }
-        foreach (DsonValue dsonValue in topContainer) {
+        foreach (DsonValue dsonValue in collection) {
             if (dsonValue.DsonType == DsonType.Object) {
                 WriteObject(writer, dsonValue.AsObject<TName>());
             } else if (dsonValue.DsonType == DsonType.Array) {
@@ -591,13 +592,13 @@ public static class Dsons
     #region 快捷方法
 
     /** 该接口用于写顶层数组容器，所有元素将被展开 */
-    public static string ToFlatDson(this DsonArray<string> topContainer, DsonTextWriterSettings? settings = null) {
+    public static string ToCollectionDson(this DsonArray<string> collection, DsonTextWriterSettings? settings = null) {
         if (settings == null) settings = DsonTextWriterSettings.Default;
 
         StringBuilder sb = LocalStringBuilderPool.Instance.Rent();
         try {
             using (DsonTextWriter writer = new DsonTextWriter(settings, new StringWriter(sb))) {
-                WriteTopContainer(writer, topContainer);
+                WriteCollection(writer, collection);
             }
             return sb.ToString();
         }
@@ -607,9 +608,9 @@ public static class Dsons
     }
 
     /** 该接口用于读取多顶层对象dson文本 */
-    public static DsonArray<string> FromFlatDson(string dsonString) {
+    public static DsonArray<string> FromCollectionDson(string dsonString) {
         using (DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.Default, dsonString)) {
-            return ReadTopContainer(reader);
+            return ReadCollection(reader);
         }
     }
 

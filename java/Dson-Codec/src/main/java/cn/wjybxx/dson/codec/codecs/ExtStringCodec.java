@@ -16,12 +16,12 @@
 
 package cn.wjybxx.dson.codec.codecs;
 
-import cn.wjybxx.dson.codec.PojoCodecImpl;
+import cn.wjybxx.dson.codec.DuplexCodec;
 import cn.wjybxx.dson.codec.TypeArgInfo;
-import cn.wjybxx.dson.codec.binary.BinaryObjectReader;
-import cn.wjybxx.dson.codec.binary.BinaryObjectWriter;
-import cn.wjybxx.dson.codec.document.DocumentObjectReader;
-import cn.wjybxx.dson.codec.document.DocumentObjectWriter;
+import cn.wjybxx.dson.codec.dson.DsonObjectReader;
+import cn.wjybxx.dson.codec.dson.DsonObjectWriter;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteObjectReader;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteObjectWriter;
 import cn.wjybxx.dson.text.ObjectStyle;
 import cn.wjybxx.dson.text.StringStyle;
 import cn.wjybxx.dson.types.ExtString;
@@ -32,7 +32,7 @@ import javax.annotation.Nonnull;
  * @author wjybxx
  * date - 2023/12/28
  */
-public class ExtStringCodec implements PojoCodecImpl<ExtString> {
+public class ExtStringCodec implements DuplexCodec<ExtString> {
 
     @Override
     public boolean isWriteAsArray() {
@@ -51,24 +51,24 @@ public class ExtStringCodec implements PojoCodecImpl<ExtString> {
     }
 
     @Override
-    public void writeObject(BinaryObjectWriter writer, ExtString instance, TypeArgInfo<?> typeArgInfo) {
+    public void writeObject(DsonLiteObjectWriter writer, ExtString instance, TypeArgInfo<?> typeArgInfo) {
         // 外部writeName
         writer.writeExtString(writer.getCurrentName(), instance);
     }
 
     @Override
-    public ExtString readObject(BinaryObjectReader reader, TypeArgInfo<?> typeArgInfo) {
+    public ExtString readObject(DsonLiteObjectReader reader, TypeArgInfo<?> typeArgInfo) {
         // 外部已readName
         return reader.readExtString(reader.getCurrentName());
     }
 
     @Override
-    public void writeObject(DocumentObjectWriter writer, ExtString instance, TypeArgInfo<?> typeArgInfo, ObjectStyle style) {
+    public void writeObject(DsonObjectWriter writer, ExtString instance, TypeArgInfo<?> typeArgInfo, ObjectStyle style) {
         writer.writeExtString(writer.getCurrentName(), instance, StringStyle.AUTO);
     }
 
     @Override
-    public ExtString readObject(DocumentObjectReader reader, TypeArgInfo<?> typeArgInfo) {
+    public ExtString readObject(DsonObjectReader reader, TypeArgInfo<?> typeArgInfo) {
         return reader.readExtString(reader.getCurrentName());
     }
 }

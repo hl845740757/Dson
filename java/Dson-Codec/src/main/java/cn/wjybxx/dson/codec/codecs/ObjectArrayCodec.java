@@ -18,14 +18,14 @@ package cn.wjybxx.dson.codec.codecs;
 
 import cn.wjybxx.dson.DsonType;
 import cn.wjybxx.dson.codec.ConverterUtils;
-import cn.wjybxx.dson.codec.PojoCodecImpl;
+import cn.wjybxx.dson.codec.DuplexCodec;
 import cn.wjybxx.dson.codec.TypeArgInfo;
-import cn.wjybxx.dson.codec.binary.BinaryObjectReader;
-import cn.wjybxx.dson.codec.binary.BinaryObjectWriter;
-import cn.wjybxx.dson.codec.binary.BinaryPojoCodecScanIgnore;
-import cn.wjybxx.dson.codec.document.DocumentObjectReader;
-import cn.wjybxx.dson.codec.document.DocumentObjectWriter;
-import cn.wjybxx.dson.codec.document.DocumentPojoCodecScanIgnore;
+import cn.wjybxx.dson.codec.dson.DsonCodecScanIgnore;
+import cn.wjybxx.dson.codec.dson.DsonObjectReader;
+import cn.wjybxx.dson.codec.dson.DsonObjectWriter;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteCodecScanIgnore;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteObjectReader;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteObjectWriter;
 import cn.wjybxx.dson.text.ObjectStyle;
 
 import javax.annotation.Nonnull;
@@ -35,9 +35,9 @@ import java.util.ArrayList;
  * @author wjybxx
  * date 2023/4/4
  */
-@BinaryPojoCodecScanIgnore
-@DocumentPojoCodecScanIgnore
-public class ObjectArrayCodec implements PojoCodecImpl<Object[]> {
+@DsonLiteCodecScanIgnore
+@DsonCodecScanIgnore
+public class ObjectArrayCodec implements DuplexCodec<Object[]> {
 
     @Nonnull
     @Override
@@ -46,7 +46,7 @@ public class ObjectArrayCodec implements PojoCodecImpl<Object[]> {
     }
 
     @Override
-    public void writeObject(BinaryObjectWriter writer, Object[] instance, TypeArgInfo<?> typeArgInfo) {
+    public void writeObject(DsonLiteObjectWriter writer, Object[] instance, TypeArgInfo<?> typeArgInfo) {
         TypeArgInfo<?> componentArgInfo = ConverterUtils.findComponentTypeArg(typeArgInfo.declaredType);
         for (Object e : instance) {
             writer.writeObject(0, e, componentArgInfo);
@@ -54,7 +54,7 @@ public class ObjectArrayCodec implements PojoCodecImpl<Object[]> {
     }
 
     @Override
-    public Object[] readObject(BinaryObjectReader reader, TypeArgInfo<?> typeArgInfo) {
+    public Object[] readObject(DsonLiteObjectReader reader, TypeArgInfo<?> typeArgInfo) {
         ArrayList<Object> result = new ArrayList<>();
         TypeArgInfo<?> componentArgInfo = ConverterUtils.findComponentTypeArg(typeArgInfo.declaredType);
         while (reader.readDsonType() != DsonType.END_OF_OBJECT) {
@@ -65,7 +65,7 @@ public class ObjectArrayCodec implements PojoCodecImpl<Object[]> {
     }
 
     @Override
-    public void writeObject(DocumentObjectWriter writer, Object[] instance, TypeArgInfo<?> typeArgInfo, ObjectStyle style) {
+    public void writeObject(DsonObjectWriter writer, Object[] instance, TypeArgInfo<?> typeArgInfo, ObjectStyle style) {
         TypeArgInfo<?> componentArgInfo = ConverterUtils.findComponentTypeArg(typeArgInfo.declaredType);
         for (Object e : instance) {
             writer.writeObject(null, e, componentArgInfo, null);
@@ -73,7 +73,7 @@ public class ObjectArrayCodec implements PojoCodecImpl<Object[]> {
     }
 
     @Override
-    public Object[] readObject(DocumentObjectReader reader, TypeArgInfo<?> typeArgInfo) {
+    public Object[] readObject(DsonObjectReader reader, TypeArgInfo<?> typeArgInfo) {
         ArrayList<Object> result = new ArrayList<>();
         TypeArgInfo<?> componentArgInfo = ConverterUtils.findComponentTypeArg(typeArgInfo.declaredType);
         while (reader.readDsonType() != DsonType.END_OF_OBJECT) {

@@ -16,10 +16,10 @@
 
 package cn.wjybxx.dson.codec;
 
-import cn.wjybxx.dson.codec.binary.BinaryConverter;
-import cn.wjybxx.dson.codec.binary.DefaultBinaryConverter;
-import cn.wjybxx.dson.codec.document.DefaultDocumentConverter;
-import cn.wjybxx.dson.codec.document.DocumentConverter;
+import cn.wjybxx.dson.codec.dson.DefaultDsonConverter;
+import cn.wjybxx.dson.codec.dson.DsonConverter;
+import cn.wjybxx.dson.codec.dsonlite.DefaultDsonLiteConverter;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteConverter;
 import cn.wjybxx.dson.text.ObjectStyle;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Assertions;
@@ -69,10 +69,10 @@ public class CodecTest {
 
     @Test
     void binCodecTest() {
-        BinaryConverter converter = DefaultBinaryConverter.newInstance(
+        DsonLiteConverter converter = DefaultDsonLiteConverter.newInstance(
                 List.of(new CodecStructs.MyStructCodec()),
                 TypeMetaRegistries.fromMetas(TypeMeta.of(CodecStructs.MyStruct.class, new ClassId(1, 1))),
-                ConvertOptions.DEFAULT);
+                ConverterOptions.DEFAULT);
 
         CodecStructs.MyStruct clonedObject = converter.cloneObject(myStruct, TypeArgInfo.of(CodecStructs.MyStruct.class));
         Assertions.assertEquals(myStruct, clonedObject);
@@ -80,10 +80,10 @@ public class CodecTest {
 
     @Test
     void docCodecTest() {
-        DocumentConverter converter = DefaultDocumentConverter.newInstance(
+        DsonConverter converter = DefaultDsonConverter.newInstance(
                 List.of(new CodecStructs.MyStructCodec()),
                 TypeMetaRegistries.fromMetas(TypeMeta.of(CodecStructs.MyStruct.class, ObjectStyle.INDENT, "MyStruct")),
-                ConvertOptions.DEFAULT);
+                ConverterOptions.DEFAULT);
 
         CodecStructs.MyStruct clonedObject = converter.cloneObject(myStruct, TypeArgInfo.of(CodecStructs.MyStruct.class));
         Assertions.assertEquals(myStruct, clonedObject);

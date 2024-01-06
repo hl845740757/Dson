@@ -23,7 +23,7 @@ public class SetKeyItrTest {
         List<String> expectedKeyList = new ArrayList<>(dsonObject.keySet());
         Collections.reverse(expectedKeyList);
 
-        try (DsonObjectReader objectReader = new DsonObjectReader(DsonReaderSettings.DEFAULT, new DsonArray<String>(1).append(dsonObject))) {
+        try (DsonCollectionReader objectReader = new DsonCollectionReader(DsonReaderSettings.DEFAULT, new DsonArray<String>(1).append(dsonObject))) {
             objectReader.readDsonType();
 
             objectReader.readStartObject();

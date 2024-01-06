@@ -16,7 +16,9 @@
 
 package cn.wjybxx.dson.io;
 
+import cn.wjybxx.base.io.ByteBufferUtils;
 import cn.wjybxx.base.mutable.MutableInt;
+import cn.wjybxx.dson.internal.CodedUtils;
 
 import java.nio.charset.StandardCharsets;
 
@@ -47,7 +49,7 @@ public class DsonInputs {
         private final MutableInt newPos = new MutableInt();
 
         ArrayDsonInput(byte[] buffer, int offset, int length) {
-            BinaryUtils.checkBuffer(buffer, offset, length);
+            ByteBufferUtils.checkBuffer(buffer, offset, length);
             this.buffer = buffer;
             this.rawOffset = offset;
             this.rawLimit = offset + length;
@@ -79,7 +81,7 @@ public class DsonInputs {
         @Override
         public int readInt32() {
             try {
-                int r = BinaryUtils.readInt32(buffer, bufferPos, newPos);
+                int r = CodedUtils.readInt32(buffer, bufferPos, newPos);
                 bufferPos = checkNewBufferPos(newPos.getValue());
                 return r;
             } catch (Exception e) {
@@ -90,7 +92,7 @@ public class DsonInputs {
         @Override
         public int readUint32() {
             try {
-                int r = BinaryUtils.readUint32(buffer, bufferPos, newPos);
+                int r = CodedUtils.readUint32(buffer, bufferPos, newPos);
                 bufferPos = checkNewBufferPos(newPos.getValue());
                 return r;
             } catch (Exception e) {
@@ -101,7 +103,7 @@ public class DsonInputs {
         @Override
         public int readSint32() {
             try {
-                int r = BinaryUtils.readSint32(buffer, bufferPos, newPos);
+                int r = CodedUtils.readSint32(buffer, bufferPos, newPos);
                 bufferPos = checkNewBufferPos(newPos.getValue());
                 return r;
             } catch (Exception e) {
@@ -112,7 +114,7 @@ public class DsonInputs {
         @Override
         public int readFixed32() {
             try {
-                int r = BinaryUtils.readFixed32(buffer, bufferPos, newPos);
+                int r = CodedUtils.readFixed32(buffer, bufferPos, newPos);
                 bufferPos = checkNewBufferPos(newPos.getValue());
                 return r;
             } catch (Exception e) {
@@ -123,7 +125,7 @@ public class DsonInputs {
         @Override
         public long readInt64() {
             try {
-                long r = BinaryUtils.readInt64(buffer, bufferPos, newPos);
+                long r = CodedUtils.readInt64(buffer, bufferPos, newPos);
                 bufferPos = checkNewBufferPos(newPos.getValue());
                 return r;
             } catch (Exception e) {
@@ -134,7 +136,7 @@ public class DsonInputs {
         @Override
         public long readUint64() {
             try {
-                long r = BinaryUtils.readUint64(buffer, bufferPos, newPos);
+                long r = CodedUtils.readUint64(buffer, bufferPos, newPos);
                 bufferPos = checkNewBufferPos(newPos.getValue());
                 return r;
             } catch (Exception e) {
@@ -145,7 +147,7 @@ public class DsonInputs {
         @Override
         public long readSint64() {
             try {
-                long r = BinaryUtils.readSint64(buffer, bufferPos, newPos);
+                long r = CodedUtils.readSint64(buffer, bufferPos, newPos);
                 bufferPos = checkNewBufferPos(newPos.getValue());
                 return r;
             } catch (Exception e) {
@@ -156,7 +158,7 @@ public class DsonInputs {
         @Override
         public long readFixed64() {
             try {
-                long r = BinaryUtils.readFixed64(buffer, bufferPos, newPos);
+                long r = CodedUtils.readFixed64(buffer, bufferPos, newPos);
                 bufferPos = checkNewBufferPos(newPos.getValue());
                 return r;
             } catch (Exception e) {
@@ -167,7 +169,7 @@ public class DsonInputs {
         @Override
         public float readFloat() {
             try {
-                float r = BinaryUtils.readFloat(buffer, bufferPos, newPos);
+                float r = CodedUtils.readFloat(buffer, bufferPos, newPos);
                 bufferPos = checkNewBufferPos(newPos.getValue());
                 return r;
             } catch (Exception e) {
@@ -178,7 +180,7 @@ public class DsonInputs {
         @Override
         public double readDouble() {
             try {
-                double r = BinaryUtils.readDouble(buffer, bufferPos, newPos);
+                double r = CodedUtils.readDouble(buffer, bufferPos, newPos);
                 bufferPos = checkNewBufferPos(newPos.getValue());
                 return r;
             } catch (Exception e) {
@@ -195,7 +197,7 @@ public class DsonInputs {
         @Override
         public String readString() {
             try {
-                int len = BinaryUtils.readUint32(buffer, bufferPos, newPos); // 字符串长度
+                int len = CodedUtils.readUint32(buffer, bufferPos, newPos); // 字符串长度
                 checkNewBufferPos(newPos.getValue() + len); // 先检查，避免构建无效字符串
 
                 String r = new String(buffer, newPos.getValue(), len, StandardCharsets.UTF_8);
@@ -232,22 +234,22 @@ public class DsonInputs {
 
         @Override
         public void setPosition(int value) {
-            BinaryUtils.checkBuffer(rawLimit - rawOffset, value);
+            ByteBufferUtils.checkBuffer(rawLimit - rawOffset, value);
             bufferPos = rawOffset + value;
         }
 
         @Override
         public byte getByte(int pos) {
-            BinaryUtils.checkBuffer(rawLimit - rawOffset, pos, 1);
+            ByteBufferUtils.checkBuffer(rawLimit - rawOffset, pos, 1);
             int bufferPos = rawOffset + pos;
             return buffer[bufferPos];
         }
 
         @Override
         public int getFixed32(int pos) {
-            BinaryUtils.checkBuffer(rawLimit - rawOffset, pos, 4);
+            ByteBufferUtils.checkBuffer(rawLimit - rawOffset, pos, 4);
             int bufferPos = rawOffset + pos;
-            return BinaryUtils.getIntLE(buffer, bufferPos);
+            return ByteBufferUtils.getInt32LE(buffer, bufferPos);
         }
 
         @Override
@@ -257,7 +259,7 @@ public class DsonInputs {
             int newPosLimit = bufferPos + byteLimit;
 
             // 不可超过原始限制
-            BinaryUtils.checkBuffer(rawLimit, rawOffset, newPosLimit - rawOffset);
+            ByteBufferUtils.checkBuffer(rawLimit, rawOffset, newPosLimit - rawOffset);
             bufferPosLimit = newPosLimit;
             return oldPosLimit;
         }
@@ -265,7 +267,7 @@ public class DsonInputs {
         @Override
         public void popLimit(int oldLimit) {
             // 不可超过原始限制
-            BinaryUtils.checkBuffer(rawLimit, rawOffset, oldLimit - rawOffset);
+            ByteBufferUtils.checkBuffer(rawLimit, rawOffset, oldLimit - rawOffset);
             bufferPosLimit = oldLimit;
         }
 

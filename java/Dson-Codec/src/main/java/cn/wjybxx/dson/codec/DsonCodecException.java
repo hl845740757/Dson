@@ -51,21 +51,6 @@ public class DsonCodecException extends RuntimeException {
     }
 
     //
-    public static DsonCodecException recursionLimitExceeded() {
-        return new DsonCodecException("Object had too many levels of nesting.");
-    }
-
-    public static DsonCodecException unexpectedName(int expected, int name) {
-        return new DsonCodecException(String.format("The number of the field does not match, expected %d, but found %d", expected, name));
-    }
-
-    public static DsonCodecException unexpectedName(String expected, String name) {
-        return new DsonCodecException(String.format("The name of the field does not match, expected %s, but found %s", expected, name));
-    }
-
-    public static DsonCodecException unexpectedSubType(int expected, int subType) {
-        return new DsonCodecException(String.format("Unexpected subType, expected %d, but found %d", expected, subType));
-    }
 
     public static DsonCodecException unsupportedType(Class<?> type) {
         return new DsonCodecException("Can't find a codec for " + type);

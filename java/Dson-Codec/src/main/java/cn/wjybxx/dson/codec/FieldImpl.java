@@ -18,10 +18,10 @@ package cn.wjybxx.dson.codec;
 
 import cn.wjybxx.dson.DsonType;
 import cn.wjybxx.dson.WireType;
-import cn.wjybxx.dson.codec.binary.BinaryObjectReader;
-import cn.wjybxx.dson.codec.binary.BinaryObjectWriter;
-import cn.wjybxx.dson.codec.document.DocumentObjectReader;
-import cn.wjybxx.dson.codec.document.DocumentObjectWriter;
+import cn.wjybxx.dson.codec.dson.DsonObjectReader;
+import cn.wjybxx.dson.codec.dson.DsonObjectWriter;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteObjectReader;
+import cn.wjybxx.dson.codec.dsonlite.DsonLiteObjectWriter;
 import cn.wjybxx.dson.text.NumberStyle;
 import cn.wjybxx.dson.text.ObjectStyle;
 import cn.wjybxx.dson.text.StringStyle;
@@ -45,7 +45,7 @@ import java.lang.annotation.Target;
  * 读写代理可以实现字段的高自由度读写。
  * 1.可以解决上面提到的多态问题。
  * 2.可以实现字段的读写替换：由于需要自行调用writeStart，因此可以替换要写入的内容。
- * 3.可以实现字段的延迟解析：通过{@link BinaryObjectReader#readValueAsBytes(int)} -- 目前仅二进制编解码接口提供支持，
+ * 3.可以实现字段的延迟解析：通过{@link DsonLiteObjectReader#readValueAsBytes(int)} -- 目前仅二进制编解码接口提供支持，
  * 4.字段读后的转换：如果字段的默认解码类型不符合要求，可以在读写代理中处理。
  * 5.可用于通知注解处理器不自动读或写
  *
@@ -158,13 +158,13 @@ public @interface FieldImpl {
     /**
      * 写代理：自定义写方法
      * 1.参数限定为两个，第一个参数为writer，第二个为name
-     * 2.参数限定为{@link BinaryObjectWriter}或{@link DocumentObjectWriter}
+     * 2.参数限定为{@link DsonLiteObjectWriter}或{@link DsonObjectWriter}
      * 示例：
      * <pre>{@code
-     *      public void writeName(BinaryObjectWriter writer, int name) {
+     *      public void writeName(DsonLiteObjectWriter writer, int name) {
      *          writer.writeString(name, this.name);
      *      }
-     *      public void writeName(DocumentObjectWriter writer, String name) {
+     *      public void writeName(DsonObjectWriter writer, String name) {
      *          writer.writeString(name, this.name);
      *      }
      * }
@@ -176,15 +176,15 @@ public @interface FieldImpl {
     /**
      * 读代理：自定义读方法
      * 1.参数限定为两个，第一个参数为reader，第二个为name
-     * 2.参数限定为{@link BinaryObjectReader}或{@link DocumentObjectReader}
+     * 2.参数限定为{@link DsonLiteObjectReader}或{@link DsonObjectReader}
      * 3.对于有特殊构造过程的字段是很有帮助的，也可以进行类型转换。
      * <p>
      * 示例：
      * <pre>{@code
-     *      public void readName(BinaryObjectReader reader, int name) {
+     *      public void readName(DsonLiteObjectReader reader, int name) {
      *          this.name = reader.readString(name);
      *      }
-     *      public void readName(DocumentObjectReader reader, String name) {
+     *      public void readName(DsonObjectReader reader, String name) {
      *          this.name = reader.readString(name);
      *      }
      * }

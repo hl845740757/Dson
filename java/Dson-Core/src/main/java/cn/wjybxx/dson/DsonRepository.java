@@ -16,15 +16,15 @@ import java.util.Objects;
 public class DsonRepository {
 
     private final Map<String, DsonValue> indexMap = new HashMap<>();
-    private final DsonArray<String> container;
+    private final DsonArray<String> collection;
 
     public DsonRepository() {
-        container = new DsonArray<>();
+        collection = new DsonArray<>();
     }
 
-    public DsonRepository(DsonArray<String> container) {
-        this.container = Objects.requireNonNull(container);
-        for (DsonValue dsonValue : container) {
+    public DsonRepository(DsonArray<String> collection) {
+        this.collection = Objects.requireNonNull(collection);
+        for (DsonValue dsonValue : collection) {
             String localId = Dsons.getLocalId(dsonValue);
             if (localId != null) {
                 indexMap.put(localId, dsonValue);
@@ -32,42 +32,42 @@ public class DsonRepository {
         }
     }
 
-    /** 勿修改返回的对象 */
+    /** 获取索引信息 -- 勿修改返回的对象 */
     public Map<String, DsonValue> getIndexMap() {
         return indexMap;
     }
 
-    /** 勿修改返回的对象 */
-    public DsonArray<String> getContainer() {
-        return container;
+    /** 获取顶层集合 -- 勿修改返回的对象 */
+    public DsonArray<String> getCollection() {
+        return collection;
     }
 
     public int size() {
-        return container.size();
+        return collection.size();
     }
 
     public DsonValue get(int idx) {
-        return container.get(idx);
+        return collection.get(idx);
     }
 
     public DsonRepository add(DsonValue value) {
         if (!value.getDsonType().isContainerOrHeader()) {
             throw new IllegalArgumentException();
         }
-        container.add(value);
+        collection.add(value);
 
         String localId = Dsons.getLocalId(value);
         if (localId != null) {
             DsonValue exist = indexMap.put(localId, value);
             if (exist != null) {
-                CollectionUtils.removeRef(container, exist);
+                CollectionUtils.removeRef(collection, exist);
             }
         }
         return this;
     }
 
     public DsonValue removeAt(int idx) {
-        DsonValue dsonValue = container.remove(idx);
+        DsonValue dsonValue = collection.remove(idx);
         String localId = Dsons.getLocalId(dsonValue);
         if (localId != null) {
             indexMap.remove(localId);
@@ -76,7 +76,7 @@ public class DsonRepository {
     }
 
     public boolean remove(DsonValue dsonValue) {
-        int idx = CollectionUtils.indexOfRef(container, dsonValue);
+        int idx = CollectionUtils.indexOfRef(collection, dsonValue);
         if (idx >= 0) {
             removeAt(idx);
             return true;
@@ -89,7 +89,7 @@ public class DsonRepository {
         Objects.requireNonNull(localId);
         DsonValue exist = indexMap.remove(localId);
         if (exist != null) {
-            CollectionUtils.removeRef(container, exist);
+            CollectionUtils.removeRef(collection, exist);
         }
         return exist;
     }
@@ -100,7 +100,7 @@ public class DsonRepository {
     }
 
     public DsonRepository resolveReference() {
-        for (DsonValue dsonValue : container) {
+        for (DsonValue dsonValue : collection) {
             resolveReference(dsonValue);
         }
         return this;
@@ -147,7 +147,7 @@ public class DsonRepository {
      */
     public static DsonRepository fromDson(DsonReader reader, boolean resolveRef) {
         try (reader) {
-            DsonRepository repository = new DsonRepository(Dsons.readTopContainer(reader));
+            DsonRepository repository = new DsonRepository(Dsons.readCollection(reader));
             if (resolveRef) {
                 repository.resolveReference();
             }
