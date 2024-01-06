@@ -19,13 +19,11 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using Wjybxx.Commons.Collections;
 using Wjybxx.Dson.IO;
 using Wjybxx.Dson.Text;
 
-namespace Wjybxx.Dson.Collections;
+namespace Wjybxx.Dson.Ext;
 
 /// <summary>
 /// 投影

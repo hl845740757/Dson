@@ -21,7 +21,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 #pragma warning disable CS1591
-namespace Wjybxx.Dson.IO;
+namespace Wjybxx.Dson.Ext;
 
 /// <summary>
 /// C#和Java的迭代器差异较大；虽然写Java的时候更多，但不能说C#的迭代器有问题。

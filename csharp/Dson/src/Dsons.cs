@@ -23,7 +23,7 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Wjybxx.Commons.IO;
-using Wjybxx.Dson.Collections;
+using Wjybxx.Dson.Ext;
 using Wjybxx.Dson.Internal;
 using Wjybxx.Dson.IO;
 using Wjybxx.Dson.Text;

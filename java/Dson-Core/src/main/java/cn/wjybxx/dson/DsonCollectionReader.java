@@ -16,8 +16,8 @@
 
 package cn.wjybxx.dson;
 
+import cn.wjybxx.dson.ext.MarkableIterator;
 import cn.wjybxx.dson.io.DsonIOException;
-import cn.wjybxx.dson.io.MarkableIterator;
 import cn.wjybxx.dson.types.*;
 
 import java.util.*;

@@ -18,7 +18,7 @@
 
 using NUnit.Framework;
 using Wjybxx.Commons;
-using Wjybxx.Dson.Collections;
+using Wjybxx.Dson.Ext;
 using Wjybxx.Dson.Text;
 
 namespace Wjybxx.Dson.Tests;

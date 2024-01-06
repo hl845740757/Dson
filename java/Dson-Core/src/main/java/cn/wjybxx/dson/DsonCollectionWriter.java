@@ -16,7 +16,6 @@ public class DsonCollectionWriter extends AbstractDsonWriter {
 
     public DsonCollectionWriter(DsonWriterSettings settings, DsonArray<String> outList) {
         super(settings);
-        // 顶层输出是一个数组
         Context context = new Context();
         context.init(null, DsonContextType.TOP_LEVEL, null);
         context.container = Objects.requireNonNull(outList);

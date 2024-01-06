@@ -13,7 +13,6 @@ public class DsonLiteCollectionWriter extends AbstractDsonLiteWriter {
 
     public DsonLiteCollectionWriter(DsonWriterSettings settings, DsonArray<FieldNumber> outList) {
         super(settings);
-        // 顶层输出是一个数组
         Context context = new Context();
         context.init(null, DsonContextType.TOP_LEVEL, null);
         context.container = Objects.requireNonNull(outList);

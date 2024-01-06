@@ -31,10 +31,8 @@ public final class FieldNumber implements Comparable<FieldNumber> {
 
     public static final FieldNumber ZERO = new FieldNumber((byte) 0, 0);
 
-    /** 类的继承深度 - Depth of Inheritance */
-    private final byte idep;
-    /** 字段正在类本地的编号 - localNumber */
-    private final int lnumber;
+    /** 字段完整编号 */
+    private final int fullNumber;
 
     public FieldNumber(byte idep, int lnumber) {
         if (idep < 0 || idep > DsonLites.IDEP_MAX_VALUE) {
@@ -43,8 +41,11 @@ public final class FieldNumber implements Comparable<FieldNumber> {
         if (lnumber < 0) {
             throw invalidArgs(idep, lnumber);
         }
-        this.lnumber = lnumber;
-        this.idep = idep;
+        this.fullNumber = DsonLites.makeFullNumber(idep, lnumber);
+    }
+
+    private FieldNumber(int fullNumber) {
+        this.fullNumber = fullNumber;
     }
 
     private static IllegalArgumentException invalidArgs(byte idep, int lnumber) {
@@ -60,19 +61,19 @@ public final class FieldNumber implements Comparable<FieldNumber> {
                 DsonLites.lnumberOfFullNumber(fullNumber));
     }
 
-    /**
-     * 获取字段的完整编号
-     */
+    /** 获取字段的完整编号 */
     public int getFullNumber() {
-        return DsonLites.makeFullNumber(idep, lnumber);
+        return fullNumber;
     }
 
-    public int getLnumber() {
-        return lnumber;
-    }
-
+    /** 类的继承深度 - Depth of Inheritance */
     public byte getIdep() {
-        return idep;
+        return DsonLites.idepOfFullNumber(fullNumber);
+    }
+
+    /** 字段正在类本地的编号 - localNumber */
+    public int getLnumber() {
+        return DsonLites.lnumberOfFullNumber(fullNumber);
     }
 
     // region 比较
@@ -93,11 +94,7 @@ public final class FieldNumber implements Comparable<FieldNumber> {
 
     @Override
     public int compareTo(@Nonnull FieldNumber that) {
-        int r = Byte.compare(idep, that.idep);
-        if (r != 0) {
-            return r;
-        }
-        return Integer.compare(lnumber, that.lnumber);
+        return compare(fullNumber, that.fullNumber);
     }
 
     // endregion
@@ -110,16 +107,12 @@ public final class FieldNumber implements Comparable<FieldNumber> {
         if (o == null || getClass() != o.getClass()) return false;
 
         FieldNumber that = (FieldNumber) o;
-
-        if (idep != that.idep) return false;
-        return lnumber == that.lnumber;
+        return fullNumber == that.fullNumber;
     }
 
     @Override
     public int hashCode() {
-        int result = idep;
-        result = 31 * result + lnumber;
-        return result;
+        return fullNumber;
     }
 
     // endregion
@@ -127,8 +120,8 @@ public final class FieldNumber implements Comparable<FieldNumber> {
     @Override
     public String toString() {
         return "FieldNumber{" +
-                "idep=" + idep +
-                ", lnumber=" + lnumber +
+                "idep=" + getIdep() +
+                ", lnumber=" + getLnumber() +
                 '}';
     }
 }

@@ -114,7 +114,7 @@ public readonly struct FieldNumber : IEquatable<FieldNumber>, IComparable<FieldN
     #region equals
 
     public bool Equals(FieldNumber other) {
-        return Idep == other.Idep && Lnumber == other.Lnumber;
+        return _fullNumber == other._fullNumber;
     }
 
     public override bool Equals(object? obj) {
@@ -122,21 +122,15 @@ public readonly struct FieldNumber : IEquatable<FieldNumber>, IComparable<FieldN
     }
 
     public override int GetHashCode() {
-        return HashCode.Combine(Idep, Lnumber);
+        return _fullNumber;
     }
 
-    public static bool operator ==(FieldNumber left, FieldNumber right) {
-        return left.Equals(right);
-    }
+    #endregion
 
-    public static bool operator !=(FieldNumber left, FieldNumber right) {
-        return !left.Equals(right);
-    }
+    #region compare
 
     public int CompareTo(FieldNumber other) {
-        var idepComparison = Idep.CompareTo(other.Idep);
-        if (idepComparison != 0) return idepComparison;
-        return Lnumber.CompareTo(other.Lnumber);
+        return Compare(_fullNumber, other._fullNumber);
     }
 
     public int CompareTo(object? obj) {
@@ -161,4 +155,8 @@ public readonly struct FieldNumber : IEquatable<FieldNumber>, IComparable<FieldN
     }
 
     #endregion
+
+    public override string ToString() {
+        return $"{nameof(Idep)}: {Idep}, {nameof(Lnumber)}: {Lnumber}";
+    }
 }

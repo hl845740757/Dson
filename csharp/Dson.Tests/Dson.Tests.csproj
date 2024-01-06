@@ -7,6 +7,9 @@
     <Nullable>annotations</Nullable>
     <RootNamespace>Wjybxx.Dson.Tests</RootNamespace>
 
+    <AssemblyName>Wjybxx.Dson.Tests</AssemblyName>
+    <PackageId>Wjybxx.Dson.Tests</PackageId>
+    
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>

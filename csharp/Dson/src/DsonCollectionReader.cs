@@ -19,7 +19,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Wjybxx.Dson.Collections;
+using Wjybxx.Dson.Ext;
 using Wjybxx.Dson.Internal;
 using Wjybxx.Dson.IO;
 using Wjybxx.Dson.Types;
