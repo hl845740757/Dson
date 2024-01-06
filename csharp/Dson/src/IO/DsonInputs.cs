@@ -253,7 +253,7 @@ public class DsonInputs
         public int GetFixed32(int pos) {
             ByteBufferUtil.CheckBuffer(_rawLimit - _rawOffset, pos, 4);
             int bufferPos = _rawOffset + pos;
-            return ByteBufferUtil.GetIntLE(_buffer, bufferPos);
+            return ByteBufferUtil.GetInt32LE(_buffer, bufferPos);
         }
 
         public int PushLimit(int byteLimit) {

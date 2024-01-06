@@ -8,7 +8,7 @@
 
         <AssemblyName>Wjybxx.Dson</AssemblyName>
         <PackageId>Wjybxx.Dson</PackageId>
-        <PackageVersion>1.4.0-rc2</PackageVersion>
+        <PackageVersion>1.4.0</PackageVersion>
 
         <Title>Wjybxx.Dson</Title>
         <Description>Dson-有点奇怪的配置文件格式和序列化方案</Description>
@@ -35,7 +35,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Wjybxx.Commons.Core" Version="1.0.5" />
+      <PackageReference Include="Wjybxx.Commons.Core" Version="1.0.6" />
     </ItemGroup>
 
 </Project>

@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Text;
 using Wjybxx.Commons.Collections;
 
 namespace Wjybxx.Dson.Internal;
@@ -115,6 +116,27 @@ internal static class DsonInternals
         var dictionary = new LinkedDictionary<TK, DsonValue>();
         dictionary.PutAll(src);
         return dictionary;
+    }
+
+    public static string ToString<T>(ICollection<T> collection) {
+        if (collection == null) throw new ArgumentNullException(nameof(collection));
+        StringBuilder sb = new StringBuilder(64);
+        sb.Append('[');
+        bool first = true;
+        foreach (T value in collection) {
+            if (first) {
+                first = false;
+            } else {
+                sb.Append(',');
+            }
+            if (value == null) {
+                sb.Append("null");
+            } else {
+                sb.Append(value.ToString());
+            }
+        }
+        sb.Append(']');
+        return sb.ToString();
     }
 
     #endregion

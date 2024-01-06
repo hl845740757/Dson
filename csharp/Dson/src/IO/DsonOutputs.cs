@@ -255,7 +255,7 @@ public class DsonOutputs
         public void SetFixedInt32(int pos, int value) {
             ByteBufferUtil.CheckBuffer(_rawLimit - _rawOffset, pos, 4);
             int bufferPos = _rawOffset + pos;
-            ByteBufferUtil.SetIntLE(_buffer, bufferPos, value);
+            ByteBufferUtil.SetInt32LE(_buffer, bufferPos, value);
         }
 
         #endregion

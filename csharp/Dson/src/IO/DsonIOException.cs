@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using Wjybxx.Dson.Internal;
 using Wjybxx.Dson.Text;
 
 #pragma warning disable CS1591
@@ -58,7 +59,7 @@ public class DsonIOException : Exception
     }
 
     public static DsonIOException ContextError(IList<DsonContextType> expected, DsonContextType contextType) {
-        return new DsonIOException($"context error, expected {expected}, but found {contextType}");
+        return new DsonIOException($"context error, expected {DsonInternals.ToString(expected)}, but found {contextType}");
     }
 
     public static DsonIOException ContextErrorTopLevel() {
@@ -81,8 +82,9 @@ public class DsonIOException : Exception
         return new DsonIOException($"The dsonType does not match, expected {expected}, but found {dsonType}");
     }
 
-    public static DsonIOException InvalidDsonType(IList<DsonType> dsonTypeList, DsonType dsonType) {
-        return new DsonIOException($"The dson type is invalid in context, context: {dsonTypeList}, dsonType: {dsonType}");
+    public static DsonIOException InvalidDsonType(IList<DsonType> expected, DsonType dsonType) {
+        return new DsonIOException($"The dson type is invalid in context, " +
+                                   $"context: {DsonInternals.ToString(expected)}, dsonType: {dsonType}");
     }
 
     public static DsonIOException InvalidDsonType(DsonContextType contextType, DsonType dsonType) {
@@ -94,11 +96,13 @@ public class DsonIOException : Exception
     }
 
     public static DsonIOException InvalidState(DsonContextType contextType, IList<DsonReaderState> expected, DsonReaderState state) {
-        return new DsonIOException($"invalid state, contextType {contextType}, expected {expected}, but found {state}.");
+        return new DsonIOException($"invalid state, contextType {contextType}, " +
+                                   $"expected {DsonInternals.ToString(expected)}, but found {state}.");
     }
 
     public static DsonIOException InvalidState(DsonContextType contextType, IList<DsonWriterState> expected, DsonWriterState state) {
-        return new DsonIOException($"invalid state, contextType {contextType}, expected {expected}, but found {state}.");
+        return new DsonIOException($"invalid state, contextType {contextType}, " +
+                                   $"expected {DsonInternals.ToString(expected)}, but found {state}.");
     }
 
     public static DsonIOException BytesRemain(int bytesUntilLimit) {
@@ -114,7 +118,8 @@ public class DsonIOException : Exception
     }
 
     public static DsonIOException InvalidTokenType(DsonContextType contextType, DsonToken token, IList<DsonTokenType> expected) {
-        return new DsonIOException($"invalid token, contextType {contextType}, expected {expected}, but found {token}.");
+        return new DsonIOException($"invalid token, contextType {contextType}, " +
+                                   $"expected {DsonInternals.ToString(expected)}, but found {token}.");
     }
 
     public static DsonIOException InvalidTopDsonType(DsonType dsonType) {
