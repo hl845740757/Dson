@@ -29,7 +29,7 @@ import java.util.Objects;
  * @author wjybxx
  * date - 2023/4/23
  */
-public class DefaultDsonLiteObjectWriter implements DsonLiteObjectWriter {
+final class DefaultDsonLiteObjectWriter implements DsonLiteObjectWriter {
 
     private final DefaultDsonLiteConverter converter;
     private final DsonLiteWriter writer;

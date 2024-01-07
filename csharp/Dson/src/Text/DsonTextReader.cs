@@ -22,6 +22,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using Wjybxx.Commons;
+using Wjybxx.Commons.Collections;
 using Wjybxx.Dson.Internal;
 using Wjybxx.Dson.IO;
 using Wjybxx.Dson.Types;
@@ -36,7 +38,7 @@ namespace Wjybxx.Dson.Text;
 public class DsonTextReader : AbstractDsonReader<string>
 {
     private static readonly List<DsonTokenType> ValueSeparatorTokens =
-        DsonInternals.NewList(DsonTokenType.Comma, DsonTokenType.EndObject, DsonTokenType.EndArray);
+        CollectionUtil.NewList(DsonTokenType.Comma, DsonTokenType.EndObject, DsonTokenType.EndArray);
 
     private static readonly DsonToken TokenBeginHeader = new DsonToken(DsonTokenType.BeginHeader, "@{", -1);
     private static readonly DsonToken TokenClassname = new DsonToken(DsonTokenType.UnquoteString, DsonHeaders.NamesClassName, -1);
@@ -236,7 +238,7 @@ public class DsonTextReader : AbstractDsonReader<string>
                 }
                 default: {
                     throw DsonIOException.InvalidTokenType(context.contextType, nameToken,
-                        DsonInternals.NewList(DsonTokenType.String, DsonTokenType.UnquoteString, DsonTokenType.EndObject));
+                        CollectionUtil.NewList(DsonTokenType.String, DsonTokenType.UnquoteString, DsonTokenType.EndObject));
                 }
             }
             // 下一个应该是冒号
@@ -613,7 +615,7 @@ public class DsonTextReader : AbstractDsonReader<string>
             }
             CheckSeparator(context);
         }
-        long seconds = new DateTime(date.ToDateTime(time).Ticks, DateTimeKind.Utc).ToEpochSeconds();
+        long seconds = DatetimeUtil.ToEpochSeconds(date.ToDateTime(time));
         return new OffsetTimestamp(seconds, nanos, offset, enables);
     }
 
@@ -696,14 +698,14 @@ public class DsonTextReader : AbstractDsonReader<string>
     private static void EnsureCountIsZero(Context context, DsonToken headerToken) {
         if (context.count > 0) {
             throw DsonIOException.InvalidTokenType(context.contextType, headerToken,
-                DsonInternals.NewList(DsonTokenType.String, DsonTokenType.UnquoteString, DsonTokenType.EndObject));
+                CollectionUtil.NewList(DsonTokenType.String, DsonTokenType.UnquoteString, DsonTokenType.EndObject));
         }
     }
 
     private static void EnsureStringsToken(Context context, DsonToken token) {
         if (token.Type != DsonTokenType.String && token.Type != DsonTokenType.UnquoteString) {
             throw DsonIOException.InvalidTokenType(context.contextType, token,
-                DsonInternals.NewList(DsonTokenType.String, DsonTokenType.UnquoteString));
+                CollectionUtil.NewList(DsonTokenType.String, DsonTokenType.UnquoteString));
         }
     }
 
@@ -715,7 +717,7 @@ public class DsonTextReader : AbstractDsonReader<string>
 
     private static void VerifyTokenType(Context context, DsonToken token, DsonTokenType expected) {
         if (token.Type != expected) {
-            throw DsonIOException.InvalidTokenType(context.contextType, token, DsonInternals.NewList(expected));
+            throw DsonIOException.InvalidTokenType(context.contextType, token, expected);
         }
     }
 

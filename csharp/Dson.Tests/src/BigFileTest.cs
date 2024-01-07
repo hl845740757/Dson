@@ -28,12 +28,19 @@ namespace Wjybxx.Dson.Tests;
 
 /// <summary>
 /// 测试读写文件的性能（Release|AnyCPU）
-/// 以540K的文件进行测试，结果如下：
+/// 以540K的文件进行测试，每个测试前先Sleep(1s)释放资源，
+/// 结果如下：
 /// <code>
 /// StopWatch[System.Json=39ms][Read=30ms,Write=8ms]
 /// StopWatch[Wjybxx.Dson=46ms][Read=36ms,Write=9ms]  // 禁用无引号字符串
 /// StopWatch[Wjybxx.Dson=47ms][Read=35ms,Write=11ms] // 启用 MaxLengthOfUnquoteString 为 16
-/// StopWatch[Bson=67ms][Read=48ms,Write=19ms]
+/// StopWatch[MongoDB.Bson=67ms][Read=48ms,Write=19ms]
+/// </code>
+/// 测试之间连续执行的结果如下：
+/// <code>
+/// StopWatch[System.Json=39ms][Read=30ms,Write=8ms]
+/// StopWatch[Wjybxx.Dson=39ms][Read=31ms,Write=7ms] // 可能利用了前面的缓存
+/// StopWatch[MongoDB.Bson=64ms][Read=45ms,Write=18ms]
 /// </code>
 /// ps：
 /// 1. 本机设备信息：I7-9750H 2.6GHz  16G内存
@@ -56,10 +63,10 @@ public class BigFileTest
             return;
         }
         TestSystemJson();
-        Thread.Sleep(1000);
+        // Thread.Sleep(1000);
 
         TestDson();
-        Thread.Sleep(1000);
+        // Thread.Sleep(1000);
 
         TestBson();
     }
@@ -78,7 +85,7 @@ public class BigFileTest
             {
                 WriteIndented = true,
             });
-        stopWatch.LogStep("Write");
+        stopWatch.Stop("Write");
         Console.WriteLine(stopWatch.GetLog());
     }
 
@@ -98,12 +105,12 @@ public class BigFileTest
 
         using DsonTextWriter writer = new DsonTextWriter(settings, new StreamWriter(NewOutputStream()));
         Dsons.WriteTopDsonValue(writer, dsonValue);
-        stopWatch.LogStep("Write");
+        stopWatch.Stop("Write");
         Console.WriteLine(stopWatch.GetLog());
     }
 
     private void TestBson() {
-        StopWatch stopWatch = StopWatch.CreateStarted("Bson");
+        StopWatch stopWatch = StopWatch.CreateStarted("MongoDB.Bson");
 
         // Bson使用object做泛型会导致读性能骤降，降低1个Level 46ms => 160ms....
         using FileStream inputStream = NewInputStream();
@@ -115,8 +122,7 @@ public class BigFileTest
             Indent = true
         });
         BsonSerializer.Serialize(jsonWriter, bsonDocument);
-        stopWatch.LogStep("Write");
-
+        stopWatch.Stop("Write");
         Console.WriteLine(stopWatch.GetLog());
     }
 }

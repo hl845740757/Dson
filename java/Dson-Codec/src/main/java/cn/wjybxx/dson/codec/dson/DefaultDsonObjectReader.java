@@ -20,10 +20,10 @@ import cn.wjybxx.base.pool.DefaultObjectPool;
 import cn.wjybxx.base.pool.ObjectPool;
 import cn.wjybxx.dson.*;
 import cn.wjybxx.dson.codec.TypeArgInfo;
-import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
 
 import javax.annotation.Nonnull;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -34,14 +34,14 @@ import java.util.Set;
  * @author wjybxx
  * date - 2023/4/23
  */
-public class DefaultDsonObjectReader extends AbstractObjectReader implements DsonObjectReader {
+final class DefaultDsonObjectReader extends AbstractObjectReader implements DsonObjectReader {
 
-    private static final ThreadLocal<ObjectPool<ObjectLinkedOpenHashSet<String>>> LOCAL_POOL
+    private static final ThreadLocal<ObjectPool<LinkedHashSet<String>>> LOCAL_POOL
             = ThreadLocal.withInitial(() -> new DefaultObjectPool<>(
-            ObjectLinkedOpenHashSet::new,
-            ObjectLinkedOpenHashSet::clear, 8));
+            LinkedHashSet::new,
+            LinkedHashSet::clear, 8));
 
-    private final ObjectPool<ObjectLinkedOpenHashSet<String>> keySetPool;
+    private final ObjectPool<LinkedHashSet<String>> keySetPool;
 
     public DefaultDsonObjectReader(DefaultDsonConverter converter, DsonCollectionReader reader) {
         super(converter, reader);
@@ -109,9 +109,9 @@ public class DefaultDsonObjectReader extends AbstractObjectReader implements Dso
     private static class KeyIterator implements Iterator<String> {
 
         Set<String> keySet;
-        ObjectLinkedOpenHashSet<String> keyQueue;
+        LinkedHashSet<String> keyQueue;
 
-        public KeyIterator(Set<String> keySet, ObjectLinkedOpenHashSet<String> keyQueue) {
+        public KeyIterator(Set<String> keySet, LinkedHashSet<String> keyQueue) {
             this.keySet = keySet;
             this.keyQueue = keyQueue;
             keyQueue.addAll(keySet);
@@ -119,12 +119,12 @@ public class DefaultDsonObjectReader extends AbstractObjectReader implements Dso
 
         public void setNext(String key) {
             Objects.requireNonNull(key);
-            keyQueue.addAndMoveToFirst(key);
+            keyQueue.addFirst(key);
         }
 
         @Override
         public boolean hasNext() {
-            return keyQueue.size() > 0;
+            return !keyQueue.isEmpty();
         }
 
         @Override

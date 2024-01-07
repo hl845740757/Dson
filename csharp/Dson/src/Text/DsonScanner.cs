@@ -20,10 +20,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using Wjybxx.Commons.Collections;
 using Wjybxx.Commons.IO;
 using Wjybxx.Commons.Pool;
-using Wjybxx.Dson.Internal;
-using Wjybxx.Dson.IO;
 
 #pragma warning disable CS1591
 namespace Wjybxx.Dson.Text;
@@ -33,7 +32,8 @@ namespace Wjybxx.Dson.Text;
 /// </summary>
 public class DsonScanner : IDisposable
 {
-    private static readonly List<DsonTokenType> StringTokenTypes = DsonInternals.NewList(DsonTokenType.String, DsonTokenType.UnquoteString);
+    private static readonly List<DsonTokenType> StringTokenTypes = 
+        CollectionUtil.NewList(DsonTokenType.String, DsonTokenType.UnquoteString);
 
 #nullable disable
     private IDsonCharStream _charStream;

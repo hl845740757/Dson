@@ -230,9 +230,7 @@ public final class OffsetTimestamp {
     }
 
     /**
-     * Z
-     * ±HH:mm
-     * ±HH:mm:ss
+     * Z, ±HH:mm, ±HH:mm:ss
      */
     public static String formatOffset(int offsetSeconds) {
         if (offsetSeconds == 0) {

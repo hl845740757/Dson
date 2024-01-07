@@ -35,6 +35,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Wjybxx.Commons.Core" Version="1.0.6" />
+      <PackageReference Include="Wjybxx.Commons.Core" Version="1.0.7" />
     </ItemGroup>
 </Project>

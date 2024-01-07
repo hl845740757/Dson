@@ -81,9 +81,9 @@ public readonly struct OffsetTimestamp : IEquatable<OffsetTimestamp>
 
     /** 考虑到跨平台问题，默认精确到毫秒部分 */
     public static OffsetTimestamp OfDateTime(in DateTime dateTime) {
-        long epochMillis = dateTime.ToEpochMillis();
+        long epochMillis = DatetimeUtil.ToEpochMillis(dateTime);
         long seconds = epochMillis / 1000;
-        int nanos = (int)(epochMillis % 1000 * DsonInternals.NanosPerMilli);
+        int nanos = (int)(epochMillis % 1000 * DatetimeUtil.NanosPerMilli);
         if (nanos == 0) {
             return new OffsetTimestamp(seconds, 0, 0, MaskDatetime);
         }
@@ -180,60 +180,18 @@ public readonly struct OffsetTimestamp : IEquatable<OffsetTimestamp>
         return timeOnly.ToString("HH:mm:ss");
     }
 
+    /// <summary>
+    /// 解析时区偏移
+    /// Z, ±H, ±HH, ±H:mm, ±HH:mm, ±HH:mm:ss
+    /// </summary>
+    /// <param name="offsetString"></param>
+    /// <returns></returns>
     public static int ParseOffset(string offsetString) {
-        if (offsetString == "Z" || offsetString == "z") {
-            return 0;
-        }
-        if (offsetString[0] != '+' && offsetString[0] != '-') {
-            throw new DsonParseException("Invalid offsetString, plus/minus not found when expected: " + offsetString);
-        }
-        // 不想写得太复杂，补全后解析
-        switch (offsetString.Length) {
-            case 2: { // ±H
-                offsetString = new StringBuilder(offsetString, 9)
-                    .Insert(1, '0')
-                    .Append(":00:00")
-                    .ToString();
-                break;
-            }
-            case 3: { // ±HH
-                offsetString = offsetString + ":00:00";
-                break;
-            }
-            case 5: { // ±H:mm
-                offsetString = new StringBuilder(offsetString, 9)
-                    .Insert(1, '0')
-                    .Append(":00")
-                    .ToString();
-                break;
-            }
-            case 6: { // ±HH:mm
-                offsetString = offsetString + ":00";
-                break;
-            }
-            case 9: { // ±HH:mm:ss
-                break;
-            }
-        }
-        int seconds = DsonInternals.ToSecondOfDay(ParseTime(offsetString.Substring(1)));
-        if (offsetString[0] == '+') {
-            return seconds;
-        }
-        return -1 * seconds;
+        return DatetimeUtil.ParseOffset(offsetString);
     }
 
     public static string FormatOffset(int offsetSeconds) {
-        if (offsetSeconds == 0) {
-            return "Z";
-        }
-        string sign = offsetSeconds < 0 ? "-" : "+";
-        string timeString = new TimeOnly(offsetSeconds * DatetimeUtil.TicksPerSecond)
-            .ToString("HH:mm:ss");
-        if (offsetSeconds % 60 == 0) { // 没有秒部分
-            return sign + timeString.Substring(0, 5);
-        } else {
-            return sign + timeString;
-        }
+        return DatetimeUtil.FormatOffset(offsetSeconds);
     }
 
     #endregion

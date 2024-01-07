@@ -19,8 +19,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Wjybxx.Commons.Collections;
 using Wjybxx.Dson.Ext;
-using Wjybxx.Dson.Internal;
 using Wjybxx.Dson.IO;
 using Wjybxx.Dson.Types;
 
@@ -55,7 +55,7 @@ public class DsonCollectionReader<TName> : AbstractDsonReader<TName> where TName
         if (defValue == null) throw new ArgumentNullException(nameof(defValue));
         Context context = GetContext();
         if (context.dsonObject == null) {
-            throw DsonIOException.ContextError(DsonInternals.NewList(DsonContextType.Object, DsonContextType.Header), context.contextType);
+            throw DsonIOException.ContextError(CollectionUtil.NewList(DsonContextType.Object, DsonContextType.Header), context.contextType);
         }
         context.SetKeyItr(keyItr, defValue);
     }
@@ -68,7 +68,7 @@ public class DsonCollectionReader<TName> : AbstractDsonReader<TName> where TName
     public ICollection<TName> Keys() {
         Context context = GetContext();
         if (context.dsonObject == null) {
-            throw DsonIOException.ContextError(DsonInternals.NewList(DsonContextType.Object, DsonContextType.Header), context.contextType);
+            throw DsonIOException.ContextError(CollectionUtil.NewList(DsonContextType.Object, DsonContextType.Header), context.contextType);
         }
         return context.dsonObject.Keys;
     }

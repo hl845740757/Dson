@@ -30,7 +30,7 @@ import java.util.Objects;
  * @author wjybxx
  * date - 2023/4/23
  */
-public class DefaultDsonLiteObjectReader implements DsonLiteObjectReader {
+final class DefaultDsonLiteObjectReader implements DsonLiteObjectReader {
 
     private final DefaultDsonLiteConverter converter;
     private final DsonLiteReader reader;

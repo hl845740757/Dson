@@ -117,6 +117,11 @@ public class DsonIOException : Exception
         return new DsonIOException($"invalid token, contextType {contextType}, token {token}.");
     }
 
+    public static DsonIOException InvalidTokenType(DsonContextType contextType, DsonToken token, DsonTokenType expected) {
+        return new DsonIOException($"invalid token, contextType {contextType}, " +
+                                   $"expected {expected}, but found {token}.");
+    }
+
     public static DsonIOException InvalidTokenType(DsonContextType contextType, DsonToken token, IList<DsonTokenType> expected) {
         return new DsonIOException($"invalid token, contextType {contextType}, " +
                                    $"expected {DsonInternals.ToString(expected)}, but found {token}.");

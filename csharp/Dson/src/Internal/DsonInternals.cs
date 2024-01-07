@@ -83,64 +83,11 @@ internal static class DsonInternals
 
     #region datetime
 
-    private const long TicksPerMillisecond = 10000;
-    private const long TicksPerSecond = TicksPerMillisecond * 1000;
     public static readonly DateOnly UtcEpochDate = new DateOnly(1970, 1, 1);
-
-    public const long NanosPerMilli = 1000_000L;
-    public const long NanosPerSecond = 1000_000_000L;
-
-    /// <summary>
-    /// 转unix秒时间戳
-    /// </summary>
-    /// <param name="dateTime"></param>
-    /// <returns></returns>
-    public static long ToEpochSeconds(this DateTime dateTime) {
-        return (long)dateTime.Subtract(DateTime.UnixEpoch).TotalSeconds;
-    }
-
-    /// <summary>
-    /// 转Unix毫秒时间戳
-    /// </summary>
-    /// <param name="dateTime"></param>
-    /// <returns></returns>
-    public static long ToEpochMillis(this DateTime dateTime) {
-        return (long)dateTime.Subtract(DateTime.UnixEpoch).TotalMilliseconds;
-    }
-
-    /// <summary>
-    /// 将时间转换为当天的总秒数
-    /// </summary>
-    /// <param name="timeOnly"></param>
-    /// <returns></returns>
-    public static int ToSecondOfDay(in TimeOnly timeOnly) {
-        return (int)(timeOnly.Ticks / TicksPerSecond);
-    }
-
-    /// <summary>
-    /// 将时间转换为当天的总毫秒数
-    /// </summary>
-    /// <param name="timeOnly"></param>
-    /// <returns></returns>
-    public static long ToMillisOfDay(in TimeOnly timeOnly) {
-        return timeOnly.Ticks / TicksPerMillisecond;
-    }
 
     #endregion
 
     #region 集合Util
-
-    public static List<T> NewList<T>(T first) {
-        return new List<T>(1) { first };
-    }
-
-    public static List<T> NewList<T>(T first, T second) {
-        return new List<T>(2) { first, second };
-    }
-
-    public static List<T> NewList<T>(T first, T second, T third) {
-        return new List<T>(3) { first, second, third };
-    }
 
     public static IGenericDictionary<TK, DsonValue> NewLinkedDictionary<TK>(int capacity = 0) {
         return new LinkedDictionary<TK, DsonValue>(capacity);

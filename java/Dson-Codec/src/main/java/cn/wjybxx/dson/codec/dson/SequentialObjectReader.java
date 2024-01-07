@@ -27,7 +27,7 @@ import cn.wjybxx.dson.DsonType;
  * @author wjybxx
  * date - 2023/4/23
  */
-public class SequentialObjectReader extends AbstractObjectReader implements DsonObjectReader {
+final class SequentialObjectReader extends AbstractObjectReader implements DsonObjectReader {
 
     public SequentialObjectReader(DefaultDsonConverter converter, DsonReader reader) {
         super(converter, reader);

@@ -34,7 +34,7 @@ import java.util.Objects;
  * @author wjybxx
  * date - 2023/4/23
  */
-public class DefaultDsonObjectWriter implements DsonObjectWriter {
+final class DefaultDsonObjectWriter implements DsonObjectWriter {
 
     private final DefaultDsonConverter converter;
     private final DsonWriter writer;

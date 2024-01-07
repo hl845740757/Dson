@@ -32,10 +32,10 @@ namespace Wjybxx.Dson.Tests;
 /// 我们仍然使用那个540K的文件，读取到内存中保存为String，然后进行解析和生成。
 /// 取稳定值结果如下：
 /// <code>
-/// StopWatch[System.Json=18ms][Read=10ms,Write=7ms]
-/// StopWatch[Newtonsoft.Json=64ms][Read=47ms,Write=17ms]
-/// StopWatch[Wjybxx.Dson=19ms][Read=16ms,Write=3ms]
-/// StopWatch[Bson=36ms][Read=25ms,Write=10ms]
+/// StopWatch[System.Json=14ms][Read=9ms,Write=5ms] // 系统库的read好快，可能用的unsafe...
+/// StopWatch[Newtonsoft.Json=64ms][Read=46ms,Write=17ms]
+/// StopWatch[Wjybxx.Dson=35ms][Read=27ms,Write=8ms]
+/// StopWatch[MongoDB.Bson=33ms][Read=23ms,Write=10ms]
 /// </code>
 /// ps：
 /// 1. 本机设备信息：I7-9750H 2.6GHz  16G内存
@@ -50,16 +50,10 @@ public class BigStringTest
             return;
         }
         string json = File.ReadAllText("D:\\Test.json");
-
+        // 不涉及资源释放问题，连续运行
         TestSystemJson(json);
-        Thread.Sleep(1000);
-
         TestNewtonsoftJson(json);
-        Thread.Sleep(1000);
-
         TestDson(json);
-        Thread.Sleep(1000);
-
         TestBson(json);
     }
 
@@ -74,7 +68,7 @@ public class BigStringTest
             {
                 WriteIndented = true,
             });
-        stopWatch.LogStep("Write");
+        stopWatch.Stop("Write");
         Console.WriteLine(stopWatch.GetLog());
     }
 
@@ -85,7 +79,7 @@ public class BigStringTest
         stopWatch.LogStep("Read");
 
         Newtonsoft.Json.JsonConvert.SerializeObject(jsonObject);
-        stopWatch.LogStep("Write");
+        stopWatch.Stop("Write");
         Console.WriteLine(stopWatch.GetLog());
     }
 
@@ -104,12 +98,12 @@ public class BigStringTest
 
         using DsonTextWriter writer = new DsonTextWriter(settings, new StringWriter());
         Dsons.WriteTopDsonValue(writer, dsonValue);
-        stopWatch.LogStep("Write");
+        stopWatch.Stop("Write");
         Console.WriteLine(stopWatch.GetLog());
     }
 
     private void TestBson(string json) {
-        StopWatch stopWatch = StopWatch.CreateStarted("Bson");
+        StopWatch stopWatch = StopWatch.CreateStarted("MongoDB.Bson");
 
         BsonDocument bsonDocument = BsonSerializer.Deserialize<BsonDocument>(new JsonReader(json));
         stopWatch.LogStep("Read");
@@ -119,8 +113,7 @@ public class BigStringTest
             Indent = true
         });
         BsonSerializer.Serialize(jsonWriter, bsonDocument);
-        stopWatch.LogStep("Write");
-
+        stopWatch.Stop("Write");
         Console.WriteLine(stopWatch.GetLog());
     }
 }

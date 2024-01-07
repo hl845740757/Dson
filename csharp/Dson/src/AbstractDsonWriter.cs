@@ -18,7 +18,7 @@
 
 using System;
 using System.Collections.Generic;
-using Wjybxx.Dson.Internal;
+using Wjybxx.Commons.Collections;
 using Wjybxx.Dson.IO;
 using Wjybxx.Dson.Text;
 using Wjybxx.Dson.Types;
@@ -83,7 +83,7 @@ public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName> where TName
         get {
             Context context = this._context;
             if (context.state != DsonWriterState.Value) {
-                throw InvalidState(DsonInternals.NewList(DsonWriterState.Value), context.state);
+                throw InvalidState(CollectionUtil.NewList(DsonWriterState.Value), context.state);
             }
             return context.curName;
         }
@@ -95,7 +95,7 @@ public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName> where TName
         if (name == null) throw new ArgumentNullException(nameof(name));
         Context context = this._context;
         if (context.state != DsonWriterState.Name) {
-            throw InvalidState(DsonInternals.NewList(DsonWriterState.Name), context.state);
+            throw InvalidState(CollectionUtil.NewList(DsonWriterState.Name), context.state);
         }
         context.curName = name;
         context.state = DsonWriterState.Value;
@@ -112,13 +112,13 @@ public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName> where TName
             WriteName(name);
         }
         if (context.state != DsonWriterState.Value) {
-            throw InvalidState(DsonInternals.NewList(DsonWriterState.Value), context.state);
+            throw InvalidState(CollectionUtil.NewList(DsonWriterState.Value), context.state);
         }
     }
 
     protected void EnsureValueState(Context context) {
         if (context.state != DsonWriterState.Value) {
-            throw InvalidState(DsonInternals.NewList(DsonWriterState.Value), context.state);
+            throw InvalidState(CollectionUtil.NewList(DsonWriterState.Value), context.state);
         }
     }
 
@@ -332,7 +332,7 @@ public abstract class AbstractDsonWriter<TName> : IDsonWriter<TName> where TName
             throw DsonIOException.ContextError(contextType, context.contextType);
         }
         if (context.state != state) {
-            throw InvalidState(DsonInternals.NewList(state), context.state);
+            throw InvalidState(CollectionUtil.NewList(state), context.state);
         }
     }
 
