@@ -16,8 +16,7 @@
 
 package cn.wjybxx.dson.codec;
 
-import cn.wjybxx.dson.codec.codecs.CollectionCodec;
-import cn.wjybxx.dson.codec.codecs.MapCodec;
+import cn.wjybxx.dson.codec.codecs.*;
 import cn.wjybxx.dson.text.*;
 import cn.wjybxx.dson.types.*;
 
@@ -29,6 +28,10 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
@@ -48,6 +51,8 @@ public class ConverterUtils {
 
     /** 类型id注册表 */
     public static final TypeMetaRegistry TYPE_META_REGISTRY;
+    /** 内置的所有编解码器 */
+    public static final List<DuplexCodec<?>> BUILTIN_CODECS;
 
     static {
         wrapperToPrimitiveTypeMap.put(Boolean.class, boolean.class);
@@ -75,7 +80,21 @@ public class ConverterUtils {
         primitiveTypeDefaultValueMap.put(Void.class, null);
 
         // 内置codec类型
-        TYPE_META_REGISTRY = TypeMetaRegistries.fromMetas(
+        TYPE_META_REGISTRY = TypeMetaRegistries.fromMetas(builtinTypeMetas());
+        BUILTIN_CODECS = builtinCodecs();
+    }
+
+    // region 初始化
+
+    private static TypeMeta typeMetaOf(Class<?> clazz, int classId, String clsName) {
+        if (clsName == null) {
+            clsName = clazz.getSimpleName();
+        }
+        return TypeMeta.of(clazz, ObjectStyle.INDENT, clsName, ClassId.ofDefaultNameSpace(classId));
+    }
+
+    private static List<TypeMeta> builtinTypeMetas() {
+        return List.of(
                 typeMetaOf(int[].class, (1), null),
                 typeMetaOf(long[].class, (2), null),
                 typeMetaOf(float[].class, (3), null),
@@ -95,21 +114,64 @@ public class ConverterUtils {
                 typeMetaOf(IdentityHashMap.class, (23), null),
                 typeMetaOf(ConcurrentHashMap.class, (24), null),
 
+                // 日期
+                typeMetaOf(LocalDateTime.class, (26), null),
+                typeMetaOf(LocalDate.class, (27), null),
+                typeMetaOf(LocalTime.class, (28), null),
+                typeMetaOf(Instant.class, (29), null),
+                typeMetaOf(DurationCodec.class, (30), null),
+
                 // dson内建结构
                 typeMetaOf(Binary.class, (31), "bi"),
                 typeMetaOf(ExtInt32.class, (32), "ei"),
                 typeMetaOf(ExtInt64.class, (33), "eL"),
                 typeMetaOf(ExtDouble.class, (34), "ed"),
-                typeMetaOf(ExtString.class, (35), "es")
+                typeMetaOf(ExtString.class, (35), "es"),
+                typeMetaOf(ObjectRef.class, (36), "ref"),
+                typeMetaOf(OffsetTimestamp.class, (37), "dt")
         );
     }
 
-    private static TypeMeta typeMetaOf(Class<?> clazz, int classId, String clsName) {
-        if (clsName == null) {
-            clsName = clazz.getSimpleName();
-        }
-        return TypeMeta.of(clazz, ObjectStyle.INDENT, clsName, ClassId.ofDefaultNameSpace(classId));
+    private static List<DuplexCodec<?>> builtinCodecs() {
+        return List.of(
+                new IntArrayCodec(),
+                new LongArrayCodec(),
+                new FloatArrayCodec(),
+                new DoubleArrayCodec(),
+                new BooleanArrayCodec(),
+                new StringArrayCodec(),
+                new ShortArrayCodec(),
+                new CharArrayCodec(),
+
+                new ObjectArrayCodec(),
+                new CollectionCodec<>(Collection.class, null),
+                new MapCodec<>(Map.class, null),
+
+                // 常用具体类型集合 -- 不含默认解码类型的超类
+                new CollectionCodec<>(LinkedList.class, LinkedList::new),
+                new CollectionCodec<>(ArrayDeque.class, ArrayDeque::new),
+                new MapCodec<>(IdentityHashMap.class, IdentityHashMap::new),
+                new MapCodec<>(ConcurrentHashMap.class, ConcurrentHashMap::new),
+
+                // 日期类型
+                new LocalDateTimeCodec(),
+                new LocalDateCodec(),
+                new LocalTimeCodec(),
+                new InstantCodec(),
+                new DurationCodec(),
+
+                // dson内建结构
+                new BinaryCodec(),
+                new ExtInt32Codec(),
+                new ExtInt64Codec(),
+                new ExtDoubleCodec(),
+                new ExtStringCodec(),
+                new ObjectRefCodec(),
+                new TimestampCodec()
+        );
     }
+
+    // endregion
 
     public static TypeMetaRegistry getDefaultTypeMetaRegistry() {
         return TYPE_META_REGISTRY;

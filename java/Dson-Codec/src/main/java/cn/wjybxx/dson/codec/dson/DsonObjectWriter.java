@@ -16,6 +16,7 @@
 
 package cn.wjybxx.dson.codec.dson;
 
+import cn.wjybxx.base.annotation.StableName;
 import cn.wjybxx.dson.DsonType;
 import cn.wjybxx.dson.WireType;
 import cn.wjybxx.dson.codec.ConverterOptions;
@@ -56,6 +57,7 @@ public interface DsonObjectWriter extends AutoCloseable {
     //
     void writeBytes(String name, byte[] value);
 
+    @StableName(comment = "APT生成代码依赖")
     void writeBytes(String name, int type, byte[] value);
 
     void writeBytes(String name, int type, @Nonnull DsonChunk chunk);
@@ -79,7 +81,7 @@ public interface DsonObjectWriter extends AutoCloseable {
 
     void writeExtString(String name, int type, @Nullable String value, StringStyle style);
 
-    void writeRef(String name, ObjectRef ref);
+    void writeRef(String name, ObjectRef objectRef);
 
     void writeTimestamp(String name, OffsetTimestamp timestamp);
 

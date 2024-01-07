@@ -385,7 +385,7 @@ public class DsonTextReader : AbstractDsonReader<string>
         }
         if (DsonTexts.LabelDatetime == clsName) { // @dt uuuu-MM-dd'T'HH:mm:ss
             DateTime dateTime = OffsetTimestamp.ParseDateTime(ScanStringUtilComma());
-            PushNextValue(new OffsetTimestamp(dateTime.ToEpochSeconds()));
+            PushNextValue(OffsetTimestamp.OfDateTime(in dateTime));
             return DsonType.Timestamp;
         }
         throw DsonIOException.InvalidTokenType(context.contextType, valueToken);

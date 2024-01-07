@@ -17,11 +17,10 @@
 package cn.wjybxx.dson.codec.dson;
 
 import cn.wjybxx.dson.codec.ConverterUtils;
-import cn.wjybxx.dson.codec.codecs.*;
 
 import javax.annotation.Nullable;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * @author wjybxx
@@ -34,41 +33,10 @@ public class DsonConverterUtils extends ConverterUtils {
     private static final DsonCodecRegistry CODEC_REGISTRY;
 
     static {
-        List<DsonCodecImpl<?>> entryList = List.of(
-                // 基础类型的数组codec用于避免拆装箱，提高性能
-                newCodec(new IntArrayCodec()),
-                newCodec(new LongArrayCodec()),
-                newCodec(new FloatArrayCodec()),
-                newCodec(new DoubleArrayCodec()),
-                newCodec(new BooleanArrayCodec()),
-                newCodec(new StringArrayCodec()),
-                newCodec(new ShortArrayCodec()),
-                newCodec(new CharArrayCodec()),
-
-                newCodec(new ObjectArrayCodec()),
-                newCodec(new CollectionCodec<>(Collection.class, null)),
-                newCodec(new MapCodec<>(Map.class, null)),
-
-                // 常用具体类型集合 -- 不含默认解码类型的超类
-                newCodec(new CollectionCodec<>(LinkedList.class, LinkedList::new)),
-                newCodec(new CollectionCodec<>(ArrayDeque.class, ArrayDeque::new)),
-                newCodec(new MapCodec<>(IdentityHashMap.class, IdentityHashMap::new)),
-                newCodec(new MapCodec<>(ConcurrentHashMap.class, ConcurrentHashMap::new)),
-
-                // dson内建结构
-                newCodec(new BinaryCodec()),
-                newCodec(new ExtInt32Codec()),
-                newCodec(new ExtInt64Codec()),
-                newCodec(new ExtDoubleCodec()),
-                newCodec(new ExtStringCodec())
-        );
-
-        Map<Class<?>, DsonCodecImpl<?>> codecMap = DsonCodecRegistries.newCodecMap(entryList);
+        Map<Class<?>, DsonCodecImpl<?>> codecMap = DsonCodecRegistries.newCodecMap(BUILTIN_CODECS.stream()
+                .map(DsonCodecImpl::new)
+                .toList());
         CODEC_REGISTRY = new DefaultCodecRegistry(codecMap);
-    }
-
-    private static <T> DsonCodecImpl<T> newCodec(DsonCodec<T> codecImpl) {
-        return new DsonCodecImpl<>(codecImpl);
     }
 
     public static DsonCodecRegistry getDefaultCodecRegistry() {

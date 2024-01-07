@@ -26,12 +26,23 @@ public class DsonInternals {
 
     public static final int CONTEXT_POOL_SIZE = 4;
 
+    /** 是否启用了所有标记 */
     public static boolean isEnabled(int value, int mask) {
         return (value & mask) == mask;
     }
 
-    public static boolean isDisabled(int value, int mask) {
+    /** 是否禁用了任意标记 */
+    public static boolean isAnyDisabled(int value, int mask) {
         return (value & mask) != mask;
     }
 
+    /** 是否启用了任意标记 */
+    public static boolean isAnyEnabled(int value, int mask) {
+        return (value & mask) != 0;
+    }
+
+    /** 是否禁用了所有标记 */
+    public static boolean isAllDisabled(int value, int mask) {
+        return (value & mask) == 0;
+    }
 }

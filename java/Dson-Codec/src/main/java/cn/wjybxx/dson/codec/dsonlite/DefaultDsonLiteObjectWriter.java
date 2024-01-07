@@ -214,6 +214,23 @@ public class DefaultDsonLiteObjectWriter implements DsonLiteObjectWriter {
         writer.writeExtString(name, new ExtString(type, value));
     }
 
+    @Override
+    public void writeRef(int name, ObjectRef objectRef) {
+        if (objectRef == null) {
+            writeNull(name);
+        } else {
+            writer.writeRef(name, objectRef);
+        }
+    }
+
+    @Override
+    public void writeTimestamp(int name, OffsetTimestamp timestamp) {
+        if (timestamp == null) {
+            writeNull(name);
+        } else {
+            writer.writeTimestamp(name, timestamp);
+        }
+    }
     // endregion
 
     // region object处理

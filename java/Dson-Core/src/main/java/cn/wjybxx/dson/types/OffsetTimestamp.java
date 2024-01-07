@@ -1,13 +1,11 @@
 package cn.wjybxx.dson.types;
 
+import cn.wjybxx.base.time.TimeUtils;
 import cn.wjybxx.dson.DsonLites;
 import cn.wjybxx.dson.internal.DsonInternals;
 
 import javax.annotation.concurrent.Immutable;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneOffset;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 
 /**
@@ -25,6 +23,7 @@ public final class OffsetTimestamp {
     public static final int MASK_NANOS = 1 << 3;
 
     public static final int MASK_DATETIME = MASK_DATE | MASK_TIME;
+    public static final int MASK_INSTANT = MASK_DATE | MASK_TIME | MASK_NANOS;
     public static final int MASK_OFFSET_DATETIME = MASK_DATE | MASK_TIME | MASK_OFFSET;
 
     private final long seconds;
@@ -32,6 +31,11 @@ public final class OffsetTimestamp {
     private final int offset;
     private final int enables;
 
+    /**
+     * 该接口慎用，通常我们需要精确到毫秒
+     *
+     * @param seconds 纪元时间-秒
+     */
     public OffsetTimestamp(long seconds) {
         this(seconds, 0, 0, MASK_DATETIME);
     }
@@ -43,13 +47,13 @@ public final class OffsetTimestamp {
      * @param enables 哪些字段有效
      */
     public OffsetTimestamp(long seconds, int nanos, int offset, int enables) {
-        if (DsonInternals.isDisabled(enables, MASK_DATE) && DsonInternals.isDisabled(enables, MASK_TIME)) {
+        if (seconds != 0 && DsonInternals.isAllDisabled(enables, MASK_DATETIME)) {
             throw new IllegalArgumentException("date and time are disabled");
         }
-        if (offset != 0 && DsonInternals.isDisabled(enables, MASK_OFFSET)) {
+        if (offset != 0 && DsonInternals.isAnyDisabled(enables, MASK_OFFSET)) {
             throw new IllegalArgumentException("offset is disabled, but the value is not 0");
         }
-        if (nanos != 0 && DsonInternals.isDisabled(enables, MASK_NANOS)) {
+        if (nanos != 0 && DsonInternals.isAnyDisabled(enables, MASK_NANOS)) {
             throw new IllegalArgumentException("nanos is disabled, but the value is not 0");
         }
         if (nanos > 999_999_999 || nanos < 0) {
@@ -60,6 +64,30 @@ public final class OffsetTimestamp {
         this.offset = offset;
         this.enables = enables;
     }
+
+    /** 考虑到跨平台问题，默认精确到毫秒部分 */
+    public static OffsetTimestamp ofDateTime(LocalDateTime localDateTime) {
+        long epochSecond = localDateTime.toEpochSecond(ZoneOffset.UTC);
+        int nanos = adjustNanos(localDateTime.getNano());
+        if (nanos == 0) {
+            return new OffsetTimestamp(epochSecond, 0, 0, MASK_DATETIME);
+        }
+        return new OffsetTimestamp(epochSecond, nanos, 0, MASK_INSTANT);
+    }
+
+    /** 完整保留纳秒部分 */
+    public static OffsetTimestamp ofInstant(Instant instant) {
+        return new OffsetTimestamp(instant.getEpochSecond(), instant.getNano(), 0, MASK_INSTANT);
+    }
+
+    /** 调整精度为毫秒 */
+    private static int adjustNanos(int nanos) {
+        if (nanos == 0) return 0;
+        int millis = nanos / (int) TimeUtils.NANOS_PER_MILLI;
+        return millis * (int) TimeUtils.NANOS_PER_MILLI;
+    }
+
+    // region
 
     public long getSeconds() {
         return seconds;
@@ -76,8 +104,6 @@ public final class OffsetTimestamp {
     public int getEnables() {
         return enables;
     }
-
-    // region
 
     public boolean hasDate() {
         return DsonInternals.isEnabled(enables, MASK_DATE);
@@ -106,6 +132,65 @@ public final class OffsetTimestamp {
     public int convertNanosToMillis() {
         return nanos / 1000_000;
     }
+    // endregion
+
+    //region equals
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        OffsetTimestamp offsetTimestamp = (OffsetTimestamp) o;
+
+        if (seconds != offsetTimestamp.seconds) return false;
+        if (nanos != offsetTimestamp.nanos) return false;
+        if (offset != offsetTimestamp.offset) return false;
+        return enables == offsetTimestamp.enables;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (int) (seconds ^ (seconds >>> 32));
+        result = 31 * result + nanos;
+        result = 31 * result + offset;
+        result = 31 * result + enables;
+        return result;
+    }
+
+    // endregion
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("OffsetTimestamp{");
+        if (hasDate()) {
+            sb.append("date: '").append(formatDate(seconds));
+        }
+        if (hasTime()) {
+            if (hasDate()) {
+                sb.append(", ");
+            }
+            sb.append("time: '").append(formatTime(seconds));
+        }
+        if (nanos != 0) {
+            sb.append(", ");
+            if (canConvertNanosToMillis()) {
+                sb.append("millis: ").append(convertNanosToMillis());
+            } else {
+                sb.append("nanos: ").append(nanos);
+            }
+        }
+        if (hasOffset()) {
+            sb.append(", ");
+            sb.append("offset: '").append(formatOffset(offset))
+                    .append("'");
+        }
+        return sb.append('}')
+                .toString();
+    }
+
+    // region parse/format
 
     /** @return 固定格式 yyyy-MM-dd */
     public static String formatDate(long epochSecond) {
@@ -173,62 +258,7 @@ public final class OffsetTimestamp {
 
     // endregion
 
-    //region equals
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        OffsetTimestamp offsetTimestamp = (OffsetTimestamp) o;
-
-        if (seconds != offsetTimestamp.seconds) return false;
-        if (nanos != offsetTimestamp.nanos) return false;
-        if (offset != offsetTimestamp.offset) return false;
-        return enables == offsetTimestamp.enables;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = (int) (seconds ^ (seconds >>> 32));
-        result = 31 * result + nanos;
-        result = 31 * result + offset;
-        result = 31 * result + enables;
-        return result;
-    }
-    // endregion
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("OffsetTimestamp{");
-        if (hasDate()) {
-            sb.append("date: '").append(formatDate(seconds));
-        }
-        if (hasTime()) {
-            if (hasDate()) {
-                sb.append(", ");
-            }
-            sb.append("time: '").append(formatTime(seconds));
-        }
-        if (nanos != 0) {
-            sb.append(", ");
-            if (canConvertNanosToMillis()) {
-                sb.append("millis: ").append(convertNanosToMillis());
-            } else {
-                sb.append("nanos: ").append(nanos);
-            }
-        }
-        if (hasOffset()) {
-            sb.append(", ");
-            sb.append("offset: '").append(formatOffset(offset))
-                    .append("'");
-        }
-        return sb.append('}')
-                .toString();
-    }
-
-    //
+    // region 常量
     public static final String NAMES_DATE = "date";
     public static final String NAMES_TIME = "time";
     public static final String NAMES_MILLIS = "millis";
@@ -242,4 +272,6 @@ public final class OffsetTimestamp {
     public static final int NUMBERS_NANOS = DsonLites.makeFullNumberZeroIdep(1);
     public static final int NUMBERS_OFFSET = DsonLites.makeFullNumberZeroIdep(2);
     public static final int NUMBERS_ENABLES = DsonLites.makeFullNumberZeroIdep(3);
+
+    // endregion
 }

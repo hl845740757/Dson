@@ -17,7 +17,6 @@
 package cn.wjybxx.dson.codec.dson;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,23 +27,18 @@ import java.util.Map;
  */
 public class DsonCodecRegistries {
 
-    public static Map<Class<?>, DsonCodecImpl<?>> newCodecMap(List<DsonCodecImpl<?>> pojoCodecs) {
+    public static Map<Class<?>, DsonCodecImpl<?>> newCodecMap(List<? extends DsonCodecImpl<?>> pojoCodecs) {
         final IdentityHashMap<Class<?>, DsonCodecImpl<?>> codecMap = new IdentityHashMap<>(pojoCodecs.size());
         for (DsonCodecImpl<?> codec : pojoCodecs) {
+            if (codecMap.containsKey(codec.getEncoderClass())) {
+                throw new IllegalArgumentException("the class has multiple codecs :" + codec.getEncoderClass().getName());
+            }
             codecMap.put(codec.getEncoderClass(), codec);
         }
         return codecMap;
     }
 
-    public static DsonCodecRegistry fromPojoCodecImpl(List<DsonCodec<?>> pojoCodecs) {
-        ArrayList<DsonCodecImpl<?>> codecList = new ArrayList<>(pojoCodecs.size());
-        for (DsonCodec<?> pojoCodec : pojoCodecs) {
-            codecList.add(new DsonCodecImpl<>(pojoCodec));
-        }
-        return fromPojoCodecs(codecList);
-    }
-
-    public static DsonCodecRegistry fromPojoCodecs(List<DsonCodecImpl<?>> pojoCodecs) {
+    public static DsonCodecRegistry fromPojoCodecs(List<? extends DsonCodecImpl<?>> pojoCodecs) {
         final IdentityHashMap<Class<?>, DsonCodecImpl<?>> identityHashMap = new IdentityHashMap<>(pojoCodecs.size());
         for (DsonCodecImpl<?> codec : pojoCodecs) {
             if (identityHashMap.put(codec.getEncoderClass(), codec) != null) {

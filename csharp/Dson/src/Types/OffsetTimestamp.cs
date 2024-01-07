@@ -36,6 +36,7 @@ public readonly struct OffsetTimestamp : IEquatable<OffsetTimestamp>
     public const int MaskNanos = 1 << 3;
 
     public const int MaskDatetime = MaskDate | MaskTime;
+    public const int MaskInstant = MaskDate | MaskTime | MaskNanos;
     public const int MaskOffsetDatetime = MaskDate | MaskTime | MaskOffset;
 
     public readonly long Seconds;
@@ -43,6 +44,10 @@ public readonly struct OffsetTimestamp : IEquatable<OffsetTimestamp>
     public readonly int Offset;
     public readonly int Enables;
 
+    /// <summary>
+    /// 该接口慎用，通常我们需要精确到毫秒
+    /// </summary>
+    /// <param name="seconds">纪元时间秒时间戳</param>
     public OffsetTimestamp(long seconds)
         : this(seconds, 0, 0, MaskDatetime) {
     }
@@ -53,13 +58,38 @@ public readonly struct OffsetTimestamp : IEquatable<OffsetTimestamp>
     /// <param name="seconds">纪元时间秒时间戳</param>
     /// <param name="nanos">时间戳的纳秒部分</param>
     /// <param name="offset">时区偏移量--秒</param>
-    /// <param name="enables">启用的字段信息</param>
+    /// <param name="enables">启用的字段信息；只有有效的字段才会被保存(序列化)</param>
     public OffsetTimestamp(long seconds, int nanos, int offset, int enables) {
+        if (seconds != 0 && DsonInternals.IsAllDisabled(enables, MaskDatetime)) {
+            throw new ArgumentException("date and time are disabled");
+        }
+        if (offset != 0 && DsonInternals.IsAnyDisabled(enables, MaskOffset)) {
+            throw new ArgumentException("offset is disabled, but the value is not 0");
+        }
+        if (nanos != 0 && DsonInternals.IsAnyDisabled(enables, MaskNanos)) {
+            throw new ArgumentException("nanos is disabled, but the value is not 0");
+        }
+        if (nanos > 999_999_999 || nanos < 0) {
+            throw new ArgumentException("nanos > 999999999 or < 0");
+        }
         this.Seconds = seconds;
         this.Nanos = nanos;
         this.Offset = offset;
         this.Enables = enables;
     }
+
+    /** 考虑到跨平台问题，默认精确到毫秒部分 */
+    public static OffsetTimestamp OfDateTime(in DateTime dateTime) {
+        long epochMillis = dateTime.ToEpochMillis();
+        long seconds = epochMillis / 1000;
+        int nanos = (int)(epochMillis % 1000 * DsonInternals.NanosPerMilli);
+        if (nanos == 0) {
+            return new OffsetTimestamp(seconds, 0, 0, MaskDatetime);
+        }
+        return new OffsetTimestamp(seconds, nanos, 0, MaskInstant);
+    }
+
+    #region props
 
     public bool HasDate => DsonInternals.IsEnabled(Enables, MaskDate);
 
@@ -76,6 +106,8 @@ public readonly struct OffsetTimestamp : IEquatable<OffsetTimestamp>
     public int ConvertNanosToMillis() {
         return Nanos / 1000_000;
     }
+
+    # endregion
 
     #region equals
 
@@ -151,11 +183,11 @@ public readonly struct OffsetTimestamp : IEquatable<OffsetTimestamp>
                 break;
             }
         }
-        long seconds = (ParseTime(offsetString.Substring(1)).Ticks / DsonInternals.TicksPerSecond);
+        int seconds = DsonInternals.ToSecondOfDay(ParseTime(offsetString.Substring(1)));
         if (offsetString[0] == '+') {
-            return (int)seconds;
+            return seconds;
         }
-        return (int)(-1 * seconds);
+        return -1 * seconds;
     }
 
     public static string FormatDateTime(long seconds) {
@@ -185,7 +217,6 @@ public readonly struct OffsetTimestamp : IEquatable<OffsetTimestamp>
     }
 
     #endregion
-
 
     #region 常量
 

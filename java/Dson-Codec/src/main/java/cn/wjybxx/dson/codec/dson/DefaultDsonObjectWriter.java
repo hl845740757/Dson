@@ -235,11 +235,11 @@ public class DefaultDsonObjectWriter implements DsonObjectWriter {
     }
 
     @Override
-    public void writeRef(String name, ObjectRef ref) {
-        if (ref == null) {
+    public void writeRef(String name, ObjectRef objectRef) {
+        if (objectRef == null) {
             writeNull(name);
         } else {
-            writer.writeRef(name, ref);
+            writer.writeRef(name, objectRef);
         }
     }
 

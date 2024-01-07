@@ -46,14 +46,28 @@ internal static class DsonInternals
         return (long)(uval >> offset);
     }
 
+    /** 是否启用了所有标记 */
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsEnabled(int value, int mask) {
         return (value & mask) == mask;
     }
 
+    /** 是否禁用了任意标记位 */
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool IsDisabled(int value, int mask) {
+    public static bool IsAnyDisabled(int value, int mask) {
         return (value & mask) != mask;
+    }
+
+    /** 是否启用了任意标记 */
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsAnyEnabled(int value, int mask) {
+        return (value & mask) != 0;
+    }
+
+    /** 是否所有标记位都禁用了 */
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsAllDisabled(int value, int mask) {
+        return (value & mask) == 0;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -69,9 +83,12 @@ internal static class DsonInternals
 
     #region datetime
 
-    internal const long TicksPerMillisecond = 10000;
-    internal const long TicksPerSecond = TicksPerMillisecond * 1000;
-    internal static readonly DateOnly UtcEpochDate = new DateOnly(1970, 1, 1);
+    private const long TicksPerMillisecond = 10000;
+    private const long TicksPerSecond = TicksPerMillisecond * 1000;
+    public static readonly DateOnly UtcEpochDate = new DateOnly(1970, 1, 1);
+
+    public const long NanosPerMilli = 1000_000L;
+    public const long NanosPerSecond = 1000_000_000L;
 
     /// <summary>
     /// 转unix秒时间戳
@@ -89,6 +106,24 @@ internal static class DsonInternals
     /// <returns></returns>
     public static long ToEpochMillis(this DateTime dateTime) {
         return (long)dateTime.Subtract(DateTime.UnixEpoch).TotalMilliseconds;
+    }
+
+    /// <summary>
+    /// 将时间转换为当天的总秒数
+    /// </summary>
+    /// <param name="timeOnly"></param>
+    /// <returns></returns>
+    public static int ToSecondOfDay(in TimeOnly timeOnly) {
+        return (int)(timeOnly.Ticks / TicksPerSecond);
+    }
+
+    /// <summary>
+    /// 将时间转换为当天的总毫秒数
+    /// </summary>
+    /// <param name="timeOnly"></param>
+    /// <returns></returns>
+    public static long ToMillisOfDay(in TimeOnly timeOnly) {
+        return timeOnly.Ticks / TicksPerMillisecond;
     }
 
     #endregion
