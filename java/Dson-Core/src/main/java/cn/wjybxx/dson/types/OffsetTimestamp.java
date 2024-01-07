@@ -212,19 +212,6 @@ public final class OffsetTimestamp {
         return formatDate(epochSecond) + "T" + formatTime(epochSecond);
     }
 
-    /**
-     * Z
-     * +HH:mm
-     * +HH:mm:ss
-     */
-    public static String formatOffset(int offsetSeconds) {
-        if (offsetSeconds == 0) {
-            return "Z";
-        }
-        String pre = offsetSeconds < 0 ? "-" : "+";
-        return pre + LocalTime.ofSecondOfDay(Math.abs(offsetSeconds)).toString();
-    }
-
     /** @param dateString 限定格式 yyyy-MM-dd */
     public static LocalDate parseDate(String dateString) {
 //        if (dateString.length() != 10) throw new IllegalArgumentException("invalid dateString " + dateString);
@@ -244,10 +231,19 @@ public final class OffsetTimestamp {
 
     /**
      * Z
-     * +H
-     * +HH
-     * +HH:mm
-     * +HH:mm:ss
+     * ±HH:mm
+     * ±HH:mm:ss
+     */
+    public static String formatOffset(int offsetSeconds) {
+        if (offsetSeconds == 0) {
+            return "Z";
+        }
+        String pre = offsetSeconds < 0 ? "-" : "+";
+        return pre + LocalTime.ofSecondOfDay(Math.abs(offsetSeconds)).toString();
+    }
+
+    /**
+     * Z, ±H, ±HH, ±HH:mm, ±HH:mm:ss
      */
     public static int parseOffset(String offsetString) {
         return switch (offsetString.length()) {

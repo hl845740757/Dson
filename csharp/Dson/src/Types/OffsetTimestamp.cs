@@ -19,6 +19,7 @@
 using System;
 using System.Globalization;
 using System.Text;
+using Wjybxx.Commons;
 using Wjybxx.Dson.Internal;
 using Wjybxx.Dson.Text;
 
@@ -151,6 +152,34 @@ public readonly struct OffsetTimestamp : IEquatable<OffsetTimestamp>
         return TimeOnly.ParseExact(timeString, "HH:mm:ss", CultureInfo.InvariantCulture);
     }
 
+    /// <summary>
+    /// 格式化日期时间为ISO-8601格式
+    /// 固定为:<code>yyyy-MM-ddTHH:mm:ss</code>
+    /// </summary>
+    public static string FormatDateTime(long seconds) {
+        return DateTime.UnixEpoch.AddSeconds(seconds).ToString("s");
+    }
+
+    /// <summary>
+    /// 格式化日期为ISO-8601格式
+    /// 固定为:<code>"yyyy-MM-dd"</code>格式
+    /// </summary>
+    public static string FormatDate(long epochSeconds) {
+        DateTime dateTime = DateTime.UnixEpoch.AddSeconds(epochSeconds);
+        DateOnly dateOnly = new DateOnly(dateTime.Year, dateTime.Month, dateTime.Day);
+        return dateOnly.ToString("O");
+    }
+
+    /// <summary>
+    /// 格式化时间为ISO-8601格式
+    /// 固定为:<code>HH:mm:ss</code>格式
+    /// </summary>
+    public static string FormatTime(long epochSeconds) {
+        DateTime dateTime = DateTime.UnixEpoch.AddSeconds(epochSeconds);
+        TimeOnly timeOnly = new TimeOnly(dateTime.Hour, dateTime.Minute, dateTime.Second);
+        return timeOnly.ToString("HH:mm:ss");
+    }
+
     public static int ParseOffset(string offsetString) {
         if (offsetString == "Z" || offsetString == "z") {
             return 0;
@@ -161,7 +190,10 @@ public readonly struct OffsetTimestamp : IEquatable<OffsetTimestamp>
         // 不想写得太复杂，补全后解析
         switch (offsetString.Length) {
             case 2: { // ±H
-                offsetString = offsetString + "0:00:00";
+                offsetString = new StringBuilder(offsetString, 9)
+                    .Insert(1, '0')
+                    .Append(":00:00")
+                    .ToString();
                 break;
             }
             case 3: { // ±HH
@@ -190,29 +222,17 @@ public readonly struct OffsetTimestamp : IEquatable<OffsetTimestamp>
         return -1 * seconds;
     }
 
-    public static string FormatDateTime(long seconds) {
-        return DateTime.UnixEpoch.AddSeconds(seconds).ToString("s");
-    }
-
-    public static string FormatDate(long epochSeconds) {
-        string fullDate = DateTime.UnixEpoch.AddSeconds(epochSeconds).ToString("s");
-        return fullDate.Substring(0, fullDate.IndexOf('T'));
-    }
-
-    public static string FormatTime(long epochSeconds) {
-        string fullDate = DateTime.UnixEpoch.AddSeconds(epochSeconds).ToString("s");
-        return fullDate.Substring(fullDate.IndexOf('T') + 1);
-    }
-
     public static string FormatOffset(int offsetSeconds) {
         if (offsetSeconds == 0) {
             return "Z";
         }
         string sign = offsetSeconds < 0 ? "-" : "+";
+        string timeString = new TimeOnly(offsetSeconds * DatetimeUtil.TicksPerSecond)
+            .ToString("HH:mm:ss");
         if (offsetSeconds % 60 == 0) { // 没有秒部分
-            return sign + FormatTime(Math.Abs(offsetSeconds)).Substring(0, 5);
+            return sign + timeString.Substring(0, 5);
         } else {
-            return sign + FormatTime(Math.Abs(offsetSeconds));
+            return sign + timeString;
         }
     }
 
