@@ -23,6 +23,7 @@ import cn.wjybxx.dson.io.DsonChunk;
 import cn.wjybxx.dson.types.*;
 
 import java.io.Writer;
+import java.util.Objects;
 
 /**
  * 总指导：
@@ -588,11 +589,8 @@ public class DsonTextWriter extends AbstractDsonWriter {
 
     @Override
     public void writeSimpleHeader(String clsName) {
+        Objects.requireNonNull(clsName, "clsName");
         Context context = getContext();
-        if (!canPrintAsUnquote(clsName, settings)) {
-            super.writeSimpleHeader(clsName);
-            return;
-        }
         if (context.contextType == DsonContextType.OBJECT && context.state == DsonWriterState.NAME) {
             context.setState(DsonWriterState.VALUE);
         }

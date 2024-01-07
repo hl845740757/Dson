@@ -17,6 +17,7 @@
 package cn.wjybxx.dson;
 
 import cn.wjybxx.dson.io.DsonChunk;
+import cn.wjybxx.dson.text.DsonTextWriter;
 import cn.wjybxx.dson.text.INumberStyle;
 import cn.wjybxx.dson.text.ObjectStyle;
 import cn.wjybxx.dson.text.StringStyle;
@@ -138,7 +139,11 @@ public interface DsonWriter extends AutoCloseable {
 
     // region 特殊支持
 
-    /** 仅有一个clsName属性的header */
+    /**
+     * 写入一个简单对象头 -- 仅有一个clsName属性的header。
+     * 1.该接口是为{@link DsonTextWriter}定制的，以支持简写。
+     * 2.对于其它Writer，则等同于普通写入。
+     */
     default void writeSimpleHeader(String clsName) {
         Objects.requireNonNull(clsName, "clsName");
         writeStartHeader(ObjectStyle.FLOW);

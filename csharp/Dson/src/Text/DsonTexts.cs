@@ -266,6 +266,12 @@ public static class DsonTexts
         if (str.IndexOf('_') >= 0) {
             str = DeleteUnderline(str);
         }
+        if (rawStr.Equals("Infinity")) {
+            return float.PositiveInfinity;
+        }
+        if (rawStr.Equals("-Infinity")) {
+            return float.NegativeInfinity;
+        }
         return float.Parse(str);
     }
 
@@ -273,6 +279,12 @@ public static class DsonTexts
         string str = rawStr;
         if (str.IndexOf('_') >= 0) {
             str = DeleteUnderline(str);
+        }
+        if (rawStr.Equals("Infinity")) {
+            return double.PositiveInfinity;
+        }
+        if (rawStr.Equals("-Infinity")) {
+            return double.NegativeInfinity;
         }
         return double.Parse(str);
     }

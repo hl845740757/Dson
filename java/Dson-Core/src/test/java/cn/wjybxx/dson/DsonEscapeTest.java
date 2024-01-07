@@ -12,6 +12,7 @@ public class DsonEscapeTest {
 
     private static final String regExp = "^[\\u4e00-\\u9fa5_a-zA-Z0-9]+$";
 
+    /** Java """ 中会执行'\'转义，c#中不会.... */
     static final String dsonString = """
             - {
             #   @ss 纯文本模式下输入正则表达式
@@ -19,7 +20,7 @@ public class DsonEscapeTest {
             ~   ],
                         
             #   在纯文本模式插入转义版本的正则表达式
-            -   reg2: [@es 10, @ss\s
+            -   reg2: [@es 10, @ss
             ^ ^[\\\\u4e00-\\\\u9fa5_a-zA-Z0-9]+$
             ~   ],
                     

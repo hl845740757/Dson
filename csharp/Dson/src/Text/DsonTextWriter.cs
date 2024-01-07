@@ -566,10 +566,6 @@ public class DsonTextWriter : AbstractDsonWriter<string>
     public override void WriteSimpleHeader(string clsName) {
         if (clsName == null) throw new ArgumentNullException(nameof(clsName));
         Context context = GetContext();
-        if (!CanPrintAsUnquote(clsName, _settings)) {
-            base.WriteSimpleHeader(clsName);
-            return;
-        }
         if (context.contextType == DsonContextType.Object && context.state == DsonWriterState.Name) {
             context.SetState(DsonWriterState.Value);
         }
@@ -580,7 +576,7 @@ public class DsonTextWriter : AbstractDsonWriter<string>
         WriteCurrentName(printer, DsonType.Header);
         // header总是使用 @{} 包起来，提高辨识度
         printer.Print("@{");
-        PrintString(printer, clsName, StringStyle.Auto);
+        PrintString(printer, clsName, StringStyle.AutoQuote);
         printer.Print('}');
         SetNextState();
     }

@@ -157,7 +157,8 @@ public interface IDsonWriter<TName> : IDisposable where TName : IEquatable<TName
 
     /// <summary>
     /// 写入一个简单对象头 -- 仅有一个clsName属性的header。
-    /// 仅适用于string键
+    /// 1.该接口是为<see cref="DsonTextWriter"/>定制的，以支持简写。
+    /// 2.对于其它Writer，则等同于普通写入。
     /// </summary>
     /// <param name="clsName"></param>
     /// <exception cref="ArgumentNullException"></exception>

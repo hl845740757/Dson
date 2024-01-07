@@ -73,8 +73,7 @@ public class BigFileTest {
 
         DsonTextWriter writer = new DsonTextWriter(settings, new FileWriter(NewOutputStream()));
         Dsons.writeTopDsonValue(writer, dsonValue);
-        stopWatch.logStep("Write");
-
+        stopWatch.stop("Write");
         System.out.println(stopWatch.getLog());
     }
 }
