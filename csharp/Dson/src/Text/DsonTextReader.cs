@@ -728,7 +728,12 @@ public class DsonTextReader : AbstractDsonReader<string>
     }
 
     protected override void DoReadName() {
-        _currentName = PopNextName();
+        if (Settings.EnableFieldIntern) {
+            _currentName = Dsons.InternField(PopNextName());
+        } else {
+            _currentName = PopNextName() ?? throw new NullReferenceException();
+        }
+
         // 将header中的特殊属性记录下来
         Context context = GetContext();
         if (context.contextType == DsonContextType.Header) {

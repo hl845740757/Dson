@@ -52,7 +52,7 @@ public class DsonReaderSettings {
          * 字段名几乎都是常量，因此命中率几乎百分之百。
          * 池化字段名可以降低字符串内存占用，有一定的查找开销。
          */
-        private boolean enableFieldIntern = true;
+        private boolean enableFieldIntern = false;
 
         protected Builder() {
         }

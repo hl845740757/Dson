@@ -707,7 +707,12 @@ public class DsonTextReader extends AbstractDsonReader {
 
     @Override
     protected void doReadName() {
-        currentName = Objects.requireNonNull(popNextName());
+        if (setting.enableFieldIntern) {
+            currentName = Dsons.internField(popNextName());
+        }  else {
+            currentName = Objects.requireNonNull(popNextName());
+        }
+
         // 将header中的特殊属性记录下来
         Context context = getContext();
         if (context.contextType == DsonContextType.HEADER) {

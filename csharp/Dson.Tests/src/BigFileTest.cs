@@ -63,10 +63,10 @@ public class BigFileTest
             return;
         }
         TestSystemJson();
-        // Thread.Sleep(1000);
+        Thread.Sleep(1000);
 
         TestDson();
-        // Thread.Sleep(1000);
+        Thread.Sleep(1000);
 
         TestBson();
     }
@@ -92,18 +92,23 @@ public class BigFileTest
     private void TestDson() {
         StopWatch stopWatch = StopWatch.CreateStarted("Wjybxx.Dson");
 
-        using DsonTextReader reader = new DsonTextReader(DsonTextReaderSettings.Default, new StreamReader(NewInputStream()));
+        DsonTextReaderSettings readerSettings = new DsonTextReaderSettings.Builder()
+        {
+            EnableFieldIntern = false
+        }.Build();
+
+        using DsonTextReader reader = new DsonTextReader(readerSettings, new StreamReader(NewInputStream()));
         DsonValue dsonValue = Dsons.ReadTopDsonValue(reader)!;
         stopWatch.LogStep("Read");
 
-        DsonTextWriterSettings settings = new DsonTextWriterSettings.Builder
+        DsonTextWriterSettings writerSettings = new DsonTextWriterSettings.Builder
         {
             DsonMode = DsonMode.Relaxed,
             EnableText = false,
             MaxLengthOfUnquoteString = 0,
         }.Build();
 
-        using DsonTextWriter writer = new DsonTextWriter(settings, new StreamWriter(NewOutputStream()));
+        using DsonTextWriter writer = new DsonTextWriter(writerSettings, new StreamWriter(NewOutputStream()));
         Dsons.WriteTopDsonValue(writer, dsonValue);
         stopWatch.Stop("Write");
         Console.WriteLine(stopWatch.GetLog());
