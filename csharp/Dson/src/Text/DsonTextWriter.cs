@@ -185,7 +185,7 @@ public class DsonTextWriter : AbstractDsonWriter<string>
             } else {
                 printer.PrintEscaped(c, unicodeChar);
             }
-            if (printer.Column > softLineLength && (i + 1 < length)) {
+            if (printer.Column >= softLineLength && (i + 1 < length)) {
                 printer.Println();
                 printer.HeadIndent = headIndent;
                 printer.BodyIndent = 0;
@@ -234,7 +234,7 @@ public class DsonTextWriter : AbstractDsonWriter<string>
             } else {
                 printer.Print(c);
             }
-            if (printer.Column > softLineLength && (i + 1 < length)) {
+            if (printer.Column >= softLineLength && (i + 1 < length)) {
                 printer.Println();
                 printer.HeadIndent = headIndent;
                 printer.BodyIndent = 0;

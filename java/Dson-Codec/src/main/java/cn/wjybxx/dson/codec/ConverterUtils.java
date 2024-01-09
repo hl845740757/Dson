@@ -122,7 +122,7 @@ public class ConverterUtils {
                 typeMetaOf(DurationCodec.class, (30), null),
 
                 // dson内建结构
-                typeMetaOf(Binary.class, (31), "bi"),
+                typeMetaOf(Binary.class, (31), "bin"),
                 typeMetaOf(ExtInt32.class, (32), "ei"),
                 typeMetaOf(ExtInt64.class, (33), "eL"),
                 typeMetaOf(ExtDouble.class, (34), "ed"),

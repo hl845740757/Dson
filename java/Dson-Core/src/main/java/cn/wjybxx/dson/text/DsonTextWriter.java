@@ -193,7 +193,7 @@ public class DsonTextWriter extends AbstractDsonWriter {
             } else {
                 printer.printEscaped(c, unicodeChar);
             }
-            if (printer.getColumn() > softLineLength && (i + 1 < length)) {
+            if (printer.getColumn() >= softLineLength && (i + 1 < length)) {
                 printer.println();
                 printer.setHeadIndent(headIndent);
                 printer.setBodyIndent(0);
@@ -242,7 +242,7 @@ public class DsonTextWriter extends AbstractDsonWriter {
             } else {
                 printer.print(c);
             }
-            if (printer.getColumn() > softLineLength && (i + 1 < length)) {
+            if (printer.getColumn() >= softLineLength && (i + 1 < length)) {
                 printer.println();
                 printer.setHeadIndent(headIndent);
                 printer.setBodyIndent(0);
