@@ -19,7 +19,7 @@
         <dependency>
             <groupId>cn.wjybxx.commons</groupId>
             <artifactId>base</artifactId>
-            <version>${base.version}</version>
+            <version>${commons.version}</version>
         </dependency>
     </dependencies>
 
