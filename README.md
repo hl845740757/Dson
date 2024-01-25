@@ -281,7 +281,7 @@ PS：对于配置文件，引用的最大作用是复用和减少嵌套。
 
 1. dt支持两种范式 @dt datetime 和 {@dt date: yyyy-MM-dd, time: HH:mm:ss, offset: ±HH:mm:ss, millis: $millis, nanos:
    $nanos}
-2. @dt datetime 简写方式用于一般情况，datetime为 "yyyy-MM-ddTHH:mm:ss"格式，即ISO601格式
+2. @dt datetime 简写方式用于一般情况，datetime为 "yyyy-MM-ddTHH:mm:ss"格式，即ISO8601格式
 3. date 部分为 "yyyy-MM-dd" 格式。
 4. time 部分为 "HH:mm:ss" 格式，不可省略秒部分。
 5. offset 部分为 "Z", "±H", "±HH", "±HH:mm" 或 "±HH:mm:ss" 格式，不可以省略正负号。
@@ -313,14 +313,14 @@ PS：对于配置文件，引用的最大作用是复用和减少嵌套。
 1. 键值对之间通过 ',' (英文逗号) 分隔。
 2. key和value之间通过 ':' (英文冒号)分隔，冒号两边空格分隔key和value不是必须的，但冒号和value之间建议输入空格。
 3. key为字符串类型，适用字符串规范，无特殊字符时可省略双引号，也可以使用 @ss 标签。
-4. `@{}` 用于声明对象的header信息 -- 新版本不在要求’@‘必须与'\['紧邻。
+4. `@{}` 用于声明对象的header信息 -- 新版本不再要求’@‘必须与'\['紧邻。
 5. 声明value的类型，可通过声明header结构体，并指定 'compClsName' 属性实现。
 6. 允许末尾出现逗号
 
 ### array
 
 1. value之间通过 ',' (英文逗号) 分隔。
-2. `@{}` 用于声明数组的header信息 -- 新版本不在要求’@‘必须与'\['紧邻。
+2. `@{}` 用于声明数组的header信息 -- 新版本不再要求’@‘必须与'\['紧邻。
 3. 声明数组元素的类型，可通过声明header结构体，并指定 'compClsName' 属性实现。
 4. 允许末尾出现逗号
 
