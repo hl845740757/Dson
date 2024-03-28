@@ -43,15 +43,11 @@ public final class DsonPrinter implements AutoCloseable {
     private StringBuilder builder;
     /** 是否是Writer内部的builder */
     private boolean backingBuilder;
+
     /** 缩进字符缓存，减少字符串构建 */
     private char[] indentionArray = SHARED_INDENTION_ARRAY;
-
     /** 结构体缩进 -- 默认的body缩进 */
     private int structIndent = 0;
-    /** 行首缩进 */
-    private int headIndent;
-    /** 内容和行首之间的缩进 */
-    private int bodyIndent;
 
     /** 当前行号 - 1开始 */
     private int ln;
@@ -62,7 +58,6 @@ public final class DsonPrinter implements AutoCloseable {
         this.settings = settings;
         this.writer = writer;
         // 初始化
-        this.headIndent = settings.extraIndent;
         if (settings.accessBackingBuilder && writer instanceof StringBuilderWriter sbWriter) {
             backingBuilder = true;
             builder = sbWriter.getBuilder();
@@ -89,32 +84,7 @@ public final class DsonPrinter implements AutoCloseable {
 
     /** 获取结构化输出body的最佳开始位置 */
     public int getPrettyBodyColum() {
-        int basicIndent = settings.extraIndent + structIndent;
-        if (settings.dsonMode == DsonMode.STANDARD) {
-            return basicIndent + (1 + 1);  // (headLabel + space)
-        } else {
-            return basicIndent;
-        }
-    }
-
-    public int getHeadIndent() {
-        return headIndent;
-    }
-
-    /** 设置行首缩进 -- 应当紧跟{@link #println()}调用 */
-    public void setHeadIndent(int headIndent) {
-        if (headIndent < 0) throw new IllegalArgumentException();
-        this.headIndent = headIndent;
-    }
-
-    public int getBodyIndent() {
-        return bodyIndent;
-    }
-
-    /** 设置body与head之间的缩进 -- 应当紧跟{@link #println()}调用 */
-    public void setBodyIndent(int bodyIndent) {
-        if (bodyIndent < 0) throw new IllegalArgumentException();
-        this.bodyIndent = bodyIndent;
+        return structIndent;
     }
 
     // endregion
@@ -193,18 +163,6 @@ public final class DsonPrinter implements AutoCloseable {
     // endregion
 
     // region dson
-
-    /** 打印行首 */
-    public void printHead(LineHead lineHead) {
-        printHead(lineHead.label);
-    }
-
-    /** 打印行首 */
-    public void printHead(String label) {
-        builder.append(label);
-        builder.append(' ');
-        column += label.length() + 1;
-    }
 
     public void printBeginObject() {
         builder.append('{');
@@ -308,18 +266,11 @@ public final class DsonPrinter implements AutoCloseable {
         }
         ln++;
         column = 0;
-        headIndent = settings.extraIndent;
-        bodyIndent = structIndent;
     }
 
-    /** 打印内容缩进 */
-    public void printBodyIndent() {
-        printSpaces(bodyIndent);
-    }
-
-    /** 打印行首缩进 */
-    public void printHeadIndent() {
-        printSpaces(headIndent);
+    /** 打印全部缩进 */
+    public void printIndent() {
+        printSpaces(structIndent);
     }
 
     /** 打印一个空格 */
@@ -338,6 +289,10 @@ public final class DsonPrinter implements AutoCloseable {
             char[] chars = new char[count];
             Arrays.fill(chars, ' ');
             builder.append(chars);
+            // 尝试缓存下来
+            if (count - indentionArray.length <= 8) {
+                indentionArray = chars;
+            }
         }
         column += count;
     }

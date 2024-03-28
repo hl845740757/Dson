@@ -72,18 +72,6 @@ public interface IDsonCharStream : IDisposable
     /// <value></value>
     LineInfo? CurLine { get; }
 
-    /// <summary>
-    /// 获取行首
-    /// </summary>
-    /// <value></value>
-    LineHead LineHead {
-        get {
-            LineInfo curLine = CurLine;
-            if (curLine == null) throw new InvalidOperationException("read must be called before LineHead");
-            return curLine.LineHead;
-        }
-    }
-
     /**
   * 获取行号
   * 1.初始0，表示尚未开始

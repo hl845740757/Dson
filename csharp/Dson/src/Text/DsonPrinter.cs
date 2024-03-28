@@ -41,15 +41,11 @@ public class DsonPrinter : IDisposable
     private StringBuilder _builder;
     /** 是否是Writer内部的builder */
     private bool _backingBuilder;
+
     /** 缩进字符缓存，减少字符串构建 */
     private char[] _indentionArray = SharedIndentionArray;
-
     /** 结构体缩进 -- 默认的body缩进 */
     private int _structIndent;
-    /** 行首缩进 */
-    private int _headIndent;
-    /** 内容和行首之间的缩进 */
-    private int _bodyIndent;
 
     /** 当前行号 */
     private int _ln;
@@ -61,7 +57,6 @@ public class DsonPrinter : IDisposable
         _settings = settings;
         _writer = writer ?? throw new ArgumentNullException(nameof(writer));
         // 初始化
-        this._headIndent = settings.ExtraIndent;
         if (settings.AccessBackingBuilder && writer is StringWriter stringWriter) {
             _backingBuilder = true;
             _builder = stringWriter.GetStringBuilder();
@@ -83,31 +78,7 @@ public class DsonPrinter : IDisposable
     /// <summary>
     /// 格式化输出时body开始列号
     /// </summary>
-    public int PrettyBodyColum {
-        get {
-            int basicIndent = _settings.ExtraIndent + _structIndent;
-            if (_settings.DsonMode == DsonMode.Standard) {
-                return basicIndent + (1 + 1); // (headLabel + space)
-            }
-            return basicIndent;
-        }
-    }
-
-    /// <summary>
-    /// 设置行首缩进 -- 应当紧跟{@link #println()}调用
-    /// </summary>
-    public int HeadIndent {
-        get => _headIndent;
-        set => _headIndent = value;
-    }
-
-    /// <summary>
-    /// 设置body与head之间的缩进 -- 应当紧跟{@link #println()}调用 
-    /// </summary>
-    public int BodyIndent {
-        get => _bodyIndent;
-        set => _bodyIndent = value;
-    }
+    public int PrettyBodyColum => _structIndent;
 
     #endregion
 
@@ -190,18 +161,6 @@ public class DsonPrinter : IDisposable
     #endregion
 
     #region dson
-
-    /** 打印行首 */
-    public void PrintHead(LineHead lineHead) {
-        PrintHead(DsonTexts.GetLabel(lineHead));
-    }
-
-    /** 打印行首 */
-    public void PrintHead(string label) {
-        _builder.Append(label);
-        _builder.Append(' ');
-        _column += label.Length + 1;
-    }
 
     public void PrintBeginObject() {
         _builder.Append('{');
@@ -307,18 +266,11 @@ public class DsonPrinter : IDisposable
         // Flush();
         _ln++;
         _column = 0;
-        _headIndent = _settings.ExtraIndent;
-        _bodyIndent = _structIndent;
     }
 
-    /** 打印内容缩进 */
-    public void PrintBodyIndent() {
-        PrintSpaces(_bodyIndent);
-    }
-
-    /** 打印行首缩进 */
-    public void PrintHeadIndent() {
-        PrintSpaces(_headIndent);
+    /** 打印全部缩进 */
+    public void PrintIndent() {
+        PrintSpaces(_structIndent);
     }
 
     /** 打印一个空格 */
@@ -337,6 +289,10 @@ public class DsonPrinter : IDisposable
             char[] chars = new char[count];
             Array.Fill(chars, ' ');
             _builder.Append(chars);
+            // 尝试缓存下来
+            if (count - _indentionArray.Length <= 8) {
+                _indentionArray = chars;
+            }
         }
         _column += count;
     }

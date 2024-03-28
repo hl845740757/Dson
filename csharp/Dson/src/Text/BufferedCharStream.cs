@@ -52,34 +52,6 @@ class BufferedCharStream : AbstractCharStream
         this._buffer = new CharBuffer(CharArrayPool.Rent(1024));
         this._nextBuffer = new CharBuffer(CharArrayPool.Rent(1024));
         this._autoClose = autoClose;
-        try {
-            DetectDsonMode();
-        }
-        catch (Exception e) {
-            ReturnBuffers();
-            throw new DsonIOException("invalid dson input", e);
-        }
-    }
-
-    private void DetectDsonMode() {
-        CharBuffer nextBuffer = this._nextBuffer;
-        int discardBytes = 0;
-        while (!_readerEof) {
-            ReadToBuffer(nextBuffer);
-            for (int idx = 0, len = nextBuffer.Length; idx < len; idx++) {
-                char firstChar = nextBuffer.CharAt(idx);
-                if (char.IsWhiteSpace(firstChar)) {
-                    continue;
-                }
-                _dsonMode = DsonTexts.DetectDsonMode(firstChar);
-                SetPosition(discardBytes + idx - 1);
-                return;
-            }
-            discardBytes += nextBuffer.Length;
-            nextBuffer.Shift(nextBuffer.Capacity);
-        }
-        _dsonMode = DsonMode.Relaxed;
-        SetPosition(discardBytes);
     }
 
     private void ReturnBuffers() {
@@ -230,75 +202,13 @@ class BufferedCharStream : AbstractCharStream
         }
 
         // startPos指向的是下一个位置，而endPos是在scan的时候增加，因此endPos需要回退一个位置
-        LineInfo tempLine = new LineInfo(ln, startPos, startPos - 1, LineHead.Append, startPos);
+        LineInfo tempLine = new LineInfo(ln, startPos, startPos - 1, startPos);
         ScanMoreChars(tempLine);
         if (tempLine.StartPos > tempLine.EndPos) { // 无效行，没有输入
             return false;
         }
-        if (_dsonMode == DsonMode.Relaxed) {
-            if (startPos > tempLine.LastReadablePosition()) { // 空行(仅换行符)
-                tempLine = new LineInfo(ln, startPos, tempLine.EndPos, LineHead.Append, -1);
-            }
-            AddLine(tempLine);
-            return true;
-        }
-
-        CharBuffer buffer = this._buffer;
-        int bufferStartPos = this._bufferStartPos;
-        // 必须出现行首，或扫描结束
-        int headPos = -1;
-        int indexStartPos = startPos;
-        while (true) {
-            if (headPos == -1) {
-                for (; indexStartPos <= tempLine.EndPos; indexStartPos++) {
-                    int ridx = indexStartPos - bufferStartPos;
-                    if (!DsonTexts.IsIndentChar(buffer.CharAt(ridx))) {
-                        headPos = indexStartPos;
-                        break;
-                    }
-                }
-            }
-            if (tempLine.IsScanCompleted()) {
-                break;
-            }
-            // 不足以判定行首或内容的开始，需要继续读 -- 要准备更多的空间
-            if (headPos == -1 || headPos + 2 > tempLine.EndPos) {
-                if (buffer.Capacity >= MaxBufferSize) {
-                    throw new DsonParseException("BufferOverFlow, caused by scanNextLine, pos: " + Position);
-                }
-                if (Position - bufferStartPos >= MinBufferSize) {
-                    DiscardReadChars(bufferStartPos + MinBufferSize / 2);
-                }
-                GrowUp(buffer);
-                ScanMoreChars(tempLine);
-                continue;
-            }
-            break;
-        }
-
-        int state = tempLine.State; // 可能已完成，也可能未完成
-        int lastReadablePos = tempLine.LastReadablePosition();
-        if (headPos >= startPos && headPos <= lastReadablePos) {
-            string label = buffer.CharAt(headPos - bufferStartPos).ToString();
-            LineHead? lineHead = DsonTexts.LineHeadOfLabel(label);
-            if (!lineHead.HasValue) {
-                throw new DsonParseException($"Unknown head {label}, pos: {headPos}");
-            }
-            // 检查缩进
-            if (headPos + 1 <= lastReadablePos && buffer.CharAt(headPos + 1 - bufferStartPos) != ' ') {
-                throw new DsonParseException($"space is required, head {{label}}, pos: {headPos}");
-            }
-            // 确定内容开始位置
-            int contentStartPos = -1;
-            if (headPos + 2 <= lastReadablePos) {
-                contentStartPos = headPos + 2;
-            }
-            tempLine = new LineInfo(ln, tempLine.StartPos, tempLine.EndPos, lineHead.Value, contentStartPos);
-            tempLine.State = state;
-        } else {
-            Debug.Assert(tempLine.IsScanCompleted());
-            tempLine = new LineInfo(ln, startPos, tempLine.EndPos, LineHead.Comment, -1);
-            tempLine.State = state;
+        if (startPos > tempLine.LastReadablePosition()) { // 空行(仅换行符)
+            tempLine = new LineInfo(ln, startPos, tempLine.EndPos, -1);
         }
         AddLine(tempLine);
         return true;

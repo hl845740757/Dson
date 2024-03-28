@@ -69,11 +69,10 @@ public static class DsonTexts
     }.ToImmutableHashSet();
 
     // 行首标签
-    public const string HeadComment = "#";
-    public const string HeadAppendLine = "-";
-    public const string HeadAppend = "|";
-    public const string HeadSwitchMode = "^";
-    public const string HeadEndOfText = "~";
+    public const char HeadAppendLine = '-';
+    public const char HeadAppend = '|';
+    public const char HeadSwitchMode = '^';
+    public const char HeadEndOfText = '~';
 
     /** 有特殊含义的字符串 */
     private static readonly ISet<string> ParsableStrings = new[]
@@ -313,36 +312,6 @@ public static class DsonTexts
 
     #endregion
 
-    #region linehead扩展
-
-    /** 通过行首label字符查找行首枚举 */
-    public static LineHead? LineHeadOfLabel(string label) {
-        return label switch
-        {
-            DsonTexts.HeadComment => LineHead.Comment,
-            DsonTexts.HeadAppendLine => LineHead.AppendLine,
-            DsonTexts.HeadAppend => LineHead.Append,
-            DsonTexts.HeadSwitchMode => LineHead.SwitchMode,
-            DsonTexts.HeadEndOfText => LineHead.EndOfText,
-            _ => null
-        };
-    }
-
-    /** 获取行首枚举关联的字符  */
-    public static string GetLabel(LineHead lineHead) {
-        return lineHead switch
-        {
-            LineHead.Comment => DsonTexts.HeadComment,
-            LineHead.AppendLine => DsonTexts.HeadAppendLine,
-            LineHead.Append => DsonTexts.HeadAppend,
-            LineHead.SwitchMode => DsonTexts.HeadSwitchMode,
-            LineHead.EndOfText => DsonTexts.HeadEndOfText,
-            _ => throw new InvalidOperationException()
-        };
-    }
-
-    #endregion
-
     /** 获取类型名对应的Token类型 */
     public static DsonTokenType TokenTypeOfClsName(string label) {
         if (label == null) throw new ArgumentNullException(nameof(label));
@@ -381,32 +350,6 @@ public static class DsonTexts
             DsonType.Timestamp => new DsonToken(DsonTokenType.BuiltinStruct, LabelDatetime, -1),
             _ => throw new ArgumentException(nameof(dsonType))
         };
-    }
-
-    /** 检测dson文本的类型 -- 对于文件，可以通过规范命名规范来表达 */
-    public static DsonMode DetectDsonMode(string dsonString) {
-        for (int i = 0, len = dsonString.Length; i < len; i++) {
-            char firstChar = dsonString[i];
-            if (char.IsWhiteSpace(firstChar)) {
-                continue;
-            }
-            return DetectDsonMode(firstChar);
-        }
-        return DsonMode.Relaxed;
-    }
-
-    /**
-     * 首个字符的范围：行首和对象开始符
-     */
-    public static DsonMode DetectDsonMode(char firstChar) {
-        LineHead? lineHead = LineHeadOfLabel(firstChar.ToString());
-        if (lineHead.HasValue) {
-            return DsonMode.Standard;
-        }
-        if (firstChar != '{' && firstChar != '[' && firstChar != '@') {
-            throw new ArgumentException("the string is not a valid dson string");
-        }
-        return DsonMode.Relaxed;
     }
 
     /** 索引首个非空白字符的位置 */

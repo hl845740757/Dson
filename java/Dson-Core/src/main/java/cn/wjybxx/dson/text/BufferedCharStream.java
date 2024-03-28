@@ -59,31 +59,6 @@ final class BufferedCharStream extends AbstractCharStream {
         this.autoClose = autoClose;
         this.buffer = new CharBuffer(CHAR_ARRAY_POOL.rent(1024));
         this.nextBuffer = new CharBuffer(CHAR_ARRAY_POOL.rent(1024));
-        try {
-            detectDsonMode();
-        } catch (IOException e) {
-            returnBuffers();
-            throw new DsonIOException("invalid dson input", e);
-        }
-    }
-
-    private void detectDsonMode() throws IOException {
-        CharBuffer nextBuffer = this.nextBuffer;
-        int discardBytes = 0;
-        while (!readerEof) {
-            readToBuffer(nextBuffer);
-            int idx = DsonTexts.indexOfNonWhitespace(nextBuffer, 0);
-            if (idx < 0) {
-                discardBytes += nextBuffer.readableChars();
-                nextBuffer.shift(nextBuffer.capacity());
-                continue;
-            }
-            dsonMode = DsonTexts.detectDsonMode(nextBuffer.charAt(idx));
-            setPosition(discardBytes + idx - 1);
-            return;
-        }
-        dsonMode = DsonMode.RELAXED;
-        setPosition(discardBytes);
     }
 
     private void returnBuffers() {
@@ -245,75 +220,13 @@ final class BufferedCharStream extends AbstractCharStream {
         }
 
         // startPos指向的是下一个位置，而endPos是在scan的时候增加，因此endPos需要回退一个位置
-        LineInfo tempLine = new LineInfo(ln, startPos, startPos - 1, LineHead.APPEND, startPos);
+        LineInfo tempLine = new LineInfo(ln, startPos, startPos - 1, startPos);
         scanMoreChars(tempLine);
         if (tempLine.startPos > tempLine.endPos) { // 无效行，没有输入
             return false;
         }
-        if (dsonMode == DsonMode.RELAXED) {
-            if (startPos > tempLine.lastReadablePosition()) { // 空行(仅换行符)
-                tempLine = new LineInfo(ln, startPos, tempLine.endPos, LineHead.APPEND, -1);
-            }
-            addLine(tempLine);
-            return true;
-        }
-
-        CharBuffer buffer = this.buffer;
-        int bufferStartPos = this.bufferStartPos;
-        // 必须出现行首，或扫描结束
-        int headPos = -1;
-        int indexStartPos = startPos;
-        while (true) {
-            if (headPos == -1) {
-                for (; indexStartPos <= tempLine.endPos; indexStartPos++) {
-                    int ridx = indexStartPos - bufferStartPos;
-                    if (!DsonTexts.isIndentChar(buffer.charAt(ridx))) {
-                        headPos = indexStartPos;
-                        break;
-                    }
-                }
-            }
-            if (tempLine.isScanCompleted()) {
-                break;
-            }
-            // 不足以判定行首或内容的开始，需要继续读 -- 要准备更多的空间
-            if (headPos == -1 || headPos + 2 > tempLine.endPos) {
-                if (buffer.capacity() >= MAX_BUFFER_SIZE) {
-                    throw new DsonParseException("BufferOverFlow, caused by scanNextLine, pos: " + getPosition());
-                }
-                if (getPosition() - bufferStartPos >= MIN_BUFFER_SIZE) {
-                    discardReadChars(bufferStartPos + MIN_BUFFER_SIZE / 2);
-                }
-                growUp(buffer);
-                scanMoreChars(tempLine);
-                continue;
-            }
-            break;
-        }
-
-        int state = tempLine.state; // 可能已完成，也可能未完成
-        int lastReadablePos = tempLine.lastReadablePosition();
-        if (headPos >= startPos && headPos <= lastReadablePos) {
-            String label = Character.toString(buffer.charAt(headPos - bufferStartPos));
-            LineHead lineHead = LineHead.forLabel(label);
-            if (lineHead == null) {
-                throw new DsonParseException("Unknown head %s, pos: %d".formatted(label, headPos));
-            }
-            // 检查缩进
-            if (headPos + 1 <= lastReadablePos && buffer.charAt(headPos + 1 - bufferStartPos) != ' ') {
-                throw new DsonParseException("space is required, head %s, pos: %d".formatted(label, headPos));
-            }
-            // 确定内容开始位置
-            int contentStartPos = -1;
-            if (headPos + 2 <= lastReadablePos) {
-                contentStartPos = headPos + 2;
-            }
-            tempLine = new LineInfo(ln, tempLine.startPos, tempLine.endPos, lineHead, contentStartPos);
-            tempLine.state = state;
-        } else {
-            assert tempLine.isScanCompleted();
-            tempLine = new LineInfo(ln, startPos, tempLine.endPos, LineHead.COMMENT, -1);
-            tempLine.state = state;
+        if (startPos > tempLine.lastReadablePosition()) { // 空行(仅换行符)
+            tempLine = new LineInfo(ln, startPos, tempLine.endPos, -1);
         }
         addLine(tempLine);
         return true;

@@ -28,14 +28,6 @@ class StringCharStream : AbstractCharStream
 
     public StringCharStream(string buffer) {
         this._buffer = buffer ?? throw new ArgumentNullException(nameof(buffer));
-        int idx = DsonTexts.IndexOfNonWhitespace(buffer, 0);
-        if (idx < 0) {
-            _dsonMode = DsonMode.Relaxed;
-            SetPosition(buffer.Length);
-        } else {
-            _dsonMode = DsonTexts.DetectDsonMode(buffer[idx]);
-            SetPosition(idx - 1);
-        }
     }
 
     public override void Dispose() {
@@ -108,32 +100,12 @@ class StringCharStream : AbstractCharStream
             }
         }
 
-        LineHead? lineHead = LineHead.Comment;
-        int contentStartPos = -1;
         int lastReadablePos = LineInfo.LastReadablePosition(state, endPos);
-        if (_dsonMode == DsonMode.Relaxed) {
-            if (startPos <= lastReadablePos) {
-                lineHead = LineHead.Append;
-                contentStartPos = startPos;
-            }
-        } else {
-            if (headPos >= startPos && headPos <= lastReadablePos) {
-                string label = buffer[headPos].ToString();
-                lineHead = DsonTexts.LineHeadOfLabel(label);
-                if (!lineHead.HasValue) {
-                    throw new DsonParseException($"Unknown head {label}, pos: {headPos}");
-                }
-                // 检查缩进
-                if (headPos + 1 <= lastReadablePos && buffer[headPos + 1] != ' ') {
-                    throw new DsonParseException($"space is required, head {label}, pos: {headPos}");
-                }
-                // 确定内容开始位置
-                if (headPos + 2 <= lastReadablePos) {
-                    contentStartPos = headPos + 2;
-                }
-            }
+        int contentStartPos = -1;
+        if (startPos <= lastReadablePos) {
+            contentStartPos = startPos;
         }
-        LineInfo tempLine = new LineInfo(ln, startPos, endPos, lineHead.Value, contentStartPos);
+        LineInfo tempLine = new LineInfo(ln, startPos, endPos, contentStartPos);
         tempLine.State = state;
         AddLine(tempLine);
         return true;

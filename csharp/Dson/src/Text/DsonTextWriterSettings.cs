@@ -32,14 +32,10 @@ public class DsonTextWriterSettings : DsonWriterSettings
 {
     private const int MinLineLength = 10;
     /** 标准模式默认设置 */
-    public static readonly DsonTextWriterSettings Default;
-    /** 宽松模式默认设置 */
-    public static readonly DsonTextWriterSettings RelaxedDefault;
+    public static readonly DsonTextWriterSettings Default = NewBuilder().Build();
 
     /** 行分隔符 */
     public readonly string LineSeparator;
-    /** Dson文本模式 */
-    public readonly DsonMode DsonMode;
     /** 行长度-软限制 */
     public readonly int SoftLineLength;
 
@@ -54,40 +50,25 @@ public class DsonTextWriterSettings : DsonWriterSettings
     public readonly float TextStringLength;
     /** 文本字符串换行是否启用左对齐 */
     public readonly bool TextAlignLeft;
-    /** 双引号字符串换行是否启用左对齐 */
-    public readonly bool StringAlignLeft;
 
     /** 不可打印的ascii码字符是否转为unicode字符 */
     public readonly bool UnicodeChar;
     /** 无引号字符串的最大长度 */
     public readonly int MaxLengthOfUnquoteString;
-    /** 行首前的额外缩进 */
-    public readonly int ExtraIndent;
 
     public DsonTextWriterSettings(Builder builder) : base(builder) {
         this.LineSeparator = builder.LineSeparator;
-        this.DsonMode = builder.DsonMode;
         this.SoftLineLength = Math.Max(MinLineLength, builder.SoftLineLength);
         this.StringBuilderPool = builder.StringBuilderPool ?? LocalStringBuilderPool.Instance;
         this.AccessBackingBuilder = builder.AccessBackingBuilder;
 
         // 标准模式下才可启用纯文本
-        this.EnableText = DsonMode == DsonMode.Standard && builder.EnableText;
+        this.EnableText = builder.EnableText;
         this.TextStringLength = Math.Max(MinLineLength, builder.TextStringLength);
         this.TextAlignLeft = builder.TextAlignLeft;
-        this.StringAlignLeft = builder.StringAlignLeft;
 
         this.UnicodeChar = builder.UnicodeChar;
         this.MaxLengthOfUnquoteString = builder.MaxLengthOfUnquoteString;
-        this.ExtraIndent = Math.Max(0, builder.ExtraIndent);
-    }
-
-    static DsonTextWriterSettings() {
-        Default = NewBuilder().Build();
-
-        Builder relaxedBuilder = NewBuilder();
-        relaxedBuilder.DsonMode = DsonMode.Relaxed;
-        RelaxedDefault = relaxedBuilder.Build();
     }
 
     public new static Builder NewBuilder() {
@@ -98,8 +79,6 @@ public class DsonTextWriterSettings : DsonWriterSettings
     {
         /** 行分隔符 */
         public string LineSeparator = Environment.NewLine;
-        /** 文本模式 */
-        public DsonMode DsonMode = DsonMode.Standard;
         /**
          * 行长度，该值是一个换行参考值
          * 精确控制行长度较为复杂，那样我们需要考虑每一种值toString后长度超出的问题；
@@ -120,10 +99,8 @@ public class DsonTextWriterSettings : DsonWriterSettings
         public bool EnableText = true;
         /** 触发text模式的字符串长度 */
         public float TextStringLength = 120;
-        /** 纯文本换行是否启用左对齐 -- 仅标准模式下生效 */
-        public bool TextAlignLeft = false;
-        /** 字符串换行是否启用左对齐 -- 仅标准模式下生效；不适用无引号字符串 */
-        public bool StringAlignLeft = false;
+        /** 纯文本换行是否启用左对齐  */
+        public bool TextAlignLeft = true;
 
         /**
          * 不可打印的ascii码字符是否转为unicode字符
@@ -133,8 +110,7 @@ public class DsonTextWriterSettings : DsonWriterSettings
         public bool UnicodeChar = false;
         /** 自动模式下无引号字符串的最大长度 -- 过大会降低序列化速度 */
         public int MaxLengthOfUnquoteString = 20;
-        /** 外层额外缩进 */
-        public int ExtraIndent;
+
 
         public Builder() {
         }

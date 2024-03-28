@@ -20,6 +20,8 @@ import cn.wjybxx.base.ObjectUtils;
 import cn.wjybxx.base.io.LocalStringBuilderPool;
 import cn.wjybxx.base.pool.ObjectPool;
 
+import javax.annotation.Nonnull;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -34,7 +36,7 @@ public class DsonScanner implements AutoCloseable {
     private DsonCharStream charStream;
     private ObjectPool<StringBuilder> builderPool;
     private StringBuilder pooledStringBuilder;
-    private final char[] hexBuffer = new char[4];
+    private final HexBuffer hexBuffer = new HexBuffer();
 
     public DsonScanner(CharSequence dson) {
         this(new StringCharStream(dson), null);
@@ -311,9 +313,10 @@ public class DsonScanner implements AutoCloseable {
         int c;
         while ((c = buffer.read()) != -1) {
             if (c == -2) {
-                if (buffer.getLineHead() == LineHead.COMMENT) {
-                    buffer.skipLine();
-                }
+                continue;
+            }
+            if (c == '/') {
+                skipComment();
                 continue;
             }
             if (!DsonTexts.isIndentChar(c)) {
@@ -323,6 +326,7 @@ public class DsonScanner implements AutoCloseable {
         return c;
     }
 
+    /** 跳过双斜杠'//'注释 */
     private void skipComment() {
         DsonCharStream buffer = this.charStream;
         int nextChar = buffer.read();
@@ -355,9 +359,6 @@ public class DsonScanner implements AutoCloseable {
         int c;
         while ((c = buffer.read()) != -1) {
             if (c == -2) {
-                if (buffer.getLineHead() == LineHead.COMMENT) {
-                    buffer.skipLine();
-                }
                 continue;
             }
             if (DsonTexts.isUnsafeStringChar(c)) {
@@ -373,9 +374,6 @@ public class DsonScanner implements AutoCloseable {
         int c;
         while ((c = buffer.read()) != -1) {
             if (c == -2) {
-                if (buffer.getLineHead() == LineHead.COMMENT) {
-                    buffer.skipLine();
-                }
                 continue;
             }
             if (DsonTexts.isUnsafeStringChar(c)) {
@@ -402,17 +400,12 @@ public class DsonScanner implements AutoCloseable {
         int c;
         while ((c = buffer.read()) != -1) {
             if (c == -2) {
-                if (buffer.getLineHead() == LineHead.COMMENT) {
-                    buffer.skipLine();
-                } else if (buffer.getLineHead() == LineHead.APPEND_LINE) { // 开启新行
-                    sb.append('\n');
-                } else if (buffer.getLineHead() == LineHead.SWITCH_MODE) { // 进入纯文本模式
-                    switch2TextMode(buffer, sb);
-                }
-            } else if (c == '\\') { // 处理转义字符
-                doEscape(buffer, sb, LineHead.APPEND);
-            } else if (c == quoteChar) { // 结束
+                continue;
+            }
+            if (c == quoteChar) { // 结束
                 return;
+            } else if (c == '\\') { // 处理转义字符
+                doEscape(buffer, sb);
             } else {
                 sb.append((char) c);
             }
@@ -420,51 +413,7 @@ public class DsonScanner implements AutoCloseable {
         throw new DsonParseException("End of file in Dson string.");
     }
 
-    /** 扫描文本段 */
-    private String scanText(boolean skipValue) {
-        if (skipValue) {
-            skipText();
-            return null;
-        }
-        StringBuilder sb = allocStringBuilder();
-        scanText(sb);
-        return sb.toString();
-    }
-
-    private void skipText() {
-        DsonCharStream buffer = this.charStream;
-        int c;
-        while ((c = buffer.read()) != -1) {
-            if (c == -2 && buffer.getLineHead() == LineHead.END_OF_TEXT) {
-                break;
-            }
-        }
-        throw new DsonParseException("End of file in Dson string.");
-    }
-
-    private void scanText(StringBuilder sb) {
-        DsonCharStream buffer = this.charStream;
-        int c;
-        while ((c = buffer.read()) != -1) {
-            if (c == -2) {
-                if (buffer.getLineHead() == LineHead.COMMENT) {
-                    buffer.skipLine();
-                } else if (buffer.getLineHead() == LineHead.END_OF_TEXT) { // 读取结束
-                    return;
-                }
-                if (buffer.getLineHead() == LineHead.APPEND_LINE) { // 开启新行
-                    sb.append('\n');
-                } else if (buffer.getLineHead() == LineHead.SWITCH_MODE) { // 进入转义模式
-                    switch2EscapeMode(buffer, sb);
-                }
-            } else {
-                sb.append((char) c);
-            }
-        }
-        throw new DsonParseException("End of file in Dson string.");
-    }
-
-    /** 扫描单行文本 */
+    /** 扫描单行纯文本 */
     private String scanSingleLineText(boolean skipValue) {
         if (skipValue) {
             charStream.skipLine();
@@ -484,38 +433,104 @@ public class DsonScanner implements AutoCloseable {
         buffer.unread();
     }
 
-    private static void switch2TextMode(DsonCharStream buffer, StringBuilder sb) {
+    /** 扫描文本段 */
+    private String scanText(boolean skipValue) {
+        if (skipValue) {
+            skipText();
+            return null;
+        }
+        StringBuilder sb = allocStringBuilder();
+        scanText(sb);
+        return sb.toString();
+    }
+
+    private void skipText() {
+        DsonCharStream buffer = this.charStream;
+        int c;
+        while ((c = buffer.read()) != -1) {
+            if (c == -2 && readHead(buffer) == LineHead.END_OF_TEXT) {
+                break;
+            }
+        }
+        throw new DsonParseException("End of file in Dson string.");
+    }
+
+    private void scanText(StringBuilder sb) {
+        DsonCharStream buffer = this.charStream;
         int c;
         while ((c = buffer.read()) != -1) {
             if (c == -2) {
-                if (buffer.getLineHead() != LineHead.SWITCH_MODE) { // 退出模式切换
-                    buffer.unread();
-                    break;
+                LineHead lineHead = readHead(buffer);
+                if (lineHead == LineHead.END_OF_TEXT) { // 读取结束
+                    return;
+                }
+                if (lineHead == LineHead.COMMENT) { // 注释行
+                    buffer.skipLine();
+                } else if (lineHead == LineHead.APPEND_LINE) { // 开启新行
+                    sb.append('\n');
+                } else if (lineHead == LineHead.SWITCH_MODE) { // 进入转义模式
+                    switch2EscapeMode(buffer, sb);
                 }
             } else {
                 sb.append((char) c);
             }
         }
+        throw new DsonParseException("End of file in Dson string.");
     }
 
+    /** 转义模式 - 单行有效 */
     private void switch2EscapeMode(DsonCharStream buffer, StringBuilder sb) {
         int c;
-        while ((c = buffer.read()) != -1) {
-            if (c == -2) {
-                if (buffer.getLineHead() != LineHead.SWITCH_MODE) { // 退出模式切换
-                    buffer.unread();
-                    break;
-                }
-            } else if (c == '\\') {
-                doEscape(buffer, sb, LineHead.SWITCH_MODE);
+        while ((c = buffer.read()) >= 0) {
+            if (c == '\\') {
+                doEscape(buffer, sb);
             } else {
                 sb.append((char) c);
             }
         }
+        buffer.unread();
     }
 
-    private void doEscape(DsonCharStream buffer, StringBuilder sb, LineHead lockHead) {
-        int c = readEscapeChar(buffer, lockHead);
+    private LineHead readHead(DsonCharStream buffer) {
+        int c;
+        while ((c = buffer.read()) >= 0) {
+            if (DsonTexts.isIndentChar(c)) {
+                continue;
+            }
+            if (c == '/') {
+                skipComment();
+                return LineHead.COMMENT; // 注释行
+            }
+            if (c != '@') { // 首字符必须是‘@'
+                throw new DsonParseException("invalid text line, position: " + getPosition());
+            }
+            int head = buffer.read();
+            if (head < 0) {
+                throw new DsonParseException("invalid text line, position: " + getPosition());
+            }
+            LineHead lineHead = switch ((char) head) {
+                case DsonTexts.HEAD_APPEND_LINE -> LineHead.APPEND_LINE;
+                case DsonTexts.HEAD_APPEND -> LineHead.APPEND;
+                case DsonTexts.HEAD_SWITCH_MODE -> LineHead.SWITCH_MODE;
+                case DsonTexts.HEAD_END_OF_TEXT -> LineHead.END_OF_TEXT;
+                default -> throw new DsonParseException("invalid text line, position: " + getPosition());
+            };
+            // 如果未达文件尾，必须是空格或换行
+            c = buffer.read();
+            if (c < 0) {
+                buffer.unread();
+            } else if (c != ' ') {
+                throw spaceRequired(getPosition());
+            }
+            return lineHead;
+        }
+        buffer.unread(); // 空行
+        return LineHead.COMMENT;
+    }
+
+    private void doEscape(DsonCharStream buffer, StringBuilder sb) {
+        final int position = getPosition();
+        final int c = readEscapeChar(buffer, position);
         switch (c) {
             case '"' -> sb.append('"'); // 双引号字符串下，双引号需要转义
             case '\\' -> sb.append('\\');
@@ -526,36 +541,65 @@ public class DsonScanner implements AutoCloseable {
             case 't' -> sb.append('\t');
             case 'u' -> {
                 // unicode字符，char是2字节，固定编码为4个16进制数，从高到底
-                char[] hexBuffer = this.hexBuffer;
-                hexBuffer[0] = (char) readEscapeChar(buffer, lockHead);
-                hexBuffer[1] = (char) readEscapeChar(buffer, lockHead);
-                hexBuffer[2] = (char) readEscapeChar(buffer, lockHead);
-                hexBuffer[3] = (char) readEscapeChar(buffer, lockHead);
-                String hex = new String(hexBuffer);
-                sb.append((char) Integer.parseInt(hex, 16));
+                HexBuffer hexBuffer = this.hexBuffer;
+                hexBuffer.charAt(0, (char) readEscapeChar(buffer, position));
+                hexBuffer.charAt(1, (char) readEscapeChar(buffer, position));
+                hexBuffer.charAt(2, (char) readEscapeChar(buffer, position));
+                hexBuffer.charAt(3, (char) readEscapeChar(buffer, position));
+                sb.append((char) Integer.parseInt(hexBuffer, 0, 4, 16));
             }
-            default -> throw invalidEscapeSequence(c, getPosition());
+            default -> throw invalidEscapeSequence(c, position);
         }
     }
 
-    /** 读取下一个要转义的字符 -- 只能换行到合并行 */
-    private int readEscapeChar(DsonCharStream buffer, LineHead lockHead) {
-        int c;
-        while (true) {
-            c = buffer.read();
-            if (c >= 0) {
-                return c;
-            }
-            if (c == -1) {
-                throw invalidEscapeSequence('\\', getPosition());
-            }
-            // c == -2 转义模式下，不可以切换到其它行
-            if (buffer.getLineHead() != lockHead) {
-                throw invalidEscapeSequence('\\', getPosition());
-            }
+    /** 读取下一个要转义的字符 */
+    private static int readEscapeChar(DsonCharStream buffer, int position) {
+        int c = buffer.read();
+        if (c >= 0) {
+            return c;
         }
+        throw invalidEscapeSequence('\\', position);
     }
 
+    /** 避免频繁构建字符串 */
+    private static class HexBuffer implements CharSequence {
+
+        final char[] buffer;
+
+        public HexBuffer() {
+            buffer = new char[4];
+        }
+
+        private HexBuffer(char[] buffer) {
+            this.buffer = buffer;
+        }
+
+        public void charAt(int index, char c) {
+            buffer[index] = c;
+        }
+
+        @Override
+        public int length() {
+            return buffer.length;
+        }
+
+        @Override
+        public char charAt(int index) {
+            return buffer[index];
+        }
+
+        @Nonnull
+        @Override
+        public CharSequence subSequence(int start, int end) {
+            return new HexBuffer(Arrays.copyOfRange(buffer, start, end));
+        }
+
+        @Nonnull
+        @Override
+        public String toString() {
+            return new String(buffer);
+        }
+    }
     // endregion
 
 }

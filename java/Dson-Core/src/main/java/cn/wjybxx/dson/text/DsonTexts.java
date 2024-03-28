@@ -67,11 +67,10 @@ public class DsonTexts {
     );
 
     // 行首标签
-    public static final String HEAD_COMMENT = "#";
-    public static final String HEAD_APPEND_LINE = "-";
-    public static final String HEAD_APPEND = "|";
-    public static final String HEAD_SWITCH_MODE = "^";
-    public static final String HEAD_END_OF_TEXT = "~";
+    public static final char HEAD_APPEND_LINE = '-';
+    public static final char HEAD_APPEND = '|';
+    public static final char HEAD_SWITCH_MODE = '^';
+    public static final char HEAD_END_OF_TEXT = '~';
 
     /** 有特殊含义的字符串 */
     private static final Set<String> PARSABLE_STRINGS = Set.of("true", "false",
@@ -315,29 +314,6 @@ public class DsonTexts {
             case TIMESTAMP -> new DsonToken(DsonTokenType.BUILTIN_STRUCT, LABEL_DATETIME, -1);
             default -> throw new IllegalArgumentException();
         };
-    }
-
-    /** 检测dson文本的类型 -- 对于文件，可以通过规范命名规范来表达 */
-    public static DsonMode detectDsonMode(CharSequence dsonString) {
-        for (int i = 0, len = dsonString.length(); i < len; i++) {
-            char firstChar = dsonString.charAt(i);
-            if (Character.isWhitespace(firstChar)) {
-                continue;
-            }
-            return detectDsonMode(firstChar);
-        }
-        return DsonMode.RELAXED;
-    }
-
-    public static DsonMode detectDsonMode(char firstChar) {
-        LineHead lineHead = LineHead.forLabel(Character.toString(firstChar));
-        if (lineHead != null) {
-            return DsonMode.STANDARD;
-        }
-        if (firstChar != '{' && firstChar != '[' && firstChar != '@') {
-            throw new IllegalArgumentException("the string is not a valid dson string");
-        }
-        return DsonMode.RELAXED;
     }
 
     /** 索引首个非空白字符的位置 */

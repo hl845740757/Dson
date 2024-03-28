@@ -71,15 +71,6 @@ public interface DsonCharStream extends AutoCloseable {
     LineInfo getCurLine();
 
     /**
-     * 获取行首
-     */
-    default LineHead getLineHead() {
-        LineInfo curLine = getCurLine();
-        if (curLine == null) throw new IllegalStateException("read must be called before getLineHead");
-        return curLine.lineHead;
-    }
-
-    /**
      * 获取行号
      * 1.初始0，表示尚未开始
      * 2.初始行号可能不为1，部分输入流可能是截断的

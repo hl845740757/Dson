@@ -30,14 +30,6 @@ final class StringCharStream extends AbstractCharStream {
 
     public StringCharStream(CharSequence buffer) {
         this.buffer = Objects.requireNonNull(buffer);
-        int idx = DsonTexts.indexOfNonWhitespace(buffer, 0);
-        if (idx < 0) {
-            dsonMode = DsonMode.RELAXED;
-            setPosition(buffer.length());
-        } else {
-            dsonMode = DsonTexts.detectDsonMode(buffer.charAt(idx));
-            setPosition(idx - 1);
-        }
     }
 
     @Override
@@ -106,7 +98,7 @@ final class StringCharStream extends AbstractCharStream {
                     break;
                 }
                 c = buffer.charAt(++endPos);
-                if (c == '\n') { // CRLF
+                if (c == '\n') { // CR LF
                     state = LineInfo.STATE_CRLF;
                     break;
                 }
@@ -117,32 +109,12 @@ final class StringCharStream extends AbstractCharStream {
             }
         }
 
-        LineHead lineHead = LineHead.COMMENT;
-        int contentStartPos = -1;
         int lastReadablePos = LineInfo.lastReadablePosition(state, endPos);
-        if (dsonMode == DsonMode.RELAXED) {
-            if (startPos <= lastReadablePos) {
-                lineHead = LineHead.APPEND;
-                contentStartPos = startPos;
-            }
-        } else {
-            if (headPos >= startPos && headPos <= lastReadablePos) {
-                String label = Character.toString(buffer.charAt(headPos));
-                lineHead = LineHead.forLabel(label);
-                if (lineHead == null) {
-                    throw new DsonParseException("Unknown head %s, pos: %d".formatted(label, headPos));
-                }
-                // 检查缩进
-                if (headPos + 1 <= lastReadablePos && buffer.charAt(headPos + 1) != ' ') {
-                    throw new DsonParseException("space is required, head %s, pos: %d".formatted(label, headPos));
-                }
-                // 确定内容开始位置
-                if (headPos + 2 <= lastReadablePos) {
-                    contentStartPos = headPos + 2;
-                }
-            }
+        int contentStartPos = -1;
+        if (startPos <= lastReadablePos) {
+            contentStartPos = startPos;
         }
-        LineInfo tempLine = new LineInfo(ln, startPos, endPos, lineHead, contentStartPos);
+        LineInfo tempLine = new LineInfo(ln, startPos, endPos, contentStartPos);
         tempLine.state = state;
         addLine(tempLine);
         return true;

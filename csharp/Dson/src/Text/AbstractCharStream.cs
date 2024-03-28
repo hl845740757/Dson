@@ -28,7 +28,6 @@ namespace Wjybxx.Dson.Text;
 /// </summary>
 public abstract class AbstractCharStream : IDsonCharStream
 {
-    protected DsonMode _dsonMode;
     private readonly List<LineInfo> _lines = new List<LineInfo>();
     private LineInfo? _curLine;
     private bool _readingContent = false;

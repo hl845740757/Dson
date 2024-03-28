@@ -16,6 +16,7 @@
 
 #endregion
 
+using System;
 using System.Text;
 
 #pragma warning disable CS1591
@@ -49,20 +50,16 @@ public class LineInfo
     public int EndPos;
     /** 行在字符流中的状态 -- endPos是否到达行尾 */
     public int State = StateScan;
-
-    /** 行首类型 */
-    public readonly LineHead LineHead;
     /**
      * 内容全局起始位置 -- -1表示无内容
      * 由于文件可能是没有行首的，因此不能记录行首的开始位置;
      */
     public readonly int ContentStartPos;
 
-    public LineInfo(int ln, int startPos, int endPos, LineHead lineHead, int contentStartPos) {
+    public LineInfo(int ln, int startPos, int endPos, int contentStartPos) {
         this.Ln = ln;
         this.StartPos = startPos;
         this.EndPos = endPos;
-        this.LineHead = lineHead;
         this.ContentStartPos = contentStartPos;
     }
 
@@ -119,7 +116,6 @@ public class LineInfo
             .Append(", startPos=").Append(StartPos)
             .Append(", endPos=").Append(EndPos)
             .Append(", state=").Append(State)
-            .Append(", lineHead=").Append(LineHead)
             .Append(", contentStartPos=").Append(ContentStartPos)
             .Append('}').ToString();
     }

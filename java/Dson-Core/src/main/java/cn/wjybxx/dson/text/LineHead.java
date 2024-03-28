@@ -25,31 +25,20 @@ package cn.wjybxx.dson.text;
 public enum LineHead {
 
     /** 注释 */
-    COMMENT(DsonTexts.HEAD_COMMENT),
+    COMMENT(),
     /** 添加新行 */
-    APPEND_LINE(DsonTexts.HEAD_APPEND_LINE),
+    APPEND_LINE(),
     /** 与上一行合并 */
-    APPEND(DsonTexts.HEAD_APPEND),
+    APPEND(),
     /** 切换模式 */
-    SWITCH_MODE(DsonTexts.HEAD_SWITCH_MODE),
+    SWITCH_MODE(),
     /** 文本输入结束 */
-    END_OF_TEXT(DsonTexts.HEAD_END_OF_TEXT);
+    END_OF_TEXT();
 
     public final String label;
 
-    LineHead(String label) {
-        this.label = label;
-    }
-
-    public static LineHead forLabel(String label) {
-        return switch (label) {
-            case DsonTexts.HEAD_COMMENT -> COMMENT;
-            case DsonTexts.HEAD_APPEND_LINE -> APPEND_LINE;
-            case DsonTexts.HEAD_APPEND -> APPEND;
-            case DsonTexts.HEAD_SWITCH_MODE -> SWITCH_MODE;
-            case DsonTexts.HEAD_END_OF_TEXT -> END_OF_TEXT;
-            default -> null;
-        };
+    LineHead() {
+        this.label = null;
     }
 
 }

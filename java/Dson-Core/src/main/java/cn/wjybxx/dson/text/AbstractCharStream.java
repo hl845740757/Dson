@@ -25,7 +25,6 @@ import java.util.Objects;
  */
 public abstract class AbstractCharStream implements DsonCharStream {
 
-    protected DsonMode dsonMode;
     private final List<LineInfo> lines = new ArrayList<>();
     private LineInfo curLine;
     private boolean readingContent = false;

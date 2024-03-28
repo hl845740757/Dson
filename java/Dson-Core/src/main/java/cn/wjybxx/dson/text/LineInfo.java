@@ -47,20 +47,16 @@ public class LineInfo {
     public int endPos;
     /** 行在字符流中的状态 -- endPos是否到达行尾 */
     public int state = STATE_SCAN;
-
-    /** 行首类型 */
-    public final LineHead lineHead;
     /**
      * 内容全局起始位置 -- -1表示无内容
      * 由于文件可能是没有行首的，因此不能记录行首的开始位置;
      */
     public final int contentStartPos;
 
-    public LineInfo(int ln, int startPos, int endPos, LineHead lineHead, int contentStartPos) {
+    public LineInfo(int ln, int startPos, int endPos, int contentStartPos) {
         this.ln = ln;
         this.startPos = startPos;
         this.endPos = endPos;
-        this.lineHead = lineHead;
         this.contentStartPos = contentStartPos;
     }
 
@@ -118,7 +114,6 @@ public class LineInfo {
                 .append(", endPos=").append(endPos)
                 .append(", state=").append(state)
 
-                .append(", lineHead=").append(lineHead)
                 .append(", contentStartPos=").append(contentStartPos)
                 .append('}').toString();
     }
