@@ -66,7 +66,6 @@ public class BigFileTest {
         stopWatch.logStep("Read");
 
         DsonTextWriterSettings settings = DsonTextWriterSettings.newBuilder()
-                .setDsonMode(DsonMode.RELAXED)
                 .setEnableText(false)
                 .setMaxLengthOfUnquoteString(0)
                 .build();

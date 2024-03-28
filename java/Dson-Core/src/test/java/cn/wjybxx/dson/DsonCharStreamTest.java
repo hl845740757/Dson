@@ -35,42 +35,43 @@ import java.util.List;
 public class DsonCharStreamTest {
 
     private static final String tokenString = """
-            - pos: {@Vector3 x: 0.5, y: 0.5, z: 0.5}
-            -
-            - posArray: [@{clsName:LinkedList,compClsName:Vector3}
-            - {x: 0.1, y: 0.1, z: 0.1},
-            - {x: 0.2, y: 0.2, z: 0.2}
-            - ]
-            -
-            # 这是一行注释
-            - // 这也是一行注释
-            -
-            - {
-            - k1: @i 1,
-            - k2: @L 987654321,
-            - k3: @f 1.05f,
-            - k4: 1.0000001,
-            - k5: @b true,
-            - k6: @b 1,
-            - k7: @N null,
-            - k8: null,
-            - k9: wjybxx
-            - }
-            - [@bin 1, FFFA]
-            - [@ei 1, 10010]
-            - [@eL 1, 10010]
-            - [@es 1, 10010]
-            - [@es 1, null],
-            -
-            - @ss intro:
-            |   salkjlxaaslkhalkhsal,anxksjah
-            | xalsjalkjlkalhjalskhalhslahlsanlkanclxa
-            | salkhaslkanlnlkhsjlanx,nalkxanla
-            - lsaljsaljsalsaajsal
-            - saklhskalhlsajlxlsamlkjalj
-            - salkhjsaljsljldjaslna
-            ~
-            - @sL 这是一行长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长的纯文本
+            pos: {@Vector3 x: 0.5, y: 0.5, z: 0.5}
+            posArray: [@{clsName:LinkedList,compClsName:Vector3}
+              {x: 0.1, y: 0.1, z: 0.1},
+              {x: 0.2, y: 0.2, z: 0.2}
+            ]
+            
+            // 这是一行注释
+            {
+              k1: @i 1,
+              k2: @L 987654321,
+              k3: @f 1.05f,
+              k4: 1.0000001,
+              k5: @b true,
+              k6: @b 1,
+              k7: @N null,
+              k8: null,
+              k9: wjybxx
+            }
+                        
+            [@bin 1, FFFA]
+            [@ei 1, 10010]
+            [@eL 1, 10010]
+            [@es 1, 10010]
+            [@es 1, null],
+                        
+            // 这是一个文本段落
+            @ss intro:
+            @|   salkjlxaaslkhalkhsal,anxksjah
+            @| xalsjalkjlkalhjalskhalhslahlsanlkanclxa
+            @| salkhaslkanlnlkhsjlanx,nalkxanla
+            @- lsaljsaljsalsaajsal
+            @- saklhskalhlsajlxlsamlkjalj
+            @- salkhjsaljsljldjaslna
+            @~
+            
+            @sL 这是一行长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长的纯文本
+                        
             """; // 换行结束与不换行是不同的
 
     /** 根据CharStream还原tokenString，测试是否相等 */
@@ -83,10 +84,6 @@ public class DsonCharStreamTest {
                 if (c1 == -2) {
                     if (charStream.getLn() > 1) {
                         sb.append('\n');
-                    }
-                    LineInfo curLine = charStream.getCurLine();
-                    if (curLine.startPos < curLine.endPos) {
-                        sb.append(curLine.lineHead.label);
                     }
                 } else {
                     if (charStream.getPosition() - charStream.getCurLine().startPos == 2) {
@@ -160,8 +157,7 @@ public class DsonCharStreamTest {
         if (self.ln != lineInfo.ln) return false;
         if (self.startPos != lineInfo.startPos) return false;
         if (self.endPos != lineInfo.endPos) return false;
-        if (self.contentStartPos != lineInfo.contentStartPos) return false;
-        return self.lineHead == lineInfo.lineHead;
+        return self.contentStartPos != lineInfo.contentStartPos;
     }
 
     private static void pullToList(DsonCharStream buffer, List<LineInfo> outList) {

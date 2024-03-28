@@ -14,21 +14,23 @@ public class DsonEscapeTest {
 
     /** Java """ 中会执行'\'转义，c#中不会.... */
     static final String dsonString = """
-            - {
-            #   @ss 纯文本模式下输入正则表达式
-            -   reg1: [@es 10, @ss ^[\\u4e00-\\u9fa5_a-zA-Z0-9]+$
-            ~   ],
+            {
+              // @ss 纯文本模式下输入正则表达式
+              reg1: [@es 10, @ss
+              @| ^[\\u4e00-\\u9fa5_a-zA-Z0-9]+$
+              @~
+              ],
                         
-            #   在纯文本模式插入转义版本的正则表达式
-            -   reg2: [@es 10, @ss
-            ^ ^[\\\\u4e00-\\\\u9fa5_a-zA-Z0-9]+$
-            ~   ],
-                    
-            #   在双引号模式下插入纯文本的正则表达式，结束行需要使用 '|' 否则会插入换行符导致不等
-            -   reg3: "
-            ^ ^[\\u4e00-\\u9fa5_a-zA-Z0-9]+$
-            | "
-            - }
+              // 在纯文本模式插入转义版本的正则表达式
+              reg2: [@es 10, @ss
+              @^ ^[\\\\u4e00-\\\\u9fa5_a-zA-Z0-9]+$
+              @~
+              ],
+              
+              // @sL 单行纯文本模式
+              reg3: [@es 10, @sL ^[\\u4e00-\\u9fa5_a-zA-Z0-9]+$
+              ]
+            }
             """;
 
     @Test
@@ -40,7 +42,7 @@ public class DsonEscapeTest {
         DsonExtString reg2 = value.asObject().get("reg2").asDsonExtString();
         Assertions.assertEquals(regExp, reg2.getValue());
 
-        DsonString reg3 = value.asObject().get("reg3").asDsonString();
+        DsonExtString reg3 = value.asObject().get("reg3").asDsonExtString();
         Assertions.assertEquals(regExp, reg3.getValue());
 
         System.out.println(Dsons.toDson(value, ObjectStyle.INDENT));

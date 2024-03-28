@@ -17,19 +17,19 @@ import java.util.List;
 public class DsonNumberTest {
 
     static final String numberString = """
-            - {
-            - value1: 10001,
-            - value2: 1.05,
-            - value3: @i 0xFF,
-            - value4: @i 0b10010001,
-            - value5: @i 100_000_000,
-            - value6: @d 1.05E-15,
-            - value7: @d Infinity,
-            - value8: @d NaN,
-            - value9: @i -0xFF,
-            - value10: @i -0b10010001,
-            - value11: @d -1.05E-15,
-            - }
+            {
+              value1: 10001,
+              value2: 1.05,
+              value3: @i 0xFF,
+              value4: @i 0b10010001,
+              value5: @i 100_000_000,
+              value6: @d 1.05E-15,
+              value7: @d Infinity,
+              value8: @d NaN,
+              value9: @i -0xFF,
+              value10: @i -0b10010001,
+              value11: @d -1.05E-15,
+            }
             """;
 
     @Test

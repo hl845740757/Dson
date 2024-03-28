@@ -91,7 +91,6 @@ public class BigStringTest
 
         DsonTextWriterSettings settings = new DsonTextWriterSettings.Builder
         {
-            DsonMode = DsonMode.Relaxed,
             EnableText = false,
             MaxLengthOfUnquoteString = 16,
         }.Build();

@@ -16,7 +16,6 @@
 
 package cn.wjybxx.dson;
 
-import cn.wjybxx.dson.text.DsonMode;
 import cn.wjybxx.dson.text.ObjectStyle;
 import cn.wjybxx.dson.types.ObjectRef;
 import org.junit.jupiter.api.Assertions;
@@ -38,7 +37,7 @@ public class DsonArrayHeaderTest {
         array.add(new DsonInt32(64)); // 会打印类型
         array.add(new DsonInt32(64));
 
-        String dsonString = Dsons.toDson(array, ObjectStyle.FLOW, DsonMode.RELAXED);
+        String dsonString = Dsons.toDson(array, ObjectStyle.FLOW);
         System.out.println(dsonString);
 
         DsonValue copiedArray = Dsons.fromDson(dsonString);
@@ -52,7 +51,7 @@ public class DsonArrayHeaderTest {
         array.add(new DsonReference(new ObjectRef("10001"))); // 会打印类型
         array.add(new DsonInt32(64));
 
-        String dsonString = Dsons.toDson(array, ObjectStyle.FLOW, DsonMode.RELAXED);
+        String dsonString = Dsons.toDson(array, ObjectStyle.FLOW);
         System.out.println(dsonString);
 
         DsonValue copiedArray = Dsons.fromDson(dsonString);
@@ -67,7 +66,7 @@ public class DsonArrayHeaderTest {
         array.add(new DsonInt32(64));
         array.getHeader().append(DsonHeader.NAMES_CLASS_NAME, new DsonString("MyArray"));
 
-        String dsonString = Dsons.toDson(array, ObjectStyle.FLOW, DsonMode.RELAXED);
+        String dsonString = Dsons.toDson(array, ObjectStyle.FLOW);
         System.out.println(dsonString);
 
         DsonValue copiedArray = Dsons.fromDson(dsonString);

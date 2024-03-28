@@ -11,13 +11,13 @@ import org.junit.jupiter.api.Test;
 public class DsonTimeTest {
 
     private static final String dsonString = """
-            - [
-            -   @dt 2023-06-17T18:37:00,
-            -   {@dt date: 2023-06-17, time: 18:37:00},
-            -   {@dt date: 2023-06-17, time: 18:37:00, offset: +8},
-            -   {@dt date: 2023-06-17, time: 18:37:00, offset: +08:00, millis: 100},
-            -   {@dt date: 2023-06-17, time: 18:37:00, offset: +08:00, nanos: 100_000_000},
-            - ]
+            [
+              @dt 2023-06-17T18:37:00,
+              {@dt date: 2023-06-17, time: 18:37:00},
+              {@dt date: 2023-06-17, time: 18:37:00, offset: +8},
+              {@dt date: 2023-06-17, time: 18:37:00, offset: +08:00, millis: 100},
+              {@dt date: 2023-06-17, time: 18:37:00, offset: +08:00, nanos: 100_000_000},
+            ]
             """;
 
     @Test

@@ -451,12 +451,6 @@ public final class Dsons {
         return toDson(dsonValue, style, DsonTextWriterSettings.DEFAULT);
     }
 
-    public static String toDson(DsonValue dsonValue, ObjectStyle style, DsonMode dsonMode) {
-        return toDson(dsonValue, style, dsonMode == DsonMode.RELAXED
-                ? DsonTextWriterSettings.RELAXED_DEFAULT
-                : DsonTextWriterSettings.DEFAULT);
-    }
-
     /** 简单转写为Dson，数组不会被展开 */
     public static String toDson(DsonValue dsonValue, ObjectStyle style, DsonTextWriterSettings settings) {
         if (!dsonValue.getDsonType().isContainerOrHeader()) {

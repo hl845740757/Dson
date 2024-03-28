@@ -33,43 +33,43 @@ import org.junit.jupiter.api.Test;
 public class DsonTextReaderTest {
 
     static final String dsonString = """
-            - @{clsName: FileHeader, intro: 预留设计，允许定义文件头}
-            -
-            - {@{MyStruct}
-            - \tname : wjybxx,
-            - \tage:28,
-            - \t介绍: 这是一段中文而且非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常长 ,
-            - \tintro: "hello world",
-            - \tref1 : {@ref localId: 10001, ns: 16148b3b4e7b8923d398},
-            - \tref2 : @ref 17630eb4f916148b,
-            - \tbin : [@bin 0, 35df2e75e6a4be9e6f4571c64cb6d08b0d6bc46c1754f6e9eb4a6e57e2fd53],
-            - }
-            -
-            - {@{MyStruct}
-            - \tname : wjybxx,
-            - \tintro: "hello world",
-            - \tref1 : {@ref localId: 10001, ns: 16148b3b4e7b8923d398},
-            - \tref2 : @ref 17630eb4f916148b
-            -  }
-            -
-            - [@{localId : 10001}
-            -  [@bin 1, FFFA],
-            -  [@ei 1, 10001],
-            -  [@ei 2, null],
-            -  [@eL 1, 20001],
-            -  [@eL 2, null],
-            -  [@ed 1, 0.5],
-            -  [@ed 2, null],
-            -  [@es 1, 10010],
-            -  [@es 1, null],
-            - ]
-            -
-            - [@{compClsName : ei, localId: 17630eb4f916148b}
-            -  [ 1, 0xFFFA],
-            -  [ 2, 10100],
-            -  [ 3, 10010],
-            -  [ 4, 10001],
-            - ]
+            @{clsName: FileHeader, intro: 预留设计，允许定义文件头}
+            
+            {@{MyStruct}
+            \tname : wjybxx,
+            \tage:28,
+            \t介绍: 这是一段中文而且非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常非常长 ,
+            \tintro: "hello world",
+            \tref1 : {@ref localId: 10001, ns: 16148b3b4e7b8923d398},
+            \tref2 : @ref 17630eb4f916148b,
+            \tbin : [@bin 0, 35df2e75e6a4be9e6f4571c64cb6d08b0d6bc46c1754f6e9eb4a6e57e2fd53],
+            }
+            
+            {@{MyStruct}
+            \tname : wjybxx,
+            \tintro: "hello world",
+            \tref1 : {@ref localId: 10001, ns: 16148b3b4e7b8923d398},
+            \tref2 : @ref 17630eb4f916148b
+            }
+            
+            [@{localId : 10001}
+              [@bin 1, FFFA],
+              [@ei 1, 10001],
+              [@ei 2, null],
+              [@eL 1, 20001],
+              [@eL 2, null],
+              [@ed 1, 0.5],
+              [@ed 2, null],
+              [@es 1, 10010],
+              [@es 1, null],
+            ]
+            
+            [@{compClsName : ei, localId: 17630eb4f916148b}
+              [ 1, 0xFFFA],
+              [ 2, 10100],
+              [ 3, 10010],
+              [ 4, 10001],
+            ]
             """;
 
     /**

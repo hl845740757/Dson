@@ -11,22 +11,22 @@ import org.junit.jupiter.api.Test;
 public class ProjectionTest {
 
     private static final String dsonString = """
-            - {@{clsName:MyClassInfo, guid :10001, flags: 0}
-            -   name : wjybxx,
-            -   age: 28,
-            -   pos :{@{Vector3} x: 1, y: 2, z: 3},
-            -   address: [
-            -     beijing,
-            -     chengdu,
-            -     shanghai
-            -   ],
-            -   posArr: [@{compClsName: Vector3}
-            -    {x: 1, y: 1, z: 1},
-            -    {x: 2, y: 2, z: 2},
-            -    {x: 3, y: 3, z: 3},
-            -   ],
-            ~   url: @sL https://www.github.com/hl845740757
-            - }
+            {@{clsName:MyClassInfo, guid :10001, flags: 0}
+              name : wjybxx,
+              age: 28,
+              pos :{@{Vector3} x: 1, y: 2, z: 3},
+              address: [
+                beijing,
+                chengdu,
+                shanghai
+              ],
+              posArr: [@{compClsName: Vector3}
+               {x: 1, y: 1, z: 1},
+               {x: 2, y: 2, z: 2},
+               {x: 3, y: 3, z: 3},
+              ],
+              url: @sL https://www.github.com/hl845740757
+            }
             """;
 
     private static final String projectInfo = """

@@ -614,10 +614,8 @@ public static class Dsons
         }
     }
 
-    public static string ToDson(this DsonValue dsonValue, ObjectStyle style = ObjectStyle.Indent, DsonMode dsonMode = DsonMode.Standard) {
-        return ToDson(dsonValue, style, dsonMode == DsonMode.Relaxed
-            ? DsonTextWriterSettings.RelaxedDefault
-            : DsonTextWriterSettings.Default);
+    public static string ToDson(this DsonValue dsonValue, ObjectStyle style = ObjectStyle.Indent) {
+        return ToDson(dsonValue, style, DsonTextWriterSettings.Default);
     }
 
     public static string ToDson(this DsonValue dsonValue, ObjectStyle style, DsonTextWriterSettings settings) {

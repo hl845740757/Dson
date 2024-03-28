@@ -103,7 +103,6 @@ public class BigFileTest
 
         DsonTextWriterSettings writerSettings = new DsonTextWriterSettings.Builder
         {
-            DsonMode = DsonMode.Relaxed,
             EnableText = false,
             MaxLengthOfUnquoteString = 0,
         }.Build();

@@ -71,12 +71,6 @@ public class DsonTextWriter : AbstractDsonWriter<string>
 
     private void WriteCurrentName(DsonPrinter printer, DsonType dsonType) {
         Context context = GetContext();
-        // 打印元素前先检查是否打印了行首
-        bool indented = false;
-        if (printer.Column == 0) {
-            indented = true;
-            PrintLineHead(LineHead.AppendLine);
-        }
         // header与外层对象无缩进，且是匿名属性 -- 如果打印多个header，将保持连续
         if (dsonType == DsonType.Header) {
             Debug.Assert(context.count == 0);
@@ -89,26 +83,26 @@ public class DsonTextWriter : AbstractDsonWriter<string>
         }
         // 先处理长度超出，再处理缩进
         if (printer.Column >= _settings.SoftLineLength) {
-            indented = true;
             printer.Println();
-            PrintLineHead(LineHead.AppendLine);
         }
-        if (!indented) {
-            if (context.style == ObjectStyle.Indent) {
-                if (context.HasElement() && printer.Column < printer.PrettyBodyColum) {
-                    // 当前行是字符串结束行，字符串结束位置尚未到达缩进，不换行
-                    printer.PrintSpaces(printer.PrettyBodyColum - printer.Column);
-                } else if (context.count == 0 || printer.Column > printer.PrettyBodyColum) {
-                    // 当前行有内容了才换行缩进；首个元素需要缩进
-                    printer.Println();
-                    PrintLineHead(LineHead.AppendLine);
-                    printer.PrintBodyIndent();
-                }
-            } else if (context.HasElement()) {
-                // 非缩进模式下，元素之间打印一个空格
-                printer.PrintFastPath(' ');
+        bool newLine = printer.Column == 0;
+        if (context.style == ObjectStyle.Indent) {
+            if (newLine) {
+                // 新的一行，只需缩进
+                printer.PrintIndent();
+            } else if (context.count == 0 || printer.Column >= printer.PrettyBodyColum) {
+                // 第一个元素，或当前行超过缩进(含逗号)，需要换行
+                printer.Println();
+                printer.PrintIndent();
+            } else {
+                // 当前位置未达缩进位置，不换行
+                printer.PrintSpaces(printer.PrettyBodyColum - printer.Column);
             }
+        } else if (!newLine && context.HasElement()) {
+            // 非缩进模式下，元素之间打印一个空格
+            printer.Print(' ');
         }
+
         if (context.contextType.IsLikeObject()) {
             PrintString(printer, context.curName, StringStyle.AutoQuote);
             printer.Print(": ");
@@ -171,12 +165,6 @@ public class DsonTextWriter : AbstractDsonWriter<string>
         bool unicodeChar = _settings.UnicodeChar;
         int softLineLength = _settings.SoftLineLength;
         DsonPrinter printer = this._printer;
-        int headIndent;
-        if (_settings.DsonMode == DsonMode.Standard) {
-            headIndent = _settings.StringAlignLeft ? printer.PrettyBodyColum : _settings.ExtraIndent;
-        } else {
-            headIndent = 0; // 字符串不能在非标准模式下缩进
-        }
         printer.Print('"');
         for (int i = 0, length = text.Length; i < length; i++) {
             char c = text[i];
@@ -186,10 +174,7 @@ public class DsonTextWriter : AbstractDsonWriter<string>
                 printer.PrintEscaped(c, unicodeChar);
             }
             if (printer.Column >= softLineLength && (i + 1 < length)) {
-                printer.Println();
-                printer.HeadIndent = headIndent;
-                printer.BodyIndent = 0;
-                PrintLineHead(LineHead.Append);
+                printer.Println(); // 双引号字符串换行不能缩进
             }
         }
         printer.Print('"');
@@ -204,11 +189,10 @@ public class DsonTextWriter : AbstractDsonWriter<string>
             headIndent = printer.PrettyBodyColum;
             printer.PrintFastPath("@ss"); // 开始符
             printer.Println();
-            printer.HeadIndent = headIndent;
-            printer.BodyIndent = 0;
-            PrintLineHead(LineHead.Append);
+            printer.PrintSpaces(headIndent);
+            printer.PrintFastPath("@| "); // 首行-避免插入换行符
         } else {
-            headIndent = _settings.ExtraIndent;
+            headIndent = 0;
             printer.PrintFastPath("@ss "); // 开始符
         }
         for (int i = 0, length = text.Length; i < length; i++) {
@@ -216,16 +200,14 @@ public class DsonTextWriter : AbstractDsonWriter<string>
             // 要执行文本中的换行符
             if (c == '\n') {
                 printer.Println();
-                printer.HeadIndent = headIndent;
-                printer.BodyIndent = 0;
-                PrintLineHead(LineHead.AppendLine);
+                printer.PrintSpaces(headIndent);
+                printer.PrintFastPath("@- ");
                 continue;
             }
             if (c == '\r' && (i + 1 < length && text[i + 1] == '\n')) {
                 printer.Println();
-                printer.HeadIndent = headIndent;
-                printer.BodyIndent = 0;
-                PrintLineHead(LineHead.AppendLine);
+                printer.PrintSpaces(headIndent);
+                printer.PrintFastPath("@- ");
                 i++;
                 continue;
             }
@@ -236,14 +218,13 @@ public class DsonTextWriter : AbstractDsonWriter<string>
             }
             if (printer.Column >= softLineLength && (i + 1 < length)) {
                 printer.Println();
-                printer.HeadIndent = headIndent;
-                printer.BodyIndent = 0;
-                PrintLineHead(LineHead.Append);
+                printer.PrintSpaces(headIndent);
+                printer.PrintFastPath("@| ");
             }
         }
         printer.Println();
-        printer.HeadIndent = headIndent;
-        PrintLineHead(LineHead.EndOfText); // 结束符
+        printer.PrintSpaces(headIndent);
+        printer.PrintFastPath("@~ "); // 结束符
     }
 
     private void PrintBinary(byte[] buffer, int offset, int length) {
@@ -255,29 +236,21 @@ public class DsonTextWriter : AbstractDsonWriter<string>
         Span<char> cBuffer = stackalloc char[segment * 2];
         int loop = length / segment;
         for (int i = 0; i < loop; i++) {
-            CheckLineLength(printer, softLineLength, LineHead.AppendLine);
+            CheckLineLength(printer, softLineLength);
             CommonsLang3.EncodeHex(buffer, offset + i * segment, segment, cBuffer);
             printer.PrintFastPath(cBuffer);
         }
         int remain = length - loop * segment;
         if (remain > 0) {
-            CheckLineLength(printer, softLineLength, LineHead.AppendLine);
+            CheckLineLength(printer, softLineLength);
             CommonsLang3.EncodeHex(buffer, offset + loop * segment, remain, cBuffer);
             printer.PrintFastPath(cBuffer.Slice(0, remain * 2));
         }
     }
 
-    private void CheckLineLength(DsonPrinter printer, int softLineLength, LineHead lineHead) {
+    private void CheckLineLength(DsonPrinter printer, int softLineLength) {
         if (printer.Column >= softLineLength) {
             printer.Println();
-            PrintLineHead(lineHead);
-        }
-    }
-
-    private void PrintLineHead(LineHead lineHead) {
-        _printer.PrintHeadIndent();
-        if (_settings.DsonMode == DsonMode.Standard) {
-            _printer.PrintHead(lineHead);
         }
     }
 
@@ -447,21 +420,21 @@ public class DsonTextWriter : AbstractDsonWriter<string>
         }
         if (objectRef.hasLocalId) {
             if (count++ > 0) printer.PrintFastPath(", ");
-            CheckLineLength(printer, softLineLength, LineHead.AppendLine);
+            CheckLineLength(printer, softLineLength);
             printer.PrintFastPath(ObjectRef.NamesLocalId);
             printer.PrintFastPath(": ");
             PrintString(printer, objectRef.LocalId, StringStyle.AutoQuote);
         }
         if (objectRef.Type != 0) {
             if (count++ > 0) printer.PrintFastPath(", ");
-            CheckLineLength(printer, softLineLength, LineHead.AppendLine);
+            CheckLineLength(printer, softLineLength);
             printer.PrintFastPath(ObjectRef.NamesType);
             printer.PrintFastPath(": ");
             printer.PrintFastPath(objectRef.Type.ToString());
         }
         if (objectRef.Policy != 0) {
             if (count > 0) printer.PrintFastPath(", ");
-            CheckLineLength(printer, softLineLength, LineHead.AppendLine);
+            CheckLineLength(printer, softLineLength);
             printer.PrintFastPath(ObjectRef.NamesPolicy);
             printer.PrintFastPath(": ");
             printer.PrintFastPath(objectRef.Policy.ToString());
@@ -487,14 +460,14 @@ public class DsonTextWriter : AbstractDsonWriter<string>
         }
         if (timestamp.HasTime) {
             if (timestamp.HasDate) printer.PrintFastPath(", ");
-            CheckLineLength(printer, softLineLength, LineHead.AppendLine);
+            CheckLineLength(printer, softLineLength);
             printer.PrintFastPath(OffsetTimestamp.NamesTime);
             printer.PrintFastPath(": ");
             printer.PrintFastPath(OffsetTimestamp.FormatTime(timestamp.Seconds));
         }
         if (timestamp.Nanos > 0) {
             printer.PrintFastPath(", ");
-            CheckLineLength(printer, softLineLength, LineHead.AppendLine);
+            CheckLineLength(printer, softLineLength);
             if (timestamp.CanConvertNanosToMillis()) {
                 printer.PrintFastPath(OffsetTimestamp.NamesMillis);
                 printer.PrintFastPath(": ");
@@ -507,7 +480,7 @@ public class DsonTextWriter : AbstractDsonWriter<string>
         }
         if (timestamp.HasOffset) {
             printer.PrintFastPath(", ");
-            CheckLineLength(printer, softLineLength, LineHead.AppendLine);
+            CheckLineLength(printer, softLineLength);
             printer.PrintFastPath(OffsetTimestamp.NamesOffset);
             printer.PrintFastPath(": ");
             printer.PrintFastPath(OffsetTimestamp.FormatOffset(timestamp.Offset));
@@ -548,8 +521,7 @@ public class DsonTextWriter : AbstractDsonWriter<string>
             // 打印了内容的情况下才换行结束
             if (context.HasElement() && (printer.Column > printer.PrettyBodyColum)) {
                 printer.Println();
-                PrintLineHead(LineHead.AppendLine);
-                printer.PrintBodyIndent();
+                printer.PrintIndent();
             }
         }
         printer.PrintFastPath(context.contextType.GetEndSymbol()!);

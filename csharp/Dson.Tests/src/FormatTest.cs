@@ -46,49 +46,32 @@ public class FormatTest
     [Test]
     public void FormatTest0() {
         DsonObject<string> dsonObject = Dsons.FromDson(DsonString).AsObject();
-        // 标准模式
+        // 标准模式，不对齐
         {
             DsonTextWriterSettings.Builder builder = new DsonTextWriterSettings.Builder()
             {
-                ExtraIndent = 2,
                 SoftLineLength = 60,
                 TextStringLength = 50,
                 TextAlignLeft = false
             };
             string dsonString2 = dsonObject.ToDson(ObjectStyle.Indent, builder.Build());
-            Console.WriteLine("Mode:" + DsonMode.Standard + ", alignLeft: false");
+            Console.WriteLine("IndentStyle, alignLeft: false");
             Console.WriteLine(dsonString2);
 
             DsonValue dsonObject2 = Dsons.FromDson(dsonString2);
             Assert.That(dsonObject2, Is.EqualTo(dsonObject));
         }
         Console.WriteLine();
-        // 宽松模式
-        {
-            DsonTextWriterSettings.Builder builder = new DsonTextWriterSettings.Builder()
-            {
-                DsonMode = DsonMode.Relaxed,
-                ExtraIndent = 2,
-                SoftLineLength = 60
-            };
-            string dsonString3 = dsonObject.ToDson(ObjectStyle.Indent, builder.Build());
-            Console.WriteLine("Mode:" + DsonMode.Relaxed + ", alignLeft: false");
-            Console.WriteLine(dsonString3);
-            DsonValue dsonObject3 = Dsons.FromDson(dsonString3);
-            Assert.That(dsonObject3, Is.EqualTo(dsonObject));
-        }
-        Console.WriteLine();
         // 标准模式纯文本左对齐
         {
             DsonTextWriterSettings.Builder builder = new DsonTextWriterSettings.Builder()
             {
-                ExtraIndent = 2,
                 SoftLineLength = 50,
                 TextStringLength = 50,
                 TextAlignLeft = true
             };
             string dsonString2 = dsonObject.ToDson(ObjectStyle.Indent, builder.Build());
-            Console.WriteLine("Mode:" + DsonMode.Standard + ", alignLeft: true");
+            Console.WriteLine("IndentStyle, alignLeft: true");
             Console.WriteLine(dsonString2);
 
             DsonValue dsonObject2 = Dsons.FromDson(dsonString2);
